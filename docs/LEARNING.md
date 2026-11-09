@@ -177,8 +177,8 @@ You'll move the same `.aab` through three tracks in the Play Console:
    14 days in a row before they can apply for production.
 3. **Production**: the public listing, after Google's review.
 
-Still to come: the privacy policy, store listing, app icon, and native plugins (volume-button logging,
-lock-screen controls, storage that Android won't clear).
+Before any track will take a build, the listing and the **App content** forms (steps 8 to 10) must be
+filled in.
 
 ## Step 7. The Coach tab: training videos, dictation, saving and sharing
 
@@ -249,3 +249,93 @@ phone. With the debug APK from CI (Step 5), check these:
 2. **Record** asks for the camera, and the clip appears under My videos.
 3. Open a clip → **Save to phone**, then look in the Files app under Documents › Hoops Ladder.
 4. **Send to coach** opens the share sheet with the video attached.
+
+## Step 8. A privacy policy, hosted on GitHub Pages
+
+**Why.** Play requires a privacy policy URL for every app, and it matters more here because the app asks for the
+camera and mic. It has to be a public web page (not a PDF or a Google Doc that needs sign-in) and it
+has to match what the app really does. Reviewers compare it with the Data safety form.
+
+**What it says.** [`site/privacy.html`](../site/privacy.html) is written from what the code actually does,
+checked by searching `www/index.html` for anything that could send data:
+
+```bash
+grep -c "fetch(\|XMLHttpRequest\|WebSocket\|sendBeacon" www/index.html   # only fetch() is the local pose model
+grep -n "localStorage" www/index.html                                     # progress is saved under "hoopsLadder.v1"
+grep -n "window.claude" www/index.html                                    # sync and coach: hidden in the app
+```
+
+The page was also opened in headless Chromium with every request logged, and nothing left `localhost`.
+The policy covers: what's stored on the phone, form checks (clips are read on-device, only the numbers
+are kept), training videos (stored in the app, leaving only when you tap Save to phone or Send to coach),
+the mic (video sound, plus voice commands and dictation through Android's speech recognizer, which is
+Google's on most phones), the few outside links, Android backup, how to delete everything, and a promise
+to update the page *before* releasing sync or an online coach.
+
+**Hosting.** GitHub Pages serves static files from a repo for free, at
+`https://<user>.github.io/<repo>/`. The site lives in `site/` and
+[`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes it whenever something in `site/`
+changes on `main`:
+
+1. `actions/upload-pages-artifact` packs `site/` into an archive.
+2. `actions/deploy-pages` publishes it. It needs the `pages: write` and `id-token: write` permissions,
+   which the workflow asks for.
+
+**One-time setup (you do this once, in the browser):** repo **Settings → Pages → Build and deployment →
+Source: GitHub Actions**. Then run the **Website** workflow from the **Actions** tab (or merge a change to
+`site/`). The policy is then at https://loyeleye.github.io/hoops-ladder/privacy.html. Open it on your phone
+to check, then paste that URL into Play Console.
+
+## Step 9. Store listing, icon and screenshots
+
+**Text.** [`store/listing.md`](../store/listing.md) has the app name (30 characters max), the short
+description (80) and the full description (4,000), ready to paste. Everything in it is a feature the app
+has today. Play rejects listings that promise features that aren't there, or that use other people's names
+(real coaches, players, the NBA) to promote the app.
+
+**Art.** One script renders all of it from the app itself, so it can be redone whenever the app changes:
+
+```bash
+npm i --no-save playwright && npx playwright install chromium   # once; not a project dependency
+node tools/make_store_art.mjs
+```
+
+[`tools/make_store_art.mjs`](../tools/make_store_art.mjs):
+
+1. Serves `www/` on a local port and opens it in headless Chromium at 360 × 740 CSS pixels with a
+   `deviceScaleFactor` of 3, so screenshots come out 1080 × 2220, like a real phone.
+2. Before the page loads, writes three weeks of **demo progress** into `localStorage`, so the screens show
+   levels and a 3-point map instead of empty states.
+3. Puts each screen inside a phone frame under a caption on a 1080 × 1920 canvas
+   (`store/screenshots/phone-1..5.png`). Play wants 2 to 8 phone screenshots; 9:16 at 1080 px or more
+   lets Play feature the app.
+4. Draws the icon from [`store/art/icon.svg`](../store/art/icon.svg) (the ball inside the app's level ring)
+   as the 512 × 512 Play icon and a 1024 × 500 feature graphic in `store/graphics/`.
+5. Writes the **launcher icons** into `android/app/src/main/res/mipmap-*`, replacing Capacitor's default
+   logo. Android has two kinds:
+   - *Legacy* (Android 7 and older): `ic_launcher.png` and `ic_launcher_round.png`, the whole icon, at
+     48 dp times each density (mdpi ×1 = 48 px up to xxxhdpi ×4 = 192 px).
+   - *Adaptive* (Android 8+): `mipmap-anydpi-v26/ic_launcher.xml` stacks a background color
+     (`values/ic_launcher_background.xml`, now the app's navy `#12203A`) under a transparent
+     `ic_launcher_foreground.png` that's 108 dp square. Each launcher masks it to its own shape (circle,
+     squircle, teardrop) and may move it for parallax, so only the middle 66 dp is guaranteed visible. The
+     script scales the mark to fit inside that circle.
+
+To change the icon, edit `store/art/icon.svg` and run the script again.
+
+## Step 10. The App content forms
+
+Under **Policy and programs → App content**, Play asks a set of questions about every app.
+[`store/play_console_notes.md`](../store/play_console_notes.md) has the answer for each one and why:
+
+- **Privacy policy**: the URL from step 8.
+- **App access**: no login, everything is reachable.
+- **Ads**: none.
+- **Content rating**: the IARC questionnaire; all "No", which gives Everyone / PEGI 3.
+- **Target audience**: 13 and up. Including under-13s brings in the Families policy and extra review.
+- **Data safety**: "No data collected, no data shared". Data that's only processed on the phone doesn't
+  count as collected. This answer has to change the day sync, the coach or crash reporting ships.
+- **Health apps**: the fitness option; no Health Connect.
+
+Still to come: native plugins (volume-button logging, lock-screen controls, voice commands, storage that
+Android won't clear).
