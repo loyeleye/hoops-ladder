@@ -78,6 +78,37 @@ Play now asks every app whether it has health features.
 
 **No / not applicable** for each.
 
+## Foreground service permissions (once hands-free logging ships)
+
+The hands-free logging work (PR #5) adds `RepLoggerService`, a foreground service of type
+`mediaPlayback`, with the `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK` and
+`POST_NOTIFICATIONS` permissions. Every app that targets Android 14+ and uses a foreground service has to
+fill in **App content → Foreground service permissions** before Play will review a release that includes it.
+
+- Select **Media playback** (`FOREGROUND_SERVICE_MEDIA_PLAYBACK`).
+- Feature: **Hands-free rep logging during a drill.**
+- Description to paste (Play allows up to 500 characters):
+
+  ```
+  During a drill the player puts the phone down and logs makes and misses with earbud buttons, a Bluetooth clicker or the lock-screen controls, while the app speaks the score and coaching cues aloud. The service holds the media session that receives those button presses and plays the spoken audio while the screen is off. It starts only when the player starts a drill, shows an ongoing notification with the controls, and stops when the drill ends.
+  ```
+
+- **User impact if the task is deferred or stopped:** button presses and lock-screen taps would be lost
+  as soon as the screen turns off, so the player's reps wouldn't be counted and the spoken score would stop
+  mid-set.
+- **Video:** Play asks for a link to a short video of the feature (YouTube unlisted or Google Drive is
+  fine). Record one on your phone: start a drill, lock the screen, press the earbud button and show the
+  count changing in the notification, then end the drill and show the notification going away.
+
+Why `mediaPlayback` fits: the service plays audio (the spoken score and cues) and owns the
+`MediaSession`, which is the only way Android delivers earbud and Bluetooth media buttons to an app.
+Reviewers are strict about this type, so the video should show the spoken audio as well as the buttons.
+If they push back, the fallback is the `shortService` type, which needs no declaration but is cut off by
+Android after about 3 minutes.
+
+`POST_NOTIFICATIONS` needs no form. It's asked for at runtime on Android 13+ the first time a drill starts
+hands-free. None of this collects data, so the Data safety answers and the privacy policy don't change.
+
 ## Permissions to double-check
 
 The manifest declares `CAMERA`, `RECORD_AUDIO`, `MODIFY_AUDIO_SETTINGS`, `VIBRATE` and `INTERNET`.
