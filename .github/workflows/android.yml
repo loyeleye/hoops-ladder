@@ -36,6 +36,12 @@ jobs:
       - run: npm ci
       - run: npx cap sync android
 
+      # The Gradle wrapper downloads Gradle itself on first use, and that download sometimes times out.
+      # Fetch it up front with a few retries so a slow mirror doesn't fail the whole build.
+      - name: Download Gradle (with retries)
+        working-directory: android
+        run: for i in 1 2 3; do ./gradlew --version && exit 0; sleep 20; done; exit 1
+
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug
