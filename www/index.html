@@ -166,7 +166,7 @@ section{display:flex;flex-direction:column;gap:10px}
 
 /* tabbar */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tabs .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr)}
 .tabs a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 0 12px;text-decoration:none;color:var(--muted);font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
 .tabs a svg{width:22px;height:22px}
 .tabs a[aria-current="page"]{color:var(--accent)}
@@ -339,6 +339,50 @@ section{display:flex;flex-direction:column;gap:10px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px);text-align:center}
 .toast b{font-family:var(--display);font-size:20px;color:var(--accent);display:block;text-transform:uppercase}
 @media (prefers-reduced-motion:no-preference){.toast{animation:pop .35s ease-out}@keyframes pop{from{transform:translate(-50%,16px);opacity:0}}}
+/* coach tab: take-home drills and my videos */
+.hwlist{display:flex;flex-direction:column;gap:8px}
+.hwgrp{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:6px 0 -2px}
+.hwgrp .linkbtn{padding:0;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+.hw{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px}
+.hw.done{background:var(--surface-2)}.hw.done .hwtext{color:var(--muted);text-decoration:line-through}
+.hwchk{width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--surface);display:grid;place-items:center;color:transparent;padding:0}
+.hwchk svg{width:20px;height:20px}
+.hwchk[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:var(--surface)}
+.hwtext{font-weight:600;line-height:1.3;padding-top:8px;overflow-wrap:anywhere}
+.hw .meta{display:flex;gap:6px 10px;flex-wrap:wrap;margin-top:6px;font-size:13px;color:var(--muted);align-items:center}
+.hw .meta a{font-weight:700;text-decoration:none;padding:2px 0}
+.hwmore{border:0;background:none;color:var(--accent);font-weight:700;font-size:14px;padding:8px 2px}
+.hwpanel{grid-column:1/-1;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:10px;min-width:0}
+.hwpanel .seg{flex-wrap:wrap}
+.coadd{display:flex;flex-direction:column;gap:8px}
+.cofield{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+textarea.cofield{min-height:128px;resize:vertical;line-height:1.4}
+.cofield::placeholder{color:var(--muted);opacity:.8}
+.btn.mic[aria-pressed="true"]{background:var(--bad);color:#fff;border-color:var(--bad)}
+.warnbtn{background:var(--bad)!important;color:#fff!important;border-color:var(--bad)!important}
+.cohome b{font-weight:700}
+.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.vcard{display:flex;flex-direction:column;padding:0;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.vthumb{position:relative;display:block;aspect-ratio:1;background:#0D1524 center/34px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239AA6BF'%3E%3Cpath d='M8 5v14l11-7z'/%3E%3C/svg%3E")}
+.vthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.vthumb b{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.72);color:#fff;font-size:12px;font-weight:700;padding:1px 6px;border-radius:5px}
+.vcard>span:last-child{padding:6px 8px 8px;font-size:12.5px;color:var(--muted);line-height:1.3}
+.vcard>span:last-child b{display:block;color:var(--ink);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.covid{position:fixed;inset:0;z-index:70;background:#05080F;color:#F2F5FA;display:flex;flex-direction:column;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.covid video{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
+.covid video.mir{transform:scaleX(-1)}
+.covid .bar{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:10px 16px}
+.covid .bar>.small{flex:1;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.covid .btn.sec{background:rgba(255,255,255,.14);color:#fff;border:0;text-decoration:none}
+.covid .btn.sec[aria-pressed="true"]{background:#F2F5FA;color:#12203A}
+.covid .seg{background:rgba(255,255,255,.1);border:0}.covid .seg button{color:#C9D2E3}.covid .seg button[aria-pressed="true"]{background:#F2F5FA;color:#12203A}
+.covid .vnote{margin:0;padding:0 16px 12px;color:#9AA6BF;text-align:center}
+.recbar{justify-content:space-between}.recbar>*{flex:1}.recbar .recnote{text-align:right;color:#9AA6BF}
+.rect{font-size:24px}
+.recbtn{flex:0 0 auto!important;width:78px;height:78px;border-radius:50%;border:5px solid #fff;background:none;display:grid;place-items:center;padding:0}
+.recbtn i{width:58px;height:58px;border-radius:50%;background:#E5483A;transition:all .2s}
+.recbtn.on i{width:28px;height:28px;border-radius:6px}
+.vctl{flex-wrap:nowrap!important;padding-top:6px!important;padding-bottom:0!important}.vctl input{flex:1;min-width:0;accent-color:#F07A35}.vctl .vplay{min-width:72px}.vctl .num{min-width:36px;text-align:right}
 </style>
 </head>
 <body>
@@ -350,6 +394,7 @@ section{display:flex;flex-direction:column;gap:10px}
   <a href="#drills" data-tab="drills"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Drills</a>
   <a href="#form" data-tab="form"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v7l-3 7M12 14l3 7M12 9l5-5M12 9 8 12"/></svg>Form</a>
   <a href="#progress" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Progress</a>
+  <a href="#coach" data-tab="coach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.5h6V4M8.5 10h7M8.5 14h7M8.5 18h4"/></svg>Coach</a>
 </div></nav>
 <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
 <div id="toastHost"></div>
@@ -589,9 +634,9 @@ const DRILLS=[
   what:"Straight volume, the way a D2 player trained you: crossovers, then between the legs, then behind the back, and it ends with Kobes. The regular set (100 crosses, 50 between the legs with each lead leg, 100 behind the back, 15 Kobes) is the default and fits a normal workout. The full D2 set (500, 250 with each lead leg, 500, then 50 Kobes) takes about 23 minutes, so pick it yourself on a day you have the time. There's a 20-second rest between parts. The phone keeps a beat and counts each rep for you, so you never count in your head.",
   steps:["Do one rep on every tick. The count is on screen and the phone calls out every 50.","Lost the ball? Tap anywhere on the screen. The app logs a drop and takes back about 10 reps (20 on the Fast beat), since a few seconds pass before you reach the phone. Grab the ball and tap again to pick up where you left off.","Pound every rep hard and keep your eyes up. Clean reps beat fast reps.","If the beat is too fast or too slow, change it below before you start.","Finish with Kobes, one continuous chain. Cross to your left hand, between the legs to your right, behind the back to your left, then keep going the other way: cross to your right, between to your left, behind to your right. Both sides together are one rep, and the next rep starts right away. Do 15 (50 in the full D2 set). One tick is one rep."],
   cue:"Every tick is a rep. Eyes up.",src:[{label:"From your D2 training session",url:""}]},
- {id:"h_d2r",skill:"h",name:"D2 Called Burnout",role:"handle",read:true,unlock:3,mins:5,log:"react",heavy:true,tempoCalls:true,calls:["Cross","Between right","Between left","Behind","Kobes"],
-  what:"D2 Rep Count, but the phone picks the move. It calls a new move at random moments, and every call gets its own random tempo inside the range you set, so you can't settle into a rhythm or guess what's next. You read the call, switch on the next tick and keep every rep clean. Short rounds with full rests keep the reps sharp, and the last round is the burnout: the top half of your range.",
-  steps:["Prop the phone at eye level, 6 to 10 feet away, and keep your eyes on it, not the ball. The calls are Cross, Between right (right leg forward), Between left (left leg forward), Behind and Kobes. One move per tick.","When a new move is called, switch on the next tick and stay with it at the new tempo. The phone never calls the same move twice in a row, and it gives you at least 3 reps of a move (6 for Kobes) before the next call.","Set your tempo range before you start. The bottom should feel easy and the top should be the fastest you can still keep clean. When a whole session feels clean, raise the top by 5. If you keep losing it, drop the top by 5.","Lost the ball? Tap anywhere, grab it, tap again and you get a countdown back in. Rest fully between rounds. Clean reps at speed are the goal, not sloppy ones at speed."],
+ {id:"h_d2r",skill:"h",name:"D2 Called Burnout",role:"handle",read:true,unlock:3,mins:6,log:"react",heavy:true,tempoCalls:true,calls:["Cross","Between right","Between left","Behind","Kobes"],
+  what:"D2 Rep Count, but the phone picks the move. It calls a new move at random moments, and every call gets its own random tempo inside the range you set, so you can't settle into a rhythm or guess what's next. You read the call, switch on the next tick and keep every rep clean. You pick the number of rounds, how long each one lasts and how long you rest (1 minute on, 30 seconds off to start), and the last round is the burnout: the top half of your range.",
+  steps:["Prop the phone at eye level, 6 to 10 feet away, and keep your eyes on it, not the ball. The calls are Cross, Between right (right leg forward), Between left (left leg forward), Behind and Kobes. One move per tick.","When a new move is called, switch on the next tick and stay with it at the new tempo. The phone never calls the same move twice in a row, and it gives you at least 3 reps of a move (6 for Kobes) before the next call.","Set your tempo range before you start. The bottom should feel easy and the top should be the fastest you can still keep clean. When a whole session feels clean, raise the top by 5. If you keep losing it, drop the top by 5.","Lost the ball? Tap anywhere, grab it, tap again and you get a countdown back in. Clean reps at speed are the goal, not sloppy ones at speed. To make it harder, add a round or shorten the rest before you speed up the tempo."],
   cue:"Read it, switch it, keep it clean.",src:[{label:"Built on your D2 training session",url:""}]},
  {id:"h_tennis",skill:"h",name:"Tennis Ball Wall Drills",role:"handle",unlock:3,mins:6,log:"timer",
   phases:[["Pound right, toss and catch with your left",45],["Pound left, toss and catch with your right",45],["Walk forward to the wall, toss and catch",60],["Walk backward away from the wall, toss and catch",60],["Toss, crossover, catch",45],["Toss, between the legs, catch",45],["Toss, behind the back, catch",45]],
@@ -692,14 +737,14 @@ const DRILLS=[
   cue:"Tight around the cone, soft off the glass.",src:[{label:"From your coach",url:""},YTT("0K0jO7X98dU",5,"Elite Hoops: Cone Layups (closest match)"),YTT("HaLql0ueNpY",205,"Breakthrough: reverse finishes")]}
 ];
 function daysSinceHandle(){for(let i=S.sessions.length-1;i>=0;i--){const se=S.sessions[i];if(se.d<today()&&se.items.some(it=>(D[it.id]||{}).skill==="h"))return Math.round((new Date(today())-new Date(se.d))/864e5)}return null}
-const D2R=()=>Object.assign({lo:70,hi:110,gap:1,big:0},S.settings.d2r||{});
+const D2R=()=>Object.assign({lo:70,hi:110,gap:1,n:4,work:60,rest:30},S.settings.d2r||{});
 const D2R_GAPS=[["Steady",6,10],["Game",3,7],["Chaos",2,4]];
-DRILLS.forEach(d=>{if(d.tempoCalls){Object.defineProperty(d,"phases",{get(){const c=D2R(),[n,w]=c.big?[6,60]:[4,45],out=[];
-  for(let i=1;i<=n;i++){if(i>1)out.push(["Rest · shake out your hands",30]);out.push([i===n?"Burnout round · top half of your tempo":`Round ${i} of ${n}`,w,null,null,{burn:i===n}])}return out}});
+DRILLS.forEach(d=>{if(d.tempoCalls){Object.defineProperty(d,"phases",{get(){const c=D2R(),n=c.n,w=c.work,out=[];
+  for(let i=1;i<=n;i++){if(i>1&&c.rest)out.push(["Rest · shake out your hands",c.rest]);out.push([i===n?"Burnout round · top half of your tempo":`Round ${i} of ${n}`,w,null,null,{burn:i===n}])}return out}});
   Object.defineProperty(d,"secs",{get(){return d.phases.reduce((a,p)=>a+p[1],0)}})}});
-function d2rCtl(){const c=D2R(),st=(f,v)=>`<div class="seg"><button data-k="d2r:${f}:-5" aria-label="Slower">−</button><span class="num cdv">${v}</span><button data-k="d2r:${f}:5" aria-label="Faster">+</button></div>`;
-  return `<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Set</span><div class="seg">${[[0,"Regular · 4 rounds"],[1,"Full · 6 rounds"]].map(([v,l])=>`<button data-k="d2r:big:${v}" aria-pressed="${!!c.big===!!v}">${l}</button>`).join("")}</div></div>
-   <div class="pcd"><span class="small">Tempo</span>${st("lo",c.lo)}<span class="small">to</span>${st("hi",c.hi)}<span class="small">per min</span></div>
+function d2rCtl(){const c=D2R(),sg=(f,v,dn,up)=>`<div class="seg"><button data-k="d2r:${f}:-1" aria-label="${dn}">−</button><span class="num cdv">${v}</span><button data-k="d2r:${f}:1" aria-label="${up}">+</button></div>`,st=(f,v,lbl,dn,up)=>`<div class="pcd"><span class="small">${lbl}</span>${sg(f,v,dn,up)}</div>`,sec=x=>x<60?x+" s":x%60?`${Math.floor(x/60)}:${String(x%60).padStart(2,"0")}`:x/60+" min";
+  return `<div class="row" style="justify-content:center;gap:4px 14px;flex-wrap:wrap">${st("n",c.n,"Rounds","Fewer rounds","More rounds")}${st("work",sec(c.work),"Work","Shorter rounds","Longer rounds")}${st("rest",c.rest?sec(c.rest):"None","Rest","Shorter rest","Longer rest")}</div>
+   <div class="pcd"><span class="small">Tempo</span>${sg("lo",c.lo,"Slower","Faster")}<span class="small">to</span>${sg("hi",c.hi,"Slower","Faster")}<span class="small">per min</span></div>
    <div class="row" style="justify-content:center;gap:10px"><span class="small muted">Switches</span><div class="seg">${D2R_GAPS.map(([l,a,b],i)=>`<button data-k="d2r:gap:${i}" aria-pressed="${c.gap===i}" title="A new call every ${a} to ${b} seconds">${l} · ${a}–${b}s</button>`).join("")}</div></div>
    <div class="row" style="justify-content:center">${cdCtl("data-k")}</div>`}
 function volBig(){const v=S.settings.vol;return !!(v&&v.d===today()&&v.big)}
@@ -1787,10 +1832,10 @@ const RANK={s:["Rookie","Rotation shooter","Spot-up threat","Knockdown shooter",
 
 /* ---------- state ---------- */
 const clone=o=>JSON.parse(JSON.stringify(o));
-const DEF={v:1,xp:{s:0,h:0,f:0},sessions:[],settings:{mins:30,partner:false,heavy:false,hand:"R",input:"sets",inV:2},forms:[]};
+const DEF={v:1,xp:{s:0,h:0,f:0},sessions:[],settings:{mins:30,partner:false,heavy:false,hand:"R",input:"sets",inV:2},forms:[],coach:{lists:[]}};
 let S=clone(DEF), syncNote="", dbRef=null, saving=Promise.resolve();
 const LS="hoopsLadder.v1";
-function normalize(x){const s=Object.assign(clone(DEF),x||{});s.xp=Object.assign({s:0,h:0,f:0},s.xp);s.settings=Object.assign(clone(DEF.settings),s.settings);if(!Array.isArray(s.sessions))s.sessions=[];if(!Array.isArray(s.forms))s.forms=[];return s}
+function normalize(x){const s=Object.assign(clone(DEF),x||{});s.xp=Object.assign({s:0,h:0,f:0},s.xp);s.settings=Object.assign(clone(DEF.settings),s.settings);if(!Array.isArray(s.sessions))s.sessions=[];if(!Array.isArray(s.forms))s.forms=[];if(!s.coach||!Array.isArray(s.coach.lists))s.coach={lists:[]};return s}
 try{const raw=localStorage.getItem(LS);if(raw)S=normalize(JSON.parse(raw))}catch(e){}
 function persist(){
   try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
@@ -1983,6 +2028,7 @@ function viewToday(){
    <div class="plantotal"><span>${p.length} drills</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min on the court</b></div>
    <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}${drillRow(x.d,i+1,{next:upIds.has(x.d.id)})}`).join("")}</div>
    <p class="muted small" style="margin:0">Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The plan only takes drills that fit the minutes you picked, timed for training alone. Follow the list top to bottom. The Up next button always starts the next drill (outlined), and timed drills in a row play back to back. You can also tap any drill to do it out of order.</p></section>
+  ${coachTodayCard()}
   ${next?`<section><div class="card small"><div class="label">Next unlock</div><b>${esc(next.name)}</b>: ${checksFor(next).n} of ${CHECK_N} skill checks. Hit your goal on ${esc(gateText(checksFor(next)))}. ${esc(next.what.split(". ")[0].replace(/\.$/,""))}.</div></section>`:""}`}
 
 function cueCard(){const c=todayCue();
@@ -2047,9 +2093,9 @@ function progLadder(){const rows=ladderHist(),d=D.s_ladder;if(!rows.length)retur
    <div class="card hist">${d.stages.map((st,i)=>{const x=last.lad[i];return `<div><span>${esc(st)}</span><span class="muted">${best[i]!=null?`best ${best[i]}`:""}</span><b class="num">${x?(x[1]>=d.stageN?x[0]:x[0]+"+ ("+x[1]+" made)"):"–"}</b></div>`}).join("")}</div>
    <p class="muted small" style="margin:0">Last ladder on ${new Date(last.d+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}. Where the count jumps is where your shot starts to change.</p></section>`}
 const state={tab:"today",drillTab:"s",range:"30"};
-function route(){const h=location.hash.slice(1);state.tab=["today","drills","progress","form"].includes(h)?h:"today";render()}
+function route(){const h=location.hash.slice(1);state.tab=["today","drills","progress","form","coach"].includes(h)?h:"today";render()}
 function render(){renderPlate();
-  $("#view").innerHTML=state.tab==="today"?viewToday():state.tab==="drills"?viewDrills():state.tab==="form"?viewForm():viewProgress();afterFormRender();
+  $("#view").innerHTML=state.tab==="today"?viewToday():state.tab==="drills"?viewDrills():state.tab==="form"?viewForm():state.tab==="coach"?viewCoach():viewProgress();afterFormRender();afterCoachRender();
   document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"))}
 
 document.addEventListener("click",e=>{
@@ -2343,7 +2389,7 @@ function stopVoice(){if(!voice)return;const r=voice;voice=null;try{r.abort()}cat
 function flash(){R.flash=true;drawDock();setTimeout(()=>{if(R){R.flash=false;drawDock()}},350)}
 function act(k){
   const d=R.d;let dir=null;if(k.startsWith("miss:")){dir=k.slice(5);k="miss"}
-  if(k.startsWith("d2r:")){const[,f,v]=k.split(":"),c=D2R(),n=+v;if(f==="big")c.big=n;else if(f==="gap")c.gap=n;else if(f==="lo")c.lo=Math.max(40,Math.min(c.hi-10,c.lo+n));else if(f==="hi")c.hi=Math.min(160,Math.max(c.lo+10,c.hi+n));S.settings.d2r=c;persist();return drawDock()}
+  if(k.startsWith("d2r:")){const[,f,v]=k.split(":"),c=D2R(),n=+v;const cl=(x,a,b)=>Math.max(a,Math.min(b,x));if(f==="gap")c.gap=n;else if(f==="n")c.n=cl(c.n+n,1,10);else if(f==="work")c.work=cl(c.work+15*n,15,180);else if(f==="rest")c.rest=cl(c.rest+15*n,0,120);else if(f==="lo")c.lo=cl(c.lo+5*n,40,c.hi-10);else if(f==="hi")c.hi=cl(c.hi+5*n,c.lo+10,160);S.settings.d2r=c;persist();return drawDock()}
   if(k.startsWith("vol:")){S.settings.vol={d:today(),big:k==="vol:1"};persist();return drawDock()}
   if(k.startsWith("hand:")){R.hand=k.slice(5);return drawDock()}
   if(k.startsWith("cd:"))return setCd(+k.slice(3));
@@ -2786,6 +2832,259 @@ function arcCard(){const a=FC.arc;let body;
   return `<div class="metric arc">${a&&!a.err?"":`<div class="mh"><b>Arc</b><span class="pill info">Tap to measure</span></div>`}${body}
    ${FC.arcMode?"":`<button class="btn sec small" data-arc="start">${a?"Measure again":"Measure arc"}</button>`}
    <p class="small muted">Side-on clips only, so the ball travels across the screen. Assumes you release about 2 ft below the rim from 22 ft, so treat it as an estimate within a few degrees. Arc target from Noah Basketball, which sells a shot tracker.</p></div>`}
+
+/* ---------- coach: take-home drills from a coach + my training videos ----------
+   Take-home lists live in S.coach with the rest of the progress. Videos never leave the phone: they're kept in this
+   device's IndexedDB ("hoopsLadder.videos"), never in S, so progress sync can't carry them anywhere. */
+const CO={draft:"",name:"",open:null,dict:null,vids:[],vidsLoaded:false,vidErr:"",usage:null,thumbs:{},rec:null,view:null,capFor:null,live:null,facing:"environment"};
+const HW_XP=10,REC_MAX=300;
+const coLists=()=>(S.coach&&Array.isArray(S.coach.lists))?S.coach.lists:(S.coach={lists:[]}).lists;
+const coFind=id=>{for(const l of coLists()){const it=l.items.find(x=>x.id===id);if(it)return{l,it}}return null};
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+function guessSkill(t){t=t.toLowerCase();
+  if(/layup|lay-up|finish|floater|mikan|euro|reverse|pro hop|rim|glass|reach|scoop/.test(t))return"f";
+  if(/shoot|shot|jumper|\b3s\b|three|free throw|\bft\b|form|pull.?up|catch and|spot|elbow|make/.test(t))return"s";
+  return"h"}
+const URL_RE=/\bhttps?:\/\/[^\s<>"']+/gi;
+function fmtT(t){const m=String(t).match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/);if(!m)return"";const s=(+m[1]||0)*3600+(+m[2]||0)*60+(+m[3]||0);return s?`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`:""}
+function linkLabel(u){try{const x=new URL(u),h=x.hostname.replace(/^(www|m)\./,"");
+  if(/(^|\.)youtube\.com$|^youtu\.be$/.test(h)){const t=fmtT(x.searchParams.get("t")||"");return"YouTube"+(t?" at "+t:"")}
+  if(/instagram\.com$/.test(h))return"Instagram";if(/tiktok\.com$/.test(h))return"TikTok";return h}catch(e){return"Link"}}
+const safeUrl=u=>/^https?:\/\//i.test(u)?u:"";
+/* One drill per line. A line that's only a link goes with the drill above it. Said out loud: pause, or say "next drill". */
+function parseDrills(text){const out=[];
+  const lines=String(text).replace(/\r/g,"").replace(/[,.;:]?\s*\b(?:next drill|new drill|next one|and then next)\b[,.;:]?\s*/gi,"\n").split("\n");
+  for(let ln of lines){const links=(ln.match(URL_RE)||[]).map(u=>u.replace(/[).,;]+$/,""));
+    let t=ln.replace(URL_RE,"").replace(/^\s*(?:[-*•–]|\d{1,2}[.)]|drill\s*\d+[:.)]?)\s*/i,"").replace(/\s+/g," ").replace(/[\s,;:–-]+$/,"").trim();
+    if(t)t=t[0].toUpperCase()+t.slice(1);
+    if(!t&&!links.length)continue;
+    if(!t&&out.length){out[out.length-1].links.push(...links);continue}
+    out.push({text:t||"Coach video",links})}
+  return out}
+function coAdd(){const ta=$("#coDraft"),nm=$("#coName");const text=ta?ta.value:CO.draft;const name=(nm?nm.value:CO.name).trim();
+  const ds=parseDrills(text);if(!ds.length){toast("Nothing to add","Type or say the drills first, one per line.");return}
+  dictStop();
+  coLists().unshift({id:uid("l"),t:Date.now(),coach:name,items:ds.map(d=>({id:uid("i"),text:d.text,links:d.links.map(u=>({url:u})),skill:guessSkill(d.text),done:false}))});
+  CO.draft="";CO.name=name;S.coach.lastCoach=name;persist();render();
+  toast("Take-home list saved",`${ds.length} drill${ds.length>1?"s":""}${name?" from "+name:""}. Check them off as you do them.`)}
+function coToggle(id){const f=coFind(id);if(!f)return;const it=f.it,before=[sL(),hL(),oL(),fL()];
+  if(!it.done){it.done=true;it.doneAt=Date.now();it.xp=HW_XP;S.xp[it.skill]=(S.xp[it.skill]||0)+HW_XP}
+  else{it.done=false;delete it.doneAt;S.xp[it.skill]=Math.max(0,(S.xp[it.skill]||0)-(it.xp||0));it.xp=0}
+  persist();render();
+  if(it.done){const after=[sL(),hL(),oL(),fL()];let head="Take-home done";
+    if(after[0]>before[0])head=`Shooting Lv ${after[0]}`;if(after[1]>before[1])head=`Handling Lv ${after[1]}`;if(after[3]>before[3])head=`Finishing Lv ${after[3]}`;if(after[2]>before[2])head=`Player Lv ${after[2]}`;
+    const left=f.l.items.filter(x=>!x.done).length;toast(head,`+${HW_XP} ${SK[it.skill]} XP. ${left?`${left} left on this list.`:"List finished. Nice work."}`);
+    if(after.some((v,i)=>v>before[i])){beep(784,120);setTimeout(()=>beep(1046,220),130)}}}
+function coSetSkill(id,k){const f=coFind(id);if(!f||f.it.skill===k)return;const it=f.it;
+  if(it.done&&it.xp){S.xp[it.skill]=Math.max(0,(S.xp[it.skill]||0)-it.xp);S.xp[k]=(S.xp[k]||0)+it.xp}it.skill=k;persist();render()}
+function coDelItem(id){const f=coFind(id);if(!f)return;if(f.it.done&&f.it.xp)S.xp[f.it.skill]=Math.max(0,(S.xp[f.it.skill]||0)-f.it.xp);
+  f.l.items=f.l.items.filter(x=>x!==f.it);if(!f.l.items.length)S.coach.lists=coLists().filter(l=>l!==f.l);CO.open=null;persist();render()}
+function coDelList(lid){S.coach.lists=coLists().filter(l=>l.id!==lid);persist();render()}
+function coAddLink(id){const f=coFind(id),inp=$("#coLink");if(!f||!inp)return;const us=(inp.value.match(URL_RE)||[]).map(u=>u.replace(/[).,;]+$/,""));
+  if(!us.length){toast("That isn't a link","Paste the full link, starting with https://");return}f.it.links=(f.it.links||[]).concat(us.map(u=>({url:u})));persist();render()}
+function coEditText(id,v){const f=coFind(id);v=v.trim();if(!f||!v||v===f.it.text)return;f.it.text=v;persist()}
+
+/* ---------- dictation: the app's own speech plugin when it has one, else the browser's, else the keyboard's mic ---------- */
+const NSR=()=>window.Capacitor?.Plugins?.SpeechRecognition;
+const dictOK=()=>!!(NSR()||((window.SpeechRecognition||window.webkitSpeechRecognition)&&micOK));
+function dictJoin(base,add){add=add.trim();if(!add)return base;return base&&!/\n\s*$/.test(base)?base.replace(/\s+$/,"")+"\n"+add:base+add}
+function dictShow(t){const ta=$("#coDraft");if(!ta||!CO.dict)return;ta.value=dictJoin(CO.dict.base,t);CO.draft=ta.value;ta.scrollTop=ta.scrollHeight}
+function dictBtn(){const b=$("#coMic");if(b){b.setAttribute("aria-pressed",!!CO.dict);b.textContent=CO.dict?"Stop listening":"Say them"}const s=$("#coMicMsg");if(s)s.textContent=CO.dict?"Listening. Pause between drills, or say “next drill”.":""}
+async function dictStart(){const ta=$("#coDraft");if(!ta)return;const base=ta.value;
+  const P=NSR();
+  if(P){try{const perm=await P.requestPermissions();if(perm&&perm.speechRecognition&&perm.speechRecognition!=="granted"){toast("Mic not allowed","Allow the microphone for Hoops Ladder in your phone's settings, or use your keyboard's mic.");return}
+      CO.dict={native:true,base};dictBtn();await P.removeAllListeners?.();
+      P.addListener("partialResults",d=>{const m=d&&d.matches&&d.matches[0];if(m)dictShow(m)});
+      P.addListener("listeningState",d=>{if(d&&d.status==="stopped"&&CO.dict&&CO.dict.native){const ta2=$("#coDraft");CO.dict.base=ta2?ta2.value:CO.dict.base;if(CO.dict.stop){CO.dict=null;dictBtn()}else P.start({language:"en-US",partialResults:true,popup:false}).catch(()=>{CO.dict=null;dictBtn()})}});
+      await P.start({language:"en-US",partialResults:true,popup:false})}
+    catch(e){CO.dict=null;dictBtn();toast("Couldn't start the mic","Use the mic on your keyboard instead.")}return}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
+  try{const r=new SR();r.continuous=true;r.interimResults=true;r.lang="en-US";CO.dict={r,base};
+    r.onresult=e=>{let t="";for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;dictShow(t)};
+    r.onerror=e=>{if(/not-allowed|service-not-allowed|audio-capture/.test(e.error)){micOK=false;CO.dict=null;dictBtn();render();toast("The mic is blocked here","Tap the mic on your phone's keyboard to say the drills instead.")}};
+    r.onend=()=>{if(!CO.dict||CO.dict.r!==r)return;const ta2=$("#coDraft");CO.dict.base=ta2?ta2.value:CO.dict.base;if(CO.dict.stop){CO.dict=null;dictBtn();return}setTimeout(()=>{if(CO.dict&&CO.dict.r===r)try{r.start()}catch(e){CO.dict=null;dictBtn()}},200)};
+    r.start();dictBtn()}catch(e){CO.dict=null;dictBtn()}}
+function dictStop(){const d=CO.dict;if(!d)return;d.stop=true;try{if(d.r)d.r.stop();else NSR()?.stop()}catch(e){}if(!d.r){CO.dict=null;dictBtn()}}
+
+/* ---------- videos: on this device only ---------- */
+const rq=r=>new Promise((a,b)=>{r.onsuccess=()=>a(r.result);r.onerror=()=>b(r.error)});
+let vdbP=null;
+function vdb(){return vdbP||(vdbP=new Promise((a,b)=>{let r;try{r=indexedDB.open("hoopsLadder.videos",1)}catch(e){b(e);return}
+  r.onupgradeneeded=()=>{const db=r.result;if(!db.objectStoreNames.contains("meta"))db.createObjectStore("meta",{keyPath:"id"});if(!db.objectStoreNames.contains("blobs"))db.createObjectStore("blobs")};
+  r.onsuccess=()=>a(r.result);r.onerror=()=>{vdbP=null;b(r.error)}}))}
+async function vtx(mode,fn){const db=await vdb();return new Promise((a,b)=>{const t=db.transaction(["meta","blobs"],mode);let out;Promise.resolve(fn(t.objectStore("meta"),t.objectStore("blobs"))).then(v=>out=v,b);t.oncomplete=()=>a(out);t.onerror=t.onabort=()=>b(t.error)})}
+async function loadVids(){try{CO.vids=(await vtx("readonly",m=>rq(m.getAll()))).sort((a,b)=>b.t-a.t);CO.vidErr=""}catch(e){CO.vids=[];CO.vidErr="This browser won't let the app keep videos (private mode or storage turned off)."}
+  CO.vidsLoaded=true;try{const e=await navigator.storage?.estimate?.();CO.usage=e?e.usage:null}catch(e){}if(state.tab==="coach")render()}
+async function coThumb(id){if(CO.thumbs[id]!==undefined)return CO.thumbs[id];CO.thumbs[id]=null;try{const b=await vtx("readonly",(m,bl)=>rq(bl.get(id+":t")));if(b)CO.thumbs[id]=URL.createObjectURL(b)}catch(e){}return CO.thumbs[id]}
+function makeThumb(blob){return new Promise(res=>{const v=document.createElement("video"),u=URL.createObjectURL(blob);let done=false;
+  const fin=b=>{if(done)return;done=true;URL.revokeObjectURL(u);v.removeAttribute("src");v.load();res(b)};
+  v.muted=true;v.playsInline=true;v.preload="auto";v.src=u;setTimeout(()=>fin(null),4000);
+  v.onloadeddata=()=>{try{const w=320,h=Math.round(w*(v.videoHeight||1)/(v.videoWidth||1)),c=document.createElement("canvas");c.width=w;c.height=h||320;c.getContext("2d").drawImage(v,0,0,c.width,c.height);c.toBlob(b=>fin(b),"image/jpeg",.7)}catch(e){fin(null)}};
+  v.onerror=()=>fin(null)})}
+function vidDur(blob){return new Promise(res=>{const v=document.createElement("video"),u=URL.createObjectURL(blob);v.preload="metadata";v.src=u;const t=setTimeout(()=>{URL.revokeObjectURL(u);res(0)},4000);
+  v.onloadedmetadata=()=>{clearTimeout(t);const d=isFinite(v.duration)?v.duration:0;URL.revokeObjectURL(u);res(d)};v.onerror=()=>{clearTimeout(t);URL.revokeObjectURL(u);res(0)}})}
+async function saveVid(blob,o={}){toast("Saving…","Keeping the clip on this phone.");
+  try{const id=uid("v"),dur=o.dur||await vidDur(blob),th=await makeThumb(blob);
+    const meta={id,t:o.t||Date.now(),dur:Math.round(dur),size:blob.size,type:blob.type||"video/mp4",item:o.item||null,name:o.name||""};
+    await vtx("readwrite",(m,bl)=>{m.put(meta);bl.put(blob,id);if(th)bl.put(th,id+":t")});
+    try{if(navigator.storage?.persist&&!(await navigator.storage.persisted?.()))await navigator.storage.persist()}catch(e){}
+    await loadVids();const f=meta.item&&coFind(meta.item);toast("Saved on this phone",f?`Clip added to “${f.it.text}”.`:"It's in My videos. It never leaves this phone.")}
+  catch(e){toast("Couldn't save the clip",e&&e.name==="QuotaExceededError"?"Your phone is out of space for videos. Delete a few clips and try again.":"This browser won't let the app keep videos.")}}
+async function delVid(id){try{await vtx("readwrite",(m,bl)=>{m.delete(id);bl.delete(id);bl.delete(id+":t")})}catch(e){}if(CO.thumbs[id])URL.revokeObjectURL(CO.thumbs[id]);delete CO.thumbs[id];closeVid();await loadVids()}
+const fmtDur=s=>s?`${Math.floor(s/60)}:${String(Math.round(s)%60).padStart(2,"0")}`:"";
+const fmtMB=b=>b>=1e9?(b/1e9).toFixed(1)+" GB":Math.max(.1,b/1e6).toFixed(b<1e7?1:0)+" MB";
+function camLive(){if(CO.live===false)return false;if(!(navigator.mediaDevices?.getUserMedia&&window.MediaRecorder))return false;
+  if(window.Capacitor?.isNativePlatform?.())return true;
+  try{const fp=document.permissionsPolicy||document.featurePolicy;if(fp&&fp.allowsFeature)return fp.allowsFeature("camera")&&fp.allowsFeature("microphone")}catch(e){}
+  try{return window.top===window}catch(e){return false}}
+/* the record control: in-app camera when the page may use it, else the phone's camera app through a file input */
+function recCtl(item,cls){return camLive()?`<button class="btn ${cls}" data-hw="rec:${item||""}">Record${item?" this drill":""}</button>`
+  :`<label class="btn ${cls} filebtn" for="coCap" data-hw="cap:${item||""}">Record${item?" this drill":""}</label>`}
+
+/* recorder */
+function pickMime(){for(const t of["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"])try{if(MediaRecorder.isTypeSupported(t))return t}catch(e){}return""}
+async function openRec(item){closeVid();dictStop();const el=document.createElement("div");el.className="covid corec";el.setAttribute("role","dialog");el.setAttribute("aria-label","Record a training video");
+  const f=item&&coFind(item);
+  el.innerHTML=`<div class="bar"><button class="btn sec small" data-rc="close">Close</button><span class="small">${f?esc(f.it.text):"New clip"}</span><button class="btn sec small" data-rc="flip">Flip</button></div>
+   <video id="coLive" autoplay muted playsinline></video>
+   <div class="bar recbar"><span class="num rect" id="coRecT">0:00</span><button class="recbtn" data-rc="go" aria-label="Start recording"><i></i></button><span class="small recnote">Saved on this phone only</span></div>`;
+  document.body.appendChild(el);document.body.style.overflow="hidden";CO.rec={el,item,chunks:[],mr:null,stream:null,t0:0,timer:0};await recStream()}
+async function recStream(){const R2=CO.rec;if(!R2)return;R2.stream?.getTracks().forEach(t=>t.stop());
+  const v={facingMode:CO.facing,width:{ideal:1280},height:{ideal:720}};let s=null;
+  try{s=await navigator.mediaDevices.getUserMedia({video:v,audio:true})}catch(e){if(e&&e.name==="NotAllowedError"&&!window.Capacitor?.isNativePlatform?.()){CO.live=false;closeRec();render();toast("The camera is blocked here","Use Record again: it opens your phone's camera app, and the clip still stays on this phone.");return}
+    try{s=await navigator.mediaDevices.getUserMedia({video:v,audio:false})}catch(e2){closeRec();toast("Couldn't open the camera","Allow the camera for Hoops Ladder, then try again.");return}}
+  if(CO.rec!==R2){s.getTracks().forEach(t=>t.stop());return}R2.stream=s;const lv=R2.el.querySelector("#coLive");lv.srcObject=s;lv.classList.toggle("mir",CO.facing==="user")}
+function recGo(){const R2=CO.rec;if(!R2||!R2.stream)return;const b=R2.el.querySelector(".recbtn");
+  if(R2.mr&&R2.mr.state==="recording"){R2.mr.stop();return}
+  const type=pickMime();let mr;try{mr=new MediaRecorder(R2.stream,Object.assign({videoBitsPerSecond:2500000},type?{mimeType:type}:{}))}catch(e){try{mr=new MediaRecorder(R2.stream)}catch(e2){toast("Recording isn't supported here","Use your phone's camera app, then add the clip.");return}}
+  R2.mr=mr;R2.chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)R2.chunks.push(e.data)};
+  mr.onstop=()=>{clearInterval(R2.timer);const dur=(Date.now()-R2.t0)/1000,blob=new Blob(R2.chunks,{type:mr.mimeType||type||"video/webm"});const item=R2.item;closeRec();if(blob.size)saveVid(blob,{dur,item})};
+  mr.start(1000);R2.t0=Date.now();b.classList.add("on");b.setAttribute("aria-label","Stop recording");R2.el.querySelector('[data-rc="flip"]').disabled=true;
+  R2.timer=setInterval(()=>{const s=(Date.now()-R2.t0)/1000,t=R2.el.querySelector("#coRecT");if(t)t.textContent=fmtDur(Math.floor(s))||"0:00";if(s>=REC_MAX&&mr.state==="recording")mr.stop()},250)}
+function closeRec(){const R2=CO.rec;if(!R2)return;CO.rec=null;clearInterval(R2.timer);if(R2.mr&&R2.mr.state==="recording"){R2.mr.onstop=null;try{R2.mr.stop()}catch(e){}}
+  R2.stream?.getTracks().forEach(t=>t.stop());R2.el.remove();if(!$("#sheet")||$("#sheet").hidden)document.body.style.overflow=""}
+
+/* viewer */
+/* In the Android app, saving and sharing go through Capacitor's Filesystem and Share plugins, because a WebView ignores download links and navigator.share */
+const CP=n=>window.Capacitor?.isNativePlatform?.()?window.Capacitor.Plugins?.[n]:null;
+const b64=blob=>new Promise((a,b)=>{const r=new FileReader();r.onload=()=>a(String(r.result).split(",")[1]||"");r.onerror=()=>b(r.error);r.readAsDataURL(blob)});
+/* write in 3 MB pieces (a multiple of 3 bytes, so the base64 parts join cleanly) so a long clip never sits in memory as one huge string */
+async function natWrite(file,directory,path){const FS=CP("Filesystem"),N=3*1024*1024;let uri="";
+  for(let i=0;i<file.size||i===0;i+=N){const data=await b64(file.slice(i,i+N));
+    if(i===0)uri=(await FS.writeFile({path,data,directory,recursive:true})).uri;else await FS.appendFile({path,data,directory});if(file.size===0)break}
+  return uri}
+async function natShare(file){const uri=await natWrite(file,"CACHE","share/"+file.name);await CP("Share").share({title:"Training clip",files:[uri]})}
+async function coShare(file){if(CP("Share")&&CP("Filesystem")){try{await natShare(file)}catch(e){if(!/cancel/i.test(e?.message||""))toast("Couldn't share","Try again, or use Save to phone.")}return}
+  navigator.share({files:[file],title:"Training clip"}).catch(()=>{})}
+/* Save to phone: inside Claude the page must ask the viewer through the downloads capability; elsewhere a plain download link works */
+async function coSave(file){if(CP("Filesystem")){try{await natWrite(file,"DOCUMENTS","Hoops Ladder/"+file.name);toast("Saved","It's in Documents › Hoops Ladder on this phone.")}
+    catch(e){if(CP("Share")){toast("Pick where to save it","Choose Files or Drive in the list.");try{await natShare(file)}catch(e2){}}else toast("Couldn't save","This phone wouldn't let the app write the file.")}
+    return}
+  let dl=null;try{dl=window.claude?.use?await claude.use("downloads"):null}catch(e){}
+  if(dl){const name=file.name.replace(/\.mov$/i,".mp4");/* Claude only saves a .mov it signed itself; phone clips play fine as .mp4 */
+    try{await dl.save({filename:name,data:file});toast("Saved","The clip is in your downloads.")}
+    catch(e){if(e?.code==="declined")return;if(e?.code==="rate_limited"){toast("One moment","A save is already waiting for your answer.");return}
+      toast("Couldn't save here",(navigator.canShare?"Try Send to coach and pick Save, or ":"Try ")+"opening Hoops Ladder in your phone's browser.")}
+    return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=file.name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
+async function openVid(id){const m=CO.vids.find(v=>v.id===id);if(!m)return;let blob;try{blob=await vtx("readonly",(x,bl)=>rq(bl.get(id)))}catch(e){}
+  if(!blob){toast("Clip not found","It may have been cleared from this phone.");return}
+  closeVid();const u=URL.createObjectURL(blob),f=m.item&&coFind(m.item),ext=/mp4/.test(m.type)?"mp4":/quicktime/.test(m.type)?"mov":"webm";
+  const file=new File([blob],`hoops-${new Date(m.t).toISOString().slice(0,10)}.${ext}`,{type:m.type});
+  const canShare=!!(CP("Share")&&CP("Filesystem"))||!!(navigator.canShare&&(()=>{try{return navigator.canShare({files:[file]})}catch(e){return false}})());
+  const el=document.createElement("div");el.className="covid";el.setAttribute("role","dialog");el.setAttribute("aria-label","Training video");
+  el.innerHTML=`<div class="bar"><button class="btn sec small" data-vv="close">Close</button><span class="small">${new Date(m.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}${f?" · "+esc(f.it.text):""}</span></div>
+   <video id="coPlay" src="${u}" playsinline preload="auto"></video>
+   <div class="bar vctl"><button class="btn sec small" data-vv="step:-1" aria-label="Back one frame">◀</button><button class="btn sec small vplay" data-vv="play">Play</button><button class="btn sec small" data-vv="step:1" aria-label="Forward one frame">▶</button>
+    <input type="range" id="coSeek" min="0" max="1000" value="0" step="1" aria-label="Position"><span class="num small" id="coTime">0:00</span></div>
+   <div class="bar"><div class="seg" role="group" aria-label="Speed">${[.25,.5,1].map(r=>`<button data-vv="rate:${r}" aria-pressed="${r===1}">${r}×</button>`).join("")}</div>
+    <button class="btn sec small" data-vv="mirror" aria-pressed="false">Mirror</button></div>
+   <div class="bar"><button class="btn sec small" data-vv="save">Save to phone</button>${canShare?`<button class="btn sec small" data-vv="share">Send to coach…</button>`:""}<button class="btn sec small" data-vv="del">Delete</button></div>
+   <p class="small vnote">Kept only on this phone. Hoops Ladder never uploads it. Send to coach hands it to an app you choose.</p>`;
+  document.body.appendChild(el);document.body.style.overflow="hidden";CO.view={el,u,id,file};
+  const pv=el.querySelector("#coPlay"),sk=el.querySelector("#coSeek"),tm=el.querySelector("#coTime"),pb=el.querySelector(".vplay");
+  const dur=()=>isFinite(pv.duration)&&pv.duration>0?pv.duration:(m.dur||0);
+  /* recorded WebM has no duration until the end is read: jump far ahead once so the browser works it out */
+  pv.addEventListener("loadedmetadata",()=>{if(!isFinite(pv.duration)){pv.currentTime=1e7;pv.addEventListener("seeked",()=>{pv.currentTime=0},{once:true})}});
+  pv.addEventListener("timeupdate",()=>{const d=dur();if(d&&!CO.view?.seeking)sk.value=Math.round(1000*pv.currentTime/d);tm.textContent=fmtDur(Math.floor(pv.currentTime))||"0:00"});
+  pv.addEventListener("play",()=>pb.textContent="Pause");pv.addEventListener("pause",()=>pb.textContent="Play");pv.addEventListener("ended",()=>pb.textContent="Play");
+  pv.addEventListener("click",()=>pv.paused?pv.play().catch(()=>{}):pv.pause());
+  sk.addEventListener("input",()=>{const d=dur();if(d)pv.currentTime=d*sk.value/1000})}
+function closeVid(){const V=CO.view;if(!V)return;CO.view=null;V.el.remove();URL.revokeObjectURL(V.u);if(!$("#sheet")||$("#sheet").hidden)document.body.style.overflow=""}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-vv],[data-rc]");if(!t)return;
+  if(t.dataset.rc){const a=t.dataset.rc;if(a==="close")closeRec();else if(a==="go")recGo();else if(a==="flip"){CO.facing=CO.facing==="user"?"environment":"user";recStream()}return}
+  const V=CO.view;if(!V)return;const a=t.dataset.vv,pv=V.el.querySelector("#coPlay");
+  if(a==="close")closeVid();
+  else if(a.startsWith("rate:")){pv.playbackRate=+a.slice(5);V.el.querySelectorAll('[data-vv^="rate:"]').forEach(b=>b.setAttribute("aria-pressed",b===t))}
+  else if(a==="play"){pv.paused?pv.play().catch(()=>{}):pv.pause()}
+  else if(a.startsWith("step:")){pv.pause();pv.currentTime=Math.max(0,pv.currentTime+(+a.slice(5))/30)}
+  else if(a==="mirror"){const on=t.getAttribute("aria-pressed")!=="true";t.setAttribute("aria-pressed",on);pv.classList.toggle("mir",on)}
+  else if(a==="share"){coShare(V.file)}
+  else if(a==="save"){coSave(V.file)}
+  else if(a==="del"){if(t.dataset.sure){delVid(V.id);return}t.dataset.sure="1";t.textContent="Tap again to delete";t.classList.add("warnbtn")}});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(CO.view)closeVid();else if(CO.rec)closeRec()});
+
+/* ---------- the Coach tab ---------- */
+const CHECK_SVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+function hwLinks(it){return (it.links||[]).map(l=>safeUrl(l.url)?`<a href="${esc(l.url)}" target="_blank" rel="noopener">▶ ${esc(linkLabel(l.url))}</a>`:"").join("")}
+function hwRow(it){const open=CO.open===it.id,clips=CO.vids.filter(v=>v.item===it.id);
+  return `<div class="hw${it.done?" done":""}">
+   <button class="hwchk" data-hw="tog:${it.id}" aria-pressed="${!!it.done}" aria-label="${it.done?"Mark not done":"Mark done"}: ${esc(it.text)}">${CHECK_SVG}</button>
+   <div><div class="hwtext">${esc(it.text)}</div><div class="meta"><span class="tag ${it.skill}">${SKS[it.skill]}</span>${hwLinks(it)}${clips.length?`<span>${clips.length} clip${clips.length>1?"s":""}</span>`:""}</div></div>
+   <button class="hwmore" data-hw="open:${it.id}" aria-expanded="${open}">${open?"Close":"Edit"}</button>
+   ${open?`<div class="hwpanel">
+     <label class="label" for="coEdit">Drill</label><input class="cofield" id="coEdit" data-item="${it.id}" value="${esc(it.text)}">
+     <div class="row small"><span class="label">Counts toward</span><div class="seg" role="group" aria-label="Skill">${["s","h","f"].map(k=>`<button data-hw="sk:${it.id}:${k}" aria-pressed="${it.skill===k}">${SK[k]}</button>`).join("")}</div></div>
+     <div class="row"><input class="cofield" id="coLink" inputmode="url" placeholder="Paste a YouTube link" style="flex:1;min-width:0"><button class="btn sec small" data-hw="link:${it.id}">Add link</button></div>
+     ${(it.links||[]).length?`<div class="row small">${(it.links||[]).map((l,i)=>`<button class="chip" data-hw="unlink:${it.id}:${i}" aria-label="Remove link ${esc(linkLabel(l.url))}">${esc(linkLabel(l.url))} ✕</button>`).join("")}</div>`:""}
+     ${clips.length?`<div class="vgrid">${clips.map(vCard).join("")}</div>`:""}
+     <div class="row">${recCtl(it.id,"pri small")}<button class="btn sec small" data-hw="del:${it.id}">Remove drill</button></div></div>`:""}
+  </div>`}
+function vCard(v){const th=CO.thumbs[v.id],f=v.item&&coFind(v.item);
+  return `<button class="vcard" data-hw="vid:${v.id}"><span class="vthumb" data-th="${v.id}">${th?`<img src="${th}" alt="">`:""}${v.dur?`<b>${fmtDur(v.dur)}</b>`:""}</span>
+   <span><b>${f?esc(f.it.text):"Training clip"}</b>${new Date(v.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})} · ${fmtMB(v.size)}</span></button>`}
+function viewCoach(){if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
+  const ls=coLists(),all=ls.flatMap(l=>l.items),left=all.filter(x=>!x.done).length,coaches=[...new Set(ls.map(l=>l.coach).filter(Boolean))];
+  const name=CO.name||S.coach.lastCoach||"",free=CO.vids.filter(v=>!v.item||!coFind(v.item));
+  return `<section><div class="sechead"><h2>Take-home drills</h2>${all.length?`<span class="muted small"><b class="num" style="font-size:18px;color:var(--ink)">${all.length-left}</b> of ${all.length} done</span>`:""}</div>
+   ${ls.length?ls.map(l=>{const n=l.items.filter(x=>x.done).length;return `<div class="hwgrp"><span>${l.coach?"From "+esc(l.coach)+" · ":""}${new Date(l.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span>${n===l.items.length?`<button class="linkbtn" data-hw="dellist:${l.id}">Clear list</button>`:`<span>${n}/${l.items.length}</span>`}</div>
+     <div class="hwlist">${l.items.map(hwRow).join("")}</div>`}).join("")
+   :`<div class="empty">When your coach gives you drills to do on your own, add them below. Type them, paste their text or links, or say them. Each one you check off earns ${HW_XP} XP.</div>`}</section>
+  <section><div class="sechead"><h2>Add from your coach</h2></div>
+   <div class="card coadd">
+    <label class="label" for="coName">Coach</label><input class="cofield" id="coName" list="coNames" placeholder="Coach's name (optional)" value="${esc(name)}" autocomplete="off">
+    <datalist id="coNames">${coaches.map(c=>`<option value="${esc(c)}">`).join("")}</datalist>
+    <label class="label" for="coDraft">Drills</label>
+    <textarea class="cofield" id="coDraft" placeholder="One drill per line, for example:&#10;Mikan drill, 3 sets of 20&#10;Form shooting, 50 makes&#10;https://youtu.be/…">${esc(CO.draft)}</textarea>
+    <div class="row">${dictOK()?`<button class="btn sec small mic" id="coMic" data-hw="mic" aria-pressed="${!!CO.dict}">${CO.dict?"Stop listening":"Say them"}</button>`:""}<button class="btn pri small" data-hw="add" style="flex:1">Add to my list</button></div>
+    <p class="muted small" id="coMicMsg" role="status" style="margin:0">${CO.dict?"Listening. Pause between drills, or say “next drill”.":""}</p>
+    <p class="muted small" style="margin:0">${dictOK()?"Say them, or":"To say them, tap"} the mic on your phone's keyboard${dictOK()?" works too":""}. A link on its own line goes with the drill above it.</p>
+   </div></section>
+  <section><div class="sechead"><h2>My videos</h2>${CO.vids.length?`<span class="muted small">${CO.vids.length} clip${CO.vids.length>1?"s":""}${CO.usage?` · ${fmtMB(CO.vids.reduce((a,v)=>a+v.size,0))}`:""}</span>`:""}</div>
+   <div class="row">${recCtl("","pri small")}<label class="btn sec small filebtn" for="coPick">Add a clip</label></div>
+   <input type="file" id="coCap" accept="video/*" capture="environment" hidden><input type="file" id="coPick" accept="video/*" hidden>
+   ${CO.vidErr?`<div class="empty">${esc(CO.vidErr)}</div>`:free.length?`<div class="vgrid">${free.map(vCard).join("")}</div>`:CO.vids.length?"":`<div class="empty">Film your reps to watch them back, slow them down, or show your coach next session. Clips you film for a drill on your list show up under that drill.</div>`}
+   <p class="muted small" style="margin:0">Videos are kept only on this phone and are never uploaded. Deleting the app deletes them, so use Save to phone for any you want to keep.</p></section>`}
+async function afterCoachRender(){if(state.tab!=="coach")return;for(const el of document.querySelectorAll("[data-th]")){if(el.querySelector("img"))continue;const u=await coThumb(el.dataset.th);if(u&&el.isConnected&&!el.querySelector("img"))el.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`)}}
+function coachTodayCard(){const ls=coLists(),open=ls.flatMap(l=>l.items.filter(x=>!x.done));if(!open.length)return"";
+  return `<section><div class="card small cohome"><div class="label">Take-home from ${ls.find(l=>l.items.some(x=>!x.done))?.coach?esc(ls.find(l=>l.items.some(x=>!x.done)).coach):"your coach"}</div>
+   <b>${open.length} drill${open.length>1?"s":""} to do:</b> ${open.slice(0,3).map(x=>esc(x.text)).join(" · ")}${open.length>3?" …":""}
+   <a class="linkbtn" href="#coach" style="display:block">Open take-home list →</a></div></section>`}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-hw]");if(!t)return;const [a,id,x]=t.dataset.hw.split(":");
+  if(a==="add")coAdd();else if(a==="mic"){CO.dict?dictStop():dictStart()}
+  else if(a==="tog")coToggle(id);else if(a==="open"){CO.open=CO.open===id?null:id;render()}
+  else if(a==="sk")coSetSkill(id,x);else if(a==="link")coAddLink(id);
+  else if(a==="unlink"){const f=coFind(id);if(f){f.it.links.splice(+x,1);persist();render()}}
+  else if(a==="del"){if(t.dataset.sure){coDelItem(id);return}t.dataset.sure="1";t.textContent="Tap again to remove";t.classList.add("warnbtn")}
+  else if(a==="dellist")coDelList(id);
+  else if(a==="rec")openRec(id||null);else if(a==="cap")CO.capFor=id||null;
+  else if(a==="vid")openVid(id)});
+document.addEventListener("input",e=>{if(e.target.id==="coDraft")CO.draft=e.target.value;else if(e.target.id==="coName")CO.name=e.target.value});
+document.addEventListener("change",e=>{const el=e.target;
+  if(el.id==="coEdit"){coEditText(el.dataset.item,el.value);return}
+  if((el.id==="coCap"||el.id==="coPick")&&el.files&&el.files[0]){const file=el.files[0],item=el.id==="coCap"?CO.capFor:null;CO.capFor=null;el.value="";
+    saveVid(file,{item,name:file.name,t:el.id==="coPick"&&file.lastModified?file.lastModified:Date.now()})}});
 
 /* ---------- boot + sync ---------- */
 route();
