@@ -1,0 +1,29 @@
+{
+  "name": "hoops-ladder",
+  "version": "0.1.0",
+  "description": "Hoops Ladder basketball training app for Android (Capacitor)",
+  "scripts": {
+    "import-prototype": "node tools/import_prototype.mjs",
+    "sync": "cap sync android",
+    "open": "cap open android"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loyeleye/hoops-ladder.git"
+  },
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/loyeleye/hoops-ladder/issues"
+  },
+  "homepage": "https://github.com/loyeleye/hoops-ladder#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/core": "^8.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "@fontsource/barlow": "^5.3.0",
+    "@fontsource/saira-condensed": "^5.3.0"
+  },
+  "private": true
+}
