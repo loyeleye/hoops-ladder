@@ -1,0 +1,18 @@
+/* Shared styles for the Hoops Ladder website (GitHub Pages). Colors match the app. */
+:root{--bg:#EBEFF4;--surface:#FFFFFF;--ink:#12203A;--muted:#5A6781;--line:#D2D9E4;--accent:#C2500F;--plate:#12203A}
+@media (prefers-color-scheme: dark){:root{--bg:#0D1524;--surface:#162038;--ink:#E9EEF7;--muted:#9AA6BF;--line:#2A3858;--accent:#F07A35;--plate:#0A1120}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--plate);color:#F4F6FA;padding:20px 16px}
+header .in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px}
+header img{width:48px;height:48px;border-radius:12px}
+header a{color:inherit;text-decoration:none;font-weight:800;font-size:22px;letter-spacing:.5px;text-transform:uppercase}
+main{max-width:760px;margin:0 auto;padding:24px 16px 64px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:20px 0}
+h1{font-size:34px;line-height:1.15;margin:8px 0 4px}
+h2{font-size:22px;margin:32px 0 6px}
+.muted{color:var(--muted)}
+a{color:var(--accent)}
+ul{padding-left:22px}
+li{margin:4px 0}
+footer{max-width:760px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:15px}

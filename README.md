@@ -6,6 +6,8 @@ Basketball training with a leveling system, for every level. Android app built w
 - `www/` – the web app (generated from the prototype by `tools/import_prototype.mjs`)
 - `android/` – the native Android project
 - `.github/workflows/android.yml` – builds a debug APK on every push, and a signed release bundle once the signing secrets are set
+- `site/` – the website and privacy policy, published to https://loyeleye.github.io/hoops-ladder/ by `.github/workflows/pages.yml`
+- `store/` – Google Play listing text, icon, feature graphic, screenshots and answers for the App content forms
 - [`docs/LEARNING.md`](docs/LEARNING.md) – how it's all built, step by step
 
 ## Quick start
