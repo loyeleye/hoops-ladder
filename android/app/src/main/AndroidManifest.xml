@@ -24,6 +24,13 @@
 
         </activity>
 
+        <!-- Keeps rep logging running with the screen locked, and owns the media session that receives the
+             volume and earbud buttons. See docs/LEARNING.md, step 8. -->
+        <service
+            android:name=".remote.RepLoggerService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -45,6 +52,12 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- navigator.vibrate() inside a WebView needs this. -->
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Rep logging with the screen locked runs as a foreground service with an ongoing notification. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Android 13+: asked for the first time the rep logger opens. Without it the volume buttons still log,
+         but the notification and lock-screen buttons stay hidden. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- The app still installs on devices without a camera or mic; those features just hide. -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
