@@ -196,10 +196,11 @@ grep -n "window.claude" www/index.html                                    # sync
 ```
 
 The page was also opened in headless Chromium with every request logged, and nothing left `localhost`.
-The policy covers: what's stored on the phone, the camera (clips are read on-device, only the numbers
-are kept), the mic (voice commands use Android's speech service), the few outside links, Android backup,
-how to delete everything, and a promise to update the page *before* releasing sync, the coach or saved
-videos.
+The policy covers: what's stored on the phone, form checks (clips are read on-device, only the numbers
+are kept), training videos (stored in the app, leaving only when you tap Save to phone or Send to coach),
+the mic (video sound, plus voice commands and dictation through Android's speech recognizer, which is
+Google's on most phones), the few outside links, Android backup, how to delete everything, and a promise
+to update the page *before* releasing sync or an online coach.
 
 **Hosting.** GitHub Pages serves static files from a repo for free, at
 `https://<user>.github.io/<repo>/`. The site lives in `site/` and

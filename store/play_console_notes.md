@@ -2,7 +2,8 @@
 
 Everything under **Play Console → Policy and programs → App content** has to be filled in before the
 first release, even for internal testing. These answers match the app as of November 2026: all data
-stays on the phone, no account, cloud sync and "Ask the coach" hidden, camera clips analyzed on-device.
+stays on the phone, no account, cloud sync and "Ask the coach" hidden, camera clips analyzed on-device,
+training videos stored on-device and sent only when the user shares them.
 **If any of that changes (sync, the coach, a server, analytics, crash reporting, ads), redo the Data
 safety form and the privacy policy before releasing that version.**
 
@@ -56,7 +57,10 @@ Why each feature still counts as "not collected":
 | Progress, settings, form numbers | WebView localStorage in the app's private storage | No |
 | Form check video | Read in memory, pose model runs on-device, only numbers kept | No |
 | Camera | Opened by Android's picker when you record a clip | No |
-| Voice commands | Android's speech service (Google) does the recognition, not the app | Not by the app. Google's own service is covered by Google's policy, the same way the keyboard is |
+| Training videos (camera + mic audio) | Stored in the app's IndexedDB on the phone | No |
+| Save to phone | Copies a video to Documents/Hoops Ladder, on the same phone | No |
+| Send to coach | Android share sheet; the user picks the app and recipient | Only by the user's own action. Google's guidance doesn't count user-initiated transfers like this as "sharing" |
+| Voice commands and dictating drills | `@capacitor-community/speech-recognition` hands audio to Android's recognizer (Google's on most phones) | Not by the app. The recognizer is a system service covered by Google's policy, like the keyboard; the app only gets text |
 | Spoken scores | Android text-to-speech | No |
 | Outside links (YouTube, articles) | Open in the browser or YouTube app | Not by the app |
 | Android Auto Backup (`allowBackup="true"`) | Android backs up app data to the user's Google account if they turned backup on | Not to you. It's an Android system feature the user turns on, and you can't read the backup. If you'd rather not think about it, set `android:allowBackup="false"` (users then lose progress when they switch phones) |
@@ -80,11 +84,8 @@ The manifest declares `CAMERA`, `RECORD_AUDIO`, `MODIFY_AUDIO_SETTINGS`, `VIBRAT
 None of them needs a separate Play declaration form (those are for SMS, call log, location in the
 background, all-files access, exact alarms and similar).
 
-One thing to know: voice commands use the web Speech Recognition API, which Android's WebView doesn't
-provide, so in the current build the voice option shows "Voice isn't available here" and the mic is never
-used. Either keep `RECORD_AUDIO` for when a native speech plugin is added, or remove it until then so
-the install page doesn't list a permission the app can't use yet. The privacy policy is written to be true
-either way.
+`RECORD_AUDIO` is needed: training videos record sound, and voice commands and dictation use a native
+speech recognition plugin (added alongside the training videos).
 
 ## Listing wording to avoid
 
