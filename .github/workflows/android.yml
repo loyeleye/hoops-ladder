@@ -36,16 +36,11 @@ jobs:
       - run: npm ci
       - run: npx cap sync android
 
-      # The Gradle wrapper downloads Gradle itself on first use, and that download sometimes gets a 504 from
-      # GitHub. The wrapper doesn't retry, so fetch it here with a few tries before the real build.
+      # The Gradle wrapper downloads Gradle itself on first use, and that download sometimes times out.
+      # Fetch it up front with a few retries so a slow mirror doesn't fail the whole build.
       - name: Download Gradle (with retries)
         working-directory: android
-        run: |
-          for i in 1 2 3 4 5; do
-            ./gradlew --version && exit 0
-            echo "Gradle download failed (try $i), retrying in $((i * 15)) s"; sleep $((i * 15))
-          done
-          exit 1
+        run: for i in 1 2 3; do ./gradlew --version && exit 0; sleep 20; done; exit 1
 
       - name: Build debug APK
         working-directory: android

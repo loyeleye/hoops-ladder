@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Hoops Ladder icon: the ball inside the level ring from the app's player plate.
+       Full-bleed square; Google Play and Android round the corners themselves.
+       tools/make_store_art.mjs renders this to the Play icon and the Android launcher icons. -->
+  <rect id="bg" width="512" height="512" fill="#12203A"/>
+  <g id="mark">
+    <circle cx="256" cy="256" r="196" fill="none" stroke="#2A3858" stroke-width="30"/>
+    <!-- about three quarters of the way to the next level, starting at 12 o'clock -->
+    <circle cx="256" cy="256" r="196" fill="none" stroke="#F4F6FA" stroke-width="30" stroke-linecap="round"
+            stroke-dasharray="880 1232" transform="rotate(-90 256 256)"/>
+    <circle cx="256" cy="256" r="140" fill="#E2601A"/>
+    <g fill="none" stroke="#12203A" stroke-width="13" stroke-linecap="round">
+      <path d="M256 118 V394"/>
+      <path d="M118 256 H394"/>
+      <path d="M158 159 C206 196 206 316 158 353"/>
+      <path d="M354 159 C306 196 306 316 354 353"/>
+    </g>
+  </g>
+</svg>
