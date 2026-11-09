@@ -337,5 +337,102 @@ Under **Policy and programs → App content**, Play asks a set of questions abou
   count as collected. This answer has to change the day sync, the coach or crash reporting ships.
 - **Health apps**: the fitness option; no Health Connect.
 
-Still to come: native plugins (volume-button logging, lock-screen controls, voice commands, storage that
-Android won't clear).
+- **Foreground service permissions**: `mediaPlayback`, for logging reps with the volume buttons and the lock
+  screen (step 11). Play asks for a sentence and a short video of it in use.
+
+## Step 11. Hands-free logging: volume buttons, earbuds and the lock screen
+
+**The problem.** Training alone, you can't keep walking back to the phone to tap. The web app already logs
+quick-rep drills by the set, with a one-button map: **one press = miss, two presses (or a hold) = set done,
+three presses = undo** (shot by shot it's one press = make, two = miss). A web page can't use the phone's
+volume buttons or keep working with the screen locked, so this step adds a **custom native plugin**.
+
+**The pieces** (all in `android/app/src/main/java/com/ladioyeleye/hoopsladder/remote/`):
+
+| File | What it does |
+|---|---|
+| `HoopsRemotePlugin.java` | The plugin the page talks to: `start`, `update`, `stop`, and a `signal` event |
+| `RemoteHub.java` | Where every button ends up. Only "armed" while the full-screen logger is open, so volume works normally everywhere else |
+| `PressDecoder.java` | Turns presses into signals: waits 380 ms after a press to see if another follows, and treats a 600 ms hold as "set done" |
+| `RepLoggerService.java` | A foreground service with a media session and the ongoing notification |
+| `MainActivity.java` | `registerPlugin(...)` and `dispatchKeyEvent(...)` |
+
+**How a button press travels.**
+
+1. **Screen on, app in front.** Android hands every key to the activity first. `MainActivity.dispatchKeyEvent`
+   gives volume and media keys to `RemoteHub`. Returning `true` means "handled", so the volume doesn't change.
+2. **Screen locked.** The activity gets no keys, so `RepLoggerService` takes over. It owns a **MediaSession**,
+   the same thing music apps use. Android sends earbud and Bluetooth media buttons to the active media session.
+   The session also says its volume is controlled **remotely** (`setPlaybackToRemote`, the way a Chromecast
+   works), so Android sends it the volume buttons too, even with the screen off, instead of changing the
+   phone's volume. Each "volume up/down" request counts as one press.
+3. **The notification and lock screen** show the drill, the set and the misses so far, with
+   **Miss / Set done / Undo** buttons (**Make / Miss / Undo** shot by shot). Android 13 and newer build the
+   lock-screen media card from the session's *custom actions*; older versions use the notification's actions.
+   Both lead to the same `RemoteHub.emit(...)`.
+4. The decoded signal goes to the page as a `signal` event. The page's existing `sig()` function does the rest.
+   While the page can't be seen, the plugin also vibrates (two buzzes for a miss, one for set done, three for
+   undo), so you can feel that it counted.
+
+Decoding happens in Java, not in the page, because a page's timers slow down when the screen is off.
+
+**Why a foreground service.** With the screen off, Android soon freezes apps that aren't doing anything
+visible. A foreground service, which must show a notification, keeps the app running. Android 14 requires each
+service to declare a **type**. This one is `mediaPlayback`, since it runs a media session and the app speaks
+counts and beeps. Google Play asks you to explain each type in the Play Console (**App content → Foreground
+service permissions**), usually with a short video. If Play rejects it, the fallback is the `specialUse` type
+with a written reason.
+
+**Permissions added to the manifest:** `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MEDIA_PLAYBACK`, and
+`POST_NOTIFICATIONS`. On Android 13+ the app asks to show notifications the first time the logger opens. If you
+say no, the volume buttons still work, but the notification and its lock-screen buttons stay hidden.
+
+**Connecting it to the page without editing the prototype.** `www/index.html` is regenerated from the prototype,
+so app-only code lives in [`native-web/native.js`](../native-web/native.js). The page's app code sits inside
+one `(()=>{ ... })();` block, so its names (`S`, `R`, `openBig`, ...) are private to it. The import script pastes
+`native.js` in just before that block's closing `})();`, where it can see those names. There it wraps four
+functions: `openBig` (start the plugin), `closeBig` (stop it), `drawBig` (refresh the notification and reword the
+hints) and `bigTop` (hide the web version's "Earbuds" toggle, since the buttons are always on in the app). In a
+normal browser `Capacitor.isNativePlatform()` is false and the file does nothing.
+
+**Calling a plugin from plain JavaScript.** Capacitor injects `window.Capacitor` into the WebView, and every
+registered plugin appears under `Capacitor.Plugins`:
+
+```js
+const Remote = Capacitor.Plugins.HoopsRemote;
+Remote.addListener("signal", e => sig(e.k));      // "a", "b" or "u"
+await Remote.start({ mode: "sets", title: "Roll-Up Drill", text: "Set 1 · 0 missed" });
+```
+
+Plugins from npm (like Preferences in step 12) are registered by `npx cap sync`. A plugin that lives inside the
+app must be registered by hand in `MainActivity.onCreate`, **before** `super.onCreate()`.
+
+**Limits to know.**
+
+- Hold to close a set only works with the screen on. With the screen locked Android reports volume presses with
+  no "released" event, so use a double press there.
+- Earbud buttons reach the app only while it's the last app that played sound. The app's beeps
+  usually make that true; if another app played music since, start that set with a tap or the volume buttons.
+- iPhone has no supported way to use the volume buttons. A $8 Bluetooth camera-shutter remote is the plan there.
+
+**How it was checked.** `./gradlew assembleDebug lintDebug` builds with no lint issues. The page side was tested in
+headless Chromium with a stand-in for the plugin: the logger starts it, signals log misses, undo and set done, the
+notification text updates, and closing the logger stops it. It still needs a try on a real phone, with the screen
+on and then locked.
+
+## Step 12. Saving progress where the system won't clear it
+
+The page saves your progress to `localStorage`. Capacitor recommends its
+[Preferences plugin](https://capacitorjs.com/docs/apis/preferences) for anything you can't lose, because the
+system can clear a WebView's storage to free space (mostly an iPhone problem, and the iPhone version will come
+later). Preferences are stored in an ordinary app file (`SharedPreferences` on Android).
+
+```bash
+npm i @capacitor/preferences
+npx cap sync android     # registers the plugin in the Android project
+```
+
+`native-web/native.js` wraps the page's `persist()` so every save also goes to Preferences. When the app starts,
+the page loads `localStorage` straight away (so the first screen is instant), then reads Preferences and switches to
+that copy if there is one. If you save something before Preferences answers, which takes a few milliseconds, the
+newer in-memory progress wins. The first launch after this update copies existing progress into Preferences.

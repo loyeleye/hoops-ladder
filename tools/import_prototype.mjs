@@ -63,6 +63,16 @@ patch(
   'const b64=await (await fetch(new URL("pose_lite.b64.txt",base).href)).text();const bin=atob(b64.trim()),buf=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);',
   'const buf=new Uint8Array(await (await fetch(new URL("pose_landmarker_lite.task",base).href)).arrayBuffer());'
 );
+// App-only page code (native-web/native.js): progress storage, volume-button and lock-screen logging.
+// The page's whole app lives inside one (()=>{ ... })(); so its names (S, R, persist, openBig, ...) are private.
+// native.js goes in just before that closing })(); so it can see and wrap those functions. See docs/LEARNING.md, step 11.
+{
+  const end = html.lastIndexOf("})();\n</script>");
+  if (end < 0 || html.indexOf("</script>", end + 6) !== html.lastIndexOf("</script>"))
+    throw new Error('native.js: the page no longer ends with "})();</script>"; update tools/import_prototype.mjs');
+  const code = fs.readFileSync(path.join(root, "native-web", "native.js"), "utf8");
+  html = html.slice(0, end) + "\n/* ---- native-web/native.js (added by tools/import_prototype.mjs) ---- */\n" + code + "\n" + html.slice(end);
+}
 html =
   '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n' +
   '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' +
