@@ -180,6 +180,76 @@ You'll move the same `.aab` through three tracks in the Play Console:
 Before any track will take a build, the listing and the **App content** forms (steps 8 to 10) must be
 filled in.
 
+## Step 7. The Coach tab: training videos, dictation, saving and sharing
+
+The prototype gained a **Coach** tab: take-home drill lists from a trainer (typed or spoken, with
+YouTube links) and personal training videos. Videos must stay on the phone, never on a server.
+Three things a browser does for free had to be swapped for native plugins inside the app.
+
+**What was run:**
+
+```bash
+npm i @capacitor/filesystem @capacitor/share @capacitor-community/speech-recognition   # all MIT licensed
+npm run import-prototype -- /path/to/hoops-app    # pull in the new Coach tab (Step 2)
+npx cap sync android                              # registers the plugins with Gradle
+```
+
+`cap sync` wrote the plugins into `android/capacitor.settings.gradle` and
+`android/app/capacitor.build.gradle`. Those two files are generated, so never edit them by hand.
+
+**Where the videos live.** Recordings go into IndexedDB (`hoopsLadder.videos`). That's the browser's
+own database, kept inside the app's private storage. It's separate from the saved progress, so it is
+never synced anywhere. Uninstalling the app deletes it, so the app offers **Save to phone**.
+
+**1. Recording needs no plugin.** The page records with `getUserMedia()` and `MediaRecorder`, the same
+web APIs as live form analysis. Camera and mic permissions are already in place (Step 3). If the
+camera can't be opened, the page falls back to `<input type="file" accept="video/*" capture>`. That
+opens the phone's own camera app, and Capacitor's WebView handles it too.
+
+**2. Dictation needs a plugin.** Chrome on a phone has `webkitSpeechRecognition`, but Android's WebView
+doesn't. `@capacitor-community/speech-recognition` calls Android's own speech recognizer instead. The
+page checks for it in `window.Capacitor.Plugins.SpeechRecognition`, then:
+
+- `requestPermissions()` shows the mic prompt.
+- `start({ partialResults: true, popup: false })` listens without Google's popup.
+- `partialResults` events give the words as they're heard.
+- A `listeningState: stopped` event means Android ended the session after a pause. The page starts it
+  again until the person taps Stop, so they can say a whole list.
+
+The plugin's own manifest adds `RECORD_AUDIO` and a `<queries>` entry for
+`android.speech.RecognitionService`. Since Android 11, an app can only see services it declares it
+looks for. Gradle merges a plugin's manifest into the app's when it builds, so `AndroidManifest.xml`
+didn't need editing.
+
+**3. Saving and sharing need plugins.** A WebView ignores `<a download>` links, and it has no
+`navigator.share()` for files. In the app:
+
+- **Save to phone** writes the clip with `Filesystem.writeFile()` into `Documents/Hoops Ladder/`. If
+  the phone refuses (Android 10 and older need a storage permission the app doesn't ask for), it
+  opens the share sheet instead, so you can pick Files or Drive.
+- **Send to coach** writes a copy into the app's cache folder and passes its `file://` address to
+  `Share.share({ files: [uri] })`. Android's share sheet then lets you pick WhatsApp, Messages, Gmail
+  and so on. Sharing a cache file to another app works through the `FileProvider` that's already in
+  the manifest (`res/xml/file_paths.xml` allows the cache folder).
+
+The bridge between JavaScript and Java passes text, not binary. So the clip is sent as base64, in
+3 MB pieces (`writeFile` for the first, then `appendFile`), so a 5-minute video never becomes one
+huge string in memory. Each piece is a multiple of 3 bytes, so the base64 pieces join without gaps.
+
+**How the page tells where it's running.** `window.Capacitor.isNativePlatform()` is `true` only
+inside the app. On claude.ai the same buttons use Claude's download prompt, and in a phone browser
+they use a normal download link and the browser's share sheet. One page serves all three.
+
+**How it was checked.** In headless Chromium with a fake camera, the page recorded clips, and the
+plugins were stood in for by test doubles. A 7 MB clip was saved and shared in three pieces and came
+back byte for byte. Dictated text landed in the drill box. The real plugins can only be tried on a
+phone. With the debug APK from CI (Step 5), check these:
+
+1. Coach → **Say them** asks for the mic, then types what you say.
+2. **Record** asks for the camera, and the clip appears under My videos.
+3. Open a clip → **Save to phone**, then look in the Files app under Documents › Hoops Ladder.
+4. **Send to coach** opens the share sheet with the video attached.
+
 ## Step 8. A privacy policy, hosted on GitHub Pages
 
 **Why.** Play requires a privacy policy URL for every app, and it matters more here because the app asks for the
