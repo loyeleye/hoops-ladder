@@ -178,9 +178,9 @@ You'll move the same `.aab` through three tracks in the Play Console:
 3. **Production**: the public listing, after Google's review.
 
 Still to come: the privacy policy, store listing and app icon. Volume-button logging, lock-screen controls and
-safer storage are steps 8 and 9.
+safer storage are steps 11 and 12.
 
-## Step 8. Hands-free logging: volume buttons, earbuds and the lock screen
+## Step 11. Hands-free logging: volume buttons, earbuds and the lock screen
 
 **The problem.** Training alone, you can't keep walking back to the phone to tap. The web app already logs
 quick-rep drills by the set, with a one-button map: **one press = miss, two presses (or a hold) = set done,
@@ -244,7 +244,7 @@ Remote.addListener("signal", e => sig(e.k));      // "a", "b" or "u"
 await Remote.start({ mode: "sets", title: "Roll-Up Drill", text: "Set 1 · 0 missed" });
 ```
 
-Plugins from npm (like Preferences in step 9) are registered by `npx cap sync`. A plugin that lives inside the
+Plugins from npm (like Preferences in step 12) are registered by `npx cap sync`. A plugin that lives inside the
 app must be registered by hand in `MainActivity.onCreate`, **before** `super.onCreate()`.
 
 **Limits to know.**
@@ -260,7 +260,7 @@ headless Chromium with a stand-in for the plugin: the logger starts it, signals 
 notification text updates, and closing the logger stops it. It still needs a try on a real phone, with the screen
 on and then locked.
 
-## Step 9. Saving progress where the system won't clear it
+## Step 12. Saving progress where the system won't clear it
 
 The page saves your progress to `localStorage`. Capacitor recommends its
 [Preferences plugin](https://capacitorjs.com/docs/apis/preferences) for anything you can't lose, because the

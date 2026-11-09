@@ -65,7 +65,7 @@ patch(
 );
 // App-only page code (native-web/native.js): progress storage, volume-button and lock-screen logging.
 // The page's whole app lives inside one (()=>{ ... })(); so its names (S, R, persist, openBig, ...) are private.
-// native.js goes in just before that closing })(); so it can see and wrap those functions. See docs/LEARNING.md, step 8.
+// native.js goes in just before that closing })(); so it can see and wrap those functions. See docs/LEARNING.md, step 11.
 {
   const end = html.lastIndexOf("})();\n</script>");
   if (end < 0 || html.indexOf("</script>", end + 6) !== html.lastIndexOf("</script>"))

@@ -17,7 +17,7 @@ public class MainActivity extends BridgeActivity {
 
     /**
      * Every key press reaches the activity before Android acts on it. While the full-screen rep logger is
-     * open, the volume and media buttons log reps instead of changing the volume. See docs/LEARNING.md, step 8.
+     * open, the volume and media buttons log reps instead of changing the volume. See docs/LEARNING.md, step 11.
      */
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {

@@ -3,7 +3,7 @@
    Why a separate file: www/index.html is generated from the prototype, so edits there get overwritten on every
    import. tools/import_prototype.mjs pastes this file in at the end of the page's main (()=>{ ... })(); block,
    where it can see the page's own names (S, R, persist, openBig, ...) and wrap a few functions without editing
-   the prototype. See docs/LEARNING.md, step 8. */
+   the prototype. See docs/LEARNING.md, step 11. */
 (() => {
   const Cap = window.Capacitor;
   if (!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) return;

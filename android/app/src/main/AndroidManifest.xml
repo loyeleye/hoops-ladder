@@ -25,7 +25,7 @@
         </activity>
 
         <!-- Keeps rep logging running with the screen locked, and owns the media session that receives the
-             volume and earbud buttons. See docs/LEARNING.md, step 8. -->
+             volume and earbud buttons. See docs/LEARNING.md, step 11. -->
         <service
             android:name=".remote.RepLoggerService"
             android:exported="false"
