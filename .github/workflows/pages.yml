@@ -1,7 +1,7 @@
 # Publishes site/ (the privacy policy and a small home page) to GitHub Pages.
 # One-time setup: repo Settings → Pages → Build and deployment → Source: "GitHub Actions".
 # The policy then lives at https://loyeleye.github.io/hoops-ladder/privacy.html
-# Walkthrough: docs/LEARNING.md, step 7.
+# Walkthrough: docs/LEARNING.md, step 8.
 name: Website
 
 on:

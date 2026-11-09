@@ -177,10 +177,10 @@ You'll move the same `.aab` through three tracks in the Play Console:
    14 days in a row before they can apply for production.
 3. **Production**: the public listing, after Google's review.
 
-Before any track will take a build, the listing and the **App content** forms (steps 7 to 9) must be
+Before any track will take a build, the listing and the **App content** forms (steps 8 to 10) must be
 filled in.
 
-## Step 7. A privacy policy, hosted on GitHub Pages
+## Step 8. A privacy policy, hosted on GitHub Pages
 
 **Why.** Play requires a privacy policy URL for every app, and it matters more here because the app asks for the
 camera and mic. It has to be a public web page (not a PDF or a Google Doc that needs sign-in) and it
@@ -216,7 +216,7 @@ Source: GitHub Actions**. Then run the **Website** workflow from the **Actions**
 `site/`). The policy is then at https://loyeleye.github.io/hoops-ladder/privacy.html. Open it on your phone
 to check, then paste that URL into Play Console.
 
-## Step 8. Store listing, icon and screenshots
+## Step 9. Store listing, icon and screenshots
 
 **Text.** [`store/listing.md`](../store/listing.md) has the app name (30 characters max), the short
 description (80) and the full description (4,000), ready to paste. Everything in it is a feature the app
@@ -253,12 +253,12 @@ node tools/make_store_art.mjs
 
 To change the icon, edit `store/art/icon.svg` and run the script again.
 
-## Step 9. The App content forms
+## Step 10. The App content forms
 
 Under **Policy and programs → App content**, Play asks a set of questions about every app.
 [`store/play_console_notes.md`](../store/play_console_notes.md) has the answer for each one and why:
 
-- **Privacy policy**: the URL from step 7.
+- **Privacy policy**: the URL from step 8.
 - **App access**: no login, everything is reachable.
 - **Ads**: none.
 - **Content rating**: the IARC questionnaire; all "No", which gives Everyone / PEGI 3.

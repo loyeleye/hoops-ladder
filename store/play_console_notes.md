@@ -10,7 +10,7 @@ safety form and the privacy policy before releasing that version.**
 ## Privacy policy
 
 URL: `https://loyeleye.github.io/hoops-ladder/privacy.html`
-(Live once GitHub Pages is turned on; see `docs/LEARNING.md`, step 7.)
+(Live once GitHub Pages is turned on; see `docs/LEARNING.md`, step 8.)
 
 ## App access
 

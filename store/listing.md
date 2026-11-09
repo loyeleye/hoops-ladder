@@ -66,7 +66,7 @@ For every level, from your first layup line to your hundredth 3-point test.
 | Feature graphic | `graphics/feature-graphic.png` | 1024 × 500 PNG or JPEG, no transparency |
 | Phone screenshots | `screenshots/phone-1.png` … `phone-5.png` | 2 to 8; 1080 × 1920 (9:16) qualifies for featuring |
 
-All of them are rendered from the app by `node tools/make_store_art.mjs` (see `docs/LEARNING.md`, step 8).
+All of them are rendered from the app by `node tools/make_store_art.mjs` (see `docs/LEARNING.md`, step 9).
 The progress in the screenshots is demo data.
 
 ## Other listing fields

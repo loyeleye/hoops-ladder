@@ -6,7 +6,7 @@
 // It serves www/ locally, opens it in headless Chromium at phone size with made-up demo progress,
 // takes the screenshots, and draws the rest from store/art/icon.svg.
 // Needs Playwright with Chromium:  npm i --no-save playwright && npx playwright install chromium
-// Usage: node tools/make_store_art.mjs        See docs/LEARNING.md, step 8.
+// Usage: node tools/make_store_art.mjs        See docs/LEARNING.md, step 9.
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
