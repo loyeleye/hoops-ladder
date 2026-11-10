@@ -435,7 +435,7 @@
         <div class="lf-shot"><span>Film from the side, shooting arm toward the phone, whole body in frame. Shoot when you're ready.</span></div>`;
       document.body.appendChild(el);
       L = { el, video: el.querySelector("video"), cv: el.querySelector("canvas"), stream: null, face: "environment", talk: true,
-            buf: [], shots: [], up: 0, cool: 0, lastT: 0, noBody: 0, raf: 0, pl: null, busy: false };
+            buf: [], shots: [], up: 0, cool: 0, armed: true, lastT: 0, noBody: 0, raf: 0, pl: null, busy: false };
       L.video.setAttribute("playsinline", "");
       el.addEventListener("click", e => {
         const b = e.target.closest("[data-lf]");
@@ -516,7 +516,7 @@
     }
 
     // Shot finder: the shooting wrist above the nose starts a shot; it's over when the wrist drops back below the
-    // nose (follow-through done) or 1.6 s later. Then compute() runs on the 3.5 s before, resampled to 10 fps.
+    // shoulder (follow-through done) or 1.8 s later. Then compute() runs on the 3.5 s before, resampled to 10 fps.
     function track(lm, t) {
       const s = SIDE[S.settings.hand || "R"];
       const body = lm && lm[0].v > .3 && lm[s.wr].v > .3 && (lm[s.an].v > .3 || lm[s.an === 28 ? 27 : 28].v > .3);
@@ -527,12 +527,20 @@
       }
       L.noBody = 0;
       msg("");
-      if (t < L.cool) return;
-      const above = lm[s.wr].y < lm[0].y;
+      // After a shot, wait for the ball to come back down (wrist below the shoulder) before looking for the next
+      // one, so a long follow-through or a wave doesn't count twice.
+      // (for 0.3 s, so one jumpy pose frame doesn't count)
+      if (!L.armed) { if (lm[s.wr].y > lm[s.sh].y) { L.downAt = L.downAt || t; if (t - L.downAt > .3) L.armed = true; } else L.downAt = 0; }
+      if (t < L.cool || !L.armed) return;
+      const above = lm[s.wr].y < lm[0].y, down = lm[s.wr].y > lm[s.sh].y;
       if (above && !L.up) L.up = t;
-      if (L.up && ((!above && t - L.up > .25) || t - L.up > 1.6)) {
+      // Over when the hand comes back below the shoulder. (Below the nose isn't enough: a set point at forehead
+      // height, or one jumpy frame, would cut the shot off before the release.)
+      if (L.up && ((down && t - L.up > .25) || t - L.up > 1.8)) {
         const start = L.up;
         L.up = 0;
+        L.armed = false;
+        L.downAt = 0;
         L.cool = t + .8;
         analyzeShot(start, t);
       }
@@ -550,6 +558,8 @@
       let res;
       try { res = compute(frames, FPS); } catch (e) { return; }
       if (!res || !res.ok) return;
+      // A hand raised without a dip and a long arm (a wave, a catch, fixing a sleeve) isn't a shot.
+      if (res.vals.knee > 165 || res.vals.ext < 120) return;
       L.shots.push(res);
       drawTop();
       showShot(res);
