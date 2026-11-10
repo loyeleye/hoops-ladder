@@ -56,7 +56,10 @@
   voice commands (for example, saying "make" or "miss" to log a shot), and dictating drills.</p>
   <p>Voice commands and dictation use the speech recognition service built into Android, not one run by
   Hoops Ladder. On most phones that service is provided by Google, so your speech may be sent to and processed
-  by Google under Google's privacy policy. Hoops Ladder receives only the recognized words. Voice commands are
+  by Google under Google's privacy policy. For voice commands the app asks for the phone's on-device recognizer
+  first, which keeps the audio on the phone, and only uses the regular one when the phone doesn't have it.
+  Voice commands listen only while a drill timer or the rep logger with Voice turned on is open, and stop when you
+  leave the app. Hoops Ladder receives only the recognized words. Voice commands are
   acted on right away and not stored; dictated drills are saved on your phone like any drill list. You can
   log shots with taps, earbuds or a clicker and type drills instead, and never use speech recognition.</p>
   <p>Spoken coaching (the app reading out your score and cues) uses your phone's built-in text-to-speech.</p>

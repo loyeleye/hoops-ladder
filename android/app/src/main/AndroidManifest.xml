@@ -49,6 +49,14 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- Voice commands and beat matching. Also asked for at runtime. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Android 11+ hides other apps' services unless declared: lets the app find the phone's speech recognizer
+         for voice commands (docs/LEARNING.md, step 15). -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- navigator.vibrate() inside a WebView needs this. -->
     <uses-permission android:name="android.permission.VIBRATE" />

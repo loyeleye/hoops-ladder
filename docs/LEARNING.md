@@ -504,3 +504,34 @@ recorded demos, which can ship inside the app as short MP4s.
 
 **Privacy.** Playing a clip connects to YouTube, so the privacy policy (`site/privacy.html`) and the Data safety
 notes (`store/play_console_notes.md`) say so. Nothing loads from YouTube until you open a clip.
+
+## Step 15. Voice commands during drills and in the rep logger
+
+Android's WebView has no `SpeechRecognition`, so the web version's Voice button was hidden in the app. Now the
+app has its own small plugin, `HoopsVoice` (`android/.../voice/HoopsVoicePlugin.java`), and `native-web/native.js`
+connects it to two screens:
+
+| Screen | How to turn it on | Words |
+|---|---|---|
+| Drill timer (handling, body) | **Voice** button beside Pause / Skip / End. It stays on for later drills until you turn it off | "pause" (or "stop", "wait"), "go" (or "resume", "ready"), "lost it", "faster", "slower", "skip" |
+| Rep logger (shooting, finishing) | The page's own **Voice** button | The web version's words: "miss", "done", the number made ("eight"), "undo", "short", "long left"... |
+
+**How the plugin listens.** Android's `SpeechRecognizer` hears one phrase and stops, so the plugin starts it again
+after every phrase or silence until the page calls `stop()`. It prefers the phone's **on-device** recognizer
+(`createOnDeviceSpeechRecognizer`, Android 12+, when the English pack is downloaded), so audio stays on the phone,
+and falls back to the regular recognizer with `EXTRA_PREFER_OFFLINE`. On Android 13+ it passes the command words as
+`EXTRA_BIASING_STRINGS`, which helps short words like "miss" win over look-alikes. When the app goes to the
+background or the screen locks it gives the mic back, and picks up again when you return.
+
+**Fast but not jumpy.** The timer acts on *partial* results, so "lost it" lands mid-phrase, and only once per
+phrase. The logger waits for the whole phrase, because there the count matters ("eight" vs. "eight... no, seven").
+
+**Not hearing itself.** The app talks (tips, "Paused", the countdown's "Go"). Anything heard while it's speaking,
+and for 0.3 s after, is ignored. Each word also only works when it makes sense: "go" does nothing while the clock
+runs, "lost it" only counts during a dribbling part, "faster" only when there's a beat.
+
+**Still to do.** A wake word ("Yo Ladder") and recording your own: try it in the gym first and see whether false
+triggers happen. Listening with the screen locked needs a microphone foreground service, which Android 14 only
+allows to start while the app is open.
+
+The `<queries>` entry in `AndroidManifest.xml` lets Android 11+ show the app the phone's speech recognizer.

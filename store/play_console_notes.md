@@ -60,7 +60,7 @@ Why each feature still counts as "not collected":
 | Training videos (camera + mic audio) | Stored in the app's IndexedDB on the phone | No |
 | Save to phone | Copies a video to Documents/Hoops Ladder, on the same phone | No |
 | Send to coach | Android share sheet; the user picks the app and recipient | Only by the user's own action. Google's guidance doesn't count user-initiated transfers like this as "sharing" |
-| Voice commands and dictating drills | `@capacitor-community/speech-recognition` hands audio to Android's recognizer (Google's on most phones) | Not by the app. The recognizer is a system service covered by Google's policy, like the keyboard; the app only gets text |
+| Voice commands and dictating drills | Dictation: `@capacitor-community/speech-recognition`. Voice commands: the app's own `HoopsVoice` plugin, which asks for Android's on-device recognizer first. Either way audio goes to Android's recognizer (Google's on most phones) | Not by the app. The recognizer is a system service covered by Google's policy, like the keyboard; the app only gets text |
 | Spoken scores | Android text-to-speech | No |
 | Demo clips | YouTube's embedded player (youtube-nocookie.com) plays inside the app when the user opens a clip | The video request goes to YouTube, like any embedded video. The app sends YouTube no user data of its own and adds no YouTube SDK. Check how the Data safety form treats an embedded player when you fill it in |
 | Outside links (articles, "YouTube app" button) | Open in the browser or YouTube app | Not by the app |
