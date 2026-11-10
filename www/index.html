@@ -62,6 +62,20 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .skill .bar.h i{background:var(--read)}
 .skill .bar.f i{background:var(--good)}
 .syncnote{font-size:12px;opacity:.75}
+/* Drills tab: Shooting / Handling / Finishing tabs at the bottom of the sticky plate. The plate keeps its own (brighter) skill colours so the blue and green read on navy in both themes. */
+.plate{--read:#8FA8FF;--good:#46C489}
+.plate .sktabs{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding-block:0;position:relative;border-top:1px solid rgb(242 245 250/.14)}
+.sktabs button{border:0;background:none;color:var(--bg);opacity:.6;font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;min-height:46px;padding:0 4px;transition:opacity .2s}
+.sktabs button[aria-selected="true"]{opacity:1}.sktabs button:active{opacity:.85}
+.sktabs .ind{position:absolute;left:0;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--sk,var(--accent));pointer-events:none;transition:transform .24s cubic-bezier(.2,.8,.2,1),width .24s cubic-bezier(.2,.8,.2,1),background-color .24s}
+.plate:has(.sktabs){box-shadow:none!important;border-bottom:1px solid rgb(242 245 250/.12)}
+.plate .skills{max-height:120px;transition:max-height .2s ease-out,opacity .2s ease-out}
+.plate .lvl{transition:width .2s ease-out,height .2s ease-out}
+.plate.compact .skills,.plate.compact .syncnote{max-height:0;opacity:0;overflow:hidden}
+.plate.compact .wrap:first-child{padding-block:8px;row-gap:0}.plate.compact .lvl{width:38px;height:38px}.plate.compact .lvl b{font-size:18px}.plate.compact .lvl small{display:none}
+@keyframes enterL{from{opacity:0;transform:translateX(-24px)}}@keyframes enterR{from{opacity:0;transform:translateX(24px)}}@keyframes enterF{from{opacity:0}}
+.enter-l{animation:enterL .22s cubic-bezier(.2,.8,.2,1)}.enter-r{animation:enterR .22s cubic-bezier(.2,.8,.2,1)}
+@media (prefers-reduced-motion: reduce){.sktabs .ind,.plate .skills,.plate .lvl{transition:none}.enter-l,.enter-r{animation:enterF .12s linear}}
 
 /* sections */
 section{display:flex;flex-direction:column;gap:10px}
@@ -1985,7 +1999,29 @@ function renderPlate(){
   <div class="skills"><span class="skill">Shooting <b class="num">Lv ${s.L}</b><span class="bar"><i style="width:${100*s.into/s.need}%"></i></span></span>
   <span class="skill">Handling <b class="num">Lv ${h.L}</b><span class="bar h"><i style="width:${100*h.into/h.need}%"></i></span></span>
   <span class="skill">Finishing <b class="num">Lv ${f.L}</b><span class="bar f"><i style="width:${100*f.into/f.need}%"></i></span></span></div>
-  ${syncNote?`<div class="syncnote" style="grid-column:1/-1">${esc(syncNote)}</div>`:""}</div>`}
+  ${syncNote?`<div class="syncnote" style="grid-column:1/-1">${esc(syncNote)}</div>`:""}</div>${state.tab==="drills"?skillTabs():""}`;
+  $("#plate").classList.toggle("compact",state.tab==="drills"&&plateSmall);placeInd(false)}
+/* Drills tab: the skill switch lives in the sticky plate so it stays reachable while scrolling a long ladder.
+   Switching updates the tabs in place (keeps focus, lets the underline slide), re-renders only the list, and remembers each ladder's scroll spot. */
+const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)"},tabScroll={};let plateSmall=false;
+function skillTabs(){const k=state.drillTab;
+  return `<div class="wrap sktabs" role="tablist" aria-label="Skill">${SKT.map(([v,l])=>`<button role="tab" id="tab-${v}" aria-controls="drillpanel" data-dtab="${v}" aria-selected="${k===v}" tabindex="${k===v?0:-1}">${l}</button>`).join("")}<i class="ind" aria-hidden="true"></i></div>`}
+function placeInd(anim){const b=$("#tab-"+state.drillTab),ind=$(".sktabs .ind");if(!b||!ind)return;
+  if(!anim)ind.style.transition="none";const w=Math.round(b.offsetWidth*.64);
+  ind.style.width=w+"px";ind.style.transform=`translateX(${b.offsetLeft+(b.offsetWidth-w)/2}px)`;ind.style.setProperty("--sk",SKC[state.drillTab]);
+  if(!anim){ind.offsetWidth;ind.style.transition=""}}
+function setDrillTab(k,focus){const old=state.drillTab;if(k===old){if(focus)$("#tab-"+k)?.focus();return}
+  tabScroll[old]=window.scrollY;state.drillTab=k;
+  document.querySelectorAll(".sktabs [role=tab]").forEach(b=>{const on=b.dataset.dtab===k;b.setAttribute("aria-selected",on);b.tabIndex=on?0:-1});
+  placeInd(true);$("#view").innerHTML=viewDrills();
+  const sec=$("#drillpanel");if(sec)sec.classList.add("shf".indexOf(k)>"shf".indexOf(old)?"enter-r":"enter-l");
+  window.scrollTo(0,tabScroll[k]||0);if(focus)$("#tab-"+k)?.focus()}
+document.addEventListener("keydown",e=>{const t=e.target.closest?.(".sktabs [role=tab]");if(!t)return;
+  const ks=SKT.map(x=>x[0]),i=ks.indexOf(state.drillTab),j={ArrowRight:i+1,ArrowLeft:i-1,Home:0,End:2}[e.key];
+  if(j==null)return;e.preventDefault();setDrillTab(ks[(j+3)%3],true)});
+window.addEventListener("scroll",()=>{if(state.tab!=="drills")return;const y=window.scrollY,small=plateSmall?y>16:y>120;
+  if(small!==plateSmall){plateSmall=small;$("#plate").classList.toggle("compact",small)}},{passive:true});
+window.addEventListener("resize",()=>placeInd(false));
 
 function courtSVG(opts={}){
   const {data,cur,done=[],size}=opts;
@@ -2051,8 +2087,7 @@ function cueCard(){const c=todayCue();
 function viewDrills(){
   const k=state.drillTab;
   const list=DRILLS.filter(d=>d.skill===k&&!d.body).sort((a,b)=>a.unlock-b.unlock||(a.read?1:0)-(b.read?1:0));
-  return `<section><div class="sechead"><h2>Drill library</h2><div class="seg" role="group" aria-label="Skill">
-   <button data-dtab="s" aria-pressed="${k==="s"}">Shooting</button><button data-dtab="h" aria-pressed="${k==="h"}">Handling</button><button data-dtab="f" aria-pressed="${k==="f"}">Finishing</button></div></div>
+  return `<section id="drillpanel" role="tabpanel" aria-labelledby="tab-${k}"><div class="sechead"><h2>${k==="s"?"Shooting":k==="h"?"Handling":"Finishing"} ladder</h2></div>
    <p class="muted small" style="margin:0">${k==="f"?"Low-lift finishes: soft touch off the glass, two-foot stops, floaters, same-foot finishes and reverses that use the rim. No backboard slaps or big jumps. Then decision reps where the phone picks the finish.":k==="s"?"Form work from SeeMikeDunn, a tracked 3-point test, then decision reps that make the catch unpredictable.":"Mechanics from In The Lab, Phil Handy and ILB coaches, then decision reps where your phone calls the move so you react instead of recite."} Locked drills open with skill checks: hit your goal twice on drills from the step before. The number on a locked drill is your checks so far.</p>
    <div class="list">${list.map((d,i)=>drillRow(d,i+1)).join("")}</div></section>${k==="f"?finCard(0):""}`}
 
@@ -2107,7 +2142,7 @@ function progLadder(){const rows=ladderHist(),d=D.s_ladder;if(!rows.length)retur
    <div class="card hist">${d.stages.map((st,i)=>{const x=last.lad[i];return `<div><span>${esc(st)}</span><span class="muted">${best[i]!=null?`best ${best[i]}`:""}</span><b class="num">${x?(x[1]>=d.stageN?x[0]:x[0]+"+ ("+x[1]+" made)"):"–"}</b></div>`}).join("")}</div>
    <p class="muted small" style="margin:0">Last ladder on ${new Date(last.d+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}. Where the count jumps is where your shot starts to change.</p></section>`}
 const state={tab:"today",drillTab:"s",range:"30"};
-function route(){const h=location.hash.slice(1);state.tab=["today","drills","progress","form","coach"].includes(h)?h:"today";render()}
+function route(){const h=location.hash.slice(1);state.tab=["today","drills","progress","form","coach"].includes(h)?h:"today";plateSmall=state.tab==="drills"&&window.scrollY>120;render()}
 function render(){renderPlate();
   $("#view").innerHTML=state.tab==="today"?viewToday():state.tab==="drills"?viewDrills():state.tab==="form"?viewForm():state.tab==="coach"?viewCoach():viewProgress();afterFormRender();afterCoachRender();
   document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"))}
@@ -2122,7 +2157,7 @@ document.addEventListener("click",e=>{
   if(t.dataset.coach){askCoach();return}
   if(t.dataset.open)openRunner(t.dataset.open);
   else if(t.dataset.mins){S.settings.mins=+t.dataset.mins;persist();render()}
-  else if(t.dataset.dtab){state.drillTab=t.dataset.dtab;render()}
+  else if(t.dataset.dtab)setDrillTab(t.dataset.dtab)
   else if(t.dataset.range){state.range=t.dataset.range;render()}});
 document.addEventListener("change",e=>{
   if(e.target.id==="optPartner"){S.settings.partner=e.target.checked;persist();render()}
