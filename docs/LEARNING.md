@@ -626,3 +626,41 @@ music back on its own after 10 seconds. Beeps aren't ducked; they're too short.
 the "notification access" permission to see other apps' media sessions). Or a Spotify integration to pick a
 playlist from the app (Spotify's App Remote SDK: needs a Spotify developer app, their approval for more than 25
 users, and the Spotify app on the phone). YouTube Music has no public API for this.
+
+## Step 19. Music controls inside the app
+
+Back, play/pause and skip for whatever is playing (Spotify, YouTube Music...), without leaving the drill. An art
+panel picked the design from four mock styles (floating disc, top capsule, edge tab, built in); the reviews are in
+the project's `hoops-app/reviews/music-controls/`.
+
+| Where | What you see |
+|---|---|
+| Drill timer and rep logger | A full-width row under the top buttons: song, artist and app, then back, play/pause, skip |
+| Tabs | The same controls in a mini-player above the tab bar |
+
+**Turning it on.** Android only lets an app see other apps' music once you turn on **notification access** for
+it. When something is playing and access is off, the tab bar shows *Control your music from here* with **Set up**
+(opens the setting) and **×** (asks again in 14 days). Phones on Android 13+ block this setting for apps installed
+outside the Play Store (like the Obtainium builds): if the switch is greyed out, open **Settings → Apps → Hoops
+Ladder → ⋮ → Allow restricted settings**, then try again.
+
+**How it works.** `MusicListenerService` (`android/.../music/`) is an empty `NotificationListenerService`: it
+exists only because Android grants the access to one. With access on, `HoopsMusicPlugin` asks
+`MediaSessionManager.getActiveSessions()` for the music apps, skips the app's own rep-logger session, follows the
+one that's playing (or the most recent, so a paused song can be resumed), and sends its title, artist and state to
+the page. Buttons call that session's `TransportControls`. Without access the plugin can still say whether
+anything is playing (`AudioManager.isMusicActive()`), which is how the setup bar knows when to show.
+
+**Never a logged miss.** The timer pauses on a tap anywhere and the logger logs a miss on a tap anywhere, so the
+row sits inside a 10 px guard that keeps every touch starting there (taps, holds, swipes) to itself. Once the row
+has shown during a drill it keeps its space until that screen closes, so the clock and number pad don't jump when
+a song ends. Skips need 0.6 s between them, so a double tap is one skip.
+
+**Looks.** White controls on navy, no orange (orange is the drill's own colour), and nothing animates. Paused
+music keeps its controls, because that's when you want play; they go 2 s after the music app's session ends.
+
+**Earbuds and volume buttons** still log reps while the logger is open (step 11), so the row is how you control
+music there.
+
+**Ideas for later** (from the panel): a smaller, dimmer row while you work that grows during rests, and the
+real album art.

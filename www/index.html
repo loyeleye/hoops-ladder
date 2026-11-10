@@ -3947,7 +3947,154 @@ route();
     };
   }
 
-  /* ---------- 7. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------
+  /* ---------- 7. Music controls: back / play-pause / skip for the music app that's playing ----------
+     Shown only while another app (Spotify, YouTube Music...) has music loaded, and only after the player turns on
+     notification access for Hoops Ladder (Android's rule for seeing other apps' music). The art panel picked controls
+     built into the screens, never floating (reviews in the project's hoops-app/reviews/music-controls/):
+     - Drill timer and rep logger: a full-width row under the top buttons. It sits inside a 10 px guard, and every
+       touch that starts in the guard stays there, so a press never pauses the timer, logs a miss, a miss direction
+       or closes a set. Once it has shown during a drill it keeps its space until the screen closes, so nothing jumps.
+     - Tabs: a mini-player docked on the tab bar; the page gets extra bottom padding so it never covers Up Next.
+     - Paused music keeps its controls (that's when you want play). They go when the music app's session ends.
+     - White controls, no orange: orange is the drill's own colour. No moving parts.
+     When music is playing but access is off, the tab bar slot offers the setup instead (Not now = 14 days).
+     See docs/LEARNING.md, step 19. */
+  const Music = Plug.HoopsMusic;
+  if (Music) {
+    const SNOOZE = "hoopsMusicAskAfter";
+    const IC = {
+      prev: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg>',
+      next: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg>',
+      pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
+      play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
+    };
+    const css = document.createElement("style");
+    css.textContent = `
+      .mz-guard{position:relative;z-index:1;padding:10px;margin:0 -10px -10px;touch-action:none}
+      .mz-guard.gone{visibility:hidden}
+      .mz-dock{display:flex;align-items:center;gap:6px;height:60px;padding:0 6px 0 16px;border-radius:30px;background:#1E2A47;
+        box-shadow:inset 0 0 0 1px rgba(233,238,247,.14);color:#E9EEF7}
+      .mz-txt{flex:1;min-width:0}
+      .mz-t{font:700 15px/1.15 var(--display,'Saira Condensed'),sans-serif;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .mz-s{font:500 12px/1.3 var(--body,Barlow),sans-serif;color:#9AA6BF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .mz-b{flex:none;width:52px;height:52px;border-radius:26px;border:0;padding:0;display:grid;place-items:center;background:transparent;color:#E9EEF7}
+      .mz-b.sm{width:44px;height:44px}
+      .mz-b svg{width:22px;height:22px;fill:currentColor}
+      .mz-b.pp{width:48px;height:48px;background:#E9EEF7;color:#12203A;margin:0 2px}
+      .mz-b:active{transform:scale(.92);background:rgba(233,238,247,.16)}
+      .mz-b.pp:active{background:#C9D2E3}
+      .mz-mini{position:fixed;left:8px;right:8px;z-index:6;display:none}
+      .mz-mini .mz-dock{border-radius:16px;background:#12203A;box-shadow:0 6px 18px rgba(0,0,0,.28),inset 0 0 0 1px rgba(233,238,247,.14)}
+      body.mz-on .mz-mini{display:block}
+      body.mz-on main{padding-bottom:184px}
+      .mz-ask{font:600 14px/1.25 var(--body,Barlow),sans-serif;flex:1;min-width:0}
+      .mz-ask small{display:block;font-weight:500;font-size:12px;color:#9AA6BF}
+      .mz-go{flex:none;height:40px;padding:0 16px;border-radius:20px;border:0;background:#E9EEF7;color:#12203A;font:700 14px var(--body,Barlow),sans-serif}
+    `;
+    document.head.appendChild(css);
+
+    let cur = { on: false }, access = false, asking = false, gone = null, lastSkip = 0;
+    const guard = document.createElement("div");
+    guard.className = "mz-guard"; guard.setAttribute("data-music", "");
+    const mini = document.createElement("div");
+    mini.className = "mz-mini"; mini.setAttribute("data-music", "");
+    document.body.appendChild(mini);
+
+    // Every touch that starts on the music controls ends there: the timer and logger never see it.
+    for (const el of [guard, mini])
+      for (const t of ["pointerdown", "pointermove", "pointerup", "pointercancel", "click", "contextmenu", "touchstart", "touchend"])
+        el.addEventListener(t, e => {
+          e.stopPropagation();
+          if (t === "contextmenu") e.preventDefault();
+          if (t !== "click") return;
+          const b = e.target.closest("button");
+          if (b) press(b.dataset.mz);
+        });
+
+    function press(k) {
+      try { navigator.vibrate?.(15); } catch (e) {}
+      if (k === "ask") { Music.openAccess().catch(() => {}); return; }
+      if (k === "later") {
+        try { localStorage.setItem(SNOOZE, String(Date.now() + 14 * 864e5)); } catch (e) {}
+        asking = false; paint(); return;
+      }
+      if (k === "next" || k === "prev") {
+        if (Date.now() - lastSkip < 600) return; // a double tap is one skip
+        lastSkip = Date.now();
+      }
+      if (k === "pp") { k = cur.playing ? "pause" : "play"; cur.playing = !cur.playing; paint(); }
+      Music.control({ action: k }).catch(() => {});
+    }
+
+    function dock() {
+      const sub = cur.playing ? [cur.artist, cur.app].filter(Boolean).join(" · ") : `Paused${cur.app ? " · " + cur.app : ""}`;
+      return `<div class="mz-dock" role="group" aria-label="Music controls">
+        <div class="mz-txt"><div class="mz-t">${esc(cur.title || cur.app || "Music")}</div><div class="mz-s">${esc(sub)}</div></div>
+        <button class="mz-b sm" data-mz="prev" aria-label="Previous song">${IC.prev}</button>
+        <button class="mz-b pp" data-mz="pp" aria-label="${cur.playing ? "Pause music" : "Play music"}">${cur.playing ? IC.pause : IC.play}</button>
+        <button class="mz-b" data-mz="next" aria-label="Next song">${IC.next}</button></div>`;
+    }
+    function askDock() {
+      return `<div class="mz-dock" role="group" aria-label="Music controls setup">
+        <div class="mz-ask">Control your music from here<small>Turn on notification access for Hoops Ladder</small></div>
+        <button class="mz-go" data-mz="ask">Set up</button>
+        <button class="mz-b sm" data-mz="later" aria-label="Not now"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg></button></div>`;
+    }
+
+    // Puts the row under a drill screen's top buttons. Called after every redraw of the timer and logger.
+    function place(host) {
+      if (!host) return;
+      const top = host.querySelector(":scope > .bt-top");
+      if (!top) { if (guard.parentNode === host) guard.remove(); return; }
+      if (cur.on && access) host._mz = true;
+      if (!host._mz) { if (guard.parentNode) guard.remove(); return; }
+      guard.classList.toggle("gone", !(cur.on && access));
+      if (top.nextSibling !== guard) top.after(guard);
+    }
+
+    function paint() {
+      const show = cur.on && access;
+      if (show) { guard.innerHTML = dock(); mini.innerHTML = dock(); }
+      else if (asking) mini.innerHTML = askDock();
+      const tabs = document.querySelector(".tabs");
+      mini.style.bottom = ((tabs ? tabs.offsetHeight : 64) + 8) + "px";
+      document.body.classList.toggle("mz-on", show || asking);
+      place(typeof pEl !== "undefined" ? pEl : null);
+      place(typeof bigEl !== "undefined" ? bigEl : null);
+    }
+
+    Music.addListener("music", e => {
+      access = !!e.access;
+      if (access) asking = false;
+      const next = { on: !!e.on, playing: !!e.playing, title: e.title || "", artist: e.artist || "", app: e.app || "" };
+      clearTimeout(gone);
+      if (!next.on && cur.on) { gone = setTimeout(() => { cur = next; paint(); }, 2000); return; } // a 2 s grace between apps
+      cur = next; paint();
+    });
+
+    // Without access, offer the setup on the tabs when something is actually playing.
+    function check() {
+      if (document.hidden) return;
+      Music.state().then(s => {
+        access = !!s.access;
+        if (access) { Music.watch().catch(() => {}); return; }
+        let after = 0;
+        try { after = +localStorage.getItem(SNOOZE) || 0; } catch (e) {}
+        const want = !!s.playingSomewhere && Date.now() > after;
+        if (want !== asking) { asking = want; paint(); }
+      }).catch(() => {});
+    }
+    Music.watch().catch(() => {});
+    check();
+    setInterval(() => { if (!access) check(); }, 5000);
+    document.addEventListener("visibilitychange", check);
+
+    const origDrawPlayer = drawPlayer, origDrawBig = drawBig;
+    drawPlayer = function () { origDrawPlayer.apply(this, arguments); if (typeof pEl !== "undefined" && pEl) place(pEl); };
+    drawBig = function () { origDrawBig.apply(this, arguments); if (typeof bigEl !== "undefined" && bigEl) place(bigEl); };
+  }
+
+  /* ---------- 8. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------
      The native HoopsRemote plugin (android/.../remote/) decodes presses into the page's own signals:
      "a" (one press), "b" (two presses or a hold), "u" (three presses). sig() already knows what each means. */
   const Remote = Plug.HoopsRemote;
