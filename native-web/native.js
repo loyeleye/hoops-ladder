@@ -723,7 +723,38 @@
     }
   }
 
-  /* ---------- 6. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------
+  /* ---------- 6. Music from another app keeps playing, and dips while the app talks ----------
+     Start a playlist in Spotify, YouTube Music or any music app, then open Hoops Ladder. The page never asks for
+     full audio focus, so the music isn't paused. Every spoken cue goes through speechSynthesis.speak(), so wrapping
+     it here covers them all: the native HoopsAudio plugin (android/.../audio/) asks Android to duck other apps, and
+     once the app has been quiet for a second the music comes back up. Beeps are too short to duck.
+     See docs/LEARNING.md, step 18. */
+  const Duck = Plug.HoopsAudio;
+  if (Duck && window.speechSynthesis) {
+    const synth = window.speechSynthesis, origSpeak = synth.speak.bind(synth);
+    const QUIET_POLLS = 4, POLL_MS = 250; // a second of silence before the music comes back, so a countdown doesn't pump it
+    let ducked = false, quiet = 0, polls = 0, timer = null;
+    const down = () => Duck.duck().catch(() => {});
+    function up() {
+      clearInterval(timer); timer = null;
+      if (ducked) { ducked = false; Duck.unduck().catch(() => {}); }
+    }
+    synth.speak = function (u) {
+      if (!ducked) { ducked = true; down(); }
+      quiet = 0;
+      if (!timer) timer = setInterval(() => {
+        if (synth.speaking || synth.pending) {
+          quiet = 0;
+          if (++polls % 16 === 0) down(); // a long cue: tell the plugin we're still talking (it lets go after 10 s)
+          return;
+        }
+        if (++quiet >= QUIET_POLLS) up();
+      }, POLL_MS);
+      return origSpeak(u);
+    };
+  }
+
+  /* ---------- 7. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------
      The native HoopsRemote plugin (android/.../remote/) decodes presses into the page's own signals:
      "a" (one press), "b" (two presses or a hold), "u" (three presses). sig() already knows what each means. */
   const Remote = Plug.HoopsRemote;

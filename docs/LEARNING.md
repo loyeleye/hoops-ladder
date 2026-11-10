@@ -598,3 +598,31 @@ are on, they pause while it listens, since Android lets only one thing use the m
 **Not yet.** Counting real bounces during the whole set (instead of beat ticks), and treating a gap in the
 bounces as a lost ball, need the mic to stay on during the set. That's the next step for this feature, along with
 camera tracking of the dribbling hand to help in a noisy gym.
+
+## Step 18. Your own music during drills
+
+Start a playlist in Spotify, YouTube Music or any other music app, then open Hoops Ladder and run your drills. The
+music keeps playing, and while the app talks ("Paused", the countdown, tips, "8 for 10") it dips and comes back up.
+
+**How Android shares the speaker.** Apps ask for *audio focus* before they play. Asking for full focus
+(`AUDIOFOCUS_GAIN`) tells a music app to pause. Asking for `AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK` says "I'll talk for
+a moment, keep playing quietly", which is what navigation apps do for directions. Since Android 8 the system turns
+the music down by itself and back up when the focus is given back, so it works with every music app, no account or
+SDK needed. (A podcast or audiobook app may pause instead, because talking over speech is hard to follow.)
+
+**The pieces.** `HoopsAudio` (`android/.../audio/HoopsAudioPlugin.java`) has `duck()` and `unduck()`. In
+`native-web/native.js` (section 6) every `speechSynthesis.speak()` calls `duck()`, and once nothing has been spoken
+for a second it calls `unduck()`. The second of slack keeps a "3, 2, 1, Go" countdown from pumping the music up and
+down. If the page never says it's done (it froze, or the app went to the background mid-cue), the plugin brings the
+music back on its own after 10 seconds. Beeps aren't ducked; they're too short.
+
+**Things to know in the gym.**
+- While the rep logger is open, the volume and earbud buttons log reps (step 11), so change the music's volume in
+  the music app, its notification, or the lock screen.
+- Music from the phone's speaker makes voice commands (step 15) and **Match my dribble** (step 17) harder to hear.
+  With earbuds it's much better. Some phones' speech recognizers also dip or pause music while they listen.
+
+**Ideas for later.** Play / pause / skip buttons for whatever is playing, inside the app (any music app, but needs
+the "notification access" permission to see other apps' media sessions). Or a Spotify integration to pick a
+playlist from the app (Spotify's App Remote SDK: needs a Spotify developer app, their approval for more than 25
+users, and the Spotify app on the phone). YouTube Music has no public API for this.
