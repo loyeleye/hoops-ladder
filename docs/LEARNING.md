@@ -143,6 +143,10 @@ Google can reset it. You create the upload key once:
 keytool -genkey -v -keystore upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
 ```
 
+On Windows, `keytool` isn't on the path by default. Use Android Studio's copy,
+`& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" ...`, or install a JDK with
+`winget install EclipseAdoptium.Temurin.21.JDK` and reopen PowerShell.
+
 Keep `upload.jks` and its password somewhere safe, like a password manager. Never commit them;
 `.gitignore` blocks `*.jks` as a guard.
 
@@ -159,7 +163,7 @@ To turn on step 4, add these under **Settings → Secrets and variables → Acti
 
 | Secret | Value |
 |---|---|
-| `UPLOAD_KEYSTORE_BASE64` | output of `base64 -w0 upload.jks` (macOS: `base64 -i upload.jks`) |
+| `UPLOAD_KEYSTORE_BASE64` | output of `base64 -w0 upload.jks` (macOS: `base64 -i upload.jks`; Windows PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("$PWD\upload.jks")) \| Set-Clipboard`) |
 | `UPLOAD_KEYSTORE_PASSWORD` | the keystore password |
 | `UPLOAD_KEY_ALIAS` | `upload` |
 | `UPLOAD_KEY_PASSWORD` | the key password (often the same as the keystore password) |
