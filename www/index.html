@@ -680,7 +680,7 @@ const DRILLS=[
   cue:"Imagine a real defender, not a highlight one.",src:[{label:"Idea from r/BasketballTips",url:""}]},
  // ---------- FINISHING: low-lift finishes (no backboard slaps, no explosive jumps) ----------
  {id:"f_mikan",skill:"f",name:"Mikan Drill",role:"fin",unlock:1,mins:3,log:"makes",goal:20,timed:true,ft:"Layup",t0:70,tstep:2,tmax:90,
-  what:"The classic touch drill. Alternating layups right under the rim build soft hands, footwork and comfort with both hands. Twenty makes, and try to beat your time.",
+  what:"The classic touch drill. Alternating layups right under the rim build soft hands, footwork and comfort with both hands. Ten makes in a row to start, then twenty in a row once you own it.",
   steps:["Under the rim, ball high, right-hand layup off the left foot.","Catch it out of the net without letting it drop below your chin.","Step across, left-hand layup off the right foot.","Keep alternating, ball never drops."],
   cue:"Ball high the whole time. Soft off the glass.",src:[YTT("HaLql0ueNpY",60,"Breakthrough: Mikan Drill, 12 Variations")]},
  {id:"f_corner",skill:"f",name:"Top Corner Layups",role:"fin",unlock:1,mins:4,log:"makes",att:20,ft:"Layup",t0:60,tstep:2,tmax:85,
@@ -1999,8 +1999,9 @@ function courtSVG(opts={}){
   <path class="ln" d="M30 0 L30 22 A120 120 0 0 0 270 22 L270 0"/><path class="ln" d="M0 184 H300"/>
   <line x1="135" y1="10" x2="165" y2="10" stroke="var(--wood-line)" stroke-width="3"/><circle class="rim" cx="150" cy="20" r="7"/>${spots}</svg>`}
 
-function drillRow(d,i,opts={}){
-  const ts=todaySession(), done=ts&&ts.items.some(it=>it.id===d.id), lock=!unlocked(d);
+/* the goal line on a drill row, after the goal mode and any custom goal */
+function rowGoal(d){if(d.gm==="streak")return `${d.streakK} in a row${d.stages?" × "+d.stages.length+" parts":d.streakN>1?" × "+d.streakN:""}`;
+  if(d.gm==="time")return `make ${d.goal} fast`;
   let tgt="";
   if(d.log==="spots")tgt=`${d.per*5} shots · goal ${targetPct(d)}%`;
   else if(d.stages)tgt=d.stageBy==="makes"?`${d.stageN} makes × ${d.stages.length} distances`:`${d.stages.length} rounds of ${d.stageN}`;
@@ -2008,6 +2009,10 @@ function drillRow(d,i,opts={}){
   else if(d.log==="timer")tgt=`${Math.round(d.phases.reduce((a,p)=>a+p[1],0)/60*10)/10} min timer`;
   else if(d.log==="react")tgt=`${d.secs}s of calls`;
   else tgt=`${d.sets.length} sets`;
+  return tgt}
+function drillRow(d,i,opts={}){
+  const ts=todaySession(), done=ts&&ts.items.some(it=>it.id===d.id), lock=!unlocked(d);
+  let tgt=rowGoal(drillGoal(d));
   const nm=d.dynamic&&weakSpot()?`${d.name}: ${SPOT[weakSpot().id].name}`:d.name;
   const ck=lock?checksFor(d):null,soon=lock&&ck.gate.some(unlocked);
   const go=lock?`<span class="lockgo" aria-label="Locked: ${ck.n} of ${ck.need} skill checks"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span class="pips">${Array.from({length:ck.need},(_,j)=>`<i class="${j<ck.n?"on":""}"></i>`).join("")}</span><small>${ck.n} of ${ck.need} checks</small></span>`:done?"Again":"Go";
@@ -2142,7 +2147,7 @@ function lockOff(){try{wake?.release()}catch(e){}wake=null}
 /* ---------- runner ---------- */
 let R=null, tick=null;
 function openRunner(id){
-  const d=gmVariant(D[id]);
+  const d=drillGoal(D[id]);
   R={d,m:0,a:0,hist:[],spots:Object.fromEntries(SPOTS.map(s=>[s.id,[0,0]])),order:null,si:0,
      phase:0,left:d.phases?d.phases[0][1]:d.secs||0,running:false,finished:false,checks:(d.sets||[]).map(()=>false),
      call:null,calls:0,speak:true,confirm:false,rating:null};
@@ -2199,7 +2204,7 @@ function drawDock(){
   if(d.log==="timer"||d.log==="react"){const ph=phasesOf(d);
     el.innerHTML=`${hasParts(d)?"":`<div class="phases">${ph.map((p,i)=>`<span class="prow2"><span>${esc(p[0])} · ${p[1]}s</span>${clipLinks(d,i)}</span>`).join("")}</div>`}
      ${d.volume?`<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Set</span><div class="seg">${[[0,"Regular · 100"],[1,"Full D2 · 500"]].map(([v,l])=>`<button data-k="vol:${v}" aria-pressed="${volBig()===!!v}">${l}</button>`).join("")}</div></div><div class="dbeat">${beatSlider()}</div><div class="row" style="justify-content:center">${cdCtl("data-k")}</div>`:""}${d.tempoCalls?d2rCtl():""}
-     <button class="btn pri" data-k="play">Start · ${fmt(totalOf(d))}</button>${CLIPS[d.id]?`<span class="small muted" style="text-align:center">▶ opens a short demo of that part on YouTube at the right moment.</span>`:""}<span class="small muted" style="text-align:center">5-second countdown, then the phone calls each part out loud. Prop it up where you can see it.</span>`;return bind()}
+     ${goalEdit(d)}<button class="btn pri" data-k="play">Start · ${fmt(totalOf(d))}</button>${CLIPS[d.id]?`<span class="small muted" style="text-align:center">▶ opens a short demo of that part on YouTube at the right moment.</span>`:""}<span class="small muted" style="text-align:center">5-second countdown, then the phone calls each part out loud. Prop it up where you can see it.</span>`;return bind()}
   const modeSeg=setupBlock(d);
   if((d.log==="spots"||d.log==="makes")&&R.mode==="sets"){
     const st=setSpec(),p=pct(R.m,R.a),doneSpots=d.log==="spots"?SPOTS.filter(x=>R.spots[x.id][1]>=d.per).map(x=>x.id):[];
@@ -2259,16 +2264,37 @@ let bigEl=null,media=null,voice=null,pressT=0,pressTimer=null,lastRec=0,talkUnti
 /* finishing goal modes. pct: the drill as written. time: make N as fast as you can. streak: K in a row (K in a row at each stage).
    The percentage is still tracked and still counts for skill checks in every mode. */
 const GM_NAMES={pct:"Percentage",time:"Time",streak:"In a row"};
-/* shooting drills that get the goal switch. Form drills, Three in a Row, Tired 3s, spot drills and the timed pivot drill keep their own goal. */
-const GM_S={s_ladder:{},s_focus:{k:3,n:3},s_seq:{k:3,n:3},s_pullup:{k:3,n:3},s_r_off:{k:3,n:3},s_r_read:{k:3,n:3},s_atw:{m:["pct","time"]},s_ft:{m:["pct","streak"],k:5,n:2}};
+/* shooting drills that get the goal switch. Form drills, Three in a Row, Tired 3s, spot drills and the timed pivot drill keep their own goal.
+   Finishing drills can be listed too: d is the default mode, and k2 is the bigger streak once k in a row is done in CHECK_N sessions. */
+const GM_S={f_mikan:{d:"streak",k:10,k2:20},s_ladder:{},s_focus:{k:3,n:3},s_seq:{k:3,n:3},s_pullup:{k:3,n:3},s_r_off:{k:3,n:3},s_r_read:{k:3,n:3},s_atw:{m:["pct","time"]},s_ft:{m:["pct","streak"],k:5,n:2}};
 function gmModes(d){if(d.log!=="makes")return null;if(d.skill==="f")return["pct","time","streak"];const c=GM_S[d.id];return c?(c.m||["pct","time","streak"]):null}
-function gmOf(id){const g=((S.settings.fgm||{})[id])||"pct",ms=D[id]&&gmModes(D[id]);return ms&&ms.includes(g)?g:"pct"}
+function gmOf(id){const g=((S.settings.fgm||{})[id])||(GM_S[id]||{}).d||"pct",ms=D[id]&&gmModes(D[id]);return ms&&ms.includes(g)?g:"pct"}
 function gmVariant(d){if(!gmModes(d))return d;const gm=gmOf(d.id);if(gm==="pct")return d;
   const v={...d,gm};
   if(gm==="time"){const L=d.stages?d.stages.length:1,per=Math.ceil(Math.min(d.att||d.goal||20,20)/L);
     v.goal=d.goal||per*L;v.timed=true;if(d.stages){v.stageBy="makes";v.stageN=Math.ceil(v.goal/L)}}
-  else{const c=GM_S[d.id]||{};v.streakK=c.k||(d.stages?3:5);v.streakN=d.stages?d.stages.length:(c.n||1);delete v.goal;delete v.att;v.timed=false}
+  else{const c=GM_S[d.id]||{};v.streakK=c.k2&&glOf(d.id).k==null&&streakWins(d.id,c.k)>=CHECK_N?c.k2:c.k||(d.stages?3:5);v.streakN=d.stages?d.stages.length:(c.n||1);delete v.goal;delete v.att;v.timed=false}
   return v}
+/* custom goals: on any drill the player can change the amount (makes, shots, shots per spot, shots per part),
+   the streak (how many in a row) or the time (call drills: seconds; timers: every part scaled together).
+   Stored per drill in S.settings.goals as {n|stage|k|per|sec|time}; "time" is a multiplier. Percentage goals stay automatic,
+   since skill checks are measured against them. */
+const GL_LIM={n:[5,5,200],stage:[1,1,50],k:[1,2,50],per:[1,1,20],sec:[15,15,900],time:[.25,.25,4]};
+const glOf=id=>((S.settings.goals||{})[id])||{};
+function glKind(d){if(!d)return null;if(d.gm==="streak")return"k";if(d.log==="spots")return"per";if(d.log==="makes")return d.stages?"stage":"n";
+  if(d.tempoCalls||d.volume)return null;if(d.log==="react")return"sec";if(d.log==="timer"&&Array.isArray(d.phases)&&d.phases.every(p=>p.length<=2))return"time";return null}
+const glVal=(d,k)=>({k:d.streakK,per:d.per,n:d.goal||d.att,stage:d.stageN,sec:d.secs})[k];
+function goalVariant(d){const k=glKind(d);if(!k)return d;const x=glOf(d.id)[k];if(x==null)return d;const v={...d};
+  if(k==="k")v.streakK=x;else if(k==="per")v.per=x;else if(k==="sec")v.secs=x;
+  else if(k==="n"){if(v.goal)v.goal=x;else v.att=x}
+  else if(k==="stage"){v.stageN=x;if(v.goal)v.goal=x*v.stages.length;else v.att=x*v.stages.length}
+  else v.phases=d.phases.map(p=>[p[0],Math.max(5,Math.round(p[1]*x/5)*5)]);
+  return v}
+const drillGoal=d=>d&&goalVariant(gmVariant(d));
+function goalEdit(d){const k=glKind(d);if(!k||R.a||R.t0)return"";const cus=glOf(d.id)[k]!=null;
+  const lab={k:"In a row",per:"Shots per spot",n:d.goal?"Makes":"Shots",stage:d.stageBy==="makes"?"Makes per part":"Shots per part",sec:"Time",time:"Time"}[k];
+  const v=k==="sec"||k==="time"?fmt(totalOf(d)):glVal(d,k);
+  return `<div class="row" style="justify-content:center;gap:10px"><span class="small muted">${lab}</span><div class="seg" role="group" aria-label="${lab}"><button data-k="gl:-1" aria-label="Less">−</button><button class="num" disabled>${v}</button><button data-k="gl:1" aria-label="More">+</button></div>${cus?`<button class="setup-btn" data-k="gl:0">Default</button>`:""}</div>`}
 /* streak progress from the log: a hands-free set counts when every shot in it went in; shot-by-shot logging counts K straight makes */
 function sState(d){let done=0,run=0;const h=R.hist,K=d.streakK;
   for(let i=0;i<h.length;){const x=h[i];
@@ -2278,12 +2304,17 @@ function sState(d){let done=0,run=0;const h=R.hist,K=d.streakK;
   return{done,run}}
 function runDone(d){if(d.gm==="streak")return sState(d).done>=d.streakN;
   return (d.log==="makes"&&d.goal&&R.m>=d.goal)||(d.log==="makes"&&!d.goal&&R.a>=d.att)||(d.log==="spots"&&R.si>=R.order.length)}
-function bestShots(id){let b=null;for(const se of S.sessions)for(const it of se.items)if(it.id===id&&it.gm==="streak"&&it.sa&&(b==null||it.sa<b))b=it.sa;return b}
+/* runs logged without a streak size (it.sk) count only for drills whose streak never grows */
+function bestShots(id,k){let b=null;for(const se of S.sessions)for(const it of se.items)if(it.id===id&&it.gm==="streak"&&it.sa&&(it.sk==null?!(GM_S[id]||{}).k2:it.sk===k)&&(b==null||it.sa<b))b=it.sa;return b}
+/* sessions where the drill's streak goal of at least k in a row was finished */
+function streakWins(id,k){let n=0;for(const se of S.sessions)if(se.items.some(it=>it.id===id&&it.gm==="streak"&&it.sa&&it.sk>=k))n++;return n}
+function streakNext(d){const c=GM_S[d.id]||{};if(!c.k2||d.streakK>=c.k2||glOf(d.id).k!=null)return"";const w=streakWins(d.id,c.k),left=CHECK_N-w;
+  return ` Finish ${c.k} in a row in ${left} more session${left===1?"":"s"} and the goal moves up to <b class="num">${c.k2} in a row</b>.`}
 function gmSeg(d){const ms=gmModes(d);if(!ms||R.a||R.t0)return"";const gm=d.gm||"pct";
   return `<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Goal</span><div class="seg" role="group" aria-label="Goal">${ms.map(m=>`<button data-k="gm:${m}" aria-pressed="${gm===m}">${GM_NAMES[m]}</button>`).join("")}</div></div>`}
 function gmTip(d){if(!d.gm)return"";
-  if(d.gm==="time"){const b=bestSecs(d.id);return `<div class="tip">Your goal: make <b class="num">${d.goal}</b> as fast as you can${d.stages?` (${d.stageN} per ${d.stages.length>1?"part":"round"})`:""}. ${b?`Your best is <b class="num">${fmt(b)}</b>.`:"Your first run sets your best time."} The clock starts when you tap to start. Your percentage still counts for level-ups.</div>`}
-  const b=bestShots(d.id);return `<div class="tip">Your goal: <b class="num">${d.streakK} in a row</b>${d.stages?` at each part (${d.stages.map(esc).join(", ")})`:d.streakN>1?`, <b class="num">${d.streakN}</b> times`:""}. Each set is ${d.streakK} shots: if they all go in, you move on, and if one misses, run the set again. ${b?`Fewest shots so far: <b class="num">${b}</b>.`:""} Your percentage still counts for level-ups.</div>`}
+  if(d.gm==="time"){const b=bestSecs(d.id,d.goal);return `<div class="tip">Your goal: make <b class="num">${d.goal}</b> as fast as you can${d.stages?` (${d.stageN} per ${d.stages.length>1?"part":"round"})`:""}. ${b?`Your best is <b class="num">${fmt(b)}</b>.`:"Your first run sets your best time."} The clock starts when you tap to start. Your percentage still counts for level-ups.</div>`}
+  const b=bestShots(d.id,d.streakK);return `<div class="tip">Your goal: <b class="num">${d.streakK} in a row</b>${d.stages?` at each part (${d.stages.map(esc).join(", ")})`:d.streakN>1?`, <b class="num">${d.streakN}</b> times`:""}. Each set is ${d.streakK} shots: if they all go in, you move on, and if one misses, run the set again. ${b?`Fewest shots so far: <b class="num">${b}</b>.`:""}${streakNext(d)} Your percentage still counts for level-ups.</div>`}
 function setsOK(d){return (d.log==="spots"&&!d.random&&d.per>=5)||(d.log==="makes"&&!d.calls&&!(d.stages&&d.stageBy==="makes"&&!d.gm)&&(!!d.att||(!!d.goal&&!!d.timed)||d.gm==="streak"))}
 function setSpec(){const d=R.d;
   if(d.gm==="streak"){if(runDone(d))return null;return{n:d.streakK,kind:"att",label:(d.stages?d.stages[stageIdx(d)]+", ":"")+d.streakK+" in a row"+(!d.stages&&d.streakN>1?` (${sState(d).done+1} of ${d.streakN})`:"")}}
@@ -2422,6 +2453,10 @@ function act(k){
     else{const g=[h];if(h.sg){while(R.hist.length&&R.hist[R.hist.length-1].sg===h.sg)g.push(R.hist.pop());R.setNo=h.sg-1;R.sm=0;R.smd=[]}
       for(const x of g){R.a--;if(x.hit)R.m--;if(x.sp){R.spots[x.sp][1]--;if(x.hit)R.spots[x.sp][0]--;R.si--}}}
     if(d.stages)R.call=stageCall(d,stageIdx(d));return drawDock()}
+  if(k.startsWith("gl:")){if(R.a||R.t0)return;const st=+k.slice(3),kd=glKind(d);if(!kd)return;
+    const all=Object.assign({},S.settings.goals),cur=Object.assign({},all[d.id]);
+    if(!st)delete cur[kd];else{const L=GL_LIM[kd],v=kd==="time"?(cur.time??1):glVal(d,kd);cur[kd]=Math.min(L[2],Math.max(L[1],Math.round((v+st*L[0])*100)/100))}
+    all[d.id]=cur;S.settings.goals=all;persist();const keep=R.mode;openRunner(d.id);if(modesFor(R.d).includes(keep))R.mode=keep;return drawDock()}
   if(k.startsWith("gm:")){if(R.a||R.t0)return;S.settings.fgm=Object.assign({},S.settings.fgm,{[d.id]:k.slice(3)});persist();const keep=R.mode;openRunner(d.id);if(modesFor(R.d).includes(keep))R.mode=keep;return drawDock()}
   if(k.startsWith("mode:")){R.mode=k.slice(5);S.settings.input=R.mode;persist();if(R.mode==="big"||R.mode==="sets")openBig();return drawDock()}
   if(k==="setup"){SETUP_OPEN=SETUP_OPEN===d.id?null:d.id;return drawDock()}
@@ -2464,8 +2499,8 @@ function drawRate(){
   el.innerHTML=`<div class="label" style="text-align:center">How did it go?</div><div class="rate">${labels.map((l,i)=>`<button class="btn ${i===2?"make":"sec"}" data-k="r${i}">${esc(l)}</button>`).join("")}</div>`;
   bind()}
 
-function rateSummary(d){const bits=[];if(d.timed&&R.t0&&(d.goal?R.m>=d.goal:d.att&&R.a>=d.att)){const t=Math.round((Date.now()-R.t0)/1000),b=bestSecs(d.id);bits.push(`Time: <b>${fmt(t)}</b>${b?` (best ${fmt(b)}${t<b?", new best":""})`:""}.`)}const st=streaks(R.hist);if(st&&st.best>1)bits.push(`Best streak: <b>${st.best} in a row</b>.`);
-  if(d.gm==="streak"&&runDone(d)){const b=bestShots(d.id);bits.push(`Done in <b>${R.a} shots</b>${b?` (fewest ${b}${R.a<b?", new best":""})`:""}.`)}
+function rateSummary(d){const bits=[];if(d.timed&&R.t0&&(d.goal?R.m>=d.goal:d.att&&R.a>=d.att)){const t=Math.round((Date.now()-R.t0)/1000),b=bestSecs(d.id,d.goal||d.att);bits.push(`Time: <b>${fmt(t)}</b>${b?` (best ${fmt(b)}${t<b?", new best":""})`:""}.`)}const st=streaks(R.hist);if(st&&st.best>1)bits.push(`Best streak: <b>${st.best} in a row</b>.`);
+  if(d.gm==="streak"&&runDone(d)){const b=bestShots(d.id,d.streakK);bits.push(`Done in <b>${R.a} shots</b>${b?` (fewest ${b}${R.a<b?", new best":""})`:""}.`)}
   if(d.stages&&d.stageBy==="makes"&&!d.gm){const r=ladderRungs(d,R.hist);bits.push("Shots for "+d.stageN+" makes: "+r.map((x,i)=>`${esc(d.stages[i])} <b>${x[1]>=d.stageN?x[0]:x[0]+"+"}</b>`).join(" · ")+".")}
   const t=sessMiss(R.hist),n=t.short+t.long+t.left+t.right;if(n){bits.push("Misses: "+Object.keys(DIRS).filter(k=>t[k]).map(k=>`${t[k]} ${k}`).join(", ")+".");const a=missAdvice(t);if(a)bits.push(esc(a.t))}
   else if(R.a-R.m>=3)bits.push("Tip: tap Short, Long, Left or Right when you miss, and the app finds your miss pattern.");
@@ -2491,7 +2526,7 @@ const FT_DRILL={Layup:{S:"f_corner",W:"f_weak"},Power:{S:"f_power",W:"f_power"},
 function finTotals(days){const cut=cutOf(days),t={};for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items)if(it.fp)for(const k in it.fp){t[k]=t[k]||{S:[0,0],W:[0,0]};for(const h of ["S","W"]){t[k][h][0]+=it.fp[k][h][0];t[k][h][1]+=it.fp[k][h][1]}}}return t}
 function finWeak(days){const t=finTotals(days);let w=null;for(const k in t)for(const h of ["S","W"]){const [m,a]=t[k][h];if(a<5)continue;const p=m/a;if(!w||p<w.p)w={k,h,p,m,a}}
   if(!w)return null;let dr=FT_DRILL[w.k][w.h];if(dr==="f_bump"&&!S.settings.partner)dr="f_power";return Object.assign(w,{drill:dr})}
-function bestSecs(id){let b=null;for(const se of S.sessions)for(const it of se.items)if(it.id===id&&it.secs&&(b==null||it.secs<b))b=it.secs;return b}
+function bestSecs(id,n){let b=null;const g=glOf(id),old=g.n==null&&g.stage==null;for(const se of S.sessions)for(const it of se.items)if(it.id===id&&it.secs&&(it.gn==null?old:it.gn===n)&&(b==null||it.secs<b))b=it.secs;return b}
 function handSeg(){const other=R.call==="Weak hand";
   return `<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Finishing with</span><div class="seg" role="group" aria-label="Hand">${[["S","Strong hand"],["W","Weak hand"]].map(([v,l])=>`<button data-k="hand:${v}" aria-pressed="${(other?"W":R.hand)===v}" ${other?"disabled":""}>${l}</button>`).join("")}</div></div>`}
 function finDock(d){return R.tip?`<div class="tip ftip">${esc(R.tip)}</div>`:""}
@@ -2500,9 +2535,9 @@ let SETUP_OPEN=null;
 function setupBlock(d){const counted=d.log==="spots"||d.log==="makes";if(!counted)return"";
   const MODE_N={sets:"Sets",big:"Shot by shot",tap:"Buttons"};
   const gs=gmSeg(d),ms=`<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Count</span><div class="seg modeseg" role="group" aria-label="How to count">${modesFor(d).map(m=>`<button data-k="mode:${m}" aria-pressed="${R.mode===m}">${MODE_N[m]}</button>`).join("")}</div></div>`,hs=d.skill==="f"?handSeg():"";
-  const bits=[d.gm==="time"?`Goal: make ${d.goal} fast`:d.gm==="streak"?`Goal: ${d.streakK} in a row`:`Goal ${targetPct(d)}%`,MODE_N[R.mode]||"",d.skill==="f"?((R.call==="Weak hand"||R.hand==="W")?"Weak hand":"Strong hand"):""].filter(Boolean);
+  const bits=[d.gm==="time"?`Goal: make ${d.goal} fast`:d.gm==="streak"?`Goal: ${d.streakK} in a row`:`Goal ${targetPct(d)}%`,d.gm?"":d.log==="spots"?`${d.per} per spot`:d.goal?`${d.goal} makes`:`${d.att} shots`,MODE_N[R.mode]||"",d.skill==="f"?((R.call==="Weak hand"||R.hand==="W")?"Weak hand":"Strong hand"):""].filter(Boolean);
   const open=SETUP_OPEN===d.id;
-  return `<div class="setup${open?" open":""}"><div class="setup-sum"><span class="setup-txt">${bits.map(esc).join(" · ")}</span><button class="setup-btn" data-k="setup" aria-expanded="${open}">${open?"Done":"Change"}</button></div>${open?`<div class="setup-body">${gs}${ms}${hs}</div>`:""}</div>`}
+  return `<div class="setup${open?" open":""}"><div class="setup-sum"><span class="setup-txt">${bits.map(esc).join(" · ")}</span><button class="setup-btn" data-k="setup" aria-expanded="${open}">${open?"Done":"Change"}</button></div>${open?`<div class="setup-body">${gs}${goalEdit(d)}${ms}${hs}</div>`:""}</div>`}
 function finCard(days){const t=finTotals(days),keys=Object.keys(FT_NAMES).filter(k=>t[k]),w=finWeak(days);
   const cell=(k,h)=>{const [m,a]=t[k][h];if(!a)return `<span class="c">–</span>`;const p=Math.round(100*m/a);return `<span class="c ${p<40?"cold":p<60?"mid":"hot"} ${w&&w.k===k&&w.h===h?"weak":""}">${m}/${a} · ${p}%</span>`};
   return `<section><div class="sechead"><h2>Finish package</h2><span class="muted small">${days?"30 days":"all time"}</span></div>
@@ -2528,7 +2563,7 @@ const isRestPart=()=>P&&P.stage==="work"&&/^rest\b/i.test((phasesOf(P.items[P.i]
 const phasesOf=d=>d.log==="react"&&!d.tempoCalls?[[d.silent?"Watch the signals":"Follow the calls",d.secs]]:d.phases;
 const totalOf=d=>phasesOf(d).reduce((a,p)=>a+p[1],0);
 function startPlayer(ids,fromRunner){
-  const items=ids.map(id=>D[id]).filter(d=>d&&unlocked(d)&&(d.log==="timer"||d.log==="react"));if(!items.length)return;
+  const items=ids.map(id=>D[id]&&goalVariant(D[id])).filter(d=>d&&unlocked(d)&&(d.log==="timer"||d.log==="react"));if(!items.length)return;
   P={items,i:0,pi:0,stage:"ready",left:5,running:true,el:items.map(()=>0),ratings:items.map(()=>1),drops:items.map(()=>0),lost:false,call:null,nextAt:0,fromRunner};
   pEl=document.createElement("div");pEl.className="bigtap player";document.body.appendChild(pEl);
   pEl.addEventListener("click",e=>{if(!P||e.target.closest("button")||e.target.closest("a")||e.target.closest("input")||e.target.closest(".pbeat")||e.target.closest(".pcd")||P.stage==="rate")return;if(P.stage==="work"&&P.running&&!P.cd&&!P.items[P.i].body&&!isRestPart())lostIt();else togglePlay()});
@@ -2651,7 +2686,8 @@ function save(){
   const d=R.d,xp=xpFor(),before=[sL(),hL(),oL(),fL()];
   const it={id:d.id,t:Date.now(),xp},ub=new Set(DRILLS.filter(unlocked).map(x=>x.id));
   if(d.log==="makes"||d.log==="spots"){it.m=R.m;it.a=R.a;it.g=targetPct(d)}
-  if(d.gm){it.gm=d.gm;if(d.gm==="streak"&&R.finished&&runDone(d))it.sa=R.a}
+  if(d.timed)it.gn=d.goal||d.att;
+  if(d.gm){it.gm=d.gm;if(d.gm==="streak"){it.sk=d.streakK;if(R.finished&&runDone(d))it.sa=R.a}}
   if(d.log==="spots"){it.spots={};for(const k in R.spots)if(R.spots[k][1])it.spots[k]=R.spots[k]}
   if(d.log==="makes"||d.log==="spots"){const md={};let any=false;for(const h of R.hist){if(h.dir){const k=h.sp||"_";md[k]=md[k]||{};md[k][h.dir]=(md[k][h.dir]||0)+1;any=true}}if(any)it.md=md;
     const st=streaks(R.hist);if(st){it.st=st.best;if(d.log==="spots"&&Object.keys(st.by).length)it.ss=st.by}
