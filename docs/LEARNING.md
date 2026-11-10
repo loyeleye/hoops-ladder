@@ -442,7 +442,7 @@ newer in-memory progress wins. The first launch after this update copies existin
 [Obtainium](https://github.com/ImranR98/Obtainium) is an open-source Android app that watches a
 GitHub repo's Releases and installs each new APK, so you get updates without Google Play.
 
-**What CI does.** On every push to `main`, once the signing secrets from Step 5 exist,
+**What CI does.** On every push to `main` (or a manual **Run workflow** on `main`), once the signing secrets from Step 5 exist,
 [`android.yml`](../.github/workflows/android.yml) also builds a release APK signed with the upload
 key and publishes it as a GitHub Release tagged `v0.1.<run number>` (matching the app's
 `versionName`, so Obtainium reads the version correctly). Android only installs an update when it's
