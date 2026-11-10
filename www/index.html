@@ -698,7 +698,7 @@ const DRILLS=[
  {id:"f_foot5",skill:"f",name:"Footwork Five",role:"fin",unlock:3,mins:7,log:"makes",att:40,ft:{"Standard":"Layup","Same foot":"Same foot","Two-foot stop":"Power","Euro step":"Euro","Pro hop":"Pro hop"},stages:["Standard","Same foot","Two-foot stop","Euro step","Pro hop"],stageBy:"shots",stageN:8,t0:50,tstep:2,tmax:75,
   what:"Five ways to get to the rim, so a shot blocker can't time you. Four reps each side of each footwork, eight per footwork.",
   steps:["Standard: inside foot, outside hand.","Same foot: right foot, right hand (beat the shot blocker's timing).","Two-foot stop finish.","Euro step.","Pro hop."],
-  cue:"Change the rhythm, not the height.",src:[YTT("HaLql0ueNpY",60,"Breakthrough"),YTT("66sGWSoDJbk",130,"By Any Means"),YTT("PZmuJMft_Mo",310,"Razooky"),YTT("NLet0FVbvEs",325,"Revenge Basketball")]},
+  cue:"Change the rhythm, not the height.",src:[YTT("HaLql0ueNpY",60,"Breakthrough"),YTT("66sGWSoDJbk",130,"By Any Means"),YTT("MDbS4QF71Iw",28,"Euro step"),YTT("PZmuJMft_Mo",336,"Razooky: bump spin and euro step"),YTT("NLet0FVbvEs",325,"Revenge Basketball")]},
  {id:"f_float",skill:"f",name:"Floater Series",role:"fin",unlock:3,mins:7,log:"makes",att:40,ft:"Floater",stages:["Cross-body floater","Two-foot floater"],stageBy:"shots",stageN:20,t0:35,tstep:2,tmax:60,
   what:"The floater is your main weapon against bigger defenders: a high, soft shot released before the shot blocker gets there. No big jump needed. About 1 in 5 with your weak hand.",
   steps:["Guide hand comes off, one-hand push.","Open-palm \"high-five\" release, high arc.","Cross-body floater off a drive.","Two-foot floater from a jump stop."],
@@ -722,7 +722,11 @@ const DRILLS=[
  {id:"f_bump",skill:"f",name:"Bump and Finish",role:"fin",partner:true,unlock:6,mins:5,log:"makes",att:20,ft:"Contact",t0:50,tstep:2,tmax:75,
   what:"Bump the defender first, on the last dribble before they jump, then finish on the far side. You make the contact so it can't knock you off.",
   steps:["Drive at a partner holding a pad.","Shoulder bump on the last dribble, before they jump.","Ball on the far shoulder, away from the pad.","Finish on the far side of the rim."],
-  cue:"Bump first, ball on the far shoulder.",src:[YTT("66sGWSoDJbk",42,"By Any Means: initiate contact"),YTT("OrfhQdRbTXA",236,"Pro Training: veer"),YTT("PZmuJMft_Mo",65,"Razooky: pin and extend")]},
+  cue:"Bump first, ball on the far shoulder.",src:[YTT("66sGWSoDJbk",42,"By Any Means: initiate contact"),YTT("OrfhQdRbTXA",236,"Pro Training: veer"),YTT("PZmuJMft_Mo",65,"Razooky: pin and extend"),YTT("PZmuJMft_Mo",255,"Razooky: aggressive elevation")]},
+ {id:"f_contact",skill:"f",name:"Finish Through Contact",role:"fin",partner:true,unlock:7,mins:7,log:"makes",att:30,ft:"Contact",stages:["Drive step","Pin and extend","Jump stop","Dribble and step timing","Aggressive elevation"],stageBy:"shots",stageN:6,t0:45,tstep:2,tmax:70,
+  what:"Five ways to finish when a defender gets into your body. You need resistance: a partner with a pad, or something solid to bump into, like a padded wall or a crash pad. Six reps per finish, three each side.",
+  steps:["Drive step: a strong last step into the contact, then finish.","Pin and extend: pin them with your inside arm, extend the ball away with the far hand.","Jump stop: two-foot stop into the contact, ball chinned, then go up.","Dribble and step timing: time the last dribble and step so you hit them first.","Aggressive elevation: take off strong through the contact and finish high."],
+  cue:"You hit them first, then go up strong.",src:[YTT("PZmuJMft_Mo",17,"Razooky: 7 ways to finish")]},
  {id:"f_read",skill:"f",name:"Read the Defender",role:"fin",read:true,unlock:7,mins:6,log:"makes",att:20,calls:["In front: floater","On your hip: bump and finish","Behind you: finger roll","Help at the rim: floater or kick it out"],ft:{"In front: floater":"Floater","On your hip: bump and finish":"Contact","Behind you: finger roll":"Finger roll","Help at the rim: floater or kick it out":"Floater"},t0:45,tstep:2,tmax:70,
   what:"No partner needed. The phone tells you where an imaginary defender is, and you play the finish that beats them.",
   steps:["Phone calls where the defender is.","In front: floater.","On your hip: bump and finish.","Behind you: reach out, finger roll.","Help at the rim: floater or kick it out."],
@@ -792,12 +796,13 @@ const STEP_CLIPS={
  f_corner:[[["eIL_P_wOrUE",31,60,"Finishing high"]],[["eIL_P_wOrUE",104,134,"Finishing angles"]],null,null],
  f_power:[null,[["OrfhQdRbTXA",153,183,"Jump stop"]],null,[["OrfhQdRbTXA",29,59,"Power layup"]]],
  f_weak:[[["NLet0FVbvEs",252,282]],null,null],
- f_foot5:[[["HaLql0ueNpY",60,90]],[["66sGWSoDJbk",130,160]],[["HaLql0ueNpY",340,370]],[["PZmuJMft_Mo",310,340]],[["NLet0FVbvEs",325,355]]],
+ f_foot5:[[["HaLql0ueNpY",60,90]],[["66sGWSoDJbk",130,160]],[["HaLql0ueNpY",340,370]],[["MDbS4QF71Iw",28,87,"Euro step"],["PZmuJMft_Mo",336,371,"Bump spin and euro step"]],[["NLet0FVbvEs",325,355]]],
  f_float:[null,[["UcWavnF8l8M",57,87,"Open palm"]],[["UcWavnF8l8M",379,409,"Runner drill"]],[["UcWavnF8l8M",256,286,"Floater drill"]]],
  f_reverse:[[["eIL_P_wOrUE",138,168,"Thumb vs. pinky"]],[["HaLql0ueNpY",205,235,"Mikan reverse"]],null],
- f_called:[null,null,[["HaLql0ueNpY",340,370,"Two feet"],["PZmuJMft_Mo",310,340,"Euro"],["UcWavnF8l8M",256,286,"Floater"],["66sGWSoDJbk",130,160,"Same foot"],["eIL_P_wOrUE",138,168,"Reverse"],["NLet0FVbvEs",252,282,"Weak hand"]]],
+ f_called:[null,null,[["HaLql0ueNpY",340,370,"Two feet"],["MDbS4QF71Iw",28,87,"Euro"],["UcWavnF8l8M",256,286,"Floater"],["66sGWSoDJbk",130,160,"Same foot"],["eIL_P_wOrUE",138,168,"Reverse"],["NLet0FVbvEs",252,282,"Weak hand"]]],
  f_divergent:[[["845TZtXA0Tk",127,165]],[["845TZtXA0Tk",165,227]],[["845TZtXA0Tk",227,278]],[["845TZtXA0Tk",278,308]]],
- f_bump:[[["66sGWSoDJbk",42,72,"Initiate contact"]],[["OrfhQdRbTXA",236,266,"Veer"]],[["PZmuJMft_Mo",65,95,"Pin and extend"]],null],
+ f_contact:[[["PZmuJMft_Mo",17,34,"Drive step"],["PZmuJMft_Mo",33,65,"Drive step: in games"]],[["PZmuJMft_Mo",65,91,"Pin and extend"],["PZmuJMft_Mo",90,143,"Pin and extend: in games"]],[["PZmuJMft_Mo",143,180,"Jump stop"],["PZmuJMft_Mo",180,211,"Jump stop: in games"]],[["PZmuJMft_Mo",211,239,"Dribble and step timing"],["PZmuJMft_Mo",239,255,"Timing: in games"]],[["PZmuJMft_Mo",255,282,"Aggressive elevation"],["PZmuJMft_Mo",282,336,"Aggressive elevation: in games"]]],
+ f_bump:[[["66sGWSoDJbk",42,72,"Initiate contact"]],[["OrfhQdRbTXA",236,266,"Veer"]],[["PZmuJMft_Mo",65,91,"Pin and extend"],["PZmuJMft_Mo",90,143,"Pin and extend: in games"]],[["PZmuJMft_Mo",255,282,"Aggressive elevation"],["PZmuJMft_Mo",282,336,"Aggressive elevation: in games"]]],
  f_read:[null,[["UcWavnF8l8M",256,286,"Floater"]],[["66sGWSoDJbk",42,72,"Bump"]],[["tdAZo0CijX8",0,30,"Trailing"]],[["tdAZo0CijX8",324,354,"Weak-side help"]]],
  f_spots:[[["tdAZo0CijX8",0,30,"Trailing"]],[["tdAZo0CijX8",180,210,"Alongside"]],[["tdAZo0CijX8",324,354,"Weak side"]]],
  f_cone:[[["0K0jO7X98dU",5,40,"Cone on the 45"]],[["0K0jO7X98dU",29,45,"Other side of the cone"]],[["HaLql0ueNpY",60,90,"Inside foot, outside hand"]],[["wHPLCs8TnJU",0,40,"Inside-hand finish"]],[["HaLql0ueNpY",205,229,"Reverse, outside hand"]],[["HaLql0ueNpY",229,264,"Reverse, inside hand"]]],
@@ -951,6 +956,14 @@ function bump(stage){const D=[{t:0,x:122,m:"pad",pad:true},{t:.8,x:122,m:"pad",p
   b.gather("R",14,.24).label("Bump first",b.t-.15,b.t+.4);if(stage===1)return b.hold(.3).build(.4);
   b.hold(.2,"farL").label("Ball on the far shoulder",b.t-.2,b.t+.5);if(stage===2)return b.hold(.25,"farL").build(.4);
   b.jump("L","reachL",6,8).shot("far",.55).land().label("Finish far side",b.t-.6,b.t+.3);return b.build()}
+function contact(stage){const D=[{t:0,x:124,m:"pad",pad:true},{t:.85,x:124,m:"pad",pad:true},{t:1.1,x:129,m:"pad",lean:-12,pad:true},{t:2.4,x:129,m:"pad",pad:true}];
+  const b=new B(40,"R");b.defender(D);b.def[0].pad=true;
+  if(stage===0){b.dribble(2,22,.3).step("R",20,.26,"chest",131).label("Big drive step into the pad",b.t-.2,b.t+.5).jump("L","reachL",6,8).shot("far",.55).land()}
+  else if(stage===1){b.dribble(2,22,.3).gather("R",14,.24).hold(.25,"farL").label("Pin with the inside arm, ball away",b.t-.4,b.t+.5).jump("L","reachL",6,8).shot("far",.55).land()}
+  else if(stage===2){b.dribble(2,22,.3,true).jumpstop(14).label("Jump stop into the contact",b.t-.25,b.t+.5).hold(.25).jump("both","powerB",6,6).shot("far",.55).land()}
+  else if(stage===3){b.dribble(1,22,.3).label("Last dribble...",0,.5).dribble(1,22,.26).gather("R",14,.2).label("...step and hit first",b.t-.3,b.t+.5).jump("L","reachL",6,8).shot("far",.55).land()}
+  else{b.dribble(2,22,.3).gather("R",14,.24).jump("both","powerB",13,6,.3).label("Go up strong",b.t-.3,b.t+.5).shot("far",.55).land()}
+  return b.build()}
 function spin(hand,inPath){const b=new B(60,hand,{inset:ins(inPath)});b.dribble(2,22,.3).gather(hand,12);
   b.jump(hand==="R"?"L":"R","rev"+hand,6,8).label(hand==="R"?"Thumb turns to the rim":"Pinky turns to the rim",b.t-.15,b.t+.55).shot("rev",.55).land(.3,4);return b.build()}
 function reverse(hand,inPath){const b=new B(70,hand,{inset:ins(inPath)});b.dribble(2,22,.3).gather(hand,14).step(hand==="R"?"L":"R",10);
@@ -1004,6 +1017,7 @@ const A={
    layup({foot:"low",inset:ins(WING),shot:"roll",st:.45,labels:[["Quick, low release",0,1.2]]}),
    (()=>{const a=layup({foot:"float",inset:ins(WING),labels:[["Turned shoulder",0,1.3]]});a.k=a.k.map(k=>({t:k.t,p:{...k.p,lean:k.p.lean-14}}));return a})()],
  f_bump:[bump(0),bump(1),bump(2),bump(3)],
+ f_contact:[contact(0),contact(1),contact(2),contact(3),contact(4)],
  f_cone:[coneTop("base"),coneTop("mid"),coneFin("R",false,"Outside hand"),coneFin("L",false,"Inside hand"),coneFin("R",true,"Outside-hand reverse"),coneFin("L",true,"Inside-hand reverse")],
  f_chair:[chairTop(0),chairTop(1),chairRace()],
  f_spots:[spots("trail"),spots("hip"),spots("help")],
@@ -2469,7 +2483,7 @@ const FTIPS={all:["Bump first","Ball on the far shoulder","Top corner of the squ
  f_mikan:["Catch it high, don't let it drop","Quick feet, soft hands"],f_corner:["Top corner of the square","Higher on the glass, softer touch"],
  f_power:["Outside shoulder leads","Chin the ball on the stop"],f_float:["High-five the floater","Guide hand off early","Arc it over the hand"],
  f_divergent:["High-five the floater","Change the look, keep the touch"],f_reverse:["Let the rim block for you","Spin it off the glass"],
- f_cone:["Tight around the cone","Let the rim block for you","Soft off the glass"],f_bump:["Bump first","Ball on the far shoulder"],f_read:["See the defender first"],f_called:["Decide late, finish soft"]};
+ f_cone:["Tight around the cone","Let the rim block for you","Soft off the glass"],f_bump:["Bump first","Ball on the far shoulder"],f_contact:["You hit them first","Go up strong","Ball away from the contact"],f_read:["See the defender first"],f_called:["Decide late, finish soft"]};
 function pickFTip(d){const pool=FTIPS.all.concat(FTIPS[d.id]||[],FTIPS[d.id]||[]);let t;do{t=pool[Math.floor(Math.random()*pool.length)]}while(pool.length>1&&R&&t===R.tip);return t}
 function ftOf(d,call){if(typeof d.ft==="string")return d.ft;if(d.ft&&call!=null&&call in d.ft)return d.ft[call];return null}
 const FT_NAMES={Layup:"Layup","Power":"Two-foot power","Same foot":"Same foot","Euro":"Euro step","Pro hop":"Pro hop","Floater":"Floater","Reverse":"Reverse","Finger roll":"Finger roll","Contact":"Through contact"};
