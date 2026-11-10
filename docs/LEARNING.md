@@ -568,3 +568,26 @@ the same way Coach recording does (step 7). Nothing is recorded or stored; only 
 
 **Next.** Ball tracking (make/miss, arc and entry angle, where the ball hits the glass) needs a ball detector on top
 of the pose model. Takeoff foot and finishing hand for layups can come from the same pose frames.
+
+## Step 17. Matching the beat to your real dribble
+
+On any timer part with a beat (D2 Rep Count, volume drills), the player now has **Match my dribble** under the
+beat slider. It pauses the beat, listens with the mic for 8 seconds while you dribble at your own pace, and offers
+what it heard: "You: 120 per min · steady, high confidence", with **Use it**, **Again** or **Cancel**. Use it sets
+the beat (rounded to the slider's 0.05 steps) and re-times the reps left, the same as moving the slider.
+
+**How it hears a bounce.** `getUserMedia` with echo cancellation, noise suppression and auto gain off (they'd
+smooth out the thuds), then a 220 Hz low-pass filter, because a bounce is mostly a low thud and squeaks and voices
+are higher. Every animation frame it measures the loudness; a bounce is a jump to 3× the recent median and 1.3×
+the previous frame, at least 0.18 s after the last bounce.
+
+**From bounces to a speed.** The median gap between bounces gives the speed, so one missed or doubled bounce
+doesn't throw it off. If fewer than 60% of the gaps are close to the median, it says it couldn't hear a steady
+bounce. Steadiness comes from how much the gaps vary (coefficient of variation under 8% is "high confidence").
+
+**Noisy gyms.** Put the phone on the floor close to you so your ball is the loudest. If voice commands (step 15)
+are on, they pause while it listens, since Android lets only one thing use the mic.
+
+**Not yet.** Counting real bounces during the whole set (instead of beat ticks), and treating a gap in the
+bounces as a lost ball, need the mic to stay on during the set. That's the next step for this feature, along with
+camera tracking of the dribbling hand to help in a noisy gym.
