@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
+import androidx.activity.OnBackPressedCallback;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.BridgeWebViewClient;
 import com.ladioyeleye.hoopsladder.remote.HoopsRemotePlugin;
@@ -27,6 +28,29 @@ public class MainActivity extends BridgeActivity {
                 public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                     if (!request.isForMainFrame()) return false;
                     return super.shouldOverrideUrlLoading(view, request);
+                }
+            }
+        );
+
+        // Back button and back swipe: the whole app is one web page, so by default Android closed the app from any
+        // screen. Ask the page first (hoopsBack() in native-web/native.js closes the open player, sheet or clip, or
+        // goes back a tab); only when it has nothing left to go back to does Android leave the app as usual.
+        getOnBackPressedDispatcher().addCallback(
+            this,
+            new OnBackPressedCallback(true) {
+                @Override
+                public void handleOnBackPressed() {
+                    bridge
+                        .getWebView()
+                        .evaluateJavascript(
+                            "(function(){try{return !!(window.hoopsBack&&window.hoopsBack())}catch(e){return false}})()",
+                            handled -> {
+                                if ("true".equals(handled)) return;
+                                setEnabled(false);
+                                getOnBackPressedDispatcher().onBackPressed();
+                                setEnabled(true);
+                            }
+                        );
                 }
             }
         );

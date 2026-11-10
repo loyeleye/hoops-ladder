@@ -34,6 +34,48 @@
     }).catch(() => { loaded = true; });
   }
 
+  /* ---------- Back button: close what's open, then go back a tab, and only then leave the app ----------
+     Android's back button (or back swipe) used to close the app from any screen, because the page is one web page
+     and Capacitor doesn't handle back on its own. MainActivity now asks hoopsBack() first on every back press, and
+     only lets Android leave the app when it returns false. Topmost first, each press does what that screen's own
+     close button does:
+     demo clip → training video / recorder → "Show the move" → drill timer (End, which goes to the rating screen) →
+     rep logger (Exit) → "Discard this drill?" (Keep going) → drill sheet (close, which asks first if anything's
+     logged) → the tab you were on before → leave the app from Today. */
+  {
+    const tabs = []; // tabs visited before the current one, oldest first
+    let cur = state.tab, popping = false;
+    // Runs after the page's own hashchange handler (route), so state.tab is already the new tab.
+    window.addEventListener("hashchange", () => {
+      if (state.tab !== cur) {
+        if (!popping) { tabs.push(cur); if (tabs.length > 30) tabs.shift(); }
+        cur = state.tab;
+      }
+      popping = false;
+    });
+    const press = (root, sel) => { const b = root && root.querySelector(sel); if (b) b.click(); return !!b; };
+    window.hoopsBack = function () {
+      const clip = document.querySelector(".ytsheet");
+      if (clip) { if (!press(clip, '[data-yt="close"]')) clip.remove(); return true; }
+      if (CO.view) { closeVid(); return true; }
+      if (CO.rec) { closeRec(); return true; }
+      if (seeEl) { if (!press(seeEl, '[data-s="resume"]')) closeSee(); return true; }
+      if (pEl && P) {
+        // The rating screen has its own Save and Discard, so back stays put rather than throwing the workout away.
+        if (P.stage !== "rate" && !press(pEl, '[data-p="end"]')) closePlayer();
+        return true;
+      }
+      if (bigEl) { if (!press(bigEl, '[data-b="exit"]')) { closeBig(); lockOff(); drawDock(); } return true; }
+      if (R) {
+        if (R.confirm) { R.confirm = false; drawDock(); } else closeRunner();
+        return true;
+      }
+      const prev = tabs.length ? tabs.pop() : state.tab !== "today" ? "today" : null;
+      if (prev && prev !== state.tab) { popping = true; location.hash = "#" + prev; return true; }
+      return false;
+    };
+  }
+
   /* ---------- 2. Demo clips play inside the app ----------
      The web version can only link each drill part to the right moment of its YouTube source. In the app, a tap on
      any YouTube link opens a player sheet instead: the demo clip plays from its start, loops back at its end, and
