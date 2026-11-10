@@ -1,6 +1,8 @@
 # Builds the Android app on every push and pull request.
 # - Always: a debug APK you can install on your own phone (download it from the run's "Artifacts").
-# - When the upload-key secrets exist: a signed release .aab, ready to upload to Google Play.
+# - When the upload-key secrets exist: a signed release .aab, ready to upload to Google Play,
+#   and a signed release .apk. On pushes to main that APK is published as a GitHub Release,
+#   which Obtainium watches to update the app on your phone (docs/LEARNING.md, step 13).
 # Walkthrough: docs/LEARNING.md, step 5.
 name: Android build
 
@@ -13,6 +15,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # lets the run create the GitHub Release that Obtainium reads
     env:
       VERSION_CODE: ${{ github.run_number }}
       VERSION_NAME: 0.1.${{ github.run_number }}
@@ -52,7 +56,7 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
       # The keystore is stored as a base64 secret and written to a temp file only for this run.
-      - name: Build signed release bundle
+      - name: Build signed release bundle and APK
         if: ${{ env.HAS_KEY == 'true' }}
         working-directory: android
         env:
@@ -61,7 +65,7 @@ jobs:
           UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
         run: |
           echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/upload.jks"
-          UPLOAD_KEYSTORE_PATH="$RUNNER_TEMP/upload.jks" ./gradlew bundleRelease
+          UPLOAD_KEYSTORE_PATH="$RUNNER_TEMP/upload.jks" ./gradlew bundleRelease assembleRelease
           rm "$RUNNER_TEMP/upload.jks"
 
       - uses: actions/upload-artifact@v4
@@ -69,3 +73,21 @@ jobs:
         with:
           name: hoops-ladder-release-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
+
+      # Obtainium needs every update signed with the same key. Debug APKs get a new random key on
+      # each CI machine, so only the release APK (signed with the upload key) is published.
+      - name: Publish the signed APK as a GitHub Release (for Obtainium)
+        if: ${{ env.HAS_KEY == 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK="$RUNNER_TEMP/hoops-ladder-$VERSION_NAME.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "$APK"
+          gh release create "v$VERSION_NAME" "$APK" \
+            --target "$GITHUB_SHA" \
+            --title "Hoops Ladder $VERSION_NAME" \
+            --notes "$(git log -1 --pretty=%s)"
+
+      - name: Explain the missing release
+        if: ${{ env.HAS_KEY != 'true' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
+        run: echo "::notice::No GitHub Release published. Add the UPLOAD_KEYSTORE_* secrets (docs/LEARNING.md, step 5) so Obtainium can update the app."

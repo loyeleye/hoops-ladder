@@ -143,6 +143,10 @@ Google can reset it. You create the upload key once:
 keytool -genkey -v -keystore upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
 ```
 
+On Windows, `keytool` isn't on the path by default. Use Android Studio's copy,
+`& "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe" ...`, or install a JDK with
+`winget install EclipseAdoptium.Temurin.21.JDK` and reopen PowerShell.
+
 Keep `upload.jks` and its password somewhere safe, like a password manager. Never commit them;
 `.gitignore` blocks `*.jks` as a guard.
 
@@ -159,7 +163,7 @@ To turn on step 4, add these under **Settings → Secrets and variables → Acti
 
 | Secret | Value |
 |---|---|
-| `UPLOAD_KEYSTORE_BASE64` | output of `base64 -w0 upload.jks` (macOS: `base64 -i upload.jks`) |
+| `UPLOAD_KEYSTORE_BASE64` | output of `base64 -w0 upload.jks` (macOS: `base64 -i upload.jks`; Windows PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("$PWD\upload.jks")) \| Set-Clipboard`) |
 | `UPLOAD_KEYSTORE_PASSWORD` | the keystore password |
 | `UPLOAD_KEY_ALIAS` | `upload` |
 | `UPLOAD_KEY_PASSWORD` | the key password (often the same as the keystore password) |
@@ -436,3 +440,36 @@ npx cap sync android     # registers the plugin in the Android project
 the page loads `localStorage` straight away (so the first screen is instant), then reads Preferences and switches to
 that copy if there is one. If you save something before Preferences answers, which takes a few milliseconds, the
 newer in-memory progress wins. The first launch after this update copies existing progress into Preferences.
+
+## Step 13. Automatic updates on your phone with Obtainium
+
+[Obtainium](https://github.com/ImranR98/Obtainium) is an open-source Android app that watches a
+GitHub repo's Releases and installs each new APK, so you get updates without Google Play.
+
+**What CI does.** On every push to `main` (or a manual **Run workflow** on `main`), once the signing secrets from Step 5 exist,
+[`android.yml`](../.github/workflows/android.yml) also builds a release APK signed with the upload
+key and publishes it as a GitHub Release tagged `v0.1.<run number>` (matching the app's
+`versionName`, so Obtainium reads the version correctly). Android only installs an update when it's
+signed with the same key as the installed app. Debug APKs get a fresh random key on each CI
+machine, which is why only the signed release APK is published.
+
+**Set up the phone (once).**
+
+1. Install Obtainium from its [GitHub Releases](https://github.com/ImranR98/Obtainium/releases) or
+   F-Droid.
+2. If you installed a debug APK from the Actions tab, uninstall it first: it has a different
+   signature, so the release APK can't update it. This clears progress saved on the phone.
+3. In Obtainium, tap **Add app**, paste `https://github.com/loyeleye/hoops-ladder`, then **Add**
+   and **Install**. Or open `obtainium://add/https://github.com/loyeleye/hoops-ladder` on the phone.
+4. Allow Obtainium to install apps when Android asks.
+5. In Obtainium's **Settings**, turn on background update checks and pick how often to check.
+
+**How automatic is it?** On Android 12 or newer, Obtainium installs updates in the background
+without asking, as long as it installed the app itself (step 3) and the app targets a recent SDK
+(ours targets 36). Some phones still show a prompt: Xiaomi/MIUI and a few others block silent
+installs, and battery savers can delay the background check. On Android 11 or older, Obtainium
+downloads the update and shows a notification you tap to install.
+
+**Google Play later.** Play re-signs apps with Google's app signing key, so the Obtainium copy and
+the Play copy have different signatures. Switching from one to the other means uninstalling first.
+To keep both, give the Obtainium build its own `applicationId` (for example with a suffix).
