@@ -62,7 +62,8 @@ Why each feature still counts as "not collected":
 | Send to coach | Android share sheet; the user picks the app and recipient | Only by the user's own action. Google's guidance doesn't count user-initiated transfers like this as "sharing" |
 | Voice commands and dictating drills | `@capacitor-community/speech-recognition` hands audio to Android's recognizer (Google's on most phones) | Not by the app. The recognizer is a system service covered by Google's policy, like the keyboard; the app only gets text |
 | Spoken scores | Android text-to-speech | No |
-| Outside links (YouTube, articles) | Open in the browser or YouTube app | Not by the app |
+| Demo clips | YouTube's embedded player (youtube-nocookie.com) plays inside the app when the user opens a clip | The video request goes to YouTube, like any embedded video. The app sends YouTube no user data of its own and adds no YouTube SDK. Check how the Data safety form treats an embedded player when you fill it in |
+| Outside links (articles, "YouTube app" button) | Open in the browser or YouTube app | Not by the app |
 | Android Auto Backup (`allowBackup="true"`) | Android backs up app data to the user's Google account if they turned backup on | Not to you. It's an Android system feature the user turns on, and you can't read the backup. If you'd rather not think about it, set `android:allowBackup="false"` (users then lose progress when they switch phones) |
 
 ## Health apps declaration

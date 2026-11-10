@@ -473,3 +473,34 @@ downloads the update and shows a notification you tap to install.
 **Google Play later.** Play re-signs apps with Google's app signing key, so the Obtainium copy and
 the Play copy have different signatures. Switching from one to the other means uninstalling first.
 To keep both, give the Obtainium build its own `applicationId` (for example with a suffix).
+
+## Step 14. Demo clips that play inside the app
+
+The web version can't embed YouTube, so each drill part links to the right second of its source video and the
+phone leaves the app. In the app, `native-web/native.js` catches a tap on any YouTube link (demo chips, drill
+sources, links in your Coach lists) and opens a full-screen player sheet instead:
+
+- **Starts at the clip's start and loops at its end.** The page's clip data (`CLIPS` and `STEP_CLIPS`) already
+  has `[videoId, start, end, label]` for each part. The chips only carried the start (`&t=`), so `native.js`
+  wraps `clipLinks()` to add a `data-end` attribute. Turn Loop off and the video plays on past the clip.
+- **Half and three-quarter speed** through YouTube's own `setPlaybackRate`.
+- **"YouTube app"** opens the full video outside the app, as before.
+- **Offline**, the sheet says the clip needs a connection; the step animations still work.
+
+**How it's built.** It uses YouTube's [IFrame Player API](https://developers.google.com/youtube/iframe_api_reference):
+the first clip loads `https://www.youtube.com/iframe_api`, then each clip is a `YT.Player` on the
+privacy-enhanced `youtube-nocookie.com` host. The loop is a 200 ms timer that seeks back to the start once
+`getCurrentTime()` passes the end, so it also catches someone scrubbing past the end. A drill timer that's
+running pauses when you open a clip, as it did for the old links.
+
+**One Android change.** Capacitor sends any page load on another site out to the browser, which is right for the
+app's own page but would break the YouTube iframe as it loads. `MainActivity` swaps in a `BridgeWebViewClient`
+that lets loads *inside a frame* (`!request.isForMainFrame()`) stay put, and keeps the old behavior for the
+page itself.
+
+**Why no mirror button.** Mirroring would mean flipping the YouTube player with CSS, and YouTube's API terms
+don't allow changing how the player shows a video. Mirror, frame-by-frame and offline playback wait for our own
+recorded demos, which can ship inside the app as short MP4s.
+
+**Privacy.** Playing a clip connects to YouTube, so the privacy policy (`site/privacy.html`) and the Data safety
+notes (`store/play_console_notes.md`) say so. Nothing loads from YouTube until you open a clip.
