@@ -189,7 +189,118 @@
     }, true);
   }
 
-  /* ---------- 3. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------
+  /* ---------- 3. Voice: commands during drills and in the rep logger ----------
+     Android's WebView has no speech recognition, so the web version's Voice button stays hidden in the app. The
+     native HoopsVoice plugin (android/.../voice/) listens on the phone instead, on-device when it can, and only
+     acts on a short list of words.
+     - Rep logger: the page's own Voice button and word list (voiceCmd: "miss", "done", "eight", "undo", "short"...).
+     - Drill player: a Voice button on the timer screen: "pause", "go", "lost it", "faster", "slower", "skip".
+     Words the app says itself (tips, "Paused", "Go") are ignored while it's talking. See docs/LEARNING.md, step 15. */
+  const Voice = Plug.HoopsVoice;
+  if (Voice) {
+    const WORDS = ["pause", "go", "resume", "lost it", "faster", "slower", "skip", "miss", "done", "undo", "make", "short", "long", "left", "right"];
+    let who = null;        // "log" or "play": which screen is listening
+    let fired = false;     // a command already ran for the phrase being spoken
+    const LOG_VOICE = { abort() {} }; // stands in for the web recognizer in the page's `voice` variable
+    const talking = () => performance.now() < talkUntil + 300 || (window.speechSynthesis && speechSynthesis.speaking);
+
+    function vStart(w) {
+      who = w; fired = false;
+      return Voice.start({ words: WORDS }).catch(e => {
+        who = null;
+        const denied = e && /denied|not allowed/i.test(String(e.code || e.message || e));
+        toast(denied ? "Mic not allowed" : "Voice isn't available", denied
+          ? "Allow the microphone for Hoops Ladder in your phone's settings to use voice."
+          : "This phone has no speech recognizer. Use the buttons, earbuds or tap.");
+        throw e;
+      });
+    }
+    function vStop() { if (!who) return; who = null; Voice.stop().catch(() => {}); }
+
+    // Drill player words. Only what makes sense right now does anything.
+    function playCmd(text) {
+      if (!P || P.stage === "rate") return false;
+      const t = " " + text.toLowerCase().replace(/[^a-z ]/g, " ").replace(/\s+/g, " ") + " ";
+      const d = P.items[P.i], cur = P.stage === "work" && phasesOf(d)[P.pi];
+      if (/ (lost it|lost|dropped it|dropped) /.test(t)) {
+        if (P.stage === "work" && P.running && !P.cd && !d.body && !isRestPart()) { lostIt(); return true }
+        return false;
+      }
+      if (/ (pause|stop|wait|hold on|hold up|time out|timeout) /.test(t)) { if (P.running) { togglePlay(); return true } return false }
+      if (/ (go|resume|start|play|ready|got it) /.test(t)) { if (!P.running) { togglePlay(); return true } return false }
+      if (/ (faster|speed up|slower|slow down) /.test(t)) {
+        if (!(cur && cur[3])) return false;
+        const m = Math.max(BEAT_MIN, Math.min(BEAT_MAX, (S.settings.beat || 1) + (/ (faster|speed up) /.test(t) ? .1 : -.1)));
+        setBeat(m, true); drawPlayer(); return true;
+      }
+      if (/ skip /.test(t)) { advance(); return true }
+      return false;
+    }
+    function logCmd(text, alts) {
+      if (!R || !bigEl) return false;
+      for (const x of [text].concat(alts || [])) {
+        let k = voiceCmd(x);
+        if (!k) continue;
+        if (k === "a_miss") k = R.mode === "sets" ? "a" : "miss";
+        if (k === "make" && R.mode === "sets") return false;
+        if (k === "b" && R.mode !== "sets") return false;
+        sig(k); return true;
+      }
+      return false;
+    }
+
+    Voice.addListener("heard", e => {
+      if (!e || !who) return;
+      if (talking()) { if (e.final) fired = false; return }
+      if (who === "play") {
+        // Act on the first words for speed ("lost it" mid-dribble), once per phrase.
+        if (!fired && playCmd(e.text)) fired = true;
+      } else if (e.final) logCmd(e.text, e.alts); // counts matter here, so wait for the whole phrase
+      if (e.final) fired = false;
+    });
+    Voice.addListener("state", e => {
+      if (e && e.error === "denied") { who = null; voice = null; if (bigEl) drawBig(); if (P) drawPlayer(); toast("Mic not allowed", "Allow the microphone for Hoops Ladder in your phone's settings to use voice.") }
+    });
+
+    // Rep logger: the page shows its Voice button when micOK is true and calls startVoice / stopVoice.
+    micOK = true;
+    startVoice = function () {
+      vStop();
+      voice = LOG_VOICE;
+      vStart("log").then(() => say(R && R.mode === "sets" ? "Voice on. Say miss, done, or the number you made." : "Voice on. Say make or miss."))
+        .catch(() => { voice = null; if (bigEl) drawBig() });
+    };
+    stopVoice = function () { if (!voice) return; voice = null; if (who === "log") vStop() };
+
+    // Drill player: a Voice button beside Pause / Skip / End. It stays on for later drills until turned off.
+    const origDrawPlayer = drawPlayer, origClosePlayer = closePlayer, origStartPlayer = startPlayer;
+    drawPlayer = function () {
+      origDrawPlayer.apply(this, arguments);
+      if (!pEl || !P || P.stage === "rate") return;
+      const top = pEl.querySelector(".bt-top");
+      if (!top) return;
+      const on = who === "play";
+      const b = document.createElement("button");
+      b.className = "btn sec small" + (on ? " mic" : "");
+      b.setAttribute("aria-pressed", on);
+      b.textContent = on ? "Voice on" : "Voice";
+      b.onclick = e => {
+        e.stopPropagation();
+        if (who === "play") { vStop(); S.settings.pvoice = false; persist(); drawPlayer() }
+        else vStart("play").then(() => { S.settings.pvoice = true; persist(); drawPlayer(); say("Voice on.") }).catch(() => drawPlayer());
+      };
+      top.insertBefore(b, top.lastElementChild);
+      const h = pEl.querySelector(".bt-hint");
+      if (on && h) h.insertAdjacentHTML("beforeend", `<br>Say “pause”, “go”, “lost it”, “faster”, “slower” or “skip”.`);
+    };
+    startPlayer = function () {
+      origStartPlayer.apply(this, arguments);
+      if (P && S.settings.pvoice && who !== "play") vStart("play").then(() => drawPlayer()).catch(() => { S.settings.pvoice = false; persist() });
+    };
+    closePlayer = function () { if (who === "play") vStop(); origClosePlayer.apply(this, arguments) };
+  }
+
+  /* ---------- 4. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------
      The native HoopsRemote plugin (android/.../remote/) decodes presses into the page's own signals:
      "a" (one press), "b" (two presses or a hold), "u" (three presses). sig() already knows what each means. */
   const Remote = Plug.HoopsRemote;
