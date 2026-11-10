@@ -8,6 +8,7 @@ import androidx.activity.OnBackPressedCallback;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.BridgeWebViewClient;
 import com.ladioyeleye.hoopsladder.audio.HoopsAudioPlugin;
+import com.ladioyeleye.hoopsladder.music.HoopsMusicPlugin;
 import com.ladioyeleye.hoopsladder.remote.HoopsRemotePlugin;
 import com.ladioyeleye.hoopsladder.remote.RemoteHub;
 import com.ladioyeleye.hoopsladder.voice.HoopsVoicePlugin;
@@ -20,6 +21,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(HoopsRemotePlugin.class);
         registerPlugin(HoopsVoicePlugin.class);
         registerPlugin(HoopsAudioPlugin.class);
+        registerPlugin(HoopsMusicPlugin.class);
         super.onCreate(savedInstanceState);
 
         // Capacitor sends every navigation to another site out to the browser. That's right for the page itself,

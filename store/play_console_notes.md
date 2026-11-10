@@ -112,6 +112,15 @@ Android after about 3 minutes.
 `POST_NOTIFICATIONS` needs no form. It's asked for at runtime on Android 13+ the first time a drill starts
 hands-free. None of this collects data, so the Data safety answers and the privacy policy don't change.
 
+## Notification access (music controls)
+
+The music controls (docs/LEARNING.md, step 19) add `MusicListenerService`, a `NotificationListenerService`
+the player turns on in **Settings → Notification access**. It's only there so the app can call
+`MediaSessionManager.getActiveSessions()` to show and control the music app that's playing; it ignores every
+notification. Play has no declaration form for it, but its policy asks that the app explain the use before
+sending the player to the setting (the "Control your music from here" bar does) and say it in the privacy
+policy (the "Your music" section). Nothing leaves the phone, so the Data safety answers don't change.
+
 ## Permissions to double-check
 
 The manifest declares `CAMERA`, `RECORD_AUDIO`, `MODIFY_AUDIO_SETTINGS`, `VIBRATE` and `INTERNET`.
