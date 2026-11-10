@@ -56,6 +56,7 @@ Why each feature still counts as "not collected":
 |---|---|---|
 | Progress, settings, form numbers | WebView localStorage in the app's private storage | No |
 | Form check video | Read in memory, pose model runs on-device, only numbers kept | No |
+| Live form check (camera) | `getUserMedia` frames read in memory, pose model runs on-device, only numbers kept | No |
 | Camera | Opened by Android's picker when you record a clip | No |
 | Training videos (camera + mic audio) | Stored in the app's IndexedDB on the phone | No |
 | Save to phone | Copies a video to Documents/Hoops Ladder, on the same phone | No |

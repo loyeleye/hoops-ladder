@@ -535,3 +535,36 @@ triggers happen. Listening with the screen locked needs a microphone foreground 
 allows to start while the app is open.
 
 The `<queries>` entry in `AndroidManifest.xml` lets Android 11+ show the app the phone's speech recognizer.
+
+## Step 16. Live form check from the camera
+
+The web version can only analyze a clip you filmed with the camera app, because Claude-hosted pages can't open
+the camera. The app can, so the Form tab now has **Live form check (camera)**. Prop the phone up side-on, start
+shooting, and after each shot the app says one short cue and shows the numbers.
+
+**Same numbers as a clip check.** `native-web/native.js` doesn't have its own shot math. It keeps the last five
+seconds of pose frames and, for each shot, hands the page's own `compute()` the 2.5 s before the shot plus the
+follow-through, resampled to the 10 frames a second that `compute()` expects. So the Line Test drift, dip knee
+angle, ball-leads timing, forearm at set point, arm extension, follow-through hold, tempo and stop-on-the-way-up
+all mean exactly what they mean for a clip.
+
+**Finding each shot.** A shot starts when the shooting wrist goes above the nose, and ends when it comes back
+down (the follow-through is over) or 1.6 s later. There's a 0.8 s pause before the next one can start.
+
+**The pose model in video mode.** The clip check uses MediaPipe's `PoseLandmarker` in `IMAGE` mode, one frame at a
+time. Live uses a second landmarker in `VIDEO` mode (`detectForVideo`), which tracks between frames, so it's
+steadier and faster. It runs at up to 15 frames a second on a 480 px copy of each frame, the same size the clip
+check uses, so the thresholds match.
+
+**Cues.** Only the biggest "Fix" on each shot is spoken, in this order: drift, ball-leads timing, set point, tempo,
+extension, hold, dip. A clean shot gets "Good shot." Turn **Cues** off to read them instead. (They're spoken with
+the phone's own voice, so voice commands from step 15 ignore them.)
+
+**Saving.** When you tap Done, the session goes into your form history as one entry: the median of each number
+across your shots, and each check's most common status. Like a clip check, it earns Shooting XP twice a day at most.
+
+**Camera permission.** `getUserMedia()` asks Capacitor's WebView, which asks Android for the camera the first time,
+the same way Coach recording does (step 7). Nothing is recorded or stored; only the numbers are.
+
+**Next.** Ball tracking (make/miss, arc and entry angle, where the ball hits the glass) needs a ball detector on top
+of the pose model. Takeoff foot and finishing hand for layups can come from the same pose frames.

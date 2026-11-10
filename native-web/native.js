@@ -342,7 +342,240 @@
     closePlayer = function () { if (who === "play") vStop(); origClosePlayer.apply(this, arguments) };
   }
 
-  /* ---------- 4. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------
+  /* ---------- 4. Live form check from the camera ----------
+     The web version only analyzes clips filmed with the camera app. In the app, "Live form check" on the Form tab
+     opens the camera and runs the same pose model on every frame. Each time it sees a shot (shooting wrist goes
+     above the head, then the follow-through ends) it runs the page's own compute() on the last few seconds, so the
+     numbers match a clip check: Line Test drift, dip, ball-leads timing, set point, extension, follow-through hold,
+     tempo and a stop on the way up. It says one short cue for the biggest problem on that shot, and closing saves
+     the session's typical numbers to your form history. See docs/LEARNING.md, step 16. */
+  {
+    const FPS = 10;                 // compute() expects evenly spaced frames; live frames are resampled to this
+    const CUES = {
+      drift: m => (m.val.startsWith("-") ? "Stay on the line. You fell back." : "Stay on the line. You drifted forward."),
+      seq: () => "Ball first, then legs.",
+      tilt: m => (m.val.startsWith("-") ? "Keep it in front of your head." : "Elbow under the ball."),
+      ext: () => "Reach for the rim.",
+      hold: () => "Hold the follow-through.",
+      tempo: m => (/stops/.test(m.text) ? "One speed up. No stop." : "Shorter, quicker motion."),
+      knee: m => (/shallow/.test(m.text) ? "Use your legs." : "Not so deep.")
+    };
+    const ORDER = ["drift", "seq", "tilt", "tempo", "ext", "hold", "knee"];
+    let L = null; // the open live session
+
+    const st = document.createElement("style");
+    st.textContent = `
+.livefc{position:fixed;inset:0;z-index:80;background:#05080F;color:#F2F5FA;display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.livefc .lf-top{display:flex;align-items:center;gap:8px;padding:10px 16px}
+.livefc .lf-title{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em}
+.livefc .lf-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.livefc video,.livefc canvas{position:absolute;max-width:100%;max-height:100%}
+.livefc .lf-msg{position:absolute;left:16px;right:16px;top:12px;text-align:center;font-size:15px;font-weight:600;background:rgba(5,8,15,.72);border-radius:12px;padding:8px 12px}
+.livefc .lf-msg:empty{display:none}
+.livefc .lf-cue{position:absolute;left:16px;right:16px;bottom:12px;text-align:center;font-family:var(--display);font-weight:800;font-size:26px;text-transform:uppercase;text-shadow:0 2px 8px #000}
+.livefc .lf-shot{padding:10px 16px 16px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;min-height:64px}
+.livefc .lf-shot span{font-size:12.5px;border-radius:999px;padding:4px 10px;background:#1C2844}
+.livefc .lf-shot span.fix{background:#C13C2A}.livefc .lf-shot span.watch{background:#6b4a05}.livefc .lf-shot span.good{background:#1E8657}
+.livefc .btn.sec{background:#1C2844;border-color:#2A3858;color:#F2F5FA}
+.livefc .btn.sec[aria-pressed="true"]{background:#F2F5FA;color:#05080F}`;
+    document.head.appendChild(st);
+
+    let liveP = null; // pose landmarker in VIDEO mode, made once
+    function loadLivePose() {
+      if (!liveP) {
+        liveP = (async () => {
+          const base = document.baseURI;
+          const v = await import(new URL("vision_bundle.mjs", base).href);
+          const fs = await v.FilesetResolver.forVisionTasks(new URL("wasm", base).href);
+          const buf = new Uint8Array(await (await fetch(new URL("pose_landmarker_lite.task", base).href)).arrayBuffer());
+          return v.PoseLandmarker.createFromOptions(fs, { baseOptions: { modelAssetBuffer: buf, delegate: "CPU" }, runningMode: "VIDEO", numPoses: 1 });
+        })();
+        liveP.catch(() => { liveP = null; });
+      }
+      return liveP;
+    }
+
+    // Form tab: add the live button under "Record or choose a clip".
+    const origViewForm = viewForm;
+    viewForm = function () {
+      return origViewForm.apply(this, arguments).replace('<input type="file" id="fcFile"',
+        '<button class="btn sec" data-livefc style="width:100%;margin-top:8px">Live form check (camera)</button><input type="file" id="fcFile"');
+    };
+    document.addEventListener("click", e => { if (e.target.closest && e.target.closest("[data-livefc]")) { e.preventDefault(); openLive(); } });
+
+    function msg(t) { const el = L && L.el.querySelector(".lf-msg"); if (el && el.textContent !== t) el.textContent = t; }
+    function drawTop() {
+      if (!L) return;
+      L.el.querySelector(".lf-n").textContent = L.shots.length ? `· ${L.shots.length}` : "";
+      const b = L.el.querySelector("[data-lf=talk]"); b.setAttribute("aria-pressed", L.talk);
+    }
+    function showShot(res) {
+      const box = L.el.querySelector(".lf-shot");
+      box.innerHTML = res.M.map(m => `<span class="${m.st}">${esc(m.label.replace(/ \(.*\)/, ""))} · ${esc(m.val)}</span>`).join("");
+    }
+
+    async function openLive() {
+      if (L) return;
+      const el = document.createElement("div");
+      el.className = "livefc";
+      el.setAttribute("role", "dialog");
+      el.setAttribute("aria-label", "Live form check");
+      el.innerHTML = `<div class="lf-top"><div class="lf-title">Live <span class="lf-n" style="opacity:.7"></span></div>
+        <button class="btn sec small" data-lf="talk" aria-pressed="true">Cues</button><button class="btn sec small" data-lf="flip">Flip</button><button class="btn sec small" data-lf="close">Done</button></div>
+        <div class="lf-stage"><video playsinline muted autoplay></video><canvas></canvas><div class="lf-msg" role="status">Starting the camera…</div><div class="lf-cue" aria-live="polite"></div></div>
+        <div class="lf-shot"><span>Film from the side, shooting arm toward the phone, whole body in frame. Shoot when you're ready.</span></div>`;
+      document.body.appendChild(el);
+      L = { el, video: el.querySelector("video"), cv: el.querySelector("canvas"), stream: null, face: "environment", talk: true,
+            buf: [], shots: [], up: 0, cool: 0, lastT: 0, noBody: 0, raf: 0, pl: null, busy: false };
+      L.video.setAttribute("playsinline", "");
+      el.addEventListener("click", e => {
+        const b = e.target.closest("[data-lf]");
+        if (!b || !L) return;
+        if (b.dataset.lf === "close") closeLive();
+        else if (b.dataset.lf === "talk") { L.talk = !L.talk; drawTop(); }
+        else if (b.dataset.lf === "flip") { L.face = L.face === "environment" ? "user" : "environment"; startCam(); }
+      });
+      lockOn();
+      drawTop();
+      try { L.pl = await loadLivePose(); } catch (e) { msg("The pose model couldn't load on this phone."); return; }
+      if (!L) return;
+      startCam();
+    }
+
+    async function startCam() {
+      if (!L) return;
+      if (L.stream) L.stream.getTracks().forEach(t => t.stop());
+      cancelAnimationFrame(L.raf);
+      msg("Starting the camera…");
+      try {
+        L.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: L.face, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } }, audio: false });
+      } catch (e) {
+        msg("Couldn't open the camera. Allow the camera for Hoops Ladder in your phone's settings, then try again.");
+        return;
+      }
+      if (!L) { return; }
+      L.video.srcObject = L.stream;
+      L.video.style.transform = L.cv.style.transform = L.face === "user" ? "scaleX(-1)" : "";
+      try { await L.video.play(); } catch (e) {}
+      L.buf = []; L.up = 0;
+      msg("");
+      L.raf = requestAnimationFrame(loop);
+    }
+
+    function size() {
+      const v = L.video, sc = 480 / Math.max(v.videoWidth || 1, v.videoHeight || 1);
+      return [Math.round(v.videoWidth * sc), Math.round(v.videoHeight * sc)];
+    }
+
+    function loop() {
+      if (!L) return;
+      L.raf = requestAnimationFrame(loop);
+      const v = L.video, now = performance.now();
+      if (!v.videoWidth || v.readyState < 2 || now - L.lastT < 1000 / 15) return;
+      L.lastT = now;
+      // Same 480 px working size as the clip check, so compute()'s thresholds mean the same thing.
+      const [cw, ch] = size();
+      let r = null;
+      try { r = L.pl.detectForVideo(v, now); } catch (e) { return; }
+      const raw = r && r.landmarks && r.landmarks[0];
+      const lm = raw ? raw.map(p => ({ x: p.x * cw, y: p.y * ch, v: p.visibility ?? 1 })) : null;
+      const t = now / 1000;
+      L.buf.push({ t, lm });
+      while (L.buf.length && L.buf[0].t < t - 5) L.buf.shift();
+      draw(lm, cw, ch);
+      track(lm, t);
+    }
+
+    function draw(lm, cw, ch) {
+      const cv = L.cv, v = L.video, box = L.el.querySelector(".lf-stage");
+      const k = Math.min(box.clientWidth / cw, box.clientHeight / ch);
+      cv.width = cw; cv.height = ch;
+      cv.style.width = v.style.width = Math.round(cw * k) + "px";
+      cv.style.height = v.style.height = Math.round(ch * k) + "px";
+      const c = cv.getContext("2d");
+      c.clearRect(0, 0, cw, ch);
+      if (!lm) return;
+      const s = SIDE[S.settings.hand || "R"], hot = new Set([s.sh, s.el, s.wr]);
+      c.lineCap = "round";
+      for (const [a, b] of BONES) {
+        const A = lm[a], B = lm[b];
+        if (A.v < .3 || B.v < .3) continue;
+        c.strokeStyle = hot.has(a) && hot.has(b) ? "#F07A35" : "rgba(255,255,255,.85)";
+        c.lineWidth = hot.has(a) && hot.has(b) ? 5 : 3;
+        c.beginPath(); c.moveTo(A.x, A.y); c.lineTo(B.x, B.y); c.stroke();
+      }
+    }
+
+    // Shot finder: the shooting wrist above the nose starts a shot; it's over when the wrist drops back below the
+    // nose (follow-through done) or 1.6 s later. Then compute() runs on the 3.5 s before, resampled to 10 fps.
+    function track(lm, t) {
+      const s = SIDE[S.settings.hand || "R"];
+      const body = lm && lm[0].v > .3 && lm[s.wr].v > .3 && (lm[s.an].v > .3 || lm[s.an === 28 ? 27 : 28].v > .3);
+      if (!body) {
+        L.noBody = L.noBody || t;
+        if (t - L.noBody > 1.5) msg("Step back until your whole body, feet included, is in frame. Film from the side.");
+        return;
+      }
+      L.noBody = 0;
+      msg("");
+      if (t < L.cool) return;
+      const above = lm[s.wr].y < lm[0].y;
+      if (above && !L.up) L.up = t;
+      if (L.up && ((!above && t - L.up > .25) || t - L.up > 1.6)) {
+        const start = L.up;
+        L.up = 0;
+        L.cool = t + .8;
+        analyzeShot(start, t);
+      }
+    }
+
+    function analyzeShot(upAt, endAt) {
+      const t0 = upAt - 2.5, frames = [];
+      const src = L.buf.filter(f => f.t >= t0 - .1 && f.t <= endAt + .05);
+      if (src.length < 8) return;
+      for (let x = t0; x <= endAt; x += 1 / FPS) {
+        let best = null;
+        for (const f of src) if (!best || Math.abs(f.t - x) < Math.abs(best.t - x)) best = f;
+        if (best && Math.abs(best.t - x) < .2) frames.push({ t: x - t0, lm: best.lm });
+      }
+      let res;
+      try { res = compute(frames, FPS); } catch (e) { return; }
+      if (!res || !res.ok) return;
+      L.shots.push(res);
+      drawTop();
+      showShot(res);
+      const worst = ORDER.map(k => res.M.find(m => m.k === k && m.st === "fix")).find(Boolean);
+      const cue = worst ? CUES[worst.k](worst) : "Good shot.";
+      const cel = L.el.querySelector(".lf-cue");
+      cel.textContent = cue;
+      cel.style.color = worst ? "#FF8A75" : "#7BE0A8";
+      if (L.talk) say(cue);
+    }
+
+    function closeLive() {
+      if (!L) return;
+      const shots = L.shots;
+      cancelAnimationFrame(L.raf);
+      if (L.stream) L.stream.getTracks().forEach(t => t.stop());
+      L.el.remove();
+      L = null;
+      lockOff();
+      if (!shots.length) return;
+      // Save one form entry for the session: the median of each number, and each check's most common status.
+      const vals = {}, M = [];
+      for (const k of Object.keys(shots[0].vals)) vals[k] = med(shots.map(r => r.vals[k]));
+      for (const m of shots[0].M) {
+        const n = {};
+        for (const r of shots) { const x = r.M.find(y => y.k === m.k); if (x) n[x.st] = (n[x.st] || 0) + 1; }
+        M.push({ k: m.k, st: Object.keys(n).sort((a, b) => n[b] - n[a])[0] });
+      }
+      saveForm({ vals, M });
+      render();
+    }
+  }
+
+  /* ---------- 5. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------
      The native HoopsRemote plugin (android/.../remote/) decodes presses into the page's own signals:
      "a" (one press), "b" (two presses or a hold), "u" (three presses). sig() already knows what each means. */
   const Remote = Plug.HoopsRemote;
