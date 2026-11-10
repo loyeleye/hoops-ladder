@@ -549,7 +549,14 @@ angle, ball-leads timing, forearm at set point, arm extension, follow-through ho
 all mean exactly what they mean for a clip.
 
 **Finding each shot.** A shot starts when the shooting wrist goes above the nose, and ends when it comes back
-down (the follow-through is over) or 1.6 s later. There's a 0.8 s pause before the next one can start.
+below the shoulder (the follow-through is over) or 1.8 s later. Ending at the nose cut shots short: a set point
+at forehead height, or one jumpy pose frame, looked like the end. The next shot can start 0.8 s later at the
+earliest, and only after the hand has come down. A raised hand with no dip or no long arm (knee angle over 165°,
+arm under 120°) is a wave or a catch, not a shot, and is skipped.
+
+**Checked on real clips.** Ladi's 13 phone clips (side-on from the floor, Pixel, 1 to 4 s) were played into the
+live mode as a fake camera. 11 gave one shot each. The other two had the shooter too far away or the feet out of
+frame, and got the "step back" message or nothing.
 
 **The pose model in video mode.** The clip check uses MediaPipe's `PoseLandmarker` in `IMAGE` mode, one frame at a
 time. Live uses a second landmarker in `VIDEO` mode (`detectForVideo`), which tracks between frames, so it's
