@@ -1,0 +1,226 @@
+{
+ "id": "s12",
+ "name": "Beat the ball screen coverage",
+ "blurb": "Once you know the coverage, take what it gives you: switch, drop, show or two on the ball.",
+ "src": {
+  "FR-KEMBA": {
+   "v": "HXuLphW1Aeo",
+   "t": "How to Recognize & Attack Different Coverages",
+   "who": "The Film Room · former Big 12 player"
+  }
+ },
+ "m": [
+  {
+   "id": "s12-01",
+   "src": "FR-KEMBA",
+   "start": 35,
+   "pause": 46,
+   "end": 60,
+   "lv": "B",
+   "checked": false,
+   "title": "They switch",
+   "q": "They switch the big onto you. What do you do?",
+   "choices": [
+    {
+     "t": "Use your speed: step back for three or blow by him",
+     "ok": true
+    },
+    {
+     "t": "Post him up"
+    },
+    {
+     "t": "Throw it to your big right away"
+    }
+   ],
+   "ans": "The big doesn't want to get beat because he's slower. Use the speed edge to get separation for three, or blow by him to the rim.",
+   "quote": "knowing that that big doesn't want to get beat because he's a bit slower you can use that advantage to get separation and knock down the three but you don't always want to have to settle for the three so you can use that speed advantage to blow by him and get to the rim",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · the big, switched onto you"
+   ]
+  },
+  {
+   "id": "s12-02",
+   "src": "FR-KEMBA",
+   "start": 60,
+   "pause": 84,
+   "end": 96,
+   "lv": "I",
+   "checked": false,
+   "title": "The big drops",
+   "q": "The big is sitting back and your man goes over the top. What's open?",
+   "choices": [
+    {
+     "t": "A pull-up three off one dribble",
+     "ok": true
+    },
+    {
+     "t": "Drive straight at the big"
+    },
+    {
+     "t": "The lob to the roller"
+    }
+   ],
+   "ans": "Against drop, hit the three off the bounce. It's hard, but it frees you up.",
+   "quote": "notice that the ball screen is being set and this big is low showing so Kemba comes off one bounce and knocks it down for three",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · the big, dropping",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s12-03",
+   "src": "FR-KEMBA",
+   "start": 96,
+   "pause": 100,
+   "end": 116,
+   "lv": "I",
+   "checked": false,
+   "title": "The big shows",
+   "q": "The big shows high and your man is cheating to get under the screen. What now?",
+   "choices": [
+    {
+     "t": "Reject it and go back the other way",
+     "ok": true
+    },
+    {
+     "t": "Come off the screen anyway"
+    },
+    {
+     "t": "Pass it back out"
+    }
+   ],
+   "ans": "Reject. Your man over-pursues, and you get straight downhill.",
+   "quote": "as this big shows or Hedges instead of Kemba continuing to go left he's actually going to reject back to his right and then his Defender who's trying to get underneath this screen is going to over pursue him and he ends up getting right downhill for a layup",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · the big, showing",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s12-04",
+   "src": "FR-KEMBA",
+   "start": 115,
+   "pause": 120,
+   "end": 135,
+   "lv": "I",
+   "checked": false,
+   "title": "The big hedges again",
+   "q": "The big tries to hedge the screen. What's the move?",
+   "choices": [
+    {
+     "t": "Snake back and split between them",
+     "ok": true
+    },
+    {
+     "t": "Back up and reset"
+    },
+    {
+     "t": "Lob it to the roller"
+    }
+   ],
+   "ans": "Change direction and speed: snake back and split right between the two defenders.",
+   "quote": "as this big tries to Edge the screen watch how Kemba snakes back to his right and splits right in between the two",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · the big",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s12-05",
+   "src": "FR-KEMBA",
+   "start": 146,
+   "pause": 154,
+   "end": 167,
+   "lv": "B",
+   "checked": false,
+   "title": "Two on the ball",
+   "q": "Two defenders come at you off the screen. What now?",
+   "choices": [
+    {
+     "t": "Get it to your big on the short roll",
+     "ok": true
+    },
+    {
+     "t": "Try to split them"
+    },
+    {
+     "t": "Back up and reset"
+    }
+   ],
+   "ans": "Two on the ball means your big is open. Hit him on the short roll.",
+   "quote": "when Kemba comes off the screen instead of doing something crazy he gets two people to the ball which means his big is open and he throws this pass that's known as a short roll and it leads to an easy layup",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · on you",
+    "DEFENDER · the big, on you too",
+    "ROLLER"
+   ]
+  },
+  {
+   "id": "s12-06",
+   "src": "FR-KEMBA",
+   "start": 167,
+   "pause": 173,
+   "end": 187,
+   "lv": "I",
+   "checked": false,
+   "title": "Two on the ball, big rolling",
+   "q": "Two on the ball again and your big is rolling. Who do you look at?",
+   "choices": [
+    {
+     "t": "The tag defender",
+     "ok": true
+    },
+    {
+     "t": "Your own man"
+    },
+    {
+     "t": "The big guarding you"
+    }
+   ],
+   "ans": "The tag defender. He's late rotating, so throw it to the big.",
+   "quote": "he knows his big as rolling and he actually gets his eyes to this man right here that's known as a tag Defender and because he's late rotating that's what allows him to throw this ball into the big",
+   "cast": [
+    "YOU · ball handler",
+    "ROLLER",
+    "DEFENDER · backside",
+    "DEFENDER · the big"
+   ]
+  },
+  {
+   "id": "s12-07",
+   "src": "FR-KEMBA",
+   "start": 187,
+   "pause": 190,
+   "end": 202,
+   "lv": "I",
+   "checked": false,
+   "title": "The tag is there",
+   "q": "The roller is covered by the tag and the big is dropping. What's left?",
+   "choices": [
+    {
+     "t": "The mid-range pull-up",
+     "ok": true
+    },
+    {
+     "t": "Force it to the roller"
+    },
+    {
+     "t": "Kick it to the corner"
+    }
+   ],
+   "ans": "The tag man takes the roller, and the big is in drop, so the mid-range jumper is there.",
+   "quote": "the roll man is open but because of this tagman right here he recognizes it and shoots this mid-range jump shot because the big is in drop coverage",
+   "cast": [
+    "YOU · ball handler",
+    "ROLLER",
+    "DEFENDER · backside",
+    "DEFENDER · the big"
+   ]
+  }
+ ]
+}

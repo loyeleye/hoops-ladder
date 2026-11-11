@@ -1,0 +1,226 @@
+{
+ "id": "s8",
+ "name": "IQ test: who's the help?",
+ "blurb": "Spot the help defender on a drive, then throw it to the man he left.",
+ "src": {
+  "FR-IQ5": {
+   "v": "Ry5tcG-2ZBU",
+   "t": "Basketball IQ Test #5 - Who's the Help Defender?",
+   "who": "The Film Room · former Big 12 player"
+  }
+ },
+ "m": [
+  {
+   "id": "s8-01",
+   "src": "FR-IQ5",
+   "start": 48,
+   "pause": 58,
+   "end": 123,
+   "lv": "B",
+   "checked": false,
+   "title": "Drive from the left wing",
+   "q": "Number 10 drives from the left wing and a help defender stops him. Where does the ball go?",
+   "choices": [
+    {
+     "t": "To the man the helper left",
+     "ok": true
+    },
+    {
+     "t": "Back out to the top"
+    },
+    {
+     "t": "Force up the shot"
+    }
+   ],
+   "ans": "The big is the helper. Score if the help is late, but if he stops you, his man should be open. If someone rotates to him, find the next man over.",
+   "quote": "If you can score because the help is late rotating over like you see right here, by all means, score it. But if the help defender does stop you from scoring it, you need to locate his matchup because he should be open.",
+   "cast": [
+    "YOU · #10, driving",
+    "DEFENDER · corner",
+    "DEFENDER · the big",
+    "TEAMMATE · the big's man"
+   ]
+  },
+  {
+   "id": "s8-02",
+   "src": "FR-IQ5",
+   "start": 125,
+   "pause": 138,
+   "end": 161,
+   "lv": "B",
+   "checked": false,
+   "title": "Spin past your man",
+   "q": "You spin past your man in the middle of the floor. Where does the ball go?",
+   "choices": [
+    {
+     "t": "To where the help came from",
+     "ok": true
+    },
+    {
+     "t": "Finish it yourself"
+    },
+    {
+     "t": "Back out and reset"
+    }
+   ],
+   "ans": "When you spin past your man, expect help. The ball goes to where the help came from.",
+   "quote": "If you ever spin to get past your defender, you should expect help. So the answer that you should have gotten is this defender right here. And just like in question number one, the ball should get thrown to where the help came from.",
+   "cast": [
+    "YOU · #8",
+    "HELPER",
+    "TEAMMATE · the helper's man"
+   ]
+  },
+  {
+   "id": "s8-03",
+   "src": "FR-IQ5",
+   "start": 163,
+   "pause": 177,
+   "end": 221,
+   "lv": "I",
+   "checked": false,
+   "title": "Spin and drive, no passes",
+   "q": "Two defenders come to help. One teammate is diving and one is standing under the rim. Who gets it?",
+   "choices": [
+    {
+     "t": "The one standing under the rim",
+     "ok": true
+    },
+    {
+     "t": "The one diving"
+    }
+   ],
+   "ans": "The one under the rim. The defender could cut off the diver, but he's facing the ball with the other man behind him and can't get back.",
+   "quote": "The reason I believe it's player B is because if this defender rotated over to player A, he would be able to cut him off and play one-on-one defense from there. However, this defender is facing the basketball with player B behind him and he's ready to jump. And I don't think there's any way he could have gotten back to player B if he would have dumped it off to him in the room.",
+   "cast": [
+    "YOU · bringing it up",
+    "TEAMMATE · diving",
+    "TEAMMATE · under the rim",
+    "HELPER",
+    "HELPER"
+   ]
+  },
+  {
+   "id": "s8-04",
+   "src": "FR-IQ5",
+   "start": 225,
+   "pause": 238,
+   "end": 291,
+   "lv": "I",
+   "checked": false,
+   "title": "Last play of the game",
+   "q": "Last play. You come off a ball screen from the wing. What's the best play?",
+   "choices": [
+    {
+     "t": "Pass to the teammate whose defender left",
+     "ok": true
+    },
+    {
+     "t": "Take the shot yourself"
+    }
+   ],
+   "ans": "Two defenders helped: the screener's man, so the popping big was open, and the man who left #12. Either pass beats the shot he took.",
+   "quote": "Because he was coming off of a ball screen, there's almost always a built-in help defender, and that's going to be the man who's guarding the screener. In that situation, he should have thrown the ball back to the pick and pop man, who probably would have got an open look to potentially win the basketball game. The more obvious answer that most of you probably chose was this defender who left number 12.",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER · popping",
+    "TEAMMATE · #12",
+    "DEFENDER · screener's man"
+   ]
+  },
+  {
+   "id": "s8-05",
+   "src": "FR-IQ5",
+   "start": 291,
+   "pause": 299,
+   "end": 331,
+   "lv": "B",
+   "checked": false,
+   "title": "Same player, similar screen",
+   "q": "You come off a similar screen and the big steps up to stop you. What now?",
+   "choices": [
+    {
+     "t": "Pass it to the man he left",
+     "ok": true
+    },
+    {
+     "t": "Drive into him"
+    },
+    {
+     "t": "Pull up over him"
+    }
+   ],
+   "ans": "The big leaves his man to stop the ball, so pass. His man cuts, the defense rotates, and the big kicks to the open corner.",
+   "quote": "The big leaves his matchup to stop the ball from getting to the paint. And now this big who's standing in the slot area reacts to his man leaving and starts to cut to the basket. When you see help come, you have to kick it to the next man over.",
+   "cast": [
+    "YOU · ball handler",
+    "THE BIG",
+    "TEAMMATE · the big's man",
+    "TEAMMATE · corner"
+   ]
+  },
+  {
+   "id": "s8-06",
+   "src": "FR-IQ5",
+   "start": 331,
+   "pause": 341,
+   "end": 375,
+   "lv": "I",
+   "checked": false,
+   "title": "After the switch",
+   "q": "They switch the screen and you attack your new man. Help steps up. Where does it go?",
+   "choices": [
+    {
+     "t": "Dump it down to the big",
+     "ok": true
+    },
+    {
+     "t": "Kick it to the helper's man on the wing"
+    },
+    {
+     "t": "Finish it yourself"
+    }
+   ],
+   "ans": "The switch puts a big on you and your old man steps up to help, leaving the big near the rim open. The helper's man isn't in a good spot to kick back.",
+   "quote": "As the big dives to the basket, the guard is now going to attack his new matchup. And that's going to force his original matchup to step up and help. And now you have the big in that dunker or room area wide open. So, dumping it down to the big was the better decision.",
+   "cast": [
+    "YOU · guard",
+    "TEAMMATE · big, diving",
+    "HELPER · your original man",
+    "TEAMMATE · wing"
+   ]
+  },
+  {
+   "id": "s8-07",
+   "src": "FR-IQ5",
+   "start": 377,
+   "pause": 387,
+   "end": 471,
+   "lv": "I",
+   "checked": false,
+   "title": "Put it all together",
+   "q": "Another switch and drive. The dump-off is taken away. Where does it go, and what does that player do next?",
+   "choices": [
+    {
+     "t": "Kick to the corner, who swings it to the wing",
+     "ok": true
+    },
+    {
+     "t": "Kick to the corner, who shoots"
+    },
+    {
+     "t": "Force the dump-off anyway"
+    }
+   ],
+   "ans": "A helper takes away the dump-off, so kick to the corner. With 7 seconds left and no need for a three, the corner should swing it to the wing instead of shooting.",
+   "quote": "The reason he didn't dish it to the big underneath the basket is because of this help defender right here who rotated down to take away that pass. So that's why he kicked it to the corner which is the decision that we should make. Now I want you to notice that on the catch there's 7 seconds left in the possession. And number 23 full rotated to the corner. And this is where I think it's a bad decision to shoot it when you could have passed it to the wing.",
+   "cast": [
+    "YOU · guard",
+    "TEAMMATE · big",
+    "TEAMMATE · corner",
+    "TEAMMATE · wing",
+    "HELPER"
+   ]
+  }
+ ]
+}
