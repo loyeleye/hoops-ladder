@@ -1106,6 +1106,7 @@
     BV = { bid: id, i: i || 0, sel: new Set(), cmp: null, pick: false, rate: .5, el, raf: 0, pf: {}, urls: {} };
     el.addEventListener("click", buClick);
     el.addEventListener("pointerdown", buPress);
+    el.addEventListener("pointerdown", buSwipe);
     buDraw();
   }
   window.burstBack = () => {
@@ -1132,23 +1133,54 @@
     const exp = B.t + BU.KEEP_DAYS * 864e5, kept = s => s.star || s.keep || s.sent;
     const unkept = S0.filter(s => s.v && !kept(s)).length;
     const shots = BV.sel.size ? S0.filter(s => BV.sel.has(s.id)) : [cur];
+    const oldStrip = BV.el.querySelector(".bu-strip"), sx = oldStrip ? oldStrip.scrollLeft : null;
+    const pkey = [cur, other].map(s => s ? s.id + "/" + (s.v || "") : "").join("|"), oldPanes = BV.pkey === pkey ? BV.el.querySelector(".bu-panes") : null;
+    if (oldPanes) oldPanes.remove();
+    const nSel = BV.sel.size, selS = S0.filter(s => BV.sel.has(s.id)), allStar = nSel && selS.every(s => s.star), selV = selS.filter(s => s.v), allKeep = selV.length && selV.every(s => s.keep);
     BV.el.innerHTML = `<div class="lf-top"><div class="lf-title">Shot ${cur.n} <span style="opacity:.7">of ${S0.length} · ${esc(buDay(B.t))}</span></div>
       <button class="btn sec small" data-bv="close">Done</button></div>
-      <div class="bu-panes">${pane(cur, other ? `Shot ${cur.n}` : "")}${other ? pane(other, `Shot ${other.n}`) : ""}</div>
+      <div class="bu-panes" data-swipe="1">${pane(cur, other ? `Shot ${cur.n}` : "")}${other ? pane(other, `Shot ${other.n}`) : ""}</div>
       <div class="bu-m">${cur.m.map(m => `<span class="${m.st}">${esc(m.l)} · ${esc(m.v)}</span>`).join("")}</div>
       <div class="bu-row">${[[1, "1×"], [.5, "½×"], [.25, "¼×"]].map(([r, l]) => `<button class="btn sec small" data-bv="rate:${r}" aria-pressed="${BV.rate === r}">${l}</button>`).join("")}
         ${cur.at ? `<button class="btn sec small" data-bv="jump:p">Dip</button><button class="btn sec small" data-bv="jump:sp">Set point</button><button class="btn sec small" data-bv="jump:r">Release</button>` : ""}<button class="btn sec small" data-bv="play">Pause</button></div>
       <div class="bu-strip" role="listbox" aria-label="Shots">${S0.map((s, j) => `<button class="bu-chip ${worstOf(s)}${s.v ? "" : " nov"}${BV.sel.has(s.id) ? " sel" : ""}" data-bv="shot:${j}" aria-current="${j === BV.i}" aria-label="Shot ${s.n}${s.star ? ", starred" : ""}${s.v ? "" : ", no video"}">${s.n}${s.star ? '<span class="st">★</span>' : ""}</button>`).join("")}</div>
       ${BV.pick ? `<p class="bu-note"><b>Tap the shot to compare with.</b> They play lined up at the release.</p>`
-        : BV.sel.size ? `<p class="bu-note">${BV.sel.size} selected · <button class="linkbtn" data-bv="selclear" style="color:inherit">Clear</button></p>`
-        : `<p class="bu-note">${unkept && Date.now() < exp ? `Video for shots with no ★ or Keep is deleted on ${esc(buDay(exp))}. ` : ""}Hold a shot to select several.</p>`}
-      <div class="bu-bar"><button class="btn sec small" data-bv="star" aria-pressed="${!!cur.star}">${cur.star ? "★ Starred" : "☆ Star"}</button>
+        : nSel ? `<p class="bu-note"><b>${nSel} selected.</b> Tap shots to add or remove them. <button class="linkbtn" data-bv="selclear" style="color:inherit">Clear</button></p>`
+        : `<p class="bu-note">${unkept && Date.now() < exp ? `Video for shots with no ★ or Keep is deleted on ${esc(buDay(exp))}. ` : ""}Swipe the video for the next shot. Hold a shot to select several.</p>`}
+      <div class="bu-bar">${nSel ? `<button class="btn sec small" data-bv="sstar" aria-pressed="${!!allStar}">${allStar ? `★ Unstar ${nSel}` : `☆ Star ${nSel}`}</button>
+        ${selV.length ? `<button class="btn sec small" data-bv="skeep" aria-pressed="${!!allKeep}">${allKeep ? `Unkeep ${selV.length}` : `Keep ${selV.length}`}</button>` : ""}
+        ${selV.length ? `<button class="btn sec small" data-bv="sdel">${BV.delAsk ? "Tap again to delete" : `Delete ${selV.length} video${selV.length > 1 ? "s" : ""}`}</button>` : ""}`
+        : `<button class="btn sec small" data-bv="star" aria-pressed="${!!cur.star}">${cur.star ? "★ Starred" : "☆ Star"}</button>
         ${cur.v ? `<button class="btn sec small" data-bv="keep" aria-pressed="${!!cur.keep}">${cur.keep ? "Kept" : "Keep"}</button>` : ""}
         ${S0.length > 1 ? `<button class="btn sec small" data-bv="cmp" aria-pressed="${other != null || BV.pick}">${other ? "Single" : "Compare"}</button>` : ""}
-        ${cur.v ? `<button class="btn sec small" data-bv="del">${BV.delAsk ? "Tap again to delete" : "Delete video"}</button>` : ""}
+        ${S0.length > 1 ? `<button class="btn sec small" data-bv="selstart">Select</button>` : ""}
+        ${cur.v ? `<button class="btn sec small" data-bv="del">${BV.delAsk ? "Tap again to delete" : "Delete video"}</button>` : ""}`}
         ${BURST_ACTIONS.map(a => `<button class="btn sec small" data-bv="act:${esc(a.id)}">${esc(a.label)}</button>`).join("")}</div>`;
     BV.shots = shots;
+    const strip = BV.el.querySelector(".bu-strip");
+    if (strip && sx != null) strip.scrollLeft = sx;
+    if (strip && BV.shown !== BV.i) { // bring the shot on screen into view, without moving the strip when only the selection changed
+      const c = strip.querySelector(`[data-bv="shot:${BV.i}"]`);
+      if (c) { const a = strip.getBoundingClientRect(), r = c.getBoundingClientRect(); if (r.left < a.left + 12 || r.right > a.right - 12) strip.scrollLeft += r.left - a.left - (a.width - r.width) / 2; }
+    }
+    BV.shown = BV.i;
+    if (oldPanes) { BV.el.querySelector(".bu-panes").replaceWith(oldPanes); return; }
+    BV.pkey = pkey;
     buLoad(cur, other);
+  }
+  function buSwipe(e) { // swipe the video left or right for the next or previous shot
+    if (!BV || !e.target.closest("[data-swipe]") || BV.sel.size || BV.pick) return;
+    const x0 = e.clientX, y0 = e.clientY, el = BV.el;
+    const up = ev => {
+      el.removeEventListener("pointerup", up); el.removeEventListener("pointercancel", up);
+      if (!BV || ev.type !== "pointerup") return;
+      const dx = ev.clientX - x0, dy = ev.clientY - y0, n = buCur().shots.length;
+      if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      const j = BV.i + (dx < 0 ? 1 : -1);
+      if (j < 0 || j >= n) return;
+      BV.i = j; if (BV.cmp === j) BV.cmp = null; buDraw();
+    };
+    el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
   }
   function pane(s, tag) {
     return `<div class="bu-pane" data-shot="${s.id}">${tag ? `<span class="bu-tag">${esc(tag)}</span>` : ""}${s.v ? `<video playsinline muted loop=""></video><canvas></canvas>` : `<div class="bu-none">No video for shot ${s.n}. ${s.gone ? "It was deleted after 14 days." : "Only its numbers were kept."}</div>`}</div>`;
@@ -1231,7 +1263,7 @@
     const b = e.target.closest("[data-bv]");
     if (!b || !BV) return;
     const [k, x] = b.dataset.bv.split(/:(.*)/), B = buCur(), cur = B.shots[BV.i];
-    if (k !== "del") BV.delAsk = false;
+    if (k !== "del" && k !== "sdel") BV.delAsk = false;
     if (k === "close") return burstClose();
     if (k === "shot") {
       if (BV.held) { BV.held = false; return; }
@@ -1246,6 +1278,23 @@
     if (k === "play") { const m = BV.P && BV.P[0]; if (!m) return; if (m.v.paused) m.v.play().catch(() => {}); else m.v.pause(); b.textContent = m.v.paused ? "Play" : "Pause"; return; }
     if (k === "jump") { const m = BV.P && BV.P[0]; if (!m || !cur.at) return; m.v.pause(); m.v.currentTime = cur.at[x]; const pb = BV.el.querySelector("[data-bv=play]"); if (pb) pb.textContent = "Play"; return; }
     if (k === "selclear") { BV.sel.clear(); return buDraw(); }
+    if (k === "selstart") { BV.sel.add(cur.id); BV.cmp = null; BV.pick = false; return buDraw(); }
+    if (k === "sstar" || k === "skeep") {
+      const sel = B.shots.filter(s => BV.sel.has(s.id) && (k === "sstar" || s.v));
+      if (k === "sstar") { const on = !sel.every(s => s.star); sel.forEach(s => (s.star = on)); }
+      else { const on = !sel.every(s => s.keep); sel.forEach(s => (s.keep = on)); }
+      persist(); return buDraw();
+    }
+    if (k === "sdel") {
+      if (!BV.delAsk) { BV.delAsk = true; b.textContent = "Tap again to delete"; return; }
+      BV.delAsk = false;
+      const sel = B.shots.filter(s => BV.sel.has(s.id) && s.v), vids = sel.map(s => s.v);
+      sel.forEach(s => { s.v = null; s.star = false; s.keep = false; });
+      BV.sel.clear(); persist();
+      await buDrop(vids, []);
+      await loadVids();
+      return BV && buDraw();
+    }
     if (k === "star") { cur.star = !cur.star; persist(); return buDraw(); }
     if (k === "keep") { cur.keep = !cur.keep; persist(); return buDraw(); }
     if (k === "cmp") {
