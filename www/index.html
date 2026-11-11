@@ -440,6 +440,35 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .planline{display:flex;gap:6px;align-items:stretch}.planline .drill{flex:1;min-width:0}
 .optb{flex:0 0 44px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);color:var(--muted)}
 .optb:hover{color:var(--accent);border-color:var(--accent)}.optb.ph{visibility:hidden}
+.shelf{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.shelf::-webkit-scrollbar{display:none}
+.pl{flex:0 0 auto;scroll-snap-align:start;width:148px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 11px;display:flex;flex-direction:column;gap:4px;color:var(--ink)}
+.pl b{font-size:14.5px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl small{font-size:12px;color:var(--muted)}
+.pl .on-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.pl[aria-pressed="true"]{border:2px solid var(--accent);padding:8px 10px;background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+.pl[aria-pressed="true"] .on-lbl{color:var(--accent)}
+.pl.more{width:auto;min-width:96px;justify-content:center;align-items:center;color:var(--accent);font-weight:700;font-size:14px;border-style:dashed}
+.mix{display:flex;height:5px;border-radius:3px;overflow:hidden;background:var(--line);width:100%}
+.mix i{display:block;height:100%}
+.mix .s{background:var(--accent)}.mix .h{background:var(--read)}.mix .f{background:var(--good)}.mix .b{background:var(--muted);opacity:.55}
+.np{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;display:flex;flex-direction:column;gap:7px}
+.np-t{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:14px}
+.np-t span{color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-bar{height:8px;border-radius:4px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.np-bar i{display:block;height:100%;background:var(--good);border-radius:4px}
+.np small{color:var(--muted);font-size:13px}
+.planline.skipped .drill{opacity:.5}
+.rwhy.skip{color:var(--muted);font-style:italic}
+.wrow-acts{display:flex;gap:18px;margin:0 12px 10px}
+.wrow-acts .linkbtn{padding:0}
+.opt>.psee-btns{margin:0 12px 10px}
+.opt .mix{margin-top:5px}
+.wsave{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;padding:12px 2px;font-size:15px;color:var(--ink)}
+.wsave .bx{flex:0 0 24px;height:24px;border:2px solid var(--line);border-radius:6px;display:grid;place-items:center;font-weight:800;color:var(--accent-ink)}
+.wsave[aria-pressed="true"] .bx{background:var(--accent);border-color:var(--accent)}
+.wsave span:last-child{display:flex;flex-direction:column}
+.wsave small{color:var(--muted);font-size:13px}
 .planrow{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
 .planrow>span:first-child{display:flex;flex-direction:column}.planrow b{font-family:var(--display);font-size:19px;text-transform:uppercase}
 .planrow .v{color:var(--accent);font-weight:700;font-size:14px;white-space:nowrap}
@@ -2165,11 +2194,14 @@ const bodyToday=()=>{const b=S.rec.body;return b&&b.d===today()&&b.k!=="good"?b.
 const planMins=()=>bodyToday()==="game"?20:S.settings.mins;
 function nwCount(mins){const v=(S.rec.nw||{})[mins];return v==null?NW_DEF[mins]??2:v}
 function swapMap(){const s=S.rec.swaps;return s&&s.d===today()?s.map:{}}
-function customToday(){const p=S.rec.plan;if(!p||p.d!==today())return null;return S.rec.workouts.find(w=>w.id===p.w)||null}
+function customToday(){const p=S.rec.plan;if(!p||(p.d!==today()&&!p.stay))return null;return S.rec.workouts.find(w=>w.id===p.w)||null}
+/* a workout set to stay on carries over to the next day, with that day's skips and add-ins cleared */
+function planRoll(){const p=S.rec.plan;if(p&&p.stay&&p.d!==today()){S.rec.plan={...p,d:today(),extra:[],skip:[]};persist()}}
+const skipped=id=>{const p=S.rec.plan;return !!(p&&customToday()&&(p.skip||[]).includes(id))};
 function eligible(d,body){return d&&!d.body&&fq(d.id).k!=="never"&&!((S.rec.paused||{})[d.id]>today())&&(!d.partner||S.settings.partner)&&!(body&&(JUMPY.has(d.id)||(body==="game"&&d.role==="volume")))}
 function plan0(){
   const cw=customToday();if(cw){const ids=[...cw.items,...((S.rec.plan.extra)||[]).filter(id=>!cw.items.includes(id))];
-    const out=ids.map(id=>D[id]).filter(Boolean).map(d=>({slot:"Your workout",d,why:cw.items.includes(d.id)?null:{k:"you",t:"You added it"}}));out.custom=cw;out.over=[];return out}
+    const out=ids.map(id=>D[id]).filter(Boolean).map(d=>({slot:"Your workout",d,skip:skipped(d.id),why:skipped(d.id)?{k:"skip",t:"Skipped today"}:cw.items.includes(d.id)?null:{k:"you",t:"You added it"}}));out.custom=cw;out.over=[];return out}
   const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")));
   const ml={s:maxLvl("s"),h:maxLvl("h"),f:maxLvl("f")},sw=swapMap(),baseline=S.sessions.length<3;let newUsed=0;
   const ok=d=>eligible(d,body),okAuto=d=>ok(d)&&lvlOf(d)<=ml[d.skill];
@@ -2301,7 +2333,7 @@ function weekDots(){
 function viewToday(){
   const p=plan(), w=weekDots(), ws=weakSpot(), mins=S.settings.mins, ts=todaySession(), isDone=x=>ts&&ts.items.some(it=>it.id===x.d.id), cw=p.custom, started=!!(ts&&ts.items.length);
   /* Up next: the first drill in the list you haven't done today. If it's timed, it takes the run of timed drills after it too, so they play back to back. */
-  const up=[];{const k=p.findIndex(x=>!isDone(x));if(k>=0){const timed=x=>x.d.log==="timer"||x.d.log==="react";up.push(p[k]);if(timed(p[k]))for(let m=k+1;m<p.length&&timed(p[m])&&!isDone(p[m]);m++)up.push(p[m])}}
+  const up=upNext(p,ts);
   const upIds=new Set(up.map(x=>x.d.id)),nNeed=p.filter(x=>x.why&&x.why.k==="need").length;
   const waiting=cw&&state.keepNext!==today()?S.rec.added.filter(id=>inNext(id)&&!p.some(x=>x.d.id===id)):[];
   const rate=!up.length&&recapIds().length&&!(S.rec.recap&&S.rec.recap.d===today());
@@ -2309,19 +2341,21 @@ function viewToday(){
    <div class="card"><div class="week">${w.html}</div></div></section>
   <section><div class="sechead"><h2>Today's workout</h2>
    ${cw?"":`<div class="seg" role="group" aria-label="Workout length">${[20,30,45].map(m=>`<button data-mins="${m}" aria-pressed="${m===mins}">${m} min</button>`).join("")}</div>`}</div>
-   ${planRow(p)}
+   ${shelf(p)}
    <div class="row"><label class="toggle"><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}> Partner today</label><label class="toggle"><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}> I have a heavy ball</label></div>
    ${!started&&!cw?bodyCard():""}
    ${waiting.length?addedCard(waiting):""}
    ${ws?`<div class="card focus">${courtSVG({data:spotTotals(30),size:96})}<div class="small"><div class="label">Focus spot</div><b>${SPOT[ws.id].name}</b> is your coldest spot over 30 days at <b class="num">${Math.round(ws.p*100)}%</b>. Weak Spot Reps will target it.</div></div>`:""}
    ${cueCard()}
+   ${nowPlaying(p,ts)}
    ${(()=>{if(!up.length)return rate?`<button class="btn pri" data-rec="recap">Rate today's drills<small style="display:block;font-family:var(--body);font-size:13px;text-transform:none;font-weight:600">Easy, Right or Hard · 10 seconds</small></button>`:`<button class="btn pri" disabled>Today's workout is done</button>`;const timed=x=>x.d.log==="timer"||x.d.log==="react";
      if(timed(up[0])){const secs=up.reduce((a,x)=>a+totalOf(x.d),0)+10*(up.length-1);return `<button class="btn pri upnext" data-play="${up.map(x=>x.d.id).join(",")}">Up next: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}<small>Timed · plays back to back · ${Math.round(secs/60)} min</small></button>`}
      return `<button class="btn pri upnext" data-open="${up[0].d.id}">Up next: ${esc(up[0].d.name)}<small>Opens the drill and its logger</small></button>`})()}
    <div class="plantotal"><span>${p.length} drills${nNeed?` · ${nNeed} for what needs work`:""}</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min on the court</b></div>
-   <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}<div class="planline">${drillRow(x.d,i+1,{next:upIds.has(x.d.id),why:x.why})}${!cw&&x.d.rt?`<button class="optb" data-rec="rt:${x.d.rt}" aria-label="${esc(x.d.name)}: pick your ${RT_NAME[x.d.rt]}">${SWAPICON}</button>`:!cw&&!FIXED.has(x.d.id)?`<button class="optb" data-rec="opt:${x.d.id}" aria-label="${esc(x.d.name)}: why it's here, swap or how often">${SWAPICON}</button>`:`<span class="optb ph" aria-hidden="true"></span>`}</div>`).join("")}</div>
+   <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}<div class="planline${x.skip?" skipped":""}">${drillRow(x.d,i+1,{next:upIds.has(x.d.id),why:x.why})}${cw?`<button class="optb" data-rec="wopt:${x.d.id}" aria-label="${esc(x.d.name)}: skip today or remove">${MOREICON}</button>`:x.d.rt?`<button class="optb" data-rec="rt:${x.d.rt}" aria-label="${esc(x.d.name)}: pick your ${RT_NAME[x.d.rt]}">${SWAPICON}</button>`:!FIXED.has(x.d.id)?`<button class="optb" data-rec="opt:${x.d.id}" aria-label="${esc(x.d.name)}: why it's here, swap or how often">${SWAPICON}</button>`:`<span class="optb ph" aria-hidden="true"></span>`}</div>`).join("")}</div>
+   ${cw&&ts?(()=>{const other=[...new Set(ts.items.map(it=>it.id))].filter(id=>D[id]&&!p.some(x=>x.d.id===id));return other.length?`<p class="muted small" style="margin:0">Also done today: ${other.map(id=>esc(D[id].name)).join(", ")}.</p>`:""})():""}
    ${cw?"":overflowCard(p)}
-   <p class="muted small" style="margin:0">${cw?`${esc(cw.name)} runs in the order you saved it, today only. Tomorrow goes back to the recommended plan. `:`Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The plan fills those slots with drills you added, what needs work, your schedule, favorites and one new drill, as many as fit the minutes you picked. Each drill says why it's here. Tap ⇄ to swap it or set how often it comes back. `}The Up next button always starts the next drill (outlined), and timed drills in a row play back to back. You can also tap any drill to do it out of order.</p></section>
+   <p class="muted small" style="margin:0">${cw?`${esc(cw.name)} runs in the order you saved it${S.rec.plan&&S.rec.plan.stay?" and stays on until you switch":", today only. Tomorrow goes back to the recommended plan"}. Switch to another workout any time: drills you've done today stay done. Tap ⋯ to skip a drill today. `:`Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The plan fills those slots with drills you added, what needs work, your schedule, favorites and one new drill, as many as fit the minutes you picked. Each drill says why it's here. Tap ⇄ to swap it or set how often it comes back. `}The Up next button always starts the next drill (outlined), and timed drills in a row play back to back. You can also tap any drill to do it out of order.</p></section>
   ${coachTodayCard()}`}
 
 function cueCard(){const c=todayCue();
@@ -2418,7 +2452,7 @@ function progLadder(){const rows=ladderHist(),d=D.s_ladder;if(!rows.length)retur
    <p class="muted small" style="margin:0">Last ladder on ${new Date(last.d+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}. Where the count jumps is where your shot starts to change.</p></section>`}
 const state={tab:"today",drillTab:"s",range:"30"};
 function route(){const h=location.hash.slice(1);state.tab=["today","drills","progress","form","coach"].includes(h)?h:"today";plateSmall=state.tab==="drills"&&window.scrollY>120;render()}
-function render(){renderPlate();
+function render(){planRoll();renderPlate();
   $("#view").innerHTML=state.tab==="today"?viewToday():state.tab==="drills"?viewDrills():state.tab==="form"?viewForm():state.tab==="coach"?viewCoach():viewProgress();afterFormRender();afterCoachRender();
   document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"))}
 
@@ -2453,7 +2487,7 @@ function bsOpen(html,label){bsClose(true);bsEl=document.createElement("div");bsE
 function bsSet(html){if(!bsEl)return bsOpen(html);const c=bsEl.querySelector(".psee-card"),y=c.scrollTop;c.innerHTML=html;c.scrollTop=y}
 function bsClose(quiet){if(bsEl){bsEl.remove();bsEl=null}if(quiet)return;if(R){const c=$("#sheet .reccard");if(c)c.outerHTML=recCard(R.d)}render()}
 const bsTop=(lab,title)=>`<div class="psee-grab"></div><div class="rs-top"><div>${lab?`<div class="label">${esc(lab)}</div>`:""}<h3>${esc(title)}</h3></div><button class="rs-x" data-rec="close" aria-label="Close">×</button></div>`;
-function toastU(h,m,undo){const host=$("#toastHost");host.innerHTML=`<div class="toast act" role="status"><span><b>${esc(h)}</b>${esc(m)}</span>${undo?`<button data-rec="undo">Undo</button>`:""}</div>`;toastU.fn=undo||null;clearTimeout(toast.t);toast.t=setTimeout(()=>{host.innerHTML="";toastU.fn=null},6000)}
+function toastU(h,m,undo,label="Undo",ms=6000){const host=$("#toastHost");host.innerHTML=`<div class="toast act" role="status"><span><b>${esc(h)}</b>${esc(m)}</span>${undo?`<button data-rec="undo">${esc(label)}</button>`:""}</div>`;toastU.fn=undo||null;clearTimeout(toast.t);toast.t=setTimeout(()=>{host.innerHTML="";toastU.fn=null},ms)}
 const nwLabel=v=>v>=NW_ALL?"Every drill":v===0?"Off":String(v);
 function setFreq(id,k){const f=S.rec.freq;if(k==="auto")delete f[id];else if(k==="weekly")f[id]={k,day:(new Date().getDay()+6)%7};else if(k==="custom")f[id]={k,mode:"week",n:2};else f[id]={k};persist()}
 
@@ -2468,6 +2502,49 @@ function switchCard(){if(!S.sessions.length||S.rec.seen)return"";
   return `<section class="coachcard"><div class="label">What's new</div><b>Every drill is open now</b><p>Skill checks are gone. Your levels, XP, goals and history all stay.</p>
    <ul><li>Workouts now mix drills you add, what needs work, your favorites and one new drill.</li><li>Drills you've already done a lot count as favorites, so your plan won't change overnight.</li><li>Tap ⇄ on any drill in today's plan to see why it's there, swap it, or set how often it comes back.</li></ul>
    <button class="btn pri small" data-rec="seen">Got it</button></section>`}
+/* the workout shelf: your saved workouts side by side, like playlists. One tap switches, even halfway through. */
+const MOREICON=`<svg viewBox="0 0 20 20" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="4.5" cy="10" r="1.7"/><circle cx="10" cy="10" r="1.7"/><circle cx="15.5" cy="10" r="1.7"/></svg>`;
+function wMix(ids){const m={s:0,h:0,f:0,b:0};for(const id of ids){const d=D[id];if(d)m[d.body?"b":d.skill]+=realMins(d)}const t=m.s+m.h+m.f+m.b||1;
+  return `<span class="mix" aria-hidden="true">${["b","h","f","s"].map(k=>m[k]?`<i class="${k}" style="width:${(100*m[k]/t).toFixed(1)}%"></i>`:"").join("")}</span>`}
+function shelf(p){const cw=p.custom,ws=S.rec.workouts,mins=S.settings.mins;
+  const card=(id,name,sub,ids,on)=>`<button class="pl" data-rec="usew:${id}" aria-pressed="${on}"><span class="on-lbl">${on?"▶ Playing":"Workout"}</span><b>${esc(name)}</b><small>${sub}</small>${wMix(ids)}</button>`;
+  const rec=card("","Recommended",`${cw?mins:p.mins} min · built for today`,cw?[]:p.map(x=>x.d.id),!cw);
+  return `<div class="shelf" role="group" aria-label="Switch workout">${rec}${ws.map(w=>card(w.id,w.name,`${w.items.length} drill${w.items.length===1?"":"s"} · ${wMins(w)} min`,w.items,!!(cw&&cw.id===w.id))).join("")}<button class="pl more" data-rec="plan">${ws.length?"All workouts ›":"+ Make your own"}</button></div>`}
+/* the next drill you haven't done or skipped; a timed drill takes the run of timed drills after it too */
+function upNext(p,ts){const isDone=x=>ts&&ts.items.some(it=>it.id===x.d.id),open=x=>!isDone(x)&&!x.skip,timed=x=>x.d.log==="timer"||x.d.log==="react";
+  const up=[],k=p.findIndex(open);if(k>=0){up.push(p[k]);if(timed(p[k]))for(let m=k+1;m<p.length&&timed(p[m])&&open(p[m]);m++)up.push(p[m])}return up}
+function nowPlaying(p,ts){if(!ts||!p.some(x=>ts.items.some(it=>it.id===x.d.id)))return"";const isDone=x=>ts.items.some(it=>it.id===x.d.id),live=p.filter(x=>!x.skip||isDone(x)),dn=live.filter(isDone);
+  const tot=Math.round(live.reduce((a,x)=>a+realMins(x.d),0)),dm=Math.round(dn.reduce((a,x)=>a+realMins(x.d),0)),sk=p.length-live.length;
+  return `<div class="np" role="group" aria-label="Workout progress"><div class="np-t"><span>${p.custom?esc(p.custom.name):"Recommended"}</span><b>${dn.length} of ${live.length} done</b></div><div class="np-bar"><i style="width:${live.length?Math.round(100*dn.length/live.length):0}%"></i></div><small>About ${dm} of ${tot} min${sk?` · ${sk} skipped`:""}</small></div>`}
+/* after you log a drill: a short "Up next" with a Start button, so a workout plays through like a playlist */
+function toastNext(head,msg){const ts=todaySession(),p=plan(),up=upNext(p,ts);if(!up.length||!ts||!p.some(x=>ts.items.some(it=>it.id===x.d.id)))return toast(head,msg);
+  const timed=x=>x.d.log==="timer"||x.d.log==="react",ids=up.map(x=>x.d.id);
+  toastU(head,`${msg}${/[.!]$/.test(msg)?"":"."} Up next: ${up[0].d.name}${up.length>1?` + ${up.length-1} more`:""}.`,()=>{if(timed(up[0]))startPlayer(ids,false);else openRunner(ids[0])},"Start",9000)}
+/* starter workouts: copied into My workouts, so they can be edited like your own */
+const STARTERS=[
+ {id:"st_quick",name:"Quick 30",note:"A bit of everything",items:["s_cold","b_body","h_lab","f_mikan","s_line","s_ft","b_cool"]},
+ {id:"st_gym",name:"Full gym day",note:"Long day. Keep the next one light",items:["s_cold","b_full","h_lab","h_pound","h_jolt","h_r_cross","f_mikan","f_weak","f_float","s_line","s_rollup","s_5spot","s_atw","s_pullup","s_ft","s_tired","b_cool2"]},
+ {id:"st_shoot",name:"Shooting day",note:"Form, then volume",items:["s_cold","b_body","s_line","s_rollup","s_elbow","s_5spot","s_ladder","s_atw","s_rimline","s_ft","b_cool"]},
+ {id:"st_fin",name:"Finishing day",note:"Layups, floaters, footwork",items:["b_body","h_lab","f_mikan","f_corner","f_weak","f_foot5","f_float","f_reverse","f_called","s_ft","b_cool"]},
+ {id:"st_handles",name:"Handles, no hoop",note:"Driveway, garage or a wall",items:["b_body","h_lab","h_pound","h_five","h_fig8","h_place","h_d2","h_tennis","b_cool"]},
+ {id:"st_game",name:"Game-day tune-up",note:"Touch and rhythm, no jumping",items:["b_game","f_mikan","s_line","s_ft","b_cool"]}];
+const wNew=()=>"w"+Date.now().toString(36)+Math.floor(Math.random()*36).toString(36);
+/* keep a workout's order rules: Cold 3s and the body warm-up first, the stretch last; finishing or jump work brings the warm-up in */
+function wOrder(items,keep){let ids=[...new Set(items)].filter(id=>D[id]);if(needsWarm(ids))ids=[rtPick("warm").id,...ids];if(!keep)return ids;const first=pinFirst(ids),last=pinLast(ids);return [...first,...ids.filter(id=>!first.includes(id)&&!last.includes(id)),...last]}
+function wUse(id){const prev=S.rec.plan;S.rec.plan=id?{d:today(),w:id,extra:[],skip:[],stay:!!S.rec.stay}:null;persist();bsClose();
+  const w=id&&S.rec.workouts.find(x=>x.id===id),ts=todaySession(),mid=ts&&ts.items.length;
+  toastU(w?`Playing ${w.name}`:"Recommended",(w?(S.rec.stay?"Stays on until you switch.":"Today only. Tomorrow goes back to recommended."):"Built for today.")+(mid?" Drills you've done stay done.":""),()=>{S.rec.plan=prev;persist();render()})}
+function wOptHTML(id){const cw=customToday();if(!cw)return"";const d=D[id],sk=skipped(id),inW=cw.items.includes(id);
+  return bsTop(cw.name,d.name)+`<div>
+   <button class="rs-row" data-rec="wskip:${id}"><span>${sk?"Bring it back today":"Skip it today"}</span><b>${sk?"Unskip":"Skip"}</b></button>
+   <button class="rs-row" data-rec="wrm:${id}"><span>${inW?`Take it out of ${esc(cw.name)}`:"Take it out of today"}</span><b>Remove</b></button>
+   <button class="rs-row" data-rec="editw:${cw.id}"><span>Reorder or add drills</span><b>Edit workout ›</b></button></div>
+   <button class="btn pri" data-rec="go:${id}">Open the drill</button>`}
+/* "Save to a workout" from any drill, like saving a video to a playlist */
+function wSaveHTML(id){const d=D[id],ws=S.rec.workouts;
+  return bsTop("Save to a workout",d.name)+(ws.length?`<div>${ws.map(w=>{const on=w.items.includes(id);return `<button class="wsave" data-rec="wtog:${w.id}:${id}" aria-pressed="${on}"><span class="bx">${on?"✓":""}</span><span><b>${esc(w.name)}</b><small>${w.items.length} drill${w.items.length===1?"":"s"} · about ${wMins(w)} min</small></span></button>`}).join("")}</div>`:`<p class="rs-p">No workouts yet. Start one with this drill.</p>`)+
+   `<div class="psee-btns"><button class="btn sec small" data-rec="wnewwith:${id}">+ New workout</button><button class="btn pri small" data-rec="close">Done</button></div>`}
+const wHas=id=>S.rec.workouts.filter(w=>w.items.includes(id));
 function planRow(p){const cw=p.custom,mins=cw?wMins(cw):p.mins;
   return `<button class="planrow" data-rec="plan"><span><span class="label">${cw?"Plan · yours, today only":p.body?"Plan · lightened":"Plan"}</span><b>${cw?esc(cw.name):"Recommended"} · ${mins} min</b></span><span class="v">Change ▾</span></button>`}
 function bodyCard(){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;
@@ -2517,12 +2594,15 @@ function nwHTML(){return bsTop("Needs work","How many per workout?")+`<p class="
   <p class="small muted" style="margin:0">Each goes from 0 (off) up to Every drill, where every swappable slot goes to what needs work, as far as the app has found weak spots. Cold 3s, the warm-up, Tired 3s and the stretch stay.</p>
   <div class="psee-btns"><button class="btn sec small" data-rec="nwreset">Reset to 1 / 2 / 2</button><button class="btn pri small" data-rec="close">Done</button></div>`}
 const wMins=w=>Math.round(w.items.reduce((a,id)=>a+(D[id]?realMins(D[id]):0),0));
-function planHTML(){const cw=customToday(),ws=S.rec.workouts,mins=S.settings.mins;
-  return bsTop("Today's plan","Pick today's workout")+`<div class="opts"><div class="opt${cw?"":" on"}"><button class="optmain" data-rec="usew:" aria-pressed="${!cw}"><b>Recommended</b><span>Built for today from your drills, your schedule and what needs work.</span></button><div class="seg" role="group" aria-label="Workout length">${[20,30,45].map(m=>`<button data-rec="pmins:${m}" aria-pressed="${mins===m}">${m} min</button>`).join("")}</div></div></div>
+function planHTML(){const cw=customToday(),ws=S.rec.workouts,mins=S.settings.mins,have=new Set(ws.map(w=>w.from).filter(Boolean)),st=STARTERS.filter(s=>!have.has(s.id));
+  return bsTop("Workouts","Pick a workout")+`<p class="rs-p">Switch any time, even halfway through. Drills you've done today stay done.</p>`+`<div class="opts"><div class="opt${cw?"":" on"}"><button class="optmain" data-rec="usew:" aria-pressed="${!cw}"><b>Recommended</b><span>Built for today from your drills, your schedule and what needs work.</span></button><div class="seg" role="group" aria-label="Workout length">${[20,30,45].map(m=>`<button data-rec="pmins:${m}" aria-pressed="${mins===m}">${m} min</button>`).join("")}</div></div></div>
    <div class="label">My workouts</div>
-   ${ws.length?`<div class="opts">${ws.map(w=>{const mm=wMins(w);return `<div class="opt${cw&&cw.id===w.id?" on":""}"><button class="optmain" data-rec="usew:${w.id}" aria-pressed="${!!(cw&&cw.id===w.id)}"><b>${esc(w.name)}</b><span>${w.items.length} drills · about ${mm} min${mm>mins+5?` · <em>${mm-mins} min over your usual ${mins}</em>`:""}</span></button><button class="linkbtn" data-rec="editw:${w.id}">Edit</button></div>`}).join("")}</div>
+   ${ws.length?`<div class="opts">${ws.map(w=>{const mm=wMins(w);return `<div class="opt${cw&&cw.id===w.id?" on":""}"><button class="optmain" data-rec="usew:${w.id}" aria-pressed="${!!(cw&&cw.id===w.id)}"><b>${cw&&cw.id===w.id?"▶ ":""}${esc(w.name)}</b><span>${w.items.length} drill${w.items.length===1?"":"s"} · about ${mm} min${mm>mins+5?` · <em>${mm-mins} min over your usual ${mins}</em>`:""}</span>${wMix(w.items)}</button><div class="wrow-acts"><button class="linkbtn" data-rec="editw:${w.id}">Edit</button><button class="linkbtn" data-rec="wdup:${w.id}">Duplicate</button></div></div>`}).join("")}</div>
      <div class="psee-btns"><button class="btn sec small" data-rec="neww">+ New workout</button><button class="btn sec small" data-rec="neww:plan">Copy today's plan</button></div>`
    :`<div class="empty"><b>Your own workouts go here</b><br>For days you know exactly what you want, like a long shooting day or handles at lunch with no hoop.<div class="psee-btns" style="margin-top:10px"><button class="btn sec small" data-rec="neww:plan">Start from today's plan</button><button class="btn sec small" data-rec="neww">Start empty</button></div></div>`}
+   <label class="toggle" style="align-self:flex-start"><input type="checkbox" id="wstay" ${S.rec.stay?"checked":""}> Stay on my pick until I switch</label>
+   <p class="small muted" style="margin:-4px 0 0">${S.rec.stay?"A workout you pick stays on, day after day, until you pick another.":"Off: a workout you pick is for today, and tomorrow goes back to Recommended."}</p>
+   ${st.length?`<div class="label">Starter workouts</div><div class="opts">${st.map(s=>`<div class="opt"><div class="optmain"><b>${esc(s.name)}</b><span>${esc(s.note)} · ${s.items.length} drills · about ${wMins(s)} min</span>${wMix(s.items)}</div><div class="psee-btns"><button class="btn sec small" data-rec="wadd:${s.id}">Add to mine</button><button class="btn sec small" data-rec="wplay:${s.id}">▶ Play now</button></div></div>`).join("")}</div><p class="small muted" style="margin:0">Adding one copies it into My workouts, so you can change it.</p>`:""}
    <button class="btn pri" data-rec="close">Done</button>`}
 
 /* My workouts: build, reorder, save */
@@ -2551,11 +2631,12 @@ function builderHTML(){
 function bPickList(L){return ["b","s","h","f"].map(k=>{const rows=L.filter(d=>k==="b"?d.body:d.skill===k&&!d.body);if(!rows.length)return"";return `<div class="label" style="margin-top:6px">${k==="b"?"Warm-up and cool-down":SK[k]}</div><div class="rs-list">${rows.map(d=>{const on=B.items.includes(d.id);return `<button class="rs-alt${on?" on":""}" data-rec="bpick:${d.id}" aria-pressed="${on}"><span><b>${esc(d.name)}</b><small>${d.body?"Body":pipsHTML(d)} ${realMins(d)} min</small></span><span class="go">${on?"✓":"+"}</span></button>`}).join("")}</div>`}).join("")}
 document.addEventListener("input",e=>{if(!B)return;if(e.target.id==="bname")B.name=e.target.value;if(e.target.id==="bq"){B.q=e.target.value;const q=B.q.trim().toLowerCase(),el=$("#bpick");if(el)el.innerHTML=bPickList(DRILLS.filter(d=>!q||d.name.toLowerCase().includes(q)))}});
 document.addEventListener("change",e=>{if(B&&e.target.id==="bkeep"){B.keep=e.target.checked;bsSet(builderHTML())}});
+document.addEventListener("change",e=>{if(e.target.id!=="wstay")return;S.rec.stay=e.target.checked;if(S.rec.plan&&customToday())S.rec.plan.stay=S.rec.stay;persist();render();bsSet(planHTML())});
 
 /* end-of-workout recap: Easy / Right / Hard for each drill, Right already picked */
 let RC=null;
 function recapIds(){const ts=todaySession();if(!ts)return[];const seen=new Set();return ts.items.map(it=>it.id).filter(id=>D[id]&&!D[id].body&&!seen.has(id)&&seen.add(id))}
-function maybeRecap(){if(S.rec.recap&&S.rec.recap.d===today())return;const p=plan(),ts=todaySession();if(!ts||!p.length)return;if(p.every(x=>ts.items.some(it=>it.id===x.d.id))&&recapIds().length)setTimeout(openRecap,500)}
+function maybeRecap(){if(S.rec.recap&&S.rec.recap.d===today())return;const p=plan(),ts=todaySession();if(!ts||!p.length)return;if(p.every(x=>x.skip||ts.items.some(it=>it.id===x.d.id))&&recapIds().length)setTimeout(openRecap,500)}
 function openRecap(){if(!recapIds().length)return;$("#toastHost").innerHTML="";RC={v:{},more:{}};drawRecap()}
 function drawRecap(){const ids=recapIds(),fresh=ids.filter(id=>!S.sessions.some(se=>se.d<today()&&se.items.some(it=>it.id===id)));
   let el=$("#recap");if(!el){el=document.createElement("div");el.id="recap";el.className="recap";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-labelledby","recapT");document.body.appendChild(el);el.addEventListener("click",recapClick)}
@@ -2580,8 +2661,8 @@ function saveRecap(){const prevG=clone(S.rec.gadj),prevP=clone(S.rec.pref),prevN
 
 /* "Add to next workout" and "How often" on the drill sheet */
 const inNext=id=>S.rec.added.includes(id)&&!(S.rec.addedDone||{})[id];
-function recCard(d){if(d.body)return`<div class="reccard"></div>`;const on=inNext(d.id);
-  return `<div class="reccard"><button class="rs-row" data-rec="freq:${d.id}"><span>How often in my workouts</span><b>${fqText(d.id)} ›</b></button><button class="btn ${on?"added":"sec"} small" data-rec="add:${d.id}" aria-pressed="${on}">${on?"✓ In next workout":"Add to next workout"}</button></div>`}
+function recCard(d){const inW=wHas(d.id),sv=`<button class="rs-row" data-rec="saveto:${d.id}"><span>Save to a workout</span><b>${inW.length?(inW.length===1?esc(inW[0].name):`In ${inW.length} workouts`)+" ›":"Pick ›"}</b></button>`;if(d.body)return`<div class="reccard">${sv}</div>`;const on=inNext(d.id);
+  return `<div class="reccard">${sv}<button class="rs-row" data-rec="freq:${d.id}"><span>How often in my workouts</span><b>${fqText(d.id)} ›</b></button><button class="btn ${on?"added":"sec"} small" data-rec="add:${d.id}" aria-pressed="${on}">${on?"✓ In next workout":"Add to next workout"}</button></div>`}
 function toggleAdd(id){const on=inNext(id),prev=[...S.rec.added];S.rec.added=on?prev.filter(x=>x!==id):[...prev.filter(x=>x!==id),id];if(S.rec.addedDone)delete S.rec.addedDone[id];persist();
   if(R){const c=$("#sheet .reccard");if(c)c.outerHTML=recCard(R.d)}if(bsEl)bsClose(true);render();
   if(on)toast("Removed",`${D[id].name} is out of your next workout.`);else toastU("Added","In your next workout, whenever you train.",()=>{S.rec.added=prev;persist();if(R){const c=$("#sheet .reccard");if(c)c.outerHTML=recCard(R.d)}render()})}
@@ -2592,10 +2673,20 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   switch(a){
   case "close":return bsClose();
   case "undo":{const f=toastU.fn;toastU.fn=null;$("#toastHost").innerHTML="";if(f)f();return}
-  case "plan":B=null;return bsOpen(planHTML(),"Today's plan");
+  case "plan":B=null;return bsOpen(planHTML(),"Workouts");
   case "pmins":S.settings.mins=+b;persist();render();return bsSet(planHTML());
-  case "usew":{const prev=S.rec.plan;S.rec.plan=b?{d:today(),w:b,extra:[]}:null;persist();bsClose();
-    if(b){const w=S.rec.workouts.find(x=>x.id===b);toastU(`Using ${w.name}`,"Today only. Tomorrow goes back to recommended.",()=>{S.rec.plan=prev;persist();render()})}return}
+  case "usew":{const cw=customToday();if((cw?cw.id:"")===(b||"")&&!bsEl)return;return wUse(b)}
+  case "wopt":return bsOpen(wOptHTML(b),"Workout drill");
+  case "wskip":{const p=S.rec.plan;if(!p)return bsClose();p.skip=p.skip||[];const on=p.skip.includes(b);p.skip=on?p.skip.filter(x=>x!==b):[...p.skip,b];persist();bsClose();return on?toast("Back in",D[b].name):toastU("Skipped today",`${D[b].name} stays in the workout for next time.`,()=>{p.skip=p.skip.filter(x=>x!==b);persist();render()})}
+  case "wrm":{const cw=customToday(),p=S.rec.plan;if(!cw)return bsClose();if(!cw.items.includes(b)){const pe=[...(p.extra||[])];p.extra=pe.filter(x=>x!==b);persist();bsClose();return toastU("Removed",`${D[b].name} is out of today.`,()=>{p.extra=pe;persist();render()})}
+    if(cw.items.length<2){bsClose();return toast("Can't remove it","A workout needs at least one drill. Delete it from Edit.")}const pi=[...cw.items];cw.items=cw.items.filter(x=>x!==b);persist();bsClose();return toastU("Removed",`${D[b].name} is out of ${cw.name}.`,()=>{cw.items=pi;persist();render()})}
+  case "wdup":{const w=S.rec.workouts.find(x=>x.id===b);if(!w)return;const n={id:wNew(),name:(w.name+" copy").slice(0,40),items:[...w.items],keep:w.keep!==false};S.rec.workouts.push(n);persist();render();bsSet(planHTML());return toast("Duplicated",`${n.name} is in My workouts.`)}
+  case "wadd":case "wplay":{const s=STARTERS.find(x=>x.id===b);if(!s)return;const n={id:wNew(),name:s.name,items:wOrder(s.items.map(id=>id==="b_body"?rtPick("warm").id:id==="b_cool"?rtPick("cool").id:id),true),keep:true,from:s.id};S.rec.workouts.push(n);persist();
+    if(a==="wplay")return wUse(n.id);render();bsSet(planHTML());return toastU("Added",`${s.name} is in My workouts.`,()=>{S.rec.workouts=S.rec.workouts.filter(w=>w.id!==n.id);persist();render();if(bsEl)bsSet(planHTML())})}
+  case "saveto":return bsOpen(wSaveHTML(b),"Save to a workout");
+  case "wtog":{const w=S.rec.workouts.find(x=>x.id===b);if(!w)return;if(w.items.includes(c)){if(w.items.length<2)return toast("Can't remove it","A workout needs at least one drill.");w.items=w.items.filter(x=>x!==c)}else w.items=wOrder([...w.items,c],w.keep!==false);
+    persist();bsSet(wSaveHTML(c));if(R){const el=$("#sheet .reccard");if(el)el.outerHTML=recCard(R.d)}return}
+  case "wnewwith":return openBuilder(null,[b]);
   case "neww":return openBuilder(null,b==="plan"?plan().map(x=>x.d.id):null);
   case "editw":return openBuilder(b);
   case "opt":return openOpt(b);
@@ -2631,9 +2722,9 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "bpick":{const j=B.items.indexOf(b);if(j>=0)B.items.splice(j,1);else B.items.push(b);const el=$("#bpick"),q=B.q.trim().toLowerCase();if(el)el.innerHTML=bPickList(DRILLS.filter(d=>!q||d.name.toLowerCase().includes(q)));const done=bsEl&&bsEl.querySelector('[data-rec="bview:list"]');if(done)done.textContent=`Done adding · ${B.items.length} drill${B.items.length===1?"":"s"}`;return}
   case "bmv":{B.items=bItems();const j=B.items.indexOf(b),to=j+ +c;const lo=B.keep?pinFirst(B.items).length:0,hi=B.items.length-1-(B.keep?pinLast(B.items).length:0);if(to<lo||to>hi)return;[B.items[j],B.items[to]]=[B.items[to],B.items[j]];return bsSet(builderHTML())}
   case "brm":{const j=B.items.indexOf(b),prev=[...B.items];B.items.splice(j,1);bsSet(builderHTML());return toastU("Removed",D[b].name,()=>{if(!B||!bsEl)return;B.items=prev;bsSet(builderHTML())})}
-  case "bdel":if(b==="yes"){S.rec.workouts=S.rec.workouts.filter(w=>w.id!==B.id);if(S.rec.plan&&S.rec.plan.w===B.id)S.rec.plan=null;persist();B=null;render();return bsOpen(planHTML(),"Today's plan")}B.del=b==="ask";return bsSet(builderHTML());
+  case "bdel":if(b==="yes"){S.rec.workouts=S.rec.workouts.filter(w=>w.id!==B.id);if(S.rec.plan&&S.rec.plan.w===B.id)S.rec.plan=null;persist();B=null;render();return bsOpen(planHTML(),"Workouts")}B.del=b==="ask";return bsSet(builderHTML());
   case "bsave":{let ids=bItems();if(!ids.length)return;if(needsWarm(ids)){ids=[rtPick("warm").id,...ids];if(B.keep){B.items=ids;ids=bItems()}}
-    const w={id:B.id||("w"+Date.now().toString(36)),name:(B.name||"").trim()||"My workout",items:ids,keep:B.keep};const j=S.rec.workouts.findIndex(x=>x.id===w.id);if(j>=0)S.rec.workouts[j]=w;else S.rec.workouts.push(w);persist();B=null;render();toast("Saved",`${w.name} is in My workouts.`);return bsOpen(planHTML(),"Today's plan")}
+    const old=B.id&&S.rec.workouts.find(x=>x.id===B.id),w={id:B.id||wNew(),name:(B.name||"").trim()||"My workout",items:ids,keep:B.keep};if(old&&old.from)w.from=old.from;const j=S.rec.workouts.findIndex(x=>x.id===w.id);if(j>=0)S.rec.workouts[j]=w;else S.rec.workouts.push(w);persist();B=null;if(R){bsClose(true);const el=$("#sheet .reccard");if(el)el.outerHTML=recCard(R.d);return toast("Saved",`${w.name} is in My workouts.`)}render();toast("Saved",`${w.name} is in My workouts.`);return bsOpen(planHTML(),"Workouts")}
   }}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&bsEl){e.stopImmediatePropagation();bsClose()}},true);
 
@@ -3223,7 +3314,7 @@ function savePlayer(){
   P.items.forEach((d,i)=>{const xp=pxp(d,i);if(!xp)return;se.items.push({id:d.id,t:Date.now(),xp,r:P.ratings[i],lost:P.drops[i]});doneWith(d.id);S.xp[d.skill]+=xp;tot+=xp});
   persist();const after=[sL(),hL(),oL(),fL()];const fr=P.fromRunner;closePlayer();if(fr)closeRunner(true);else render();
   let head="Logged";if(after[1]>before[1])head=`Handling Lv ${after[1]}`;if(after[2]>before[2])head=`Player Lv ${after[2]} · ${rankOf("o",after[2])}`;
-  toast(head,`+${tot} Handling XP`);maybeRecap();if(after.some((v,i)=>v>before[i])){beep(784,120);setTimeout(()=>beep(1046,220),130)}}
+  toastNext(head,`+${tot} Handling XP.`);maybeRecap();if(after.some((v,i)=>v>before[i])){beep(784,120);setTimeout(()=>beep(1046,220),130)}}
 
 function save(){
   const d=R.d,xp=xpFor(),before=[sL(),hL(),oL(),fL()];
@@ -3250,7 +3341,7 @@ function save(){
   if(after[3]>before[3])head=`Finishing Lv ${after[3]} · ${rankOf("f",after[3])}`;
   if(after[2]>before[2])head=`Player Lv ${after[2]} · ${rankOf("o",after[2])}`;
   if((d.log==="makes"||d.log==="spots")&&R.a>=MIN_A){const ng=targetPct(d);msg+=passed(it)?". Goal hit.":". Below goal this time.";if(ng>it.g){if(head==="Logged")head="Goal raised";msg+=` New goal ${ng}%.`}}
-  closeRunner(true);toast(head,msg);maybeRecap();if(after.some((v,i)=>v>before[i])){beep(784,120);setTimeout(()=>beep(1046,220),130)}}
+  closeRunner(true);toastNext(head,msg);maybeRecap();if(after.some((v,i)=>v>before[i])){beep(784,120);setTimeout(()=>beep(1046,220),130)}}
 function toast(h,m){const host=$("#toastHost");host.innerHTML=`<div class="toast" role="status"><b>${esc(h)}</b>${esc(m)}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>host.innerHTML="",3200)}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&R)closeRunner()});
 
