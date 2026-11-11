@@ -179,7 +179,6 @@ section{display:flex;flex-direction:column;gap:10px}
 .pq-a button{font:inherit;font-size:20px;font-weight:700;padding:16px 12px;border-radius:14px;border:2px solid color-mix(in srgb,var(--bg) 35%,transparent);background:color-mix(in srgb,var(--bg) 10%,transparent);color:inherit;min-height:60px}
 .pq-a button[aria-pressed="true"]{background:var(--bg);color:var(--ink);border-color:var(--bg)}
 .condrow .sechead{margin-top:6px}
-.covid .barpad{width:64px}
 .cllib .bar .btn,.clrec .bar .btn,.rmv .bar .btn,.frd .bar .btn{width:auto;flex:0 0 auto}
 .lib-body{overflow-y:auto;padding:0 16px 20px;display:flex;flex-direction:column;gap:12px}.lib-body p{margin:0}
 .lib-tip{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;font-size:14px}
@@ -319,9 +318,14 @@ section{display:flex;flex-direction:column;gap:10px}
 .sheet{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
 .sheet[hidden]{display:none!important}
 .sheet header{background:var(--ink);color:var(--bg)}
-.sheet header .wrap{display:flex;align-items:center;gap:10px;padding-block:12px}
+.sheet header .wrap{display:flex;align-items:center;gap:10px;padding-block:8px;min-height:60px}
 .sheet header h2{font-size:22px;text-transform:uppercase;flex:1;min-width:0}
-.x{border:0;background:color-mix(in srgb,var(--bg) 14%,transparent);color:var(--bg);width:36px;height:36px;border-radius:50%;font-size:20px;line-height:1}
+/* one sheet header: title left, a 44px × right. .hx on light sheets, .hx.dk on dark ones (drill header, video and film) */
+.hx{flex:0 0 44px;width:44px;height:44px;margin-left:auto;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--ink);font-size:26px;line-height:1;cursor:pointer}
+.hx.dk{background:rgba(255,255,255,.14);color:#F2F5FA}
+.covid .bar.top,.cmp-top,.ytsheet .yt-top,.livefc .lf-top{flex-wrap:nowrap;gap:8px;padding:8px 16px;min-height:60px}
+.covid .bar.top>.btn{flex:0 0 auto;width:auto}
+.covid .bar.top>span.small{text-align:left;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em}
 .sbody{flex:1;overflow-y:auto}
 .sbody .wrap{padding-block:14px 20px;display:flex;flex-direction:column;gap:14px}
 .steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
@@ -550,7 +554,7 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .covid .bar>.small{flex:1;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cmp{position:fixed;inset:0;z-index:75;background:#05080F;color:#F2F5FA;overflow-y:auto;overscroll-behavior:contain;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) calc(16px + env(safe-area-inset-bottom,0px)) env(safe-area-inset-left,0px);--ink:#F2F5FA;--bg:#05080F;--surface:#111A2C;--surface-2:#1A2540;--line:#2E3B5C;--muted:#9AA6BF}
 .cmp .btn{color:var(--ink)}.cmp .btn.pri{color:var(--accent-ink)}
-.cmp-top{position:sticky;top:0;z-index:2;display:flex;gap:10px;align-items:center;padding:10px 16px;background:#05080F}
+.cmp-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;background:#05080F}
 .cmp-title{flex:1;min-width:0;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cmp-panes{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;height:min(58vh,560px);scroll-margin-top:60px}
 .cmp-pane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#000;border-radius:14px;overflow:hidden}
@@ -643,7 +647,6 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .optmain{display:flex;flex-direction:column;gap:2px;text-align:left;border:0;background:none;padding:10px 12px;width:100%}
 .optmain b{font-size:15px;line-height:1.2}.optmain span{font-size:13px;color:var(--muted)}.optmain em{color:var(--warn);font-style:normal;font-weight:600}
 .rs-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.rs-x{border:0;background:var(--surface-2);border-radius:50%;width:36px;height:36px;font-size:22px;line-height:1;flex:0 0 36px}
 .rs-p{margin:0;font-size:15px}
 .rs-list{display:flex;flex-direction:column;gap:6px}
 .rs-alt{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:10px 12px}
@@ -2941,7 +2944,7 @@ function bsOpen(html,label){bsClose(true);bsEl=document.createElement("div");bsE
   bsEl.innerHTML=`<div class="psee-back" data-rec="close"></div><div class="psee-card" tabindex="-1">${html}</div>`;document.body.appendChild(bsEl);bsEl.querySelector(".psee-card").focus({preventScroll:true})}
 function bsSet(html){if(!bsEl)return bsOpen(html);const c=bsEl.querySelector(".psee-card"),y=c.scrollTop;c.innerHTML=html;c.scrollTop=y}
 function bsClose(quiet){if(bsEl){bsEl.remove();bsEl=null}if(quiet)return;if(R){const c=$("#sheet .reccard");if(c)c.outerHTML=recCard(R.d)}render()}
-const bsTop=(lab,title)=>`<div class="psee-grab"></div><div class="rs-top"><div>${lab?`<div class="label">${esc(lab)}</div>`:""}<h3>${esc(title)}</h3></div><button class="rs-x" data-rec="close" aria-label="Close">×</button></div>`;
+const bsTop=(lab,title)=>`<div class="psee-grab"></div><div class="rs-top"><div>${lab?`<div class="label">${esc(lab)}</div>`:""}<h3>${esc(title)}</h3></div><button class="hx" data-rec="close" aria-label="Close">×</button></div>`;
 function toastU(h,m,undo,label="Undo",ms=6000){const host=$("#toastHost");host.innerHTML=`<div class="toast act" role="status"><span><b>${esc(h)}</b>${esc(m)}</span>${undo?`<button data-rec="undo">${esc(label)}</button>`:""}</div>`;toastU.fn=undo||null;clearTimeout(toast.t);toast.t=setTimeout(()=>{host.innerHTML="";toastU.fn=null},ms)}
 const nwLabel=v=>v>=NW_ALL?"Every drill":v===0?"Off":String(v);
 function setFreq(id,k){const f=S.rec.freq;if(k==="auto")delete f[id];else if(k==="weekly")f[id]={k,day:(new Date().getDay()+6)%7};else if(k==="custom")f[id]={k,mode:"week",n:2};else f[id]={k};persist()}
@@ -3259,7 +3262,7 @@ function drawRunner(){
   const src=(d.src||[]).map(s=>s.url?`<a href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}</a>`:esc(s.label)).join(" · ");
   const heavy=d.heavy&&S.settings.heavy?`<div class="tip"><b>Heavy ball:</b> run the stationary rounds with the heavy ball, then switch to your regular ball for anything moving. The regular ball will feel light and quick after.</div>`:"";
   const bl=baseline(d),tgt=d.gm?gmTip(d):(d.log==="makes"||d.log==="spots")?`<div class="tip">Your goal: <b class="num">${targetPct(d)}%</b>${d.goal?` · finish at ${d.goal} makes`:""}. ${bl?`Your average over your last ${bl.n>1?bl.n+" sessions":"session"} is ${bl.p}%, so the goal is ${GOAL_UP} points above it. It moves when your numbers move.`:`A starter goal. After your first session it becomes your own average plus ${GOAL_UP} points.`}</div>`:"";
-  $("#sheet").innerHTML=`<header><div class="wrap"><h2 id="sheetTitle">${esc(d.dynamic&&weakSpot()?d.name+": "+SPOT[weakSpot().id].name:d.name)}</h2><button class="x" aria-label="Close drill">×</button></div></header>
+  $("#sheet").innerHTML=`<header><div class="wrap"><h2 id="sheetTitle">${esc(d.dynamic&&weakSpot()?d.name+": "+SPOT[weakSpot().id].name:d.name)}</h2><button class="x hx dk" aria-label="Close drill">×</button></div></header>
   <div class="sbody"><div class="wrap">
    <div class="row">${d.clips==="read"?'<span class="tag rd">Film</span>':`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}${d.cond?`${d.clips==="read"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard · counts toward leg load</span>':""}`:""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
    <p style="margin:0">${esc(d.what)}</p>
@@ -3742,7 +3745,7 @@ function seeIds(d,pi){if(!d)return[];const own=d.id+":"+pi;if(window.BV&&BV.has(
 function openSee(){if(!P)return;const di=P.stage==="rest"?P.i+1:P.i,d=P.items[di],pi=P.stage==="work"?P.pi:0,ids=seeIds(d,pi);if(!ids.length)return;
   if(P.running)togglePlay();closeSee();const part=phasesOf(d)[pi][0],own=ids.length===1&&!!ids[0].own;
   seeEl=document.createElement("div");seeEl.className="psee";seeEl.setAttribute("role","dialog");seeEl.setAttribute("aria-label","How to do it");
-  seeEl.innerHTML=`<div class="psee-back" data-s="close"></div><div class="psee-card"><div class="psee-grab"></div><div class="label">How to do it</div><h3>${esc(own?part:d.name)}</h3>
+  seeEl.innerHTML=`<div class="psee-back" data-s="close"></div><div class="psee-card"><div class="psee-grab"></div><div class="rs-top"><div><div class="label">How to do it</div><h3>${esc(own?part:d.name)}</h3></div><button class="hx" data-s="close" aria-label="Close">×</button></div>
    <div class="psee-list">${ids.map(x=>`<div class="psee-item">${x.a}<p>${esc(x.t)}</p></div>`).join("")}</div>
    <div class="psee-btns">${P.stage==="work"?`<button class="btn sec small" data-s="restart">Restart this part</button>`:""}<button class="btn pri small" data-s="resume">Resume</button></div></div>`;
   document.body.appendChild(seeEl);seeEl.addEventListener("click",e=>{e.stopPropagation();const b=e.target.closest("[data-s]");if(!b)return;const k=b.dataset.s;
@@ -3893,7 +3896,7 @@ function openLib(){if(LIB)return;const el=overlay("cllib","Your clip library");L
     else if(k==="clr"){if(LIB.arm!==a){LIB.arm=a;libDraw();return}LIB.arm=null;await clearClips(a)}})}
 function closeLib(){if(!LIB)return;unOverlay(LIB.el);LIB=null;if(R&&R.d&&R.d.clips)drawDock();else if(state.tab==="drills")render()}
 function libDraw(){if(!LIB)return;const n=CL.list.length,tot=FMV.length*TAKES,next=FMV.find(m=>clipCount(m.k)<TAKES);
-  LIB.el.innerHTML=`<div class="bar"><button class="btn sec small" data-cl="close">Close</button><span class="small">Your clip library</span><span class="barpad"></span></div>
+  LIB.el.innerHTML=`<div class="bar top"><span class="small">Your clip library</span><button class="hx dk" data-cl="close" aria-label="Close">×</button></div>
    <div class="lib-body"><p>You play the ball handler. Film each move ${TAKES} times. The app cuts each take where you commit to the move and also plays it mirrored, so ${tot} takes become ${tot*2} clips. About 20 minutes on a court.</p>
    <div class="lib-tip"><b>Set up like a defender.</b> Phone on a ball bag or tripod at chest height, about 2 m away, with your whole body in frame. Each take: hold your stance with the ball, then go on the beep. Make the moves the way you'd make them in a game.</div>
    ${CL.err?`<p class="small">${esc(CL.err)}</p>`:""}
@@ -3907,7 +3910,7 @@ let CR=null,crFace="user";
 async function openClipRec(k){const m=FMV.find(x=>x.k===k);if(!m)return;
   if(!(navigator.mediaDevices?.getUserMedia&&window.MediaRecorder)){toast("Recording isn't supported here","This browser can't record from the camera.");return}
   const el=overlay("clrec","Record clips of "+m.n);
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-cr="close">Close</button><span class="small">${esc(m.n)}</span><button class="btn sec small" data-cr="flip">Flip</button></div>
+  el.innerHTML=`<div class="bar top"><span class="small">${esc(m.n)}</span><button class="btn sec small" data-cr="flip">Flip</button><button class="hx dk" data-cr="close" aria-label="Close">×</button></div>
    <div class="cr-stage"><video id="crLive" autoplay muted playsinline></video><div class="cr-msg"><b id="crBig"></b><span id="crSub"></span></div></div><div class="cr-low" id="crLow"></div>`;
   CR={el,k,m,stream:null,stop:false,state:"idle",mr:null};
   el.addEventListener("click",e=>{const b=e.target.closest("[data-cr]");if(!b)return;const a=b.dataset.cr;
@@ -3941,7 +3944,7 @@ function closeClipRec(){const C=CR;if(!C)return;CR=null;C.stop=true;if(C.mr&&C.m
 /* Read the Move: a clip stops as the handler commits; tap where it's going, then see the rest */
 let RM=null;
 function openReadMove(){const deck=clipDeck(12);if(deck.length<4)return;const el=overlay("rmv","Read the Move");
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-rm="end">End</button><span class="small" id="rmMeta"></span><span class="barpad"></span></div><div class="fr-stage"><video id="rmV" muted playsinline></video></div><div class="rm-ans" id="rmAns"></div>`;
+  el.innerHTML=`<div class="bar top"><span class="small" id="rmMeta"></span><button class="hx dk" data-rm="end" aria-label="End">×</button></div><div class="fr-stage"><video id="rmV" muted playsinline></video></div><div class="rm-ans" id="rmAns"></div>`;
   RM={el,v:el.querySelector("#rmV"),deck,i:0,right:0,ans:[],state:"play"};
   el.addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;const k=b.dataset.rm;
     if(k.startsWith("a:"))rmAnswer(k.slice(2));else if(k==="end"){if(RM.ans.length>=4&&RM.state!=="end"){RM.deck=RM.deck.slice(0,RM.ans.length);rmEnd()}else closeReadMove()}else if(k==="close")closeReadMove();
@@ -3955,7 +3958,7 @@ async function rmNext(){const M=RM;if(!M)return;M.state="play";rmDraw();await pl
 async function rmAnswer(k){const M=RM;if(!M||M.state!=="ask")return;const c=M.deck[M.i];M.ok=k===c.read;if(M.ok)M.right++;M.ans.push(k);M.state="show";rmDraw();beep(M.ok?988:330,140);
   await revealClip(M.v,c);await zz(500);if(RM!==M)return;M.i++;if(M.i>=M.deck.length)rmEnd();else rmNext()}
 function rmEnd(){const M=RM;M.state="end";freeVid(M.v);const n=M.ans.length,p=Math.round(100*M.right/n),prev=lastRead();
-  M.el.innerHTML=`<div class="bar"><span class="barpad"></span><span class="small">Read the Move</span><span class="barpad"></span></div><div class="rm-end"><div class="label">Read right</div><div class="rm-big num">${M.right} of ${n}</div>
+  M.el.innerHTML=`<div class="bar top"><span class="small">Read the Move</span></div><div class="rm-end"><div class="label">Read right</div><div class="rm-big num">${M.right} of ${n}</div>
    <p>${p}%${prev?` · last time ${prev[0]} of ${prev[1]}`:""}. ${p>=75?"Sharp. Try Film Reads on the court next.":"Watch the hips: they turn before the ball goes."}</p>
    <button class="btn pri" data-rm="save">Save · +${rmXp(M)} XP</button><button class="btn sec small" data-rm="close">Discard</button></div>`}
 function lastRead(){for(let i=S.sessions.length-1;i>=0;i--){const it=[...S.sessions[i].items].reverse().find(x=>x.id==="c_read"&&x.rm);if(it)return it.rm}return null}
@@ -3965,7 +3968,7 @@ function closeReadMove(){const M=RM;if(!M)return;RM=null;freeVid(M.v);unOverlay(
 let FRP=null;
 const FR_SETS=2,FR_PER=6;
 function openFilm(){const deck=clipDeck(FR_SETS*FR_PER);if(deck.length<4)return;const el=overlay("frd","Film Reads");
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-fr="pause">Pause</button><span class="small" id="frMeta">Get ready</span><button class="btn sec small" data-fr="end">End</button></div>
+  el.innerHTML=`<div class="bar top"><span class="small" id="frMeta">Get ready</span><button class="btn sec small" data-fr="pause">Pause</button><button class="hx dk" data-fr="end" aria-label="End">×</button></div>
    <div class="fr-stage"><video id="frV" muted playsinline></video><div class="fr-flash" id="frFlash" hidden>React</div></div><div class="fr-low" id="frLow"></div>`;
   FRP={el,v:el.querySelector("#frV"),deck,ans:[],sd:0,done:0,paused:false,stop:false,restLeft:0};
   el.addEventListener("click",e=>{const F=FRP;const b=e.target.closest("[data-fr]");if(!b||!F)return;const k=b.dataset.fr;
@@ -3990,7 +3993,7 @@ function frRestDraw(F,s){const a=F.ans[s],last=s+1>=FR_SETS;F.el.querySelector("
   frSet(F,"#frLow",`<div class="pq" style="margin:0 auto"><div class="pq-q">${esc(WRONG.q)}</div><div class="pq-a">${WRONG.a.map((l,i)=>`<button data-fr="ans:${s}:${i}" aria-pressed="${a===i}">${esc(l)}</button>`).join("")}</div>
    <div class="pmeta">${a==null?`Skip it and set ${s+1} logs as “${WRONG.a[0]}”`:"Got it"} · <span id="frCd" class="num">${fmt(F.restLeft/1000)}</span></div><button class="btn sec small" data-fr="skip">${last?"Finish":"Next set now"}</button></div>`)}
 function frEnd(F){F.stop=true;lockOff();freeVid(F.v);const sd=F.sd,c=WRONG.a.map(()=>0);for(let i=0;i<sd;i++)c[F.ans[i]??0]++;
-  F.el.innerHTML=`<div class="bar"><span class="barpad"></span><span class="small">Film Reads</span><span class="barpad"></span></div><div class="rm-end"><div class="label">Done</div><div class="rm-big num">${F.done} clips</div>
+  F.el.innerHTML=`<div class="bar top"><span class="small">Film Reads</span></div><div class="rm-end"><div class="label">Done</div><div class="rm-big num">${F.done} clips</div>
    <p>${sd} of ${FR_SETS} sets${sd?" · wrong reads: "+WRONG.a.map((l,j)=>c[j]?`${c[j]} set${c[j]===1?"":"s"} ${l.toLowerCase()}`:"").filter(Boolean).join(", "):""}</p>
    <button class="btn pri" data-fr="save">Save · +${frXp(F)} XP</button><button class="btn sec small" data-fr="close">Discard</button></div>`}
 function closeFilm(){const F=FRP;if(!F)return;FRP=null;F.stop=true;lockOff();freeVid(F.v);unOverlay(F.el)}
@@ -4058,7 +4061,7 @@ function fsNoCC(p){try{p.setOption("captions","track",{})}catch(x){}try{p.unload
 let FSQ=null;
 function openFS(id){const set=FILM_SETS.find(s=>s.id===id);if(!set||FSQ)return;const lv=fsLog().lv,list=fsList(set,lv);if(!list.length)return;
   const el=overlay("fsq","Film study: "+set.name);
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-fq="end">End</button><span class="small" id="fqMeta"></span><span class="barpad"></span></div>
+  el.innerHTML=`<div class="bar top"><span class="small" id="fqMeta"></span><button class="hx dk" data-fq="end" aria-label="End">×</button></div>
    <div class="fq-box"><div class="fq-yt" id="fqYT"><div class="fq-msg">Loading the video…</div></div></div><div class="fq-sheet" id="fqSheet"></div>`;
   FSQ={el,set,lv,list,i:0,right:0,res:[],st:"load",player:null,ready:false,vid:"",ed:null,cc:0};
   FSQ.tm=setInterval(fsTick,50);
@@ -4110,7 +4113,7 @@ function fsNext(){const Q=FSQ;if(!Q)return;try{Q.player&&Q.ready&&(Q.player.paus
 function fsEnd(){const Q=FSQ;if(!Q)return;const n=Q.res.length;if(!n)return closeFS();
   const f=fsLog(),prev=fsLast(Q.set.id);f.runs.push({s:Q.set.id,lv:Q.lv,r:Q.right,n,d:today()});if(f.runs.length>60)f.runs.splice(0,f.runs.length-60);persist();
   clearInterval(Q.tm);try{Q.player&&Q.player.destroy()}catch(x){}Q.player=null;Q.st="end";const p=Math.round(100*Q.right/n);
-  Q.el.innerHTML=`<div class="bar"><span class="barpad"></span><span class="small">Film study</span><span class="barpad"></span></div><div class="rm-end"><div class="label">${esc(Q.set.name)} · ${FS_LV[Q.lv]}</div><div class="label">Read right</div><div class="rm-big num">${Q.right} of ${n}</div>
+  Q.el.innerHTML=`<div class="bar top"><span class="small">Film study</span></div><div class="rm-end"><div class="label">${esc(Q.set.name)} · ${FS_LV[Q.lv]}</div><div class="label">Read right</div><div class="rm-big num">${Q.right} of ${n}</div>
    <p>${prev?`Last time ${prev.r} of ${prev.n}. `:""}${p>=75?"Sharp reads.":p>=50?"Good start. The misses are the ones to watch again.":"These get easier the more film you watch. Run it again in a few days."}</p>
    <button class="btn pri" data-fq="close">Done</button><button class="btn sec small" data-fq="again">Run it again</button></div>`}
 
@@ -4691,7 +4694,7 @@ function recCtl(item,cls){return camLive()?`<button class="btn ${cls}" data-hw="
 function pickMime(){for(const t of["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"])try{if(MediaRecorder.isTypeSupported(t))return t}catch(e){}return""}
 async function openRec(item){closeVid();dictStop();const el=document.createElement("div");el.className="covid corec";el.setAttribute("role","dialog");el.setAttribute("aria-label","Record a training video");
   const f=item&&coFind(item),wl=item&&CO.wiz&&CO.wiz.id===item&&CO.wiz.text;
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-rc="close">Close</button><span class="small">${f?esc(f.it.text):wl?esc(wl):"New clip"}</span><button class="btn sec small" data-rc="flip">Flip</button></div>
+  el.innerHTML=`<div class="bar top"><span class="small">${f?esc(f.it.text):wl?esc(wl):"New clip"}</span><button class="btn sec small" data-rc="flip">Flip</button><button class="hx dk" data-rc="close" aria-label="Close">×</button></div>
    <video id="coLive" autoplay muted playsinline></video>
    <div class="bar recbar"><span class="num rect" id="coRecT">0:00</span><button class="recbtn" data-rc="go" aria-label="Start recording"><i></i></button><span class="small recnote">Saved on this phone only</span></div>`;
   document.body.appendChild(el);document.body.style.overflow="hidden";CO.rec={el,item,chunks:[],mr:null,stream:null,t0:0,timer:0};await recStream()}
@@ -4740,7 +4743,7 @@ async function openVid(id){const m=CO.vids.find(v=>v.id===id);if(!m)return;let b
   const file=new File([blob],`hoops-${new Date(m.t).toISOString().slice(0,10)}.${ext}`,{type:m.type});
   const canShare=!!(CP("Share")&&CP("Filesystem"))||!!(navigator.canShare&&(()=>{try{return navigator.canShare({files:[file]})}catch(e){return false}})());
   const el=document.createElement("div");el.className="covid";el.setAttribute("role","dialog");el.setAttribute("aria-label","Training video");
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-vv="close">Close</button><span class="small">${new Date(m.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}${f?" · "+esc(f.it.text):m.name?" · "+esc(m.name):""}</span></div>
+  el.innerHTML=`<div class="bar top"><span class="small">${new Date(m.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}${f?" · "+esc(f.it.text):m.name?" · "+esc(m.name):""}</span><button class="hx dk" data-vv="close" aria-label="Close">×</button></div>
    <video id="coPlay" src="${u}" playsinline preload="auto"></video>
    <div class="bar vctl"><button class="btn sec small" data-vv="step:-1" aria-label="Back one frame">◀</button><button class="btn sec small vplay" data-vv="play">Play</button><button class="btn sec small" data-vv="step:1" aria-label="Forward one frame">▶</button>
     <input type="range" id="coSeek" min="0" max="1000" value="0" step="1" aria-label="Position"><span class="num small" id="coTime">0:00</span></div>
@@ -4844,7 +4847,7 @@ function cmpDraw(){const C=CMP;if(!C)return;const d=C.d,dm=C.demos[C.di],has=C.s
       <div class="cmp-row">${seg("rate",[1,.5,.25],C.rate,"Speed",v=>v===1?"1×":v===.5?"½×":"¼×")}<button class="btn sec small" data-cm="mir" aria-pressed="${C.mir}">Mirror me</button>${C.frames?`<button class="btn sec small" data-cm="bones" aria-pressed="${C.bones}">Skeleton</button>`:""}</div>
       <div class="cmp-row"><button class="btn sec small" data-cm="redo">Film again</button><button class="btn sec small" data-cm="keep"${C.kept?" disabled":""}>${C.kept?"Kept":"Keep clip"}</button></div>`
     :`<div class="cmp-row">${seg("rate",[1,.5,.25],C.rate,"Demo speed",v=>v===1?"1×":v===.5?"½×":"¼×")}</div>`;
-  C.el.innerHTML=`<div class="cmp-top"><button class="btn sec small" data-cm="close">Close</button><div class="cmp-title">${esc(d.name)}</div></div>
+  C.el.innerHTML=`<div class="cmp-top"><div class="cmp-title">${esc(d.name)}</div><button class="hx dk" data-cm="close" aria-label="Close">×</button></div>
    <div class="cmp-panes"><div class="cmp-pane"><div class="cmp-lab">Demo</div><div class="cmp-demo">${dm.a}</div></div><div class="cmp-pane mine"><div class="cmp-lab">You</div><div class="cmp-mine">${mine}</div></div></div>
    ${C.demos.length>1?`<div class="cmp-row cmp-steps" role="group" aria-label="Demo step">${C.demos.map((_,i)=>`<button class="chip" data-cm="demo:${i}" aria-pressed="${i===C.di}">Step ${i+1}</button>`).join("")}</div>`:""}
    <p class="cmp-step small">${esc(dm.t)}${dm.c||""}</p>
@@ -5258,7 +5261,7 @@ route();
     st.textContent = `
 .ytsheet{position:fixed;inset:0;z-index:80;background:#05080F;color:#F2F5FA;display:flex;flex-direction:column;
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
-.ytsheet .yt-top{display:flex;align-items:center;gap:10px;padding:10px 16px}
+.ytsheet .yt-top{display:flex;align-items:center}
 .ytsheet .yt-title{flex:1;min-width:0;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ytsheet .yt-stage{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
 .ytsheet .yt-box{position:relative;width:100%;max-height:100%;aspect-ratio:16/9;background:#000}
@@ -5301,7 +5304,7 @@ route();
       el.setAttribute("role", "dialog");
       el.setAttribute("aria-label", "Demo clip");
       V = { el, player: null, id: c.id, a: c.start, b: end > c.start ? end : 0, label, url: c.url, loop: end > c.start, rate: 1, timer: 0 };
-      el.innerHTML = `<div class="yt-top"><div class="yt-title">${esc(label || "Demo")}</div><button class="btn sec small" data-yt="close">Close</button></div>
+      el.innerHTML = `<div class="yt-top"><div class="yt-title">${esc(label || "Demo")}</div><button class="hx dk" data-yt="close" aria-label="Close">×</button></div>
         <div class="yt-stage"><div class="yt-box"><div class="yt-msg">Loading the clip…</div></div></div><div class="yt-ctl">${ctl()}</div>`;
       el.addEventListener("click", e => {
         const b = e.target.closest("[data-yt]");
@@ -5510,7 +5513,7 @@ route();
     st.textContent = `
 .livefc{position:fixed;inset:0;z-index:80;background:#05080F;color:#F2F5FA;display:flex;flex-direction:column;
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
-.livefc .lf-top{display:flex;align-items:center;gap:8px;padding:10px 16px}
+.livefc .lf-top{display:flex;align-items:center}
 .livefc .lf-title{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em}
 .livefc .lf-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .livefc video,.livefc canvas{position:absolute;max-width:100%;max-height:100%}
@@ -5565,7 +5568,7 @@ route();
       el.setAttribute("role", "dialog");
       el.setAttribute("aria-label", "Live form check");
       el.innerHTML = `<div class="lf-top"><div class="lf-title">Live <span class="lf-n" style="opacity:.7"></span></div>
-        <button class="btn sec small" data-lf="talk" aria-pressed="true">Cues</button><button class="btn sec small" data-lf="flip">Flip</button><button class="btn sec small" data-lf="close">Done</button></div>
+        <button class="btn sec small" data-lf="talk" aria-pressed="true">Cues</button><button class="btn sec small" data-lf="flip">Flip</button><button class="hx dk" data-lf="close" aria-label="Done">×</button></div>
         <div class="lf-stage"><video playsinline muted autoplay></video><canvas></canvas><div class="lf-msg" role="status">Starting the camera…</div><div class="lf-cue" aria-live="polite"></div></div>
         <div class="lf-shot"><span>${filmTip()} Shoot when you're ready.</span></div>`;
       document.body.appendChild(el);
