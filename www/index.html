@@ -49,6 +49,9 @@ main{padding-block:12px 112px;display:flex;flex-direction:column;gap:18px}
 /* player plate */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--ink)}
 .plate{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ink);color:var(--bg)}
+/* only Drills keeps the plate pinned (slim, with the skill tabs); on every other tab it scrolls away so it never covers a section */
+.plate.free{position:relative;top:auto;margin-top:env(safe-area-inset-top,0px)}
+#view .sechead{scroll-margin-top:110px}
 .plate .wrap{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding-block:12px}
 .lvl{grid-row:span 2;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;position:relative}
 .lvl svg{position:absolute;inset:0}
@@ -88,6 +91,10 @@ section{display:flex;flex-direction:column;gap:10px}
 
 /* week */
 .week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.fills>summary{display:flex;justify-content:space-between;align-items:baseline;cursor:pointer;font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:18px;list-style:none;padding:10px 14px;border:1px dashed var(--line);border-radius:var(--r)}.fills>summary::-webkit-details-marker{display:none}.fills>summary::after{content:"›";margin-left:8px}.fills[open]>summary::after{content:"⌄"}.fills[open]>summary{margin-bottom:10px}.fills>section{margin-top:14px}
+.weekrow{display:flex;align-items:center;gap:10px;flex-direction:row!important}.weekrow .label{margin:0;white-space:nowrap}.weekrow .week{flex:1;gap:2px}.weekrow .day{font-size:10px;gap:2px}.weekrow .day i{width:16px;height:16px;border-width:1.5px}.weekrow>.small{white-space:nowrap}
+.setup{display:flex;flex-direction:column;gap:8px}.setup .label{margin:0}
+.cueline{display:flex;justify-content:space-between;align-items:baseline}.cueline .linkbtn{padding:0}.cuecard:not(.open) .cuebig{font-size:18px;margin:0}
 .day{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
 .day i{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:block}
 .day.on i{background:var(--accent);border-color:var(--accent)}
@@ -2563,7 +2570,7 @@ function plan0(){
   for(const id in S.rec.freq){if(fq(id).k==="every"&&ok(D[id]))add(D[id],{k:"every",t:"Every workout"},"every")}
   for(const id in S.rec.freq){const k=fq(id).k;if((k==="weekly"||k==="custom")&&ok(D[id])&&due(id))add(D[id],{k:"sched",t:fqText(id)},"sched")}
   const isNew=d=>daysAgo(lastDone(d.id))>=21;
-  const whyOf=d=>light?light:baseline?{k:"new",t:"Baseline week: sets your first goal"}:isNew(d)?{k:"new",t:lastDone(d.id)?`Not done in ${daysAgo(lastDone(d.id))} days`:"New to try"}:isFav(d.id)?{k:"fav",t:"Favorite"}:{k:"mix",t:`Last done ${daysAgo(lastDone(d.id))===1?"yesterday":daysAgo(lastDone(d.id))+" days ago"}`};
+  const whyOf=d=>light?light:baseline?{k:"new",t:"Baseline week: sets your first goal"}:isNew(d)?{k:"new",t:lastDone(d.id)?`Not done in ${daysAgo(lastDone(d.id))} days`:"New to try"}:isFav(d.id)?{k:"fav",t:"Favorite"}:{k:"note",t:`Last done ${daysAgo(lastDone(d.id))===1?"yesterday":daysAgo(lastDone(d.id))+" days ago"}`};
   const pick=pool=>{const p=pool.filter(okAuto).filter(d=>!used.has(d.id)&&!(newUsed&&!baseline&&isNew(d)));
     for(const d of p)d._s=favScore(d.id)+Math.min(2,daysAgo(lastDone(d.id))/7)+r()*.6;p.sort((a,b)=>b._s-a._s);const d=p[0];if(d&&isNew(d))newUsed++;return d};
   const fill=pool=>{const d=pick(pool);if(d)add(d,whyOf(d),"fav")};
@@ -2616,7 +2623,7 @@ function renderPlate(){
   <span class="skill">Finishing <b class="num">Lv ${f.L}</b><span class="bar f"><i style="width:${100*f.into/f.need}%"></i></span></span>
   <span class="skill">Conditioning <b class="num">Lv ${c.L}</b><span class="bar c"><i style="width:${100*c.into/c.need}%"></i></span></span></div>
   ${syncNote?`<div class="syncnote" style="grid-column:1/-1">${esc(syncNote)}</div>`:""}</div>${state.tab==="drills"?skillTabs():""}`;
-  $("#plate").classList.toggle("compact",state.tab==="drills"&&plateSmall);placeInd(false)}
+  $("#plate").classList.toggle("compact",state.tab==="drills"&&plateSmall);$("#plate").classList.toggle("free",state.tab!=="drills");placeInd(false)}
 /* Drills tab: the skill switch lives in the sticky plate so it stays reachable while scrolling a long ladder.
    Switching updates the tabs in place (keeps focus, lets the underline slide), re-renders only the list, and remembers each ladder's scroll spot. */
 const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"],["b","Conditioning"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)",b:"var(--warn)"},tabScroll={};let plateSmall=false;
@@ -2668,7 +2675,7 @@ function drillRow(d,i,opts={}){
   const w=opts.why, lib=opts.lib&&!d.body, f=lib?fq(d.id).k:"auto";
   return `<button class="drill ${done?"done":""} ${opts.next?"next":""}" data-open="${d.id}">
    <span class="ix">${done?"✓":i}</span>
-   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}${d.cond?condTags(d,opts.lib):`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SKS[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}<span>${tgt}</span></span></span>
+   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}${d.cond?condTags(d,opts.lib):`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}<span>${tgt}</span></span></span>
    <span class="go">${done?"Again":"Go"}</span></button>`}
 
 function weekDots(){
@@ -2684,20 +2691,18 @@ function viewToday(){
   const upIds=new Set(up.map(x=>x.d.id)),nNeed=p.filter(x=>x.why&&x.why.k==="need").length;
   const waiting=cw&&state.keepNext!==today()?S.rec.added.filter(id=>inNext(id)&&!p.some(x=>x.d.id===id)):[];
   const rate=!up.length&&recapIds().length&&!(S.rec.recap&&S.rec.recap.d===today());
-  return `${startCard()}${switchCard()}<section><div class="sechead"><h2>This week</h2><span class="muted small"><b class="num" style="font-size:18px;color:var(--ink)">${w.cnt}</b> of 3 sessions</span></div>
-   <div class="card"><div class="week">${w.html}</div></div></section>
+  return `${startCard()}${switchCard()}<section class="weekrow" aria-label="This week"><span class="label">This week</span><div class="week">${w.html}</div><span class="muted small"><b class="num" style="font-size:16px;color:var(--ink)">${w.cnt}</b> of 3</span></section>
   <section><div class="sechead"><h2>Today's workout</h2>
    ${cw?"":`<div class="seg" role="group" aria-label="Workout length">${[20,30,45].map(m=>`<button data-mins="${m}" aria-pressed="${m===mins}">${m} min</button>`).join("")}</div>`}</div>
    ${shelf(p)}
-   <div class="row"><label class="toggle"><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}> Partner today</label><label class="toggle"><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}> I have a heavy ball</label></div>
-   ${!started&&!cw?bodyCard():""}
+   ${setupStrip(!started&&!cw)}
    ${waiting.length?addedCard(waiting):""}
-   ${ws?`<div class="card focus">${courtSVG({data:spotTotals(30),size:96})}<div class="small"><div class="label">Focus spot</div><b>${SPOT[ws.id].name}</b> is your coldest spot over 30 days at <b class="num">${Math.round(ws.p*100)}%</b>. Weak Spot Reps will target it.</div></div>`:""}
-   ${cueCard()}
    ${nowPlaying(p,ts)}
    ${(()=>{if(!up.length)return rate?`<button class="btn pri" data-rec="recap">Rate today's drills<small style="display:block;font-family:var(--body);font-size:13px;text-transform:none;font-weight:600">Easy, Right or Hard · 10 seconds</small></button>`:`<button class="btn pri" disabled>Today's workout is done</button>`;const timed=x=>x.d.log==="timer"||x.d.log==="react";
      if(timed(up[0])){const secs=up.reduce((a,x)=>a+totalOf(x.d),0)+10*(up.length-1);return `<button class="btn pri upnext" data-play="${up.map(x=>x.d.id).join(",")}">Up next: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}<small>Timed · plays back to back · ${Math.round(secs/60)} min</small></button>`}
      return `<button class="btn pri upnext" data-open="${up[0].d.id}">Up next: ${esc(up[0].d.name)}<small>Opens the drill and its logger</small></button>`})()}
+   ${cueCard()}
+   ${ws?`<div class="card focus">${courtSVG({data:spotTotals(30),size:96})}<div class="small"><div class="label">Focus spot</div><b>${SPOT[ws.id].name}</b> is your coldest spot over 30 days at <b class="num">${Math.round(ws.p*100)}%</b>. Weak Spot Reps will target it.</div></div>`:""}
    <div class="plantotal"><span>${p.length} drills${nNeed?` · ${nNeed} for what needs work`:""}</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min on the court</b></div>
    <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}<div class="planline${x.skip?" skipped":""}">${drillRow(x.d,i+1,{next:upIds.has(x.d.id),why:x.why})}${cw?`<button class="optb" data-rec="wopt:${x.d.id}" aria-label="${esc(x.d.name)}: skip today or remove">${MOREICON}</button>`:x.d.rt?`<button class="optb" data-rec="rt:${x.d.rt}" aria-label="${esc(x.d.name)}: pick your ${RT_NAME[x.d.rt]}">${SWAPICON}</button>`:!FIXED.has(x.d.id)?`<button class="optb" data-rec="opt:${x.d.id}" aria-label="${esc(x.d.name)}: why it's here, swap or how often">${SWAPICON}</button>`:`<span class="optb ph" aria-hidden="true"></span>`}</div>`).join("")}</div>
    ${cw&&ts?(()=>{const other=[...new Set(ts.items.map(it=>it.id))].filter(id=>D[id]&&!p.some(x=>x.d.id===id));return other.length?`<p class="muted small" style="margin:0">Also done today: ${other.map(id=>esc(D[id].name)).join(", ")}.</p>`:""})():""}
@@ -2705,9 +2710,9 @@ function viewToday(){
    <p class="muted small" style="margin:0">${cw?`${esc(cw.name)} runs in the order you saved it${S.rec.plan&&S.rec.plan.stay?" and stays on until you switch":", today only. Tomorrow goes back to the recommended plan"}. Switch to another workout any time: drills you've done today stay done. Tap ⋯ to skip a drill today. `:`Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The plan fills those slots with drills you added, what needs work, your schedule, favorites and one new drill, as many as fit the minutes you picked. Each drill says why it's here. Tap ⇄ to swap it or set how often it comes back. `}The Up next button always starts the next drill (outlined), and timed drills in a row play back to back. You can also tap any drill to do it out of order.</p></section>
   ${coachTodayCard()}`}
 
-function cueCard(){const c=todayCue();
-  return `<div class="card small cuecard"><div class="label">Today's one cue</div><b class="cuebig">${esc(CUES[c.i].t)}</b><div class="muted">${esc(CUES[c.i].w)} ${esc(c.why)}</div>
-   <div class="chips" role="group" aria-label="Pick today's cue">${CUES.map((x,i)=>`<button class="chip" data-cue="${i}" aria-pressed="${i===c.i}">${esc(x.t)}</button>`).join("")}</div></div>`}
+function cueCard(){const c=todayCue(),open=!!state.cueOpen;
+  return `<div class="card small cuecard${open?" open":""}"><div class="cueline"><span class="label">Today's one cue</span><button class="linkbtn" data-cueopen="1" aria-expanded="${open}">${open?"Done":"Change ›"}</button></div><b class="cuebig">${esc(CUES[c.i].t)}</b>${open?`<div class="muted">${esc(CUES[c.i].w)} ${esc(c.why)}</div>
+   <div class="chips" role="group" aria-label="Pick today's cue">${CUES.map((x,i)=>`<button class="chip" data-cue="${i}" aria-pressed="${i===c.i}">${esc(x.t)}</button>`).join("")}</div>`:""}</div>`}
 function viewDrills(){
   const k=state.drillTab;if(k==="b")return viewBody();
   const list=DRILLS.filter(d=>d.skill===k&&!d.body).sort((a,b)=>a.unlock-b.unlock||(a.read?1:0)-(b.read?1:0));
@@ -2716,12 +2721,12 @@ function viewDrills(){
    <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div></section>${k==="f"?finCard(0):""}`}
 
 /* Drills → Conditioning: your warm-up and cool-down on one card (open it to see all and change), then the athletic drills */
-const condTags=(d,lib)=>`${lib&&(state.condGrp||"all")!=="all"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard</span>':""}`;
+const condTags=(d,lib)=>`${d.clips?'<span class="tag rd">Film</span>':lib&&(state.condGrp||"all")!=="all"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard</span>':""}`;
 function viewBody(){const open=!!state.rtOpen,g=state.condGrp||"all";
   const grp=k=>{const cur=rtPick(k).id;return `<div class="sechead"><h2>${k==="warm"?"Warm-ups":"Cool-downs"}</h2><button class="linkbtn" data-rec="rt:${k}" style="padding:0">Change yours ›</button></div>
-   <div class="list">${RTS(k).map((d,i)=>`<div class="planline">${drillRow(d,i+1,{why:d.id===cur?{k:"fixed",t:`Your ${RT_NAME[k]}: in every workout`}:{k:"mix",t:d.short||""}})}</div>`).join("")}</div>`};
+   <div class="list">${RTS(k).map((d,i)=>`<div class="planline">${drillRow(d,i+1,{why:d.id===cur?{k:"fixed",t:`Your ${RT_NAME[k]}: in every workout`}:{k:"note",t:d.short||""}})}</div>`).join("")}</div>`};
   const w=rtPick("warm"),c=rtPick("cool");
-  const list=DRILLS.filter(d=>d.cond&&(g==="all"||d.cond===g)).sort((a,b)=>a.unlock-b.unlock);
+  const list=DRILLS.filter(d=>d.cond&&!d.clips&&(g==="all"||d.cond===g)).sort((a,b)=>a.unlock-b.unlock);
   const why=d=>{const x=condGate(d);return !x.ok?{k:"skip",t:x.rest?"Rest day today":"Over today's leg cap"}:x.trim?{k:"light",t:`${x.n} ${(d.unit||"set").toLowerCase()}s left under today's cap`}:null};
   return `<div id="drillpanel" role="tabpanel" aria-labelledby="tab-b"><section><div class="sechead"><h2>Warm-up and cool-down</h2><button class="linkbtn" data-cond="rt" aria-expanded="${open}" style="padding:0">${open?"Done":"See all and change ›"}</button></div>
    ${open?`<p class="muted small" style="margin:0">Your recommended workout starts with your warm-up and ends with your cool-down. Pick which ones, or open any routine to run it on its own, like before a game or after club night. Each one is a timer that calls the next move, and tells you when to switch sides.</p>${grp("warm")}${grp("cool")}`
@@ -2730,7 +2735,7 @@ function viewBody(){const open=!!state.rtOpen,g=state.condGrp||"all";
    <p class="muted small" style="margin:0">Footwork, defense, jumping, speed and strength, all solo. Hands-free while you move: each set starts on a beep, and anything to log is asked in the rest with big buttons. Every drill shows how well it's backed: <b>Studied</b> (trials found it works), <b>Injury prevention</b> (part of programs that cut injuries) or <b>Coaching</b> (standard practice, no trial). The dots show difficulty.</p>
    <div class="chips" role="group" aria-label="Group">${[["all","All"],...Object.entries(CGR)].map(([k,v])=>`<button class="chip" data-cond="g:${k}" aria-pressed="${k===g}">${v}</button>`).join("")}</div>
    <p class="small muted" style="margin:0">${esc(CGB[g])}</p>
-   ${legCard()}${g==="all"||g==="fd"?clipCard():""}
+   ${legCard()}${g==="all"||g==="fd"?`<p class="small muted" style="margin:0">Read the Move, Film Reads and your clip library are in <a href="#coach" class="linkbtn" style="padding:0">Coach › Film room</a>.</p>`:""}
    <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true,why:why(d)})).join("")}</div></section></div>`}
 document.addEventListener("click",e=>{const t=e.target.closest("[data-cond]");if(!t)return;const [k,a,b]=t.dataset.cond.split(":");
   if(k==="g")state.condGrp=a;else if(k==="rt")state.rtOpen=!state.rtOpen;
@@ -2749,18 +2754,21 @@ function spark(series){
   return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="3-point percentage by session">${grid}<path class="area" d="${area}"/><path class="lineA" d="${lineA}"/>${lineB?`<path class="lineB" d="${lineB}"/>`:""}<circle class="end" cx="${last[0]}" cy="${last[1]}" r="4"/><text x="${Math.min(last[0],W-30)}" y="${last[1]-9}" text-anchor="middle" style="fill:var(--ink);font-weight:700">${series[n-1].p3}%</text><text x="${pl}" y="${H-5}">${series[0].d.slice(5)}</text><text x="${W-pr}" y="${H-5}" text-anchor="end">${series[n-1].d.slice(5)}</text></svg>`}
 
 function viewProgress(){
-  const range=state.range, tot=spotTotals(range==="30"?30:0);
+  /* nothing from 3 in 30 days but older shots exist: show all time instead of an all-dash map */
+  const has=t=>Object.values(t).some(v=>v[1]>0),fell=state.range==="30"&&!has(spotTotals(30))&&has(spotTotals(0)),range=fell?"all":state.range,tot=spotTotals(range==="30"?30:0);
   let m3=0,a3=0;for(const k in tot){m3+=tot[k][0];a3+=tot[k][1]}
   let mft=0,aft=0,decisions=0,shots=0;for(const se of S.sessions)for(const it of se.items){if(it.id==="s_ft"){mft+=it.m;aft+=it.a}if(D[it.id]?.read)decisions++;if(it.a)shots+=it.a}
   const series=S.sessions.map(se=>{let m=0,a=0,fm=0,fa=0;for(const it of se.items){if(it.spots)for(const k in it.spots){m+=it.spots[k][0];a+=it.spots[k][1]}if(it.id==="s_ft"){fm+=it.m;fa+=it.a}}return a?{d:se.d,p3:pct(m,a),ft:fa?pct(fm,fa):null}:null}).filter(Boolean).slice(-14);
   const recent=S.sessions.slice(-8).reverse();
   return `<section><div class="sechead"><h2>3-point map</h2><div class="seg" role="group" aria-label="Range"><button data-range="30" aria-pressed="${range==="30"}">30 days</button><button data-range="all" aria-pressed="${range==="all"}">All time</button></div></div>
-   <div class="card">${courtSVG({data:tot})}<div class="legend" style="margin-top:8px;justify-content:center"><span><i style="background:var(--bad)"></i>Under 28%</span><span><i style="background:var(--warn)"></i>28–35%</span><span><i style="background:var(--good)"></i>36%+</span></div></div></section>
-  <section><div class="stats"><div class="stat"><b>${a3?pct(m3,a3)+"%":"–"}</b><span>3PT · ${m3}/${a3}</span></div><div class="stat"><b>${aft?pct(mft,aft)+"%":"–"}</b><span>Free throws · ${mft}/${aft}</span></div><div class="stat"><b>${decisions}</b><span>Decision drills</span></div></div></section>
-  ${progClimb()}
-  ${progConsistency()}${progMiss()}${progCalls()}${progLadder()}${finCard(state.range==="30"?30:0)}
-  <section><div class="sechead"><h2>Trend</h2><div class="legend"><span><i style="background:var(--accent)"></i>3PT %</span><span><i style="background:var(--read)"></i>FT %</span></div></div>
-   ${series.length>=2?`<div class="card">${spark(series)}</div>`:`<div class="empty">Log the 5-Spot 3s on two different days and your 3-point trend line shows up here.</div>`}</section>
+   ${fell?`<p class="muted small" style="margin:0">No 3-point spot drills in the last 30 days, so this shows all time.</p>`:""}<div class="card">${courtSVG({data:tot})}<div class="legend" style="margin-top:8px;justify-content:center"><span><i style="background:var(--bad)"></i>Under 28%</span><span><i style="background:var(--warn)"></i>28–35%</span><span><i style="background:var(--good)"></i>36%+</span></div></div></section>
+  <section><div class="stats"><div class="stat"><b>${a3?pct(m3,a3)+"%":"–"}</b><span>3PT spot drills · ${m3}/${a3}</span></div><div class="stat"><b>${aft?pct(mft,aft)+"%":"–"}</b><span>Free throws · ${mft}/${aft}</span></div><div class="stat"><b>${decisions}</b><span>Decision drills</span></div></div></section>
+  ${(()=>{/* cards with data first; the ones still waiting for logs fold into one group at the bottom of this block */
+    const parts=[progClimb(),progConsistency(),progMiss(),progCalls(),progLadder(),finCard(range==="30"?30:0),
+     `<section><div class="sechead"><h2>Trend</h2><div class="legend"><span><i style="background:var(--accent)"></i>3PT %</span><span><i style="background:var(--read)"></i>FT %</span></div></div>
+   ${series.length>=2?`<div class="card">${spark(series)}</div>`:`<div class="empty">Log the 5-Spot 3s on two different days and your 3-point trend line shows up here.</div>`}</section>`].filter(Boolean);
+    const empty=x=>x.includes('class="empty"')&&!/class="(card|stats|stat)[ "]/.test(x),full=parts.filter(x=>!empty(x)),wait=parts.filter(empty);
+    return full.join("")+(wait.length?`<section><details class="fills"><summary><span>Fills in as you log</span><span class="muted small">${wait.length} more</span></summary>${wait.join("")}</details></section>`:"")})()}
   <section><div class="sechead"><h2>Sessions</h2><span class="muted small">${shots} shots logged</span></div>
    ${progHeat()}
    ${recent.length?`<div class="card hist">${recent.map(se=>`<div><span>${new Date(se.d+"T12:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><span class="muted">${se.items.length} drill${se.items.length>1?"s":""}</span><b class="num">+${se.items.reduce((a,it)=>a+it.xp,0)} XP</b></div>`).join("")}</div>`:`<div class="empty">No sessions yet. Finish any drill on the Today tab and it's logged here with the XP you earned.</div>`}</section>
@@ -2819,11 +2827,12 @@ function render(){planRoll();renderPlate();
   document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"))}
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-open],[data-mins],[data-dtab],[data-range],[data-hand],[data-jump],[data-coach],[data-play],[data-cue],[data-arc],[data-fcview],[data-arcd],[data-heat],[data-hday]");if(!t)return;
+  const t=e.target.closest("[data-open],[data-mins],[data-dtab],[data-range],[data-hand],[data-jump],[data-coach],[data-play],[data-cue],[data-cueopen],[data-arc],[data-fcview],[data-arcd],[data-heat],[data-hday]");if(!t)return;
   if(t.dataset.heat){S.settings.heat=t.dataset.heat==="1";persist();render();return}
   if(t.dataset.hday){const by=heatDays(),c=$("#heatCap");document.querySelectorAll(".heat .sel").forEach(x=>x.classList.remove("sel"));t.classList.add("sel");if(c)c.textContent=heatCap(t.dataset.hday,by[t.dataset.hday]);return}
   if(t.dataset.fcview){S.settings.fcView=t.dataset.fcview;persist();reView();return}
   if(t.dataset.arcd){S.settings.arcDist=+t.dataset.arcd;persist();if(FC.arc&&!FC.arc.err){FC.arc.dist=S.settings.arcDist;FC.arc.entry=entryOf(FC.arc.launch,FC.arc.dist);const f=(S.forms||[])[S.forms.length-1];if(f&&f.t>=(FC.savedAt||0)){f.v.entry=FC.arc.entry;f.v.ad=FC.arc.dist;persist()}}render();return}
+  if(t.dataset.cueopen){state.cueOpen=!state.cueOpen;render();return}
   if(t.dataset.cue){S.settings.cue={d:today(),i:+t.dataset.cue};persist();render();return}
   if(t.dataset.arc){arcAct(t.dataset.arc);return}
   if(t.dataset.play){startPlayer(t.dataset.play.split(","),false);return}
@@ -2909,9 +2918,11 @@ function wSaveHTML(id){const d=D[id],ws=S.rec.workouts;
 const wHas=id=>S.rec.workouts.filter(w=>w.items.includes(id));
 function planRow(p){const cw=p.custom,mins=cw?wMins(cw):p.mins;
   return `<button class="planrow" data-rec="plan"><span><span class="label">${cw?"Plan · yours, today only":p.body?"Plan · lightened":"Plan"}</span><b>${cw?esc(cw.name):"Recommended"} · ${mins} min</b></span><span class="v">Change ▾</span></button>`}
-function bodyCard(){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;
-  const note=k==="heavy"?"Same minutes, but no Tired 3s runs, no two-foot jump or contact drills, and lighter footwork.":k==="game"?"20 minutes of form and touch: no volume shooting, no jump or contact drills.":"Optional. Ignore it and nothing changes.";
-  return `<div class="coachcard bodycard"><div class="label">Before you start</div><b>How's the body today?</b><div class="chips" role="group" aria-label="How's the body today">${[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]].map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${k===v?"✓ ":""}${t}</button>`).join("")}</div><p>${note}</p></div>`}
+/* Today's setup in one strip: the optional body check (before the first drill only), then the partner and heavy-ball switches */
+function setupStrip(body){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;
+  const note=k==="heavy"?"Same minutes, but no Tired 3s runs, no two-foot jump or contact drills, and lighter footwork.":k==="game"?"20 minutes of form and touch: no volume shooting, no jump or contact drills.":"";
+  return `<div class="setup">${body?`<div class="label">How's the body today? <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">Optional</span></div><div class="chips" role="group" aria-label="How's the body today">${[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]].map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${k===v?"✓ ":""}${t}</button>`).join("")}</div>${note?`<p class="small muted" style="margin:0">${note}</p>`:""}`:""}
+   <div class="row"><label class="toggle"><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}> Partner today</label><label class="toggle"><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}> I have a heavy ball</label></div></div>`}
 function addedCard(ids){const names=ids.map(id=>D[id].name);
   return `<div class="addedcard"><b>You added ${esc(names.length>2?names.length+" drills":names.join(" and "))}.</b> Put ${names.length>1?"them":"it"} in today's workout, or keep ${names.length>1?"them":"it"} for your next recommended one?<div class="psee-btns"><button class="btn sec small" data-rec="addin">Add ${names.length>1?"them":"it"} in</button><button class="btn sec small" data-rec="keepnext">Keep for next</button></div></div>`}
 const SWAPICON=`<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11l-3-3M16 13H5l3 3"/></svg>`;
@@ -2957,14 +2968,17 @@ function nwHTML(){return bsTop("Needs work","How many per workout?")+`<p class="
   <div class="psee-btns"><button class="btn sec small" data-rec="nwreset">Reset to 1 / 2 / 2</button><button class="btn pri small" data-rec="close">Done</button></div>`}
 const wMins=w=>Math.round(w.items.reduce((a,id)=>a+(D[id]?realMins(D[id]):0),0));
 function planHTML(){const cw=customToday(),ws=S.rec.workouts,mins=S.settings.mins,have=new Set(ws.map(w=>w.from).filter(Boolean)),st=STARTERS.filter(s=>!have.has(s.id));
+  /* starter workouts: above My workouts while you have none of your own, below once you do */
+  const stHTML=`${st.length?`<div class="label">Starter workouts</div><div class="opts">${st.map(s=>`<div class="opt"><div class="optmain"><b>${esc(s.name)}</b><span>${esc(s.note)} · ${s.items.length} drills · about ${wMins(s)} min</span>${wMix(s.items)}</div><div class="psee-btns"><button class="btn sec small" data-rec="wadd:${s.id}">Add to mine</button><button class="btn sec small" data-rec="wplay:${s.id}">▶ Play now</button></div></div>`).join("")}</div><p class="small muted" style="margin:0">Adding one copies it into My workouts, so you can change it. Play now starts its first drill.</p>`:""}`;
   return bsTop("Workouts","Pick a workout")+`<p class="rs-p">Switch any time, even halfway through. Drills you've done today stay done.</p>`+`<div class="opts"><div class="opt${cw?"":" on"}"><button class="optmain" data-rec="usew:" aria-pressed="${!cw}"><b>Recommended</b><span>Built for today from your drills, your schedule and what needs work.</span></button><div class="seg" role="group" aria-label="Workout length">${[20,30,45].map(m=>`<button data-rec="pmins:${m}" aria-pressed="${mins===m}">${m} min</button>`).join("")}</div></div></div>
+   ${ws.length?"":stHTML}
    <div class="label">My workouts</div>
    ${ws.length?`<div class="opts">${ws.map(w=>{const mm=wMins(w);return `<div class="opt${cw&&cw.id===w.id?" on":""}"><button class="optmain" data-rec="usew:${w.id}" aria-pressed="${!!(cw&&cw.id===w.id)}"><b>${cw&&cw.id===w.id?"▶ ":""}${esc(w.name)}</b><span>${w.items.length} drill${w.items.length===1?"":"s"} · about ${mm} min${mm>mins+5?` · <em>${mm-mins} min over your usual ${mins}</em>`:""}</span>${wMix(w.items)}</button><div class="wrow-acts"><button class="linkbtn" data-rec="editw:${w.id}">Edit</button><button class="linkbtn" data-rec="wdup:${w.id}">Duplicate</button></div></div>`}).join("")}</div>
      <div class="psee-btns"><button class="btn sec small" data-rec="neww">+ New workout</button><button class="btn sec small" data-rec="neww:plan">Copy today's plan</button></div>`
    :`<div class="empty"><b>Your own workouts go here</b><br>For days you know exactly what you want, like a long shooting day or handles at lunch with no hoop.<div class="psee-btns" style="margin-top:10px"><button class="btn sec small" data-rec="neww:plan">Start from today's plan</button><button class="btn sec small" data-rec="neww">Start empty</button></div></div>`}
    <label class="toggle" style="align-self:flex-start"><input type="checkbox" id="wstay" ${S.rec.stay?"checked":""}> Stay on my pick until I switch</label>
    <p class="small muted" style="margin:-4px 0 0">${S.rec.stay?"A workout you pick stays on, day after day, until you pick another.":"Off: a workout you pick is for today, and tomorrow goes back to Recommended."}</p>
-   ${st.length?`<div class="label">Starter workouts</div><div class="opts">${st.map(s=>`<div class="opt"><div class="optmain"><b>${esc(s.name)}</b><span>${esc(s.note)} · ${s.items.length} drills · about ${wMins(s)} min</span>${wMix(s.items)}</div><div class="psee-btns"><button class="btn sec small" data-rec="wadd:${s.id}">Add to mine</button><button class="btn sec small" data-rec="wplay:${s.id}">▶ Play now</button></div></div>`).join("")}</div><p class="small muted" style="margin:0">Adding one copies it into My workouts, so you can change it.</p>`:""}
+   ${ws.length?stHTML:""}
    <button class="btn pri" data-rec="close">Done</button>`}
 
 /* My workouts: build, reorder, save */
@@ -3044,7 +3058,7 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
     if(cw.items.length<2){bsClose();return toast("Can't remove it","A workout needs at least one drill. Delete it from Edit.")}const pi=[...cw.items];cw.items=cw.items.filter(x=>x!==b);persist();bsClose();return toastU("Removed",`${D[b].name} is out of ${cw.name}.`,()=>{cw.items=pi;persist();render()})}
   case "wdup":{const w=S.rec.workouts.find(x=>x.id===b);if(!w)return;const n={id:wNew(),name:(w.name+" copy").slice(0,40),items:[...w.items],keep:w.keep!==false};S.rec.workouts.push(n);persist();render();bsSet(planHTML());return toast("Duplicated",`${n.name} is in My workouts.`)}
   case "wadd":case "wplay":{const s=STARTERS.find(x=>x.id===b);if(!s)return;const n={id:wNew(),name:s.name,items:wOrder(s.items.map(id=>id==="b_body"?rtPick("warm").id:id==="b_cool"?rtPick("cool").id:id),true),keep:true,from:s.id};S.rec.workouts.push(n);persist();
-    if(a==="wplay")return wUse(n.id);render();bsSet(planHTML());return toastU("Added",`${s.name} is in My workouts.`,()=>{S.rec.workouts=S.rec.workouts.filter(w=>w.id!==n.id);persist();render();if(bsEl)bsSet(planHTML())})}
+    if(a==="wplay"){wUse(n.id);render();window.scrollTo(0,0);setTimeout(()=>document.querySelector(".upnext")?.click(),250);return}render();bsSet(planHTML());return toastU("Added",`${s.name} is in My workouts.`,()=>{S.rec.workouts=S.rec.workouts.filter(w=>w.id!==n.id);persist();render();if(bsEl)bsSet(planHTML())})}
   case "saveto":return bsOpen(wSaveHTML(b),"Save to a workout");
   case "wtog":{const w=S.rec.workouts.find(x=>x.id===b);if(!w)return;if(w.items.includes(c)){if(w.items.length<2)return toast("Can't remove it","A workout needs at least one drill.");w.items=w.items.filter(x=>x!==c)}else w.items=wOrder([...w.items,c],w.keep!==false);
     persist();bsSet(wSaveHTML(c));if(R){const el=$("#sheet .reccard");if(el)el.outerHTML=recCard(R.d)}return}
@@ -3161,7 +3175,7 @@ function drawRunner(){
   const bl=baseline(d),tgt=d.gm?gmTip(d):(d.log==="makes"||d.log==="spots")?`<div class="tip">Your goal: <b class="num">${targetPct(d)}%</b>${d.goal?` · finish at ${d.goal} makes`:""}. ${bl?`Your average over your last ${bl.n>1?bl.n+" sessions":"session"} is ${bl.p}%, so the goal is ${GOAL_UP} points above it. It moves when your numbers move.`:`A starter goal. After your first session it becomes your own average plus ${GOAL_UP} points.`}</div>`:"";
   $("#sheet").innerHTML=`<header><div class="wrap"><h2 id="sheetTitle">${esc(d.dynamic&&weakSpot()?d.name+": "+SPOT[weakSpot().id].name:d.name)}</h2><button class="x" aria-label="Close drill">×</button></div></header>
   <div class="sbody"><div class="wrap">
-   <div class="row"><span class="tag ${d.skill}">${SK[d.skill]}</span>${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}${d.cond?`<span class="tag c">${CGR[d.cond]}</span><span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard · counts toward leg load</span>':""}`:""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
+   <div class="row">${d.clips?'<span class="tag rd">Film</span>':`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}${d.cond?`${d.clips?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard · counts toward leg load</span>':""}`:""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
    <p style="margin:0">${esc(d.what)}</p>
    ${d.read?`<div class="why">Why decision reps: drills where you already know the next move look clean but don't show up in games. Here the choice comes late, so your hands react instead of recite. Do these after your mechanics work.</div>`:""}
    ${hasParts(d)?`<h3 class="partshead">The parts · ${fmt(totalOf(d))}</h3><ol class="steps">${d.phases.map((p,i)=>`<li><div class="srow">${partAnim(d,i)}<div><b>${esc(p[0])}</b> · ${p[1]}s<div class="small muted">${esc(d.mv?BV.note(d.id+":"+i):HV.note(d.id+"p:"+i))}</div>${clipLinks(d,i)}</div></div></li>`).join("")}</ol><h3 class="partshead">Coaching points</h3>`:""}
@@ -3194,9 +3208,13 @@ function drawDock(){
      ${g.ok?`<button class="btn pri" data-k="play">Start · ${fmt(totalOf(d))}</button>`:`<button class="btn sec" data-k="anyway">Start anyway</button>`}<span class="small muted" style="text-align:center">5-second countdown, then each ${u} starts on a beep. Prop the phone where you can see and hear it.</span>`;return bind()}
   if(d.log==="timer"||d.log==="react"){const ph=phasesOf(d);
     el.innerHTML=`${hasParts(d)?"":`<div class="phases">${ph.map((p,i)=>`<span class="prow2"><span>${esc(p[0])} · ${p[1]}s</span>${clipLinks(d,i)}</span>`).join("")}</div>`}
-     ${d.volume?`<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Set</span><div class="seg">${[[0,"Regular · 100"],[1,"Full D2 · 500"]].map(([v,l])=>`<button data-k="vol:${v}" aria-pressed="${volBig()===!!v}">${l}</button>`).join("")}</div></div><div class="dbeat">${beatSlider()}</div><div class="row" style="justify-content:center">${cdCtl("data-k")}</div>`:""}${d.tempoCalls?d2rCtl():""}
+     ${d.volume?(R.dockSet?`<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Set</span><div class="seg">${[[0,"Regular · 100"],[1,"Full D2 · 500"]].map(([v,l])=>`<button data-k="vol:${v}" aria-pressed="${volBig()===!!v}">${l}</button>`).join("")}</div></div><div class="dbeat">${beatSlider()}</div><div class="row" style="justify-content:center">${cdCtl("data-k")}</div><button class="linkbtn" data-k="dockset" style="align-self:center">Done</button>`:`<button class="linkbtn" data-k="dockset" style="align-self:center">${volBig()?"Full D2 · 500":"Regular · 100"} · beat and countdown ›</button>`):""}${d.tempoCalls?d2rCtl():""}
      ${goalEdit(d)}<button class="btn pri" data-k="play">Start · ${fmt(totalOf(d))}</button>${CLIPS[d.id]?`<span class="small muted" style="text-align:center">▶ opens a short demo of that part on YouTube at the right moment.</span>`:""}<span class="small muted" style="text-align:center">5-second countdown, then the phone calls each part out loud. Prop it up where you can see it.</span>`;return bind()}
   const modeSeg=setupBlock(d);
+  /* before the first shot the dock stays small (goal, how you count, one start button) so the steps and demo above have room;
+     the court map, tally and logging buttons open with the first start or log */
+  if((d.log==="spots"||d.log==="makes")&&!R.a&&!R.hist.length&&!R.dockOpen){
+    el.innerHTML=`${modeSeg}${R.mode==="sets"?`<button class="btn pri" data-k="big">Start sets</button>`:R.mode==="big"?`<button class="btn pri" data-k="big">Open shot-by-shot screen</button>`:`<button class="btn pri" data-k="dockopen">Start logging</button>`}`;return bind()}
   if((d.log==="spots"||d.log==="makes")&&R.mode==="sets"){
     const st=setSpec(),p=pct(R.m,R.a),doneSpots=d.log==="spots"?SPOTS.filter(x=>R.spots[x.id][1]>=d.per).map(x=>x.id):[];
     const labels=d.log==="spots"?Object.fromEntries(SPOTS.map(x=>[x.id,R.spots[x.id][1]?`${R.spots[x.id][0]}/${R.spots[x.id][1]}`:""])):{};
@@ -3432,6 +3450,8 @@ function flash(){R.flash=true;drawDock();setTimeout(()=>{if(R){R.flash=false;dra
 function act(k){
   const d=R.d;let dir=null,sw=false;if(k.startsWith("miss:")){dir=k.slice(5);k="miss"}if(k==="swish"){sw=true;k="make"}
   if(k.startsWith("d2r:")){const[,f,v]=k.split(":"),c=D2R(),n=+v;const cl=(x,a,b)=>Math.max(a,Math.min(b,x));if(f==="gap")c.gap=n;else if(f==="n")c.n=cl(c.n+n,1,10);else if(f==="work")c.work=cl(c.work+15*n,15,180);else if(f==="rest")c.rest=cl(c.rest+15*n,0,120);else if(f==="lo")c.lo=cl(c.lo+5*n,40,c.hi-10);else if(f==="hi")c.hi=cl(c.hi+5*n,c.lo+10,160);S.settings.d2r=c;persist();return drawDock()}
+  if(k==="dockopen"){R.dockOpen=true;return drawDock()}
+  if(k==="dockset"){R.dockSet=!R.dockSet;return drawDock()}
   if(k.startsWith("vol:")){S.settings.vol={d:today(),big:k==="vol:1"};persist();return drawDock()}
   if(k.startsWith("hand:")){R.hand=k.slice(5);return drawDock()}
   if(k.startsWith("cd:"))return setCd(+k.slice(3));
@@ -3743,7 +3763,7 @@ function cdb(){return cdbP||(cdbP=new Promise((a,b)=>{let r;try{r=indexedDB.open
   r.onsuccess=()=>a(r.result);r.onerror=()=>{cdbP=null;b(r.error)}}))}
 async function ctx(mode,fn){const db=await cdb();return new Promise((a,b)=>{const t=db.transaction(["meta","blobs"],mode);let out;Promise.resolve(fn(t.objectStore("meta"),t.objectStore("blobs"))).then(v=>out=v,b);t.oncomplete=()=>a(out);t.onerror=t.onabort=()=>b(t.error)})}
 async function loadClips(){try{CL.list=(await ctx("readonly",m=>rq(m.getAll()))).filter(c=>FMV.some(m=>m.k===c.mv));CL.err=""}catch(e){CL.list=[];CL.err="This browser won't let the app keep clips (private mode or storage turned off)."}
-  CL.loaded=true;CL.busy=false;libDraw();if(R&&R.d&&R.d.clips)drawDock();else if(!LIB&&!CR&&state.tab==="drills"&&state.drillTab==="b"){const y=window.scrollY;render();window.scrollTo(0,y)}}
+  CL.loaded=true;CL.busy=false;libDraw();if(R&&R.d&&R.d.clips)drawDock();else if(!LIB&&!CR&&state.tab==="coach"){const y=window.scrollY;render();window.scrollTo(0,y)}}
 const clipsSoon=()=>{if(!CL.loaded&&!CL.busy){CL.busy=true;loadClips()}};
 const clipCount=k=>CL.list.filter(c=>c.mv===k).length;
 async function saveClip(blob,o){const id=uid("cl");await ctx("readwrite",(m,bl)=>{m.put({id,t:Date.now(),mv:o.mv,go:o.go,cut:o.cut,auto:o.auto,size:blob.size,type:blob.type||"video/webm"});bl.put(blob,id)});
@@ -3917,6 +3937,11 @@ const fsReduce=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* the Coach tab card */
 let fsCopyText="";
+/* Coach › Film room: the read drills that play clips of you, next to Film study. Read the Move works anywhere; Film Reads is on court. */
+function filmRoom(){const ds=DRILLS.filter(d=>d.clips);
+  return `<section><div class="sechead"><h2>Film room</h2><span class="muted small">your own clips</span></div>
+   <div class="list">${ds.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div>
+   ${clipCard()}</section>`}
 function filmCard(){const f=fsLog(),lv=f.lv,extra=Object.keys(f.dia).length+Object.keys(f.flag).length;
   return `<section><div class="sechead"><h2>Film study</h2><div class="seg" role="group" aria-label="Film study level">${["B","I"].map(k=>`<button data-fs="lv:${k}" aria-pressed="${lv===k}">${FS_LV[k]}</button>`).join("")}</div></div>
    <p class="muted small" style="margin:0">Make the read on real film. A breakdown by an NBA, pro or college player plays muted and stops at the decision. You pick, then hear them explain it. ${lv==="B"?"Basics plays the starter moments and highlights the players who matter.":"Intermediate adds pick and roll and help reads, and highlights nobody, so spotting who matters is part of the read."}</p>
@@ -4902,11 +4927,11 @@ function vCard(v){const th=CO.thumbs[v.id],f=v.item&&coFind(v.item);
 function viewCoach(){if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
   const ls=coLists(),all=ls.flatMap(l=>l.items),left=all.filter(x=>!x.done).length,coaches=[...new Set(ls.map(l=>l.coach).filter(Boolean))];
   const name=CO.name||S.coach.lastCoach||"",free=CO.vids.filter(v=>!v.item||(!coFind(v.item)&&!(CO.wiz&&v.item===CO.wiz.id)));
-  return `${filmCard()}<section><div class="sechead"><h2>Take-home drills</h2>${all.length?`<span class="muted small"><b class="num" style="font-size:18px;color:var(--ink)">${all.length-left}</b> of ${all.length} done</span>`:""}</div>
+  return `${filmCard()}${filmRoom()}<section><div class="sechead"><h2>Take-home drills</h2>${all.length?`<span class="muted small"><b class="num" style="font-size:18px;color:var(--ink)">${all.length-left}</b> of ${all.length} done</span>`:""}</div>
    ${ls.length?ls.map(l=>{const n=l.items.filter(x=>x.done).length;return `<div class="hwgrp"><span>${l.coach?"From "+esc(l.coach)+" · ":""}${new Date(l.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span>${n===l.items.length?`<button class="linkbtn" data-hw="dellist:${l.id}">Clear list</button>`:`<span>${n}/${l.items.length}</span>`}</div>
      <div class="hwlist">${l.items.map(hwRow).join("")}</div>`}).join("")
    :`<div class="empty">When your coach gives you drills to do on your own, add them below. Type them, paste their text or links, or say them. Each one you check off earns ${HW_XP} XP.</div>`}</section>
-  <section><div class="sechead"><h2>Add from your coach</h2></div>
+  ${ls.length&&!CO.addOpen&&!CO.wiz&&!CO.draft?`<section><button class="btn sec" data-hw="addopen">+ Add from your coach</button></section>`:`<section><div class="sechead"><h2>Add from your coach</h2></div>
    <div class="seg comode" role="group" aria-label="How to add"><button data-hw="mode:list" aria-pressed="${CO.mode!=="step"}">All at once</button><button data-hw="mode:step" aria-pressed="${CO.mode==="step"}">One at a time</button></div>
    <div class="card coadd">
     <label class="label" for="coName">Coach</label><input class="cofield" id="coName" list="coNames" placeholder="Coach's name (optional)" value="${esc(name)}" autocomplete="off">
@@ -4916,7 +4941,7 @@ function viewCoach(){if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
     <div class="row">${dictOK()?`<button class="btn sec small mic" id="coMic" data-hw="mic" aria-pressed="${!!CO.dict}">${CO.dict?"Stop listening":"Say them"}</button>`:""}<button class="btn pri small" data-hw="add" style="flex:1">Add to my list</button></div>
     <p class="muted small" id="coMicMsg" role="status" style="margin:0">${CO.dict?"Listening. Pause between drills, or say “next drill”.":""}</p>
     <p class="muted small" style="margin:0">${dictOK()?"Say them, or":"To say them, tap"} the mic on your phone's keyboard${dictOK()?" works too":""}. A link on its own line goes with the drill above it. To add a video or clip and a goal to each drill, use One at a time.</p>`}
-   </div></section>
+   </div></section>`}
   <section><div class="sechead"><h2>My videos</h2>${CO.vids.length?`<span class="muted small">${CO.vids.length} clip${CO.vids.length>1?"s":""}${CO.usage?` · ${fmtMB(CO.vids.reduce((a,v)=>a+v.size,0))}`:""}</span>`:""}</div>
    <div class="row">${recCtl("","pri small")}<label class="btn sec small filebtn" for="coPick" data-hw="pick:">Add a clip</label></div>
    <input type="file" id="coCap" accept="video/*" capture="environment" hidden><input type="file" id="coPick" accept="video/*" hidden>
@@ -4928,6 +4953,7 @@ function coachTodayCard(){const ls=coLists(),open=ls.flatMap(l=>l.items.filter(x
    <b>${open.length} drill${open.length>1?"s":""} to do:</b> ${open.slice(0,3).map(x=>esc(x.text)).join(" · ")}${open.length>3?" …":""}
    <a class="linkbtn" href="#coach" style="display:block">Open take-home list →</a></div></section>`}
 document.addEventListener("click",e=>{const t=e.target.closest("[data-hw]");if(!t)return;const p=t.dataset.hw.split(":"),[a,id,x]=p;
+  if(a==="addopen"){CO.addOpen=true;render();document.getElementById("coName")?.focus();return}
   if(a==="wz"){const W=CO.wiz;if(!W)return;
     if(id==="go")wzGo(+x);else if(id==="sk"){W.skill=x;W.skillSet=true;wzUp()}
     else if(id==="g"){hgStep(W.g,x,p[3]);wzUp()}
