@@ -1,5 +1,6 @@
 package com.ladioyeleye.hoopsladder;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.webkit.WebResourceRequest;
@@ -11,6 +12,7 @@ import com.ladioyeleye.hoopsladder.audio.HoopsAudioPlugin;
 import com.ladioyeleye.hoopsladder.music.HoopsMusicPlugin;
 import com.ladioyeleye.hoopsladder.remote.HoopsRemotePlugin;
 import com.ladioyeleye.hoopsladder.remote.RemoteHub;
+import com.ladioyeleye.hoopsladder.share.HoopsSharePlugin;
 import com.ladioyeleye.hoopsladder.voice.HoopsVoicePlugin;
 
 public class MainActivity extends BridgeActivity {
@@ -22,6 +24,11 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(HoopsVoicePlugin.class);
         registerPlugin(HoopsAudioPlugin.class);
         registerPlugin(HoopsMusicPlugin.class);
+        registerPlugin(HoopsSharePlugin.class);
+        // A link shared into the app reaches onNewIntent() below, including the one that started it (BridgeActivity
+        // passes its first intent there too). When Android rebuilds the app after closing it in the background, it
+        // hands back that same old intent, so drop it rather than add the link twice.
+        if (savedInstanceState != null && Intent.ACTION_SEND.equals(getIntent().getAction())) setIntent(new Intent(Intent.ACTION_MAIN));
         super.onCreate(savedInstanceState);
 
         // Capacitor sends every navigation to another site out to the browser. That's right for the page itself,
@@ -60,6 +67,16 @@ public class MainActivity extends BridgeActivity {
                 }
             }
         );
+    }
+
+    /**
+     * Share › Hoops Ladder from YouTube: the link goes to the drill on the Coach tab. The app is launchMode
+     * singleTask, so a share while it's open arrives here instead of starting a second copy. See docs/LEARNING.md, step 20.
+     */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        HoopsSharePlugin.receive(intent);
     }
 
     /**
