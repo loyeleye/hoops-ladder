@@ -32,7 +32,7 @@ import com.ladioyeleye.hoopsladder.R;
  *    sends it the phone's volume buttons, even with the screen off. Those presses become reps instead of
  *    changing the volume.
  * 3. The notification and the lock-screen media card show the current set and have Miss / Set done / Undo
- *    buttons (Make / Miss / Undo when logging shot by shot).
+ *    buttons (Miss / Make / Undo when logging shot by shot).
  */
 public class RepLoggerService extends Service {
 
@@ -103,10 +103,11 @@ public class RepLoggerService extends Service {
             if (b.getString(EXTRA_MODE) != null) mode = b.getString(EXTRA_MODE);
         }
         boolean sets = !"shots".equals(mode);
-        String aLabel = sets ? "Miss" : "Make";
-        String bLabel = sets ? "Set done" : "Miss";
-        int aIcon = sets ? R.drawable.ic_rep_miss : R.drawable.ic_rep_make;
-        int bIcon = sets ? R.drawable.ic_rep_done : R.drawable.ic_rep_miss;
+        // One rule in every mode: one press ("a") means something went wrong, two presses ("b") mean it went right.
+        String aLabel = "Miss";
+        String bLabel = sets ? "Set done" : "Make";
+        int aIcon = R.drawable.ic_rep_miss;
+        int bIcon = sets ? R.drawable.ic_rep_done : R.drawable.ic_rep_make;
 
         session.setMetadata(new MediaMetadata.Builder()
             .putString(MediaMetadata.METADATA_KEY_TITLE, title)

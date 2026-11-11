@@ -950,8 +950,8 @@
       .replace(", click your earbuds", ", press a volume button or click your earbuds")
       .replace(", double-click", ", double-press")
       .replace("Triple-click: undo.", "Triple-press: undo. The buttons work with the screen locked too.")
-      .replace("Earbuds: click = make, double-click = miss, triple-click = undo",
-               "Volume buttons or earbuds: press = make, double-press = miss, triple-press = undo, even with the screen locked");
+      .replace("Earbuds: click = miss, double-click = make, triple-click = undo",
+               "Volume buttons or earbuds: press = miss, double-press = make, triple-press = undo, even with the screen locked");
     if (on) Remote.update(info()).catch(() => {});
   };
 })();

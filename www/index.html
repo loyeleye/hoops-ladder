@@ -296,6 +296,15 @@ section{display:flex;flex-direction:column;gap:10px}
 .bt-hint{text-align:center;font-size:14px;opacity:.7}
 .bt-top .btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .bt-set{font-size:18px;font-weight:700;opacity:.85}
+.bt-zones{position:absolute;inset:0;display:grid;grid-template-rows:1fr 1fr;pointer-events:none;z-index:0}
+.bt-zones .z{display:flex;flex-direction:column;align-items:center;gap:2px;padding:64px 16px 12px;font-family:var(--display);text-transform:uppercase}
+.bt-zones .z b{font-size:22px;letter-spacing:.06em}.bt-zones .z span{font-family:var(--body);text-transform:none;font-size:13px;opacity:.8}
+.bt-zones .mk{background:color-mix(in srgb,#46C489 16%,transparent);color:#7FE0B0;border-bottom:2px dashed rgba(255,255,255,.25)}
+.bt-zones .ms{background:color-mix(in srgb,#EE6A55 16%,transparent);color:#FF9C8C;justify-content:flex-end;padding:12px 16px 120px}
+.bigtap>:not(.bt-zones){position:relative;z-index:1}
+.hgrid table{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;table-layout:fixed}
+.hgrid th,.hgrid td{padding:8px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}.hgrid thead th{border-top:0;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface-2)}
+.hgrid tbody th{font-weight:700;width:34%}.hgrid h3{margin:0 0 8px}
 .bigtap.sets .bt-count{font-size:clamp(80px,28vw,150px)}.bigtap.sets .bt-count span{font-size:.3em}
 .bt-count.ms{color:var(--bad)}
 .bt-padl{text-align:center;font-size:13px;opacity:.7;margin-top:6px}
@@ -813,6 +822,8 @@ const DRILLS=[
  {id:"f_cone",skill:"f",name:"Cone Loop Finishes",role:"fin",unlock:2,mins:7,log:"makes",att:16,ft:{"Outside-hand layup":"Layup","Inside-hand layup":"Layup","Outside-hand reverse":"Reverse","Inside-hand reverse":"Reverse"},stages:["Outside-hand layup","Inside-hand layup","Outside-hand reverse","Inside-hand reverse"],stageBy:"shots",stageN:4,t0:50,tstep:2,tmax:75,
   what:"From your coach: a cone on each 45, right on the 3-point line. Start under the basket, dribble out and loop around a cone and finish, then go straight to the other cone and do the same finish there. Each finish 4 times: right cone and left cone looping toward the baseline, then both again looping toward the middle. Then move to the next finish. Low lift: step into each finish, no big jumps.",
   steps:["Set a cone on each 45 (both wings), on the 3-point line. Start under the basket and dribble out to the right cone. Baseline loop: dribble around the outside of the cone so you come off its baseline side, then attack the rim along the baseline. After the finish, grab the ball and dribble straight out to the left cone for the same loop.","Middle loop: go around the cone the other way, so you come off its inside and attack the rim through the lane. Again one cone, then the other.","Finish 1, outside-hand layup: the hand on the side you're finishing on (right cone, baseline loop: right hand), off the inside foot, ball to the top corner of the square.","Finish 2, inside-hand layup: the other hand, the one closer to the middle. It keeps the ball away from a defender on your side.","Finish 3, outside-hand reverse: keep going under the rim and finish on the far side with the outside hand. Let the rim shield the ball.","Finish 4, inside-hand reverse: the same reverse, finished with the inside hand. At the left cone every hand flips."],
+  grid:{title:"Hand and takeoff foot",note:"The same for the baseline loop and the middle loop. Takeoff foot is the one you jump off, opposite the finishing hand.",head:["Finish","Right cone","Left cone"],
+   rows:[["Outside-hand layup","Right hand · left foot","Left hand · right foot"],["Inside-hand layup","Left hand · right foot","Right hand · left foot"],["Outside-hand reverse","Right hand · left foot, on the far side of the rim","Left hand · right foot, on the far side of the rim"],["Inside-hand reverse","Left hand · right foot, on the far side of the rim","Right hand · left foot, on the far side of the rim"]]},
   cue:"Tight around the cone, soft off the glass.",src:[{label:"From your coach",url:""},YTT("0K0jO7X98dU",5,"Elite Hoops: Cone Layups (closest match)"),YTT("HaLql0ueNpY",205,"Breakthrough: reverse finishes")]}
 ];
 function daysSinceHandle(){for(let i=S.sessions.length-1;i>=0;i--){const se=S.sessions[i];if(se.d<today()&&se.items.some(it=>(D[it.id]||{}).skill==="h"))return Math.round((new Date(today())-new Date(se.d))/864e5)}return null}
@@ -2558,6 +2569,7 @@ function drawRunner(){
    ${d.read?`<div class="why">Why decision reps: drills where you already know the next move look clean but don't show up in games. Here the choice comes late, so your hands react instead of recite. Do these after your mechanics work.</div>`:""}
    ${hasParts(d)?`<h3 class="partshead">The parts · ${fmt(totalOf(d))}</h3><ol class="steps">${d.phases.map((p,i)=>`<li><div class="srow">${partAnim(d,i)}<div><b>${esc(p[0])}</b> · ${p[1]}s<div class="small muted">${esc(HV.note(d.id+"p:"+i))}</div>${clipLinks(d,i)}</div></div></li>`).join("")}</ol><h3 class="partshead">Coaching points</h3>`:""}
    <ol class="steps">${d.steps.map((s,i)=>`<li>${hasAnim(d)?`<div class="srow">${stepAnim(d,i)}<div>${esc(s)}${stepClips(d,i)}</div></div>`:`${esc(s)}${stepClips(d,i)}`}</li>`).join("")}</ol>
+   ${d.grid?`<div class="hgrid"><h3 class="partshead">${esc(d.grid.title)}</h3><table><thead><tr>${d.grid.head.map(h=>`<th scope="col">${esc(h)}</th>`).join("")}</tr></thead><tbody>${d.grid.rows.map(r=>`<tr><th scope="row">${esc(r[0])}</th>${r.slice(1).map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table><p class="small muted" style="margin:6px 0 0">${esc(d.grid.note)}</p></div>`:""}
    ${STEP_CLIPS[d.id]?`<p class="small muted" style="margin:0">▶ opens ${d.skill==="f"||d.coachClips?"a coach":"SeeMikeDunn"} showing that step on YouTube.</p>`:""}
    ${CHECKS[d.id]?`<div class="checkit"><div><b>Check it on video</b><span class="small">Film one shot from the side. The form check measures ${CHECKS[d.id].map(esc).join(" and ")}.</span></div><a class="btn sec small" href="#form" data-check="${d.id}">Check it</a></div>`:""}
    <div class="cue">${esc(d.cue)}</div>${d.skill==="s"?`<div class="tip"><b>Today's one cue:</b> ${esc(CUES[todayCue().i].t)}. Think only this between shots. Change it on the Today tab.</div>`:""}${d.stages&&d.between?`<div class="tip"><b>Before each round:</b> ${esc(d.between)}</div>`:""}${heavy}${tgt}
@@ -2631,6 +2643,8 @@ const missRow=dis=>`<div class="mdir" role="group" aria-label="Log a miss with i
 /* hands-free logging. Two full-screen modes share one input layer:
    "sets" (quick-rep drills): shoot a whole set without touching anything, flag only the misses, close the set once.
    "big" (per shot): every shot gets its own signal.
+   One rule in every mode: a single tap or click means something went wrong (a miss, or a lost ball in the timed player),
+   and a hold or double-click means it went right (set done, or a make). Shot by shot also splits the screen: top half Make, bottom half Miss.
    Signals: a = tap / earbud click / remote press · b = hold / double-click / double-press · u = undo (triple-click, back key) · n:k = score · dir:x = miss with direction */
 let bigEl=null,media=null,voice=null,pressT=0,pressTimer=null,lastRec=0,talkUntil=0;
 /* finishing goal modes. pct: the drill as written. time: make N as fast as you can. streak: K in a row (K in a row at each stage).
@@ -2721,17 +2735,17 @@ function setUndo(){if(R.sm>0){R.sm--;R.smd.pop();beep(520,90);say(`Undo. ${R.sm}
   act("undo");say(`Last set removed. ${R.m} for ${R.a}. ${setIntro()}`);drawBig()}
 function sig(k){if(!R||R.finished||!bigEl)return;
   if(R.mode==="sets"){if(k==="a")setMiss();else if(k==="b")setDone();else if(k==="u")setUndo();else if(k.startsWith("n:"))setDone(+k.slice(2));else if(k.startsWith("dir:"))setMiss(k.slice(4));return}
-  if(k==="a"||k==="make")bigRec(true);else if(k==="b"||k==="miss")bigRec(false);else if(k.startsWith("dir:"))bigRec(false,k.slice(4));else if(k==="u"){act("undo");drawBig();say(`Undo. ${R.m} for ${R.a}`)}}
+  if(k==="b"||k==="make")bigRec(true);else if(k==="a"||k==="miss")bigRec(false);else if(k.startsWith("dir:"))bigRec(false,k.slice(4));else if(k==="u"){act("undo");drawBig();say(`Undo. ${R.m} for ${R.a}`)}}
 function openBig(){closeBig();if(R.mode==="sets"){R.sm=R.sm||0;R.smd=R.smd||[]}
   bigEl=document.createElement("div");bigEl.className="bigtap"+(R.mode==="sets"?" sets":"");bigEl.setAttribute("role","application");
-  bigEl.setAttribute("aria-label",R.mode==="sets"?"Tap anywhere for each miss, press and hold when the set is done":"Tap anywhere for a make, press and hold for a miss");
+  bigEl.setAttribute("aria-label",R.mode==="sets"?"Tap anywhere for each miss, press and hold when the set is done":"Tap the top half for a make, the bottom half for a miss");
   document.body.appendChild(bigEl);lockOn();drawBig();
   let sx=0,sy=0,down=false;
   bigEl.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;e.preventDefault();down=true;sx=e.clientX;sy=e.clientY;pressT=performance.now();clearTimeout(pressTimer);pressTimer=setTimeout(()=>{pressTimer=null;tapSig("b")},450)});
   bigEl.addEventListener("pointermove",e=>{if(down&&pressTimer&&Math.hypot(e.clientX-sx,e.clientY-sy)>24){clearTimeout(pressTimer);pressTimer=null}});
   bigEl.addEventListener("pointerup",e=>{if(e.target.closest("button")||!down)return;down=false;const dx=e.clientX-sx,dy=e.clientY-sy;
     if(Math.hypot(dx,dy)>=50){clearTimeout(pressTimer);pressTimer=null;tapSig("dir:"+swipeDir(dx,dy));return}
-    if(pressTimer){clearTimeout(pressTimer);pressTimer=null;tapSig("a")}});
+    if(pressTimer){clearTimeout(pressTimer);pressTimer=null;tapSig(R&&R.mode==="big"?(sy<innerHeight/2?"make":"miss"):"a")}});
   bigEl.addEventListener("pointercancel",()=>{down=false;clearTimeout(pressTimer);pressTimer=null});
   bigEl.addEventListener("contextmenu",e=>e.preventDefault());
   say(R.mode==="sets"?(R.d.timed&&!R.t0?`${setIntro()}. Tap or click once to start the clock.`:setIntro()):(bigLabel()||"Ready")+(R.d.skill==="s"?". Cue: "+CUES[todayCue().i].t:""))}
@@ -2752,11 +2766,12 @@ function drawBig(){if(!bigEl||!R)return;const d=R.d,p=pct(R.m,R.a),last=R.hist[R
      ${d.skill==="s"?`<div class="bt-cue">Cue: ${esc(CUES[todayCue().i].t)}</div>`:d.skill==="f"&&R.tip?`<div class="bt-cue">${esc(R.tip)}${R.hand==="W"&&R.call!=="Weak hand"?" · weak hand":""}</div>`:""}
      ${s&&s.kind==="att"&&!wait?`<div class="bt-padl">Or tap how many went in</div><div class="bt-pad">${[...Array(s.n+1)].map((_,k)=>`<button class="btn ${k===s.n?"full":""}" data-b="n:${k}">${k}</button>`).join("")}</div>`:""}
      <div class="bt-hint">${s&&s.kind==="goal"?"Make "+s.n+". ":""}Don't touch anything while you shoot. Each miss: tap anywhere (or swipe the way it missed, diagonal for long-left and so on)${media?", click your earbuds":""}${voice?', or say "miss"':""}. Set done: hold${media?", double-click":""}${voice?', say "done" or the number made':""}.${media?" Triple-click: undo.":""}</div>`}
-  else bigEl.innerHTML=`${bigTop()}
+  else bigEl.innerHTML=`<div class="bt-zones" aria-hidden="true"><div class="z mk"><b>Make</b><span>tap the top half · or hold</span></div><div class="z ms"><b>Miss</b><span>tap the bottom half · or swipe the way it missed</span></div></div>${bigTop()}
    <div class="bt-mid"><div class="bt-label">${esc(bigLabel()||(R.finished?"Finished":""))}</div><div class="bt-count num">${R.m}<span>/${R.a}</span></div>
-   <div class="bt-last ${last?(last.hit?"mk":"ms"):""}">${last?(last.hit?"Make":"Miss"+(last.dir?" · "+dirName(last.dir).toLowerCase():"")):"Tap anywhere: make"}</div><div class="bt-pct">${p==null?"":p+"%"}${d.stages?` · ${esc(stageLabel(d))}`:d.goal?` · ${R.m} of ${d.goal} makes`:d.att?` · ${R.a} of ${d.att}`:d.per?` · ${R.a} of ${d.per*5}`:""}</div></div>
+   <div class="bt-last ${last?(last.hit?"mk":"ms"):""}">${last?(last.hit?"Make":"Miss"+(last.dir?" · "+dirName(last.dir).toLowerCase():"")):"Ready"}</div><div class="bt-pct">${p==null?"":p+"%"}${d.stages?` · ${esc(stageLabel(d))}`:d.goal?` · ${R.m} of ${d.goal} makes`:d.att?` · ${R.a} of ${d.att}`:d.per?` · ${R.a} of ${d.per*5}`:""}</div></div>
    ${d.skill==="s"?`<div class="bt-cue">Cue: ${esc(CUES[todayCue().i].t)}</div>`:d.skill==="f"&&R.tip?`<div class="bt-cue">${esc(R.tip)}${R.hand==="W"&&R.call!=="Weak hand"?" · weak hand":""}</div>`:""}
-   <div class="bt-hint">Tap = make · Hold = miss · Swipe the way the ball missed: up long, down short, sideways left or right, diagonal for both (up-left = long and left)${media?" · Earbuds: click = make, double-click = miss, triple-click = undo":""}${voice?' · Say "make", "miss", a direction like "long left", or "undo"':""}</div>`;
+   <div class="bt-hint">Swipe the way the ball missed: up long, down short, sideways left or right, diagonal for both (up-left = long and left)${media?" · Earbuds: click = miss, double-click = make, triple-click = undo":""}${voice?' · Say "make", "miss", a direction like "long left", or "undo"':""}</div>`;
+  const pc=bigEl.querySelector(".bt-pct");if(pc&&pc.innerHTML.startsWith(" · "))pc.innerHTML=pc.innerHTML.slice(3);
   bigEl.querySelectorAll("[data-b]").forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.b;
     if(k==="exit"){closeBig();lockOff();drawDock()}else if(k==="undo")sig("u");else if(k==="ear"){media?stopMedia():startMedia();drawBig()}else if(k==="voice"){voice?stopVoice():startVoice();drawBig()}else if(k.startsWith("n:"))sig(k)})}
 setInterval(()=>{const c=document.getElementById("btClock");if(c&&R&&R.t0)c.textContent=fmt((Date.now()-R.t0)/1000)},500);
@@ -4478,8 +4493,8 @@ route();
       .replace(", click your earbuds", ", press a volume button or click your earbuds")
       .replace(", double-click", ", double-press")
       .replace("Triple-click: undo.", "Triple-press: undo. The buttons work with the screen locked too.")
-      .replace("Earbuds: click = make, double-click = miss, triple-click = undo",
-               "Volume buttons or earbuds: press = make, double-press = miss, triple-press = undo, even with the screen locked");
+      .replace("Earbuds: click = miss, double-click = make, triple-click = undo",
+               "Volume buttons or earbuds: press = miss, double-press = make, triple-press = undo, even with the screen locked");
     if (on) Remote.update(info()).catch(() => {});
   };
 })();
