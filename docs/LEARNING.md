@@ -950,7 +950,7 @@ is kept per coach in `S.coach.ok`.
 happened: `c` the coach on camera, `m` your tries (numbered), `t` voice notes, and `l` links. A topic can also hold
 `hw`, the id of the take-home drill made from it. *Film coach* starts a new topic when the current one already has a
 try. *Film me*, *Talk* and *Link* add to the current topic. Tapping a topic's name makes it current. The camera opens
-only when you film, so there's no live preview on the board.
+only when you film (or for Rewind, below), so there's no live preview on the board.
 
 **Recording.** The camera is `getUserMedia` + `MediaRecorder` at 2.5 Mbps with sound, like the Coach recorder in
 step 7. A recording stops at 5 minutes (about 19 MB).
@@ -965,18 +965,52 @@ same moment, tap *Lock*, and from then on the left follows the right with the sa
 YouTube player (step 14), looping the part you marked.
 
 **Voice notes.** *Talk* records audio only (`MediaRecorder`, Opus where the phone has it). *Feedback* on a replay
-attaches the note to that try. Notes are kept as audio. Turning them into text afterward needs Android's
-speech engine to read a file (Android 13 and later), which is planned.
+attaches the note to that try. Notes are kept as audio.
+
+**Transcripts.** After a voice note or a coach clip is saved, the app turns it into text on the phone, never live.
+The page decodes the recording to 16 kHz mono PCM (`OfflineAudioContext.decodeAudioData`, `sesPcm`) and sends it
+to the `HoopsTranscribe` plugin (`android/.../voice/HoopsTranscribePlugin.java`). That writes it to a temporary
+file and gives the file to Android's on-device recognizer (`createOnDeviceSpeechRecognizer` with
+`EXTRA_AUDIO_SOURCE`, Android 13+) in a segmented session, so pauses don't cut it short. Nothing is sent to a
+server, and the temporary file is deleted straight away.
+- The text is kept on the piece as `tx`. It shows under the note or clip on the board and in the replay, and gives
+  a *Suggested* name at wrap-up (a basketball term from the coach's words, like "Follow-through", or the first
+  words). The drill's name and a link's title are suggested too.
+- One at a time, and only once filming or talking stops. A failure shows *Try again* (`txs: "fail"`, or `"lang"`
+  while the phone fetches its English speech pack). Older phones and the browser keep audio only and show nothing.
+- Up to 3 minutes of each piece is transcribed.
+
+**Spoken marks (beta).** In setup, *Say "my turn"* (off by default, `S.coach.sesVoice`) listens during a propped
+recording: "my turn" marks your try, "again" or "one more" marks another, and "done" stops and opens the replay.
+The recording screen has a *Voice on/off · beta* button to switch it mid-session. In the app it borrows the live
+`HoopsVoice` listener from step 15 (`hoopsSesVoice` in native.js); in a browser it uses the page's speech
+recognition. The camera's own recording holds the mic at the same time, and some phones give the recognizer
+silence while it does: then nothing is heard, and taps keep working.
 
 **Links and shared videos.** While a session runs, the app pushes an Android sharing shortcut, *Session · Mo*, that
 shows in the share sheet. Ending the session removes it. A link shared through it goes to the session's *Add a link*
 screen and never to a take-home drill. The plain *Hoops Ladder* target still works as in step 20. Videos can be
 shared in too (`video/*`): the plugin copies the file into the app's cache, the page reads it back as a Blob, and it
-becomes a coach piece. With no session running, a shared video goes to My videos.
+asks *Coach or Me*: Coach starts a new topic when the current one already has a try, and Me becomes the topic's next
+numbered try. Several shares wait in line and are asked one at a time. With no session running, the first shared video
+asks where shared videos should go (My videos, or start a coach session with it) and remembers the answer in
+`S.settings.shareTo`. Change it on the Coach tab's session card (*Videos shared in with no session running*).
 - `HoopsSharePlugin.sessionStart/sessionEnd` push and remove the shortcut. `res/xml/shortcuts.xml` declares the
   share target.
 - A share through the shortcut carries `target: "session"`.
 - The share target only shows on Android 10 and later.
+
+**Best and latest.** In each topic the highest-numbered try is marked *Latest* once there are two, and *Best try* (★)
+is your pick: one per topic, set from the star on the replay (or the dock when there's nothing to compare). Both marks
+show on the board and in the compare picker. Nothing is deleted because of them.
+
+**Importing past clips** (storyboard frame 21). *Import past clips* on the Coach tab's session card picks several
+videos (`<input type=file multiple accept=video/*>`). Each clip's time comes from the MP4's own creation time (the
+`mvhd` box), else a date in the file name (`VID_20240428_173912`), else the file's date. More than 3 minutes between
+clips starts a new topic. The first clip of a topic with more than one is guessed as Coach, the rest Me, and each can be
+switched. Each topic goes to a past session it falls within, else a new session shared with topics less than 2 hours
+apart on the same day, and that can be changed (another new session, any past session, or left out). Clips are kept
+with the same `sesStore` as filmed ones. New sessions wait under *Finish setting up …* so the topics get named.
 
 **Homework and wrap-up.** *Homework* adds the topic to the take-home list straight away, with the goal chips from One
 at a time and the topic's links. The take-home row gets a *Session clips* button that opens the topic. *End* opens the
@@ -987,6 +1021,52 @@ everything and leaves *Finish setting up …* on the Coach tab. A session left a
 leaves them out. Nothing is uploaded. *Delete session* on a past session removes its clips and notes. Take-home
 drills made from it stay.
 
-**Not built yet** (from the storyboard): Rewind (keeping the last 30 seconds while propped), trimming setup and
-the end of a clip with the pose model, finding the handoff between two people in one clip, importing past clips,
-drawing on a frame, the in-session quick test, voice-note transcripts, and spoken *my turn* / *again*.
+**Rewind: save the last 30 s** (storyboard frame 12). A setup switch, off by default and only for propped sessions
+(`s.rw`). While the board shows, the camera runs with no preview and a small *Rewind on* line says so. Two
+MediaRecorders share the stream, started 30 s apart, and each starts over after 60 s, so the older one always holds
+30 to 60 s. A file from one recorder's own start plays anywhere, which a later timeslice chunk on its own doesn't.
+*Save last 30 s* stops that recorder and keeps its last 30 s as a try (`rw: 1`, shown as *Rewind · Try n*), then
+opens the replay. Nothing is written until Save. The camera closes whenever the board isn't showing: filming
+(which opens its own camera), Talk, a replay, End, closing session mode, or the app going to the background. A
+phone that won't run two recorders at once keeps one, restarted every 60 s. Code: `sesRw*`.
+
+**Draw on a frame** (frame 22). *✎ Draw* on a replay pauses it and grabs the frame on a canvas. *Line* is freehand,
+*Circle* and *Arrow* follow the drag, with *Undo* and *Clear*. *Save as picture* keeps the frame and the drawing as
+one JPEG in the video store and adds a Picture piece (`k: "d"`, `on` the try, `at` the second). It lists on the board
+and under its try's replay. Tapping it shows the picture, with *Talk over it* for a voice note. Code: `sesInk*`.
+
+**A link in compare** (frame 18). Compare's chips now include the topic's links, and a topic with a link offers
+Compare even without a coach clip. Picking a link stacks the YouTube video above your try (it's landscape). It's a
+`youtube-nocookie.com/embed` iframe with the marked part as `start`/`end`, so it loads in the app through the same
+`MainActivity` frame rule as step 14. When the IFrame API loads, it attaches to the iframe, loops `a` to `b` on a
+200 ms timer, and the speed and play/pause buttons drive both sides. Offline, the iframe area stays blank and the
+try still plays. *Full player* opens the step 14 player. Line up isn't offered, because the YouTube player can't be
+synced to a frame. Code: `sesCmpLink`, `sesYt*`.
+
+**Trimming and the handoff (pose).** After a recording is kept, the same bundled MediaPipe `PoseLandmarker` as the
+form check (Apache-2.0, already in `www/`: `vision_bundle.mjs`, `wasm/`, `pose_landmarker_lite.task`, so it works
+offline) reads 4 frames a second in the background, looking for up to two people. It never runs while the camera
+records. It finds the first and last frames with someone in them (a palm over the lens, the floor at the end). In a
+propped recording with no *My turn* mark it also looks for the handoff, in this order: a second or more with nobody
+in frame, the main person changing size or place (6 s either side), two people becoming one, or a still gap of
+2.5 s or more. It only suggests. The topic card shows *Suggested: coach 0:00–0:41, try 0:44–1:10* with *Apply*,
+*Adjust* (half-second nudges, with that part looping above) and *Not now*. *Apply* changes the pieces' `a`/`b`, or
+adds the try piece, and keeps *Undo*. The suggestion is kept in `topic.trim`. The frames stay in memory only. If the
+model can't load or finds nobody, nothing shows. `sesPoseSplit()` is the heuristic and can be tested on its own.
+
+**Film this rep against the coach.** A take-home drill made in a session (`item.ses`) whose topic kept a coach clip
+or a link gets a *Film this rep* button on its row. It opens the usual compare screen with the coach's clip on the
+left instead of the app's animation. It follows *Play both* and the speed, and lines up by time from its start when
+you scrub or step. Chips switch the left side to the link, your session try (*Before*) or back to the animation. The
+same goes for an app drill's sheet when the topic came from that drill (a session started from the workout player).
+A clip you keep there is attached to the take-home drill.
+
+**Quick test.** *+ Quick test* on the current topic opens a counter with the workout logger's + and − (+ a make,
+− takes back the last shot, *+ Miss* a miss), the same beeps and buzz. Goals: N makes, makes in a time (the clock
+starts with the first shot), or N in a row. *Done · save score* adds a Score piece (`k: "q"`, with `gk`, `goal`,
+`made`, `att`, `secs`, `best`) shown on the board and at wrap-up, with *Last time with Mo* from earlier tests on the
+same topic. When the topic came from a drill that logs makes, a switch (on by default) also logs it to that drill's
+history as `{m, a, xp: 0, q: 1}`, so it counts toward the drill's goal.
+
+**Not built yet** (from the storyboard): auto-stop when the phone tips toward the floor, and splitting one imported
+clip that has both the coach and you in it.

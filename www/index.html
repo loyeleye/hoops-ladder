@@ -733,12 +733,53 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .ses-wrow{display:flex;gap:10px;align-items:center;border:1px solid #2A3858;border-radius:14px;background:#131C30;padding:9px 10px}.ses-wm{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.ses-wm .ses-in{margin:0;padding:8px 10px}
 .ses-sw{flex:0 0 auto;width:48px;height:30px;border-radius:15px;border:0;background:#2A3858;position:relative;padding:0}.ses-sw span{position:absolute;left:4px;top:4px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
 .ses-sw[aria-pressed="true"]{background:#F07A35}.ses-sw[aria-pressed="true"] span{left:22px}
+.ses-tx{font-size:13.5px;line-height:1.45;color:#E9EEF7;background:#0B111D;border:1px solid #22304D;border-top:0;border-radius:0 0 12px 12px;margin:-8px 0 0;padding:8px 10px 8px 12px}
+.ses-tx.w{color:#9AA6BF;font-style:italic}.ses-tx.f{color:#9AA6BF}.ses-txr{background:none;border:0;padding:4px 0;min-height:32px;color:#F7A06A;font-weight:700;font-size:13.5px}
+.ses-spd+.ses-tx{margin:0;border-top:1px solid #22304D;border-radius:12px}
+.ses-sug{font-size:12.5px;color:#9AA6BF;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}.ses-sugb{background:none;border:0;border-bottom:1px dotted #9AA6BF;padding:2px 0;min-height:32px;color:#E9EEF7;font-size:12.5px;text-align:left}
+.ses-beta{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:#2A3858;color:#E9EEF7;vertical-align:2px;margin-left:4px}
+.ses-vm{position:relative}.ses-vm>span:nth-child(2){flex:1}.ses-vm .ses-sw{pointer-events:none}
+.ses-sm[data-svm][aria-pressed="true"]{background:#F07A35;color:#1A0C03}
 .sescard{background:var(--plate,#12203A);color:#F2F5FA;border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 3px 0 0 var(--accent)}
 .sescard .label{color:#B9C3D6}.sescard .sest{font-family:var(--display);font-size:26px;text-transform:uppercase;line-height:1}.sescard>span{font-size:14px;color:#C7CFDE}
 .sescard .linkbtn{color:#F7A06A;text-align:left}
+.sesto{display:flex;flex-direction:column;gap:4px;color:#C7CFDE}.sesto select{background:#1C2844;color:#F2F5FA;border:1px solid #2A3858;border-radius:10px;padding:8px 10px;font:inherit;font-size:15px;min-height:44px}
+.ses-mk{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#FFD166;margin-left:4px}.ses-mk.l{color:#7FD1A8}
+.ses-star{position:absolute;right:8px;top:8px;min-height:40px;padding:0 12px;border-radius:10px;border:0;background:rgba(5,8,15,.72);color:#FFD166;font-weight:800;font-size:14px}
+.ses-pc small{display:block;font-size:11.5px;color:#7F8BA3;overflow:hidden;text-overflow:ellipsis}.ses-pc.off{opacity:.45}
+.ses-seg{flex:0 0 auto;display:flex;background:#1C2844;border-radius:10px;padding:2px;gap:2px}.ses-seg button{min-height:40px;min-width:52px;border:0;border-radius:8px;background:none;color:#C7CFDE;font-weight:700;font-size:13px;padding:0 8px}
+.ses-seg button[aria-pressed="true"]:first-child{background:#3557C9;color:#fff}.ses-seg button[aria-pressed="true"]:last-child{background:#F07A35;color:#1A0C03}
+.ses-x{flex:0 0 auto;width:40px;height:40px;border-radius:10px;border:0;background:none;color:#9AA6BF;font-size:22px}
+.ses-sel{margin:0;padding:9px 10px;font-size:15px}
+.ses-rw{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#C7CFDE;min-height:36px}.ses-rw b{color:#F2F5FA}.ses-rwn{flex:1;min-width:0}
+.ses-rwdot{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:#46C489;box-shadow:0 0 0 3px rgba(70,196,137,.25)}.ses-rw.wait .ses-rwdot{background:#9AA6BF;box-shadow:none}
+.ses-rwx{background:none;border:0;color:#F7A06A;font-weight:700;font-size:13.5px;min-height:36px;padding:0 4px}
+.ses-btn.rw{background:#E9EEF7;color:#12203A!important;min-height:64px;font-size:22px}
+.ses-opt .ses-sw{margin-left:auto}
+.ses-ink{flex:1;min-height:0;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ses-ink canvas,.ses-ink img{display:block;max-width:100%;max-height:100%;touch-action:none}
+.ses-body.fit{flex:0 0 auto}
+.ses-k.d{background:#FFD166;color:#1A1203}.ses-th.d{background:#000}
+.ses-stack{display:flex;flex-direction:column;gap:3px;flex:0 0 auto}.ses-stack .ses-vid{height:min(34vh,320px)}
+.ses-yt{position:relative;background:#000;width:100%;aspect-ratio:16/9;max-height:32vh}
+.ses-yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.ses-yt em{position:absolute;left:8px;bottom:8px;font-style:normal;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:5px;background:#C8322A;color:#fff;pointer-events:none}
+.ses-ytmsg{position:absolute;inset:0;display:grid;place-items:center;padding:16px;text-align:center;font-size:14px;color:#C7CFDE}
+.ses-lnk{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border-radius:12px;background:#1C2844;color:#F7A06A;font-weight:700;font-size:14px;text-decoration:none}
 .sespill{position:fixed;left:12px;right:12px;bottom:calc(var(--tabh,64px) + 10px);z-index:7;background:#0B111D;color:#F2F5FA;border:1.5px solid #F07A35;border-radius:14px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;box-shadow:0 8px 22px -8px rgba(0,0,0,.6);font:inherit}
 .sespill>span{display:flex;flex-direction:column;min-width:0}.sespill b{font-family:var(--display);font-size:17px;text-transform:uppercase}.sespill span span{font-size:12.5px;color:#9AA6BF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sespill u{text-decoration:none;color:#F7A06A;font-weight:700;white-space:nowrap}
+.ses-sug{border:1px solid #F07A35;background:#2A1A10;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:#F2F5FA}
+.ses-sug small{font-size:12px;color:#C7CFDE}.ses-sug.done{border-color:#2A3858;background:#0B111D;flex-direction:row;align-items:center;justify-content:space-between;color:#C7CFDE}
+.ses-sugb{display:flex;gap:6px;flex-wrap:wrap}.ses-sugb button{min-height:40px;padding:0 14px;border-radius:10px;border:0;background:#1C2844;color:#F2F5FA;font-weight:700;font-size:14px}.ses-sugb button.ok{background:#F07A35;color:#1A0C03}
+.ses-k.q{background:#46C489;color:#0B111D}
+.ses-qt{border:1px solid #2A3858;background:#131C30;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;align-items:stretch;text-align:center}
+.ses-qrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ses-qb{width:76px;height:76px;border-radius:20px;border:0;background:#1C2844;color:#F2F5FA;font-size:40px;font-weight:800;line-height:1}.ses-qb.mk{background:#46C489;color:#0B111D}.ses-qb:disabled{opacity:.4}
+.ses-qn{font-family:var(--display);font-weight:800;font-size:76px;line-height:1}.ses-qn span{font-size:32px;color:#9AA6BF}
+.ses-btn:disabled,.ses-chip:disabled{opacity:.45}
+.cmp-demo.vid{background:#000}.cmp-demo .cmp-sesv{width:100%;height:100%;object-fit:contain;display:block}
+.cmp-seslink{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px;color:#F2F5FA;font-weight:700;text-align:center;text-decoration:none}.cmp-seslink small{color:#C9D2E3;font-weight:500}
 body:has(.wk-bar[style*="block"]) .sespill,body:has(#wkbar:not(:empty)) .sespill{bottom:calc(var(--tabh,64px) + 80px)}
 .coachcard{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:14px}
 .coachcard p{margin:0;color:var(--muted)}.coachcard ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}.coachcard .chips{margin-top:2px}.coachcard .btn{align-self:flex-start}
@@ -5024,11 +5065,11 @@ function cmpWhat(d){if(d.skill==="s")return CHECKS[d.id]?CHECKS[d.id].join(" and
    self-review clip of this drill, the card leads with it: tap the thumbnail to watch it, then film again or check it.
    It sits in the sheet, so nothing here is ever tapped mid-rep. Not a fold: folds never go on drill sheets. */
 const filmClip=d=>CO.vids.find(v=>v.drill===d.id||(!v.drill&&v.name===`Self-review: ${d.name}`))||null;
-function repCard(d){const cmp=cmpDemos(d).length>0,chk=!!CHECKS[d.id];if(!cmp&&!chk)return"";
+function repCard(d){const sx=sesDemoFor({drill:d.id}),cmp=cmpDemos(d).length>0||!!sx,chk=!!CHECKS[d.id];if(!cmp&&!chk)return"";
   if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
   const w=cmpWhat(d),v=filmClip(d),th=v&&CO.thumbs[v.id];
   const chkTxt=chk?`The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")} from one shot filmed ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}.`:"";
-  const cmpTxt=cmp?`Film a rep and watch it next to the demo${w?`, with notes on ${esc(w)}`:""}.`:"";
+  const cmpTxt=sx?`Film a rep and watch it next to ${esc(sesDemoWho(sx))} or your try from the session.`:cmp?`Film a rep and watch it next to the demo${w?`, with notes on ${esc(w)}`:""}.`:"";
   const cmpBtn=(cls,lab)=>`<button class="btn ${cls} small" data-cmp="${d.id}" aria-label="${lab} and compare it with the demo">${lab}</button>`;
   const chkBtn=`<a class="btn sec small" href="#form" data-check="${d.id}" aria-label="Check one shot with the form check">Check it</a>`;
   const chkLink=`<a class="linkbtn" href="#form" data-check="${d.id}">Or measure one shot with the form check →</a>`;
@@ -5046,12 +5087,12 @@ function repCard(d){const cmp=cmpDemos(d).length>0,chk=!!CHECKS[d.id];if(!cmp&&!
 function filmUp(){if(!R||$("#sheet").hidden)return;const c=$("#filmcard");if(!c)return;c.outerHTML=repCard(R.d);filmThumb()}
 async function filmThumb(){const t=$("#filmcard [data-th]");if(t&&!t.querySelector("img")){const u=await coThumb(t.dataset.th);if(u&&t.isConnected&&!t.querySelector("img"))t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`)}}
 
-function openCmp(id){const d=D[id];if(!d)return;closeCmp();const demos=cmpDemos(d);if(!demos.length)return;
+function openCmp(id,o){if(!o){const x=sesDemoFor({drill:id});if(x&&sesCmpOpen(x,D[id]))return}const d=o?o.d:D[id];if(!d)return;closeCmp();const demos=o?o.demos:cmpDemos(d);if(!demos.length)return;
   const el=document.createElement("div");el.className="cmp";el.setAttribute("role","dialog");el.setAttribute("aria-label","Compare your rep with the demo");
   document.body.appendChild(el);document.body.style.overflow="hidden";
   CMP={el,d,demos,di:0,state:"empty",rate:1,mir:false,bones:true,playing:false,dt:0,last:0,raf:0,
     stream:null,mr:null,chunks:[],cd:0,recT0:0,timer:0,blob:null,url:"",v:null,cv:null,cw:0,ch:0,dur:0,frames:null,res:null,status:"",msg:"",seeking:false};
-  cmpDraw();CMP.raf=requestAnimationFrame(cmpLoop)}
+  CMP.ses=o&&o.ses||null;cmpDraw();CMP.raf=requestAnimationFrame(cmpLoop)}
 function closeCmp(){const C=CMP;if(!C)return;CMP=null;cancelAnimationFrame(C.raf);clearInterval(C.timer);cmpStopCam(C);
   if(C.v){C.v.pause();C.v.removeAttribute("src");C.v.load()}if(C.url)URL.revokeObjectURL(C.url);C.el.remove();
   if(!$("#sheet")||$("#sheet").hidden)document.body.style.overflow=""}
@@ -5086,7 +5127,7 @@ function cmpDraw(){const C=CMP;if(!C)return;const d=C.d,dm=C.demos[C.di],has=C.s
   if(C.stream){const lv=C.el.querySelector(".cmp-live");if(lv)lv.srcObject=C.stream}
   C.el.querySelector("#cmpFile")?.addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)cmpSetClip(f,0)});
   const sk=C.el.querySelector(".cmp-seek");if(sk){sk.addEventListener("input",()=>{if(!C.v||!C.dur)return;C.seeking=true;cmpPause();C.v.currentTime=C.dur*sk.value/1000});sk.addEventListener("change",()=>{C.seeking=false})}
-  cmpPaint()}
+  cmpPaint();if(C.ses)sesCmpDecor(C)}
 
 /* one loop drives the demo (at the chosen speed) and paints your clip with the skeleton on top */
 function cmpLoop(now){const C=CMP;if(!C)return;const dt=C.last?Math.min(.1,(now-C.last)/1000):0;C.last=now;
@@ -5095,7 +5136,7 @@ function cmpLoop(now){const C=CMP;if(!C)return;const dt=C.last?Math.min(.1,(now-
   const t=still?1.2:C.dt;for(const el of C.el.querySelectorAll(".cmp-demo svg")){const a=el.dataset;if(a.bv)BV.render(el,a.bv,still?.4:t);else if(a.hv)HV.render(el,a.hv,t);else if(a.sv)SV.render(el,a.sv,t);else if(a.fv)FV.render(el,a.fv,t)}
   for(const g of C.tb||[])g(t+1.2);
   if(C.state==="clip"){cmpPaint();const sk=C.el.querySelector(".cmp-seek");if(sk&&!C.seeking&&C.dur)sk.value=Math.round(1000*C.v.currentTime/C.dur)}
-  C.raf=requestAnimationFrame(cmpLoop)}
+  if(C.ses)sesCmpTick(C);C.raf=requestAnimationFrame(cmpLoop)}
 function cmpPaint(){const C=CMP;if(!C||C.state!=="clip"||!C.v)return;const cv=C.el.querySelector(".cmp-cv");if(!cv)return;const c=cv.getContext("2d");
   try{c.drawImage(C.v,0,0,C.cw,C.ch)}catch(e){return}
   if(!C.bones||!C.frames)return;const i=Math.round(C.v.currentTime*CMP_FPS),fr=C.frames[Math.min(C.frames.length-1,Math.max(0,i))];if(!fr||!fr.lm)return;
@@ -5262,7 +5303,7 @@ function hwLinks(it){return (it.links||[]).map(l=>safeUrl(l.url)?`<a href="${esc
 function hwRow(it){const open=CO.open===it.id,clips=CO.vids.filter(v=>v.item===it.id);
   return `<div class="hw${it.done?" done":""}">
    <button class="hwchk" data-hw="tog:${it.id}" aria-pressed="${!!it.done}" aria-label="${it.done?"Mark not done":"Mark done"}: ${esc(it.text)}">${CHECK_SVG}</button>
-   <div><div class="hwtext">${esc(it.text)}</div><div class="meta"><span class="tag ${it.skill}">${SKS[it.skill]}</span>${it.goal?`<span class="hggoal">${esc(hgText(it.goal))}</span>`:""}${hwLinks(it)}${clips.length?`<span>${clips.length} clip${clips.length>1?"s":""}</span>`:""}${it.ses&&sesFind(it.ses.s)?`<button class="linkbtn" data-ses="topic:${it.ses.s}:${it.ses.t}">Session clips</button>`:""}</div></div>
+   <div><div class="hwtext">${esc(it.text)}</div><div class="meta"><span class="tag ${it.skill}">${SKS[it.skill]}</span>${it.goal?`<span class="hggoal">${esc(hgText(it.goal))}</span>`:""}${hwLinks(it)}${clips.length?`<span>${clips.length} clip${clips.length>1?"s":""}</span>`:""}${it.ses&&sesFind(it.ses.s)?`<button class="linkbtn" data-ses="topic:${it.ses.s}:${it.ses.t}">Session clips</button>`:""}${sesFilmBtn(it)}</div></div>
    <button class="hwmore" data-hw="open:${it.id}" aria-expanded="${open}">${open?"Close":"Edit"}</button>
    ${open?`<div class="hwpanel">
      <label class="label" for="coEdit">Drill</label><input class="cofield" id="coEdit" data-item="${it.id}" value="${esc(it.text)}">
@@ -5322,7 +5363,7 @@ const sesVidP=t=>t.pieces.filter(p=>p.k==="m"||p.k==="c");
 function sesPiece(s,id){for(const t of s.topics){const p=t.pieces.find(x=>x.id===id);if(p)return{t,p}}return null}
 const sesTName=(s,t)=>t.name||`Topic ${s.topics.indexOf(t)+1}`;
 const sesCoaches=()=>[...new Set([...sesAll().map(x=>x.coach),...coLists().map(l=>l.coach),S.coach.lastCoach].filter(Boolean))];
-const sesLabel=(p,t)=>p.k==="c"?"Coach":p.k==="m"?`Try ${p.n}`:p.k==="t"?"Talk":"Link";
+const sesLabel=(p,t)=>p.k==="c"?"Coach":p.k==="m"?`Try ${p.n}`:p.k==="t"?"Talk":p.k==="d"?"Picture":"Link";
 
 /* clips and voice notes: same store as My videos, tagged with the session so My videos leaves them out */
 const SESU={};
@@ -5349,16 +5390,16 @@ function sesOpen(o={}){const s=sesCur();if(SES){SES.el.hidden=false}else{const e
   else if(s){SES.sid=s.id;SES.v="board";if(o.from&&!s.topics.some(t=>t.from===o.from.drill)){sesNewTopic(s,o.from.name).from=o.from.drill;s.from=o.from;sesTouch(s)}}
   else{SES.sid=null;SES.v="setup";SES.set={coach:S.coach.lastCoach||"",mode:S.coach.sesMode||"prop",from:o.from||null,ok:false}}
   sesDraw();sesPill()}
-function sesHide(){if(!SES)return;sesStopCam();sesStopTalk();SES.el.remove();SES=null;if(!document.querySelector(".covid")&&(!$("#sheet")||$("#sheet").hidden))document.body.style.overflow="";sesPill();if(state.tab==="coach")render()}
-window.sesBack=function(){if(!SES)return false;const v=SES.v;
+function sesHide(){if(!SES)return;sesStopCam();sesRwStop();sesStopTalk();SES.el.remove();SES=null;if(!document.querySelector(".covid")&&(!$("#sheet")||$("#sheet").hidden))document.body.style.overflow="";sesPill();if(state.tab==="coach")render()}
+window.sesBack=function(){if(!SES)return false;const v=SES.v;if(/^sx/.test(v)||v==="setup"&&sesQ.length)return sesXBack();if(sesPzBack(v))return true;
   if(v==="rec"){sesRecStop(false);return true}if(v==="talk"){sesStopTalk();SES.v=SES.back||"board";sesDraw();return true}
   if(v==="replay"||v==="cmp"||v==="link"||v==="hw"){SES.v=v==="cmp"?"replay":v==="hw"&&SES.hw&&SES.hw.from==="wrap"?"wrap":"board";sesDraw();return true}
   sesHide();return true};
 function sesStart(){const st=SES.set,name=(st.coach||"").trim();
-  const s={id:uid("s"),t:Date.now(),last:Date.now(),coach:name,mode:st.mode,topics:[],cur:-1,from:st.from||null};
+  const s={id:uid("s"),t:Date.now(),last:Date.now(),coach:name,mode:st.mode,rw:st.mode==="prop"&&!!st.rw,topics:[],cur:-1,from:st.from||null};
   S.coach.lastCoach=name||S.coach.lastCoach;S.coach.sesMode=st.mode;(S.coach.ok=S.coach.ok||{})[name||"_"]=true;
   if(st.from)sesNewTopic(s,st.from.name).from=st.from.drill;
-  sesAll().push(s);persist();SES.sid=s.id;SES.v="board";try{window.hoopsSesShare?.(true,name)}catch(e){}sesDraw();sesPill()}
+  sesAll().push(s);persist();SES.sid=s.id;SES.v="board";try{window.hoopsSesShare?.(true,name)}catch(e){}sesDraw();sesPill();sesPendGo()}
 function sesEnd(){const s=sesFind(SES.sid);if(!s)return;if(!s.end)s.end=Date.now();persist();try{window.hoopsSesShare?.(false)}catch(e){}
   if(!s.topics.some(t=>t.pieces.length)){sesAll().splice(sesAll().indexOf(s),1);persist();sesHide();toast("Session ended","Nothing was filmed, so there's nothing to keep.");return}
   SES.v="wrap";sesDraw()}
@@ -5387,14 +5428,14 @@ async function sesRecSave(R){sesStopCam();if(SES)SES.rec=null;const s=sesFind(SE
   const blob=new Blob(R.chunks,{type:R.chunks[0].type||"video/mp4"}),t=s.topics.find(x=>x.id===R.tid);
   try{const {id,dur}=await sesStore(blob,s,{name:t?sesTName(s,t):""}),end=dur||R.secs,ps=[];
     R.marks.forEach((m,i)=>{const b=i+1<R.marks.length?R.marks[i+1].t:end;if(b-m.t<.5)return;ps.push(Object.assign({id:uid("p"),k:m.k,v:id,a:+m.t.toFixed(2),b:+b.toFixed(2),t:Date.now()},m.k==="m"?{n:m.n}:{}))});
-    if(t)t.pieces.push(...ps);sesTouch(s);sesThumbs(s,ps,SESU[id]);
+    if(t)t.pieces.push(...ps);sesTouch(s);sesThumbs(s,ps,SESU[id]);sesTxQ(s,...ps);if(t)sesPoseLater(s,t,id,end,R.marks);
     const last=ps[ps.length-1];if(last&&last.k==="m"&&R.stopTo!=="board"){SES.p=last.id;SES.v="replay"}else SES.v="board"}
   catch(e){SES.v="board";SES.msg=e&&e.name==="QuotaExceededError"?"Your phone is out of space for videos. Delete a few clips and try again.":"Couldn't keep that clip."}
   sesDraw()}
 /* a clip picked from the phone (or shared in): one piece, coach or you */
 async function sesAddFile(blob,k,name){const s=sesFind(SES?.sid)||sesCur();if(!s)return;let t=sesTop(s);if(!t||(k==="c"&&sesTries(t).length))t=sesNewTopic(s);
-  try{const {id,dur}=await sesStore(blob,s,{name});const p=Object.assign({id:uid("p"),k,v:id,a:0,b:dur||0,t:Date.now()},k==="m"?{n:sesTries(t).length+1}:{});t.pieces.push(p);sesTouch(s);
-    if(SES){SES.msg=`Added ${name?`“${name}” `:""}to ${sesTName(s,t)}.`;sesDraw()}sesThumbs(s,[p],SESU[id])}catch(e){if(SES){SES.msg="Couldn't keep that clip.";sesDraw()}}}
+  try{const {id,dur}=await sesStore(blob,s,{name});const p=Object.assign({id:uid("p"),k,v:id,a:0,b:dur||0,t:Date.now()},k==="m"?{n:sesTries(t).length+1}:{});t.pieces.push(p);sesTouch(s);sesTxQ(s,p);
+    if(SES){SES.msg=`Added ${name?`“${name}” `:""}to ${sesTName(s,t)}.`;sesDraw()}sesThumbs(s,[p],SESU[id]);sesPoseLater(s,t,id,dur,[{k}])}catch(e){if(SES){SES.msg="Couldn't keep that clip.";sesDraw()}}}
 
 /* ---------- voice notes ---------- */
 async function sesTalk(on){const s=sesFind(SES.sid);if(!s||s.end)return;if(!sesTop(s))sesNewTopic(s);
@@ -5408,7 +5449,7 @@ async function sesTalk(on){const s=sesFind(SES.sid);if(!s||s.end)return;if(!sesT
 function sesStopTalk(keep){const T=SES&&SES.talk;if(!T)return;T.keep=!!keep;clearInterval(T.tick);if(T.mr&&T.mr.state!=="inactive"){try{T.mr.stop()}catch(e){}}else if(T.stream){T.stream.getTracks().forEach(x=>x.stop())}SES.talk=null}
 async function sesTalkSave(T){if(T.stream)T.stream.getTracks().forEach(x=>x.stop());const s=sesFind(SES?.sid);if(!T.keep||!T.chunks.length||!s)return;
   const blob=new Blob(T.chunks,{type:T.chunks[0].type||"audio/webm"}),dur=(performance.now()-T.t0)/1000,on=T.on&&sesPiece(s,T.on),t=on?on.t:sesTop(s);
-  try{const {id}=await sesStore(blob,s,{audio:true,dur,name:"Voice note"});t.pieces.push({id:uid("p"),k:"t",v:id,dur:Math.round(dur),on:T.on||null,t:Date.now()});sesTouch(s);if(SES){SES.msg="Voice note saved.";sesDraw()}}
+  try{const {id}=await sesStore(blob,s,{audio:true,dur,name:"Voice note"});t.pieces.push({id:uid("p"),k:"t",v:id,dur:Math.round(dur),on:T.on||null,t:Date.now()});sesTouch(s);sesTxQ(s,t.pieces[t.pieces.length-1]);if(SES){SES.msg="Voice note saved.";sesDraw()}}
   catch(e){if(SES){SES.msg="Couldn't keep the voice note.";sesDraw()}}}
 let sesAudio=null;
 async function sesPlayTalk(p){try{if(sesAudio){sesAudio.pause();if(sesAudio._p===p.id){sesAudio=null;sesDraw();return}}const u=await sesBlob(p.v);if(!u)return;sesAudio=new Audio(u);sesAudio._p=p.id;sesAudio.onended=()=>{sesAudio=null;sesDraw()};sesAudio.play();sesDraw()}catch(e){}}
@@ -5420,10 +5461,143 @@ const unmmss=v=>{const m=String(v||"").trim().match(/^(?:(\d+):)?(\d{1,2})$/);re
 function sesLinkHref(p){try{const x=new URL(p.url);if(p.a&&/youtu/.test(x.hostname)){x.searchParams.set("t",p.a+"s")}return x.toString()}catch(e){return p.url}}
 window.sesShared=function(o){o=o||{};const s=sesCur();
   if(o.failed){toast("Couldn't add the video","The share didn't come through. Try sharing it again.");return true}
-  if(o.blob){if(!s){saveVid(o.blob,{name:o.name||"Shared video"});return true}if(!SES)sesOpen();SES.v="board";sesAddFile(o.blob,"c",o.name||"Shared video");return true}
+  if(o.blob)return sesShareIn(o);
   const us=(String(o.text||"").match(URL_RE)||[]).map(u=>u.replace(/[).,;]+$/,""));
   if(!s||!us.length){if(s&&o.target==="session"&&!us.length){toast("Nothing to add","Share a link or a video into the session.");return true}return false}
   if(!SES)sesOpen();SES.link={url:us[0],title:(typeof ytTitle==="function"?ytTitle(o.subject,o.text):"")||o.subject||"",a:ytStart(us[0]),b:0};SES.v="link";sesDraw();return true};
+/* ---------- shared videos, best and latest, importing past clips (step 27) ----------
+   A video shared in during a session asks Coach or Me (Me is the topic's next try). With no session running, the
+   first share asks where shared videos go and remembers it in S.settings.shareTo ("vids" or "ses"), changed later
+   on the Coach tab's session card. The views here are named sx… so sesDraw and sesBack hand them over in one line. */
+const SES_GAP=180; // importing: more than 3 minutes between clips starts a new topic
+let sesQ=[]; // shared videos waiting for an answer: {blob,name,u}
+const sesQFree=it=>{if(it&&it.u){URL.revokeObjectURL(it.u);it.u=""}};
+function sesQToVids(){const q=sesQ.splice(0);for(const it of q){sesQFree(it);saveVid(it.blob,{name:it.name})}}
+function sesXEl(){if(!SES||SES.el._sx)return;SES.el._sx=true;SES.el.addEventListener("click",sesXClick);SES.el.addEventListener("change",sesXInput);SES.el.addEventListener("input",sesXInput)}
+function sesShareIn(o){sesQ.push({blob:o.blob,name:o.name||"Shared video"});
+  if(sesCur()){sesAsk();return true}
+  const to=S.settings.shareTo;if(to==="vids"){sesQToVids();return true}
+  sesOpen();sesXEl();if(to!=="ses"){SES.v="sxwhere";sesDraw()}return true}
+/* Coach or Me, one shared video at a time; waits while the camera or mic is busy */
+function sesAsk(){const s=sesCur();if(!s||!sesQ.length)return;clearTimeout(sesAsk.t);
+  if(SES&&/^(rec|saving|talk)$/.test(SES.v)){sesAsk.t=setTimeout(sesAsk,1500);return}
+  if(!SES||SES.sid!==s.id)sesOpen();sesXEl();SES.v="sxkind";sesDraw()}
+const sesPendGo=()=>{if(sesQ.length)sesAsk()};
+/* best (your star, one per topic) and latest (the highest-numbered try, once there are two) */
+const sesLatest=t=>sesTries(t).reduce((b,p)=>!b||p.n>b.n?p:b,null);
+function sesMk(t,p,txt){if(!t||p.k!=="m")return"";const l=sesTries(t).length>1&&sesLatest(t)===p;
+  if(txt)return (p.star?" ★":"")+(l?" · latest":"");
+  return (p.star?` <b class="ses-mk">★ Best</b>`:"")+(l?` <b class="ses-mk l">Latest</b>`:"")}
+const sesStarBtn=(s,p,busy)=>p.k==="m"&&(busy||s.end)?`<button class="ses-star" data-x="star:${p.id}" aria-pressed="${!!p.star}">${p.star?"★ Best try":"☆ Best try"}</button>`:"";
+
+function sesXDraw(el,s){const v=SES.v,I=SES.imp;
+  if(v==="sxwhere"){el.innerHTML=`${sesHead("Shared video",sesQ.length>1?`${sesQ.length} videos`:"Where should it go?")}<div class="ses-body">
+     <p class="ses-sub">No coach session is running. Where should videos you share into Hoops Ladder go? The app remembers, and you can change it on the Coach tab.</p>
+     <button class="ses-opt" data-x="sxto:vids"><span class="ses-ic">🎞</span><span><b>My videos</b><span>Kept on the Form tab with your other clips.</span></span></button>
+     <button class="ses-opt" data-x="sxto:ses"><span class="ses-ic">🏀</span><span><b>Start a coach session</b><span>Opens a new session, then asks if it's the coach or you.</span></span></button></div>`;return}
+  if(v==="sxkind"){const it=sesQ[0];if(!it||!s){SES.v="board";return sesDraw()}if(!it.u)it.u=URL.createObjectURL(it.blob);
+    const t=sesTop(s),n=t?sesTries(t).length+1:1,tn=t?esc(sesTName(s,t)):"";
+    el.innerHTML=`${sesHead("Shared video",sesQ.length>1?`1 of ${sesQ.length} · ${it.name}`:it.name)}
+     <div class="ses-vid"><video playsinline muted loop autoplay src="${it.u}"></video></div>
+     <div class="ses-body"><div class="ses-lab">Who's in it?</div><p class="ses-sub">${!t?"Coach or Me starts the first topic.":`Coach ${sesTries(t).length?"starts a new topic":`goes in ${tn}`}. Me becomes try ${n} in ${tn}.`}</p></div>
+     <div class="ses-dock"><div class="r2"><button class="ses-btn c" data-x="sxk:c">Coach<small>Demo or explain</small></button><button class="ses-btn m" data-x="sxk:m">Me<small>Try ${n}</small></button></div>
+      <button class="ses-btn g wide" data-x="sxk:v">Put it in My videos instead</button></div>`;return}
+  if(v==="sximp"&&I){const on=I.cs.filter(c=>!c.off),cOf=id=>I.cs.find(c=>c.id===id),past=sesAll().filter(x=>x.end).slice().reverse().slice(0,20);
+    const day=t=>new Date(t).toLocaleDateString(undefined,{month:"short",day:"numeric",year:new Date(t).getFullYear()===new Date().getFullYear()?undefined:"numeric"}),hm=t=>new Date(t).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+    const nk=Object.keys(I.nd).length,opts=g=>[...Object.entries(I.nd).map(([k,t])=>[`new:${k}`,`New session · ${day(t)}${nk>1?` (${k})`:""}`]),[`own:${g.id}`,"A new session of its own"],...past.map(x=>[`old:${x.id}`,`${day(x.t)}${x.coach?" · "+x.coach:""} (past session)`]),["skip","Leave this topic out"]]
+      .map(([k,l])=>`<option value="${esc(k)}" ${g.to===k?"selected":""}>${esc(l)}</option>`).join("");
+    const gs=I.gs.filter(g=>g.cs.some(id=>!cOf(id).off));
+    el.innerHTML=`${sesHead("Import past clips",I.cs.length?`${on.length} clip${on.length===1?"":"s"} · ${gs.length} topic${gs.length===1?"":"s"}`:"Build sessions from videos on this phone")}<div class="ses-body">${sesNote()}
+     ${I.busy?`<div class="ses-msg" role="status">Reading ${I.busy} clip${I.busy===1?"":"s"}…</div>`:""}
+     ${!I.cs.length&&!I.busy?`<div class="ses-empty"><b>Pick from your videos</b><span>Pick several clips. Clips filmed within 3 minutes of each other become one topic, in the order they were filmed. Then set each one to Coach or Me and choose its session.</span></div>`:""}
+     ${gs.length?`<label class="ses-lab" for="sesImpCoach">Coach, for new sessions</label><input class="ses-in" id="sesImpCoach" data-sxin="coach" value="${esc(I.coach)}" placeholder="Coach's name (optional)" autocomplete="off">`:""}
+     ${gs.map((g,i)=>{const cs=g.cs.map(cOf).filter(c=>!c.off);return `<div class="ses-topic"><div class="ses-th-h"><b class="ses-tn">Topic ${i+1}</b><span class="ses-sub">${day(cs[0].t0)} · ${hm(cs[0].t0)}</span></div>
+      <select class="ses-in ses-sel" data-sxin="to:${g.id}" aria-label="Session for topic ${i+1}">${opts(g)}</select>
+      <div class="ses-pcs">${cs.map(c=>`<div class="ses-pc${g.to==="skip"?" off":""}"><span class="ses-th" data-sxth="${c.id}">${c.th?`<img src="${c.th}" alt="">`:""}</span><span class="tx">${hm(c.t0)} · ${fmtDur(c.dur)||"0:01"}${c.src==="file"?" · file date":""}<small>${esc(c.name)}</small></span>
+        <span class="ses-seg"><button data-x="sximpk:${c.id}:c" aria-pressed="${c.k==="c"}">Coach</button><button data-x="sximpk:${c.id}:m" aria-pressed="${c.k==="m"}">Me</button></span><button class="ses-x" data-x="sximpdel:${c.id}" aria-label="Leave out ${esc(c.name)}">×</button></div>`).join("")}</div></div>`}).join("")}
+     ${on.some(c=>c.src==="file")?`<p class="ses-sub">“File date” means the clip didn't say when it was filmed, so its time comes from the file and may be off.</p>`:""}
+     <input type="file" id="sesImpPick" accept="video/*" multiple hidden></div>
+     <div class="ses-dock">${I.cs.length?`<button class="ses-btn g wide" data-x="sximppick" ${I.saving?"disabled":""}>+ Pick more</button>`:""}<div class="r2"><button class="ses-btn g" data-x="back">Cancel</button>${I.cs.length?`<button class="ses-btn m" data-x="sximpgo" ${I.busy||I.saving||!on.length?"disabled":""}>${I.saving?"Importing…":`Import ${on.length}`}</button>`:`<button class="ses-btn go" data-x="sximppick" ${I.busy?"disabled":""}>Pick videos</button>`}</div></div>`;return}
+  SES.v="board";if(s)return sesDraw();sesHide()}
+function sesXBack(){const v=SES.v;
+  if(v==="sxkind"){const n=sesQ.length;sesQToVids();SES.v="board";sesDraw();return true}
+  if(v==="sximp"){sesImpFree(SES.imp);SES.imp=null;if(SES.sid&&sesFind(SES.sid)){SES.v="board";sesDraw()}else sesHide();return true}
+  sesQToVids();sesHide();return true}
+function sesXClick(e){const b=e.target.closest("[data-x]");if(!b||!SES||!/^sx/.test(b.dataset.x))return;const [a,id,k]=b.dataset.x.split(":");
+  if(a==="sxto"){S.settings.shareTo=id;persist();if(id==="vids"){sesQToVids();sesHide();return}SES.v="setup";return sesDraw()}
+  if(a==="sxk")return sesKind(id);
+  const I=SES.imp;if(!I)return;
+  if(a==="sximppick"){const inp=SES.el.querySelector("#sesImpPick");if(inp){inp.value="";inp.click()}return}
+  if(a==="sximpk"){const c=I.cs.find(x=>x.id===id);if(c)c.k=k;return sesDraw()}
+  if(a==="sximpdel"){const c=I.cs.find(x=>x.id===id);if(c)c.off=true;return sesDraw()}
+  if(a==="sximpgo")return sesImpGo()}
+function sesXInput(e){const t=e.target;if(!SES)return;
+  if(t.id==="sesImpPick"&&e.type==="change"){if(t.files&&t.files.length)sesImpAdd([...t.files]);return}
+  const k=t.dataset&&t.dataset.sxin,I=SES.imp;if(!k||!I)return;
+  if(k==="coach")I.coach=t.value;else if(k.startsWith("to:")&&e.type==="change"){const g=I.gs.find(x=>x.id===k.slice(3));if(g){g.to=t.value;sesDraw()}}}
+async function sesKind(k){const it=sesQ.shift();if(!it||!SES)return;SES.v="board";sesDraw();
+  if(k==="v")saveVid(it.blob,{name:it.name});else await sesAddFile(it.blob,k,it.name);sesQFree(it);
+  if(sesQ.length)sesAsk()}
+
+/* ---------- importing past clips (storyboard frame 21) ---------- */
+/* when a clip was filmed: the MP4's own creation time, else a date in the file name (VID_20240428_173912), else the
+   file's date, which is usually when filming stopped */
+async function sesMvhd(f){const rd=async(o,n)=>new DataView(await f.slice(o,o+n).arrayBuffer()),ty=(d,o)=>String.fromCharCode(d.getUint8(o),d.getUint8(o+1),d.getUint8(o+2),d.getUint8(o+3));
+  for(let o=0,i=0;i<64&&o+8<=f.size;i++){const h=await rd(o,16);let sz=h.getUint32(0),hl=8;const tp=ty(h,4);
+    if(sz===1){sz=h.getUint32(8)*4294967296+h.getUint32(12);hl=16}else if(sz===0)sz=f.size-o;if(sz<hl)return 0;
+    if(tp==="moov"){for(let c=o+hl,j=0;j<64&&c+8<=o+sz;j++){const d=await rd(c,24),cs=d.getUint32(0);
+        if(ty(d,4)==="mvhd"){const sec=d.getUint8(8)===1?d.getUint32(12)*4294967296+d.getUint32(16):d.getUint32(12),ms=(sec-2082844800)*1000;return ms>Date.UTC(2005,0,1)&&ms<Date.now()+864e5?ms:0}
+        if(cs<8)return 0;c+=cs}return 0}
+    o+=sz}return 0}
+async function sesClipStart(f,dur){const mv=await sesMvhd(f).catch(()=>0);if(mv)return{t:mv,src:"clip"};
+  const m=String(f.name||"").match(/(20\d\d)[-_.]?(\d\d)[-_.]?(\d\d)[ _T.-]?(\d\d)[-_.:]?(\d\d)[-_.:]?(\d\d)/);
+  if(m&&+m[2]>=1&&+m[2]<=12&&+m[3]<=31&&+m[4]<24&&+m[5]<60){const d=new Date(+m[1],m[2]-1,+m[3],+m[4],+m[5],+m[6]).getTime();if(d>0)return{t:d,src:"name"}}
+  return{t:(f.lastModified||Date.now())-dur*1000,src:"file"}}
+function sesImpOpen(){sesOpen();sesXEl();SES.imp={cs:[],gs:[],nd:{},busy:0,coach:S.coach.lastCoach||""};SES.v="sximp";sesDraw();
+  const inp=SES.el.querySelector("#sesImpPick");if(inp)try{inp.click()}catch(e){}}
+const sesImpFree=I=>{if(I)for(const c of I.cs){if(c.u)URL.revokeObjectURL(c.u);if(c.th)URL.revokeObjectURL(c.th)}};
+async function sesImpAdd(files){const I=SES&&SES.imp;if(!I)return;const fs=files.filter(f=>/^video\//.test(f.type)||/\.(mp4|mov|m4v|3gp|webm|mkv)$/i.test(f.name||""));
+  if(!fs.length){SES.msg="Those aren't videos. Pick clips from your phone's videos.";return sesDraw()}
+  I.busy+=fs.length;sesDraw();const added=[];
+  for(const f of fs){try{if(!I.cs.some(x=>x.f.name===f.name&&x.f.size===f.size&&!x.off)){const dur=await vidDur(f),st=await sesClipStart(f,dur);
+      const c={id:uid("c"),f,name:(f.name||"Clip").replace(/\.[^.]+$/,""),t0:st.t,t1:st.t+dur*1000,dur,src:st.src,k:null};I.cs.push(c);added.push(c)}}catch(e){}I.busy--}
+  sesImpGroup(I);if(SES&&SES.imp===I)sesDraw();
+  for(const c of added){c.u=URL.createObjectURL(c.f);const b=await sesStill(c.u,0);if(b&&SES&&SES.imp===I){c.th=URL.createObjectURL(b);const sp=SES.el.querySelector(`[data-sxth="${c.id}"]`);if(sp)sp.innerHTML=`<img src="${c.th}" alt="">`}}}
+/* topics by time gaps; a guess at Coach (the first clip of a topic with more than one) or Me; and a session for each
+   topic: a past session it falls in, else a new one shared with topics less than 2 hours apart on the same day */
+function sesImpGroup(I){const cs=I.cs.filter(c=>!c.off).sort((a,b)=>a.t0-b.t0),gs=[],cOf=id=>cs.find(c=>c.id===id);let g=null,end=-Infinity;
+  for(const c of cs){if(!g||c.t0-end>SES_GAP*1000){g={id:uid("g"),cs:[]};gs.push(g)}g.cs.push(c.id);end=Math.max(end,c.t1)}
+  const past=sesAll().filter(x=>x.end),nd={};let nk=0,last=null;
+  for(const g of gs){const a=cOf(g.cs[0]).t0,b=Math.max(...g.cs.map(id=>cOf(id).t1));
+    g.cs.forEach((id,i)=>{const c=cOf(id);if(!c.k)c.k=g.cs.length>1&&i===0?"c":"m"});
+    const old=past.find(x=>a>=x.t-1800e3&&a<=(x.end||x.last||x.t)+1800e3);if(old){g.to="old:"+old.id;continue}
+    if(!last||a-last.b>SES_IDLE||new Date(a).toDateString()!==new Date(last.b).toDateString()){nk++;nd[nk]=a;last={b}}else last.b=Math.max(last.b,b);
+    g.to="new:"+nk}
+  I.gs=gs;I.nd=nd}
+async function sesImpGo(){const I=SES&&SES.imp;if(!I||I.busy||I.saving)return;I.saving=true;sesDraw();
+  const cOf=id=>I.cs.find(c=>c.id===id),made={},mine=new Set(),hit=new Set(),coach=(I.coach||"").trim();let n=0,full=false;
+  for(const g of I.gs){const cs=g.cs.map(cOf).filter(c=>c&&!c.off);if(!cs.length||g.to==="skip"||full)continue;
+    const t1=Math.max(...cs.map(c=>c.t1));let s=g.to.startsWith("old:")?sesFind(g.to.slice(4)):null;
+    if(!s){const key=g.to.startsWith("new:")?g.to:"own:"+g.id;s=made[key];
+      if(!s){s=made[key]={id:uid("s"),t:cs[0].t0,last:t1,end:t1,coach,mode:"hand",topics:[],cur:-1,from:null,wrap:false,imp:true};sesAll().push(s);mine.add(s)}}
+    const t={id:uid("t"),name:"",pieces:[],t:cs[0].t0},ps=[];
+    for(const c of cs){try{const {id,dur}=await sesStore(c.f,s,{name:c.name,dur:c.dur});const p=Object.assign({id:uid("p"),k:c.k||"m",v:id,a:0,b:+(dur||c.dur||0).toFixed(2),t:c.t0},c.k==="c"?{}:{n:sesTries(t).length+1});t.pieces.push(p);ps.push([p,id]);n++}
+      catch(e){if(e&&e.name==="QuotaExceededError"){full=true;break}}}
+    if(!t.pieces.length)continue;
+    const cur=s.topics[s.cur];s.topics.push(t);s.topics.sort((x,y)=>(x.t||0)-(y.t||0));s.cur=mine.has(s)?s.topics.length-1:s.topics.indexOf(cur);
+    if(mine.has(s)){s.t=Math.min(s.t,t.t);s.end=s.last=Math.max(s.end,t1)}hit.add(s);
+    for(const [p,id] of ps)sesThumbs(s,[p],SESU[id])}
+  for(const s of mine)if(!s.topics.length)sesAll().splice(sesAll().indexOf(s),1);
+  if(coach)S.coach.lastCoach=coach;persist();sesImpFree(I);
+  const nm=[...mine].filter(s=>s.topics.length).length,k=hit.size;
+  if(SES){SES.imp=null;if(SES.sid&&sesFind(SES.sid)){SES.v="board";sesDraw()}else sesHide()}
+  if(!n)return toast("Nothing imported",full?"Your phone is out of space for videos.":"Couldn't keep those clips.");
+  toast(`Imported ${n} clip${n===1?"":"s"}`,`Into ${k} session${k===1?"":"s"}.${nm?` Name the topics from “Finish setting up” on the Coach tab.`:""}${full?" The phone ran out of space, so some were left out.":""}`)}
+/* on the Coach tab's session card: importing, and where videos shared with no session running go */
+function sesCardMore(){const to=S.settings.shareTo||"";return `<button class="linkbtn" data-sx="imp">Import past clips →</button>
+   <label class="small sesto">Videos shared in with no session running<select data-sx="shareto">${[["","Ask me"],["vids","Go to My videos"],["ses","Start a coach session"]].map(([k,l])=>`<option value="${k}" ${to===k?"selected":""}>${l}</option>`).join("")}</select></label>`}
+document.addEventListener("click",e=>{const b=e.target.closest('[data-sx="imp"]');if(b){e.preventDefault();sesImpOpen()}});
+document.addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.sx==="shareto"){if(t.value)S.settings.shareTo=t.value;else delete S.settings.shareTo;persist();toast("Saved",t.value==="vids"?"Shared videos go to My videos.":t.value==="ses"?"A shared video starts a coach session.":"The app will ask where a shared video goes.")}});
 
 /* ---------- homework: straight onto the take-home list ---------- */
 function sesHwOpen(tid,from){const s=sesFind(SES.sid),t=s&&s.topics.find(x=>x.id===tid);if(!t)return;
@@ -5446,17 +5620,17 @@ function sesWrapSave(){const s=sesFind(SES.sid);if(!s)return;const before=[sL(),
 /* ---------- drawing ---------- */
 const sesClock=s=>fmtDur(((s.end||Date.now())-s.t)/1000)||"0:00";
 function sesThumbHtml(p,big){const th=CO.thumbs[p.id];return `<span class="ses-th${p.k==="c"?" c":" m"}${p.star?" star":""}${big?" big":""}">${th?`<img src="${th}" alt="">`:""}<em>${esc(sesLabel(p))}</em></span>`}
-function sesPieceRow(s,t,p){const kk={c:"Coach",m:"Me",t:"Talk",l:"Link"}[p.k];
+function sesPieceRow(s,t,p){if(p.k==="d")return sesInkRow(s,t,p);if(p.k==="q")return sesQtRow(p);const kk={c:"Coach",m:"Me",t:"Talk",l:"Link"}[p.k];
   if(p.k==="l")return `<a class="ses-pc" href="${esc(sesLinkHref(p))}" ${p.b?`data-end="${p.b}"`:""} target="_blank" rel="noopener"><span class="ses-ic">🔗</span><i class="ses-k l">Link</i><span class="tx">${esc(p.title||linkLabel(p.url))}</span><span class="tm">${p.b?`${mmss(p.a)}–${mmss(p.b)}`:p.a?`from ${mmss(p.a)}`:""}</span></a>`;
   if(p.k==="t"){const on=p.on&&t.pieces.find(x=>x.id===p.on),pl=sesAudio&&sesAudio._p===p.id;return `<button class="ses-pc" data-x="talkplay:${p.id}"><span class="ses-ic">${pl?"❚❚":"▶"}</span><i class="ses-k t">Talk</i><span class="tx">${on?`About ${esc(sesLabel(on).toLowerCase())}`:"Voice note"}</span><span class="tm">${fmtDur(p.dur)||"0:01"}</span></button>`}
-  return `<button class="ses-pc" data-x="play:${p.id}">${sesThumbHtml(p)}<i class="ses-k ${p.k}">${kk}</i><span class="tx">${p.k==="m"?`Try ${p.n}${p.star?" ★":""}`:"Coach on camera"}</span><span class="tm">${fmtDur(p.b-p.a)||"0:01"}</span></button>`}
+  return `<button class="ses-pc" data-x="play:${p.id}">${sesThumbHtml(p)}<i class="ses-k ${p.k}">${kk}</i><span class="tx">${p.k==="m"?`${p.rw?"Rewind · ":""}Try ${p.n}${sesMk(t,p)}`:"Coach on camera"}</span><span class="tm">${fmtDur(p.b-p.a)||"0:01"}</span></button>`}
 function sesTopicCard(s,t,i){const cur=!s.end&&i===s.cur;
   return `<div class="ses-topic${cur?" cur":""}"><div class="ses-th-h"><button class="ses-tn" data-x="cur:${t.id}">${esc(sesTName(s,t))}${cur?" · now":""}</button>${t.hw?`<i class="ses-k h">Homework</i>`:t.from?`<span class="ses-sub">from workout</span>`:""}</div>
    ${t.pieces.length?`<div class="ses-pcs">${t.pieces.map(p=>sesPieceRow(s,t,p)).join("")}</div>`:`<div class="ses-sub">Nothing yet. Film coach, Film me, Talk or Link adds to this topic.</div>`}
-   ${!s.end&&t.pieces.length&&!t.hw?`<button class="ses-lk" data-x="hw:${t.id}">+ Homework</button>`:""}</div>`}
+   ${!s.end&&t.pieces.length&&!t.hw?`<button class="ses-lk" data-x="hw:${t.id}">+ Homework</button>`:""}${sesTopicExtra(s,t,cur)}</div>`}
 function sesHead(title,sub,right){return `<div class="ses-top"><button class="ses-back" data-x="back" aria-label="Back">‹</button><div class="ses-tt"><b>${esc(title)}</b>${sub?`<span>${esc(sub)}</span>`:""}</div>${right||""}</div>`}
 const sesNote=()=>{const m=SES.msg;SES.msg="";return m?`<div class="ses-msg" role="status">${esc(m)}</div>`:""};
-function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=SES.v;
+function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=SES.v;if(/^sx/.test(v))return sesXDraw(el,s);
   if(v==="setup"){const st=SES.set,key=(st.coach||"").trim()||"_",asked=(S.coach.ok||{})[key]||st.ok,cs=sesCoaches();
     el.innerHTML=`${sesHead("New coach session","Two questions, both remembered")}<div class="ses-body">
      <label class="ses-lab" for="sesCoach">Coach</label>
@@ -5464,15 +5638,16 @@ function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=
      <input class="ses-in" id="sesCoach" data-in="coach" placeholder="Coach's name (optional)" value="${esc(st.coach)}" autocomplete="off">
      <div class="ses-lab">Where's the phone?</div>
      <button class="ses-opt" data-x="mode:prop" aria-pressed="${st.mode==="prop"}"><span class="ses-ic">📐</span><span><b>Propped up</b><span>One recording per turn. A 3-second count, then tap My turn when you take over.</span></span></button>
-     <button class="ses-opt" data-x="mode:hand" aria-pressed="${st.mode==="hand"}"><span class="ses-ic">🤳</span><span><b>Someone's holding it</b><span>One short clip per rep.</span></span></button>
+     <button class="ses-opt" data-x="mode:hand" aria-pressed="${st.mode==="hand"}"><span class="ses-ic">🤳</span><span><b>Someone's holding it</b><span>One short clip per rep.</span></span></button>${sesRwSetHtml(st)}
      ${asked?"":`<div class="ses-ask"><b>${st.coach?`First session with ${esc(st.coach)}`:"Before you film"}</b><span>Ask ${st.coach?esc(st.coach):"your coach"} if it's OK to film them. Their video and voice stay on this phone.</span><button class="ses-btn ok" data-x="okyes">They said yes</button></div>`}
      <p class="ses-sub">Propped tip: waist height or higher, rim in frame for shooting drills.</p></div>
      <div class="ses-dock"><button class="ses-btn go" data-x="start" ${asked?"":"disabled"}>Start</button></div>`;return}
-  if(!s){sesHide();return}
+  if(!s){sesHide();return}sesHook(s);if(v==="ink"||v==="pic")return sesInkView(s);
+  if(sesPzDraw(el,s,v))return;
   if(v==="board"){const live=!s.end,n=s.topics.reduce((a,t)=>a+t.pieces.length,0);
     el.innerHTML=`${sesHead(`Session${s.coach?" with "+s.coach:""}`,`${s.mode==="prop"?"Propped":"Handheld"} · ${s.topics.length} topic${s.topics.length===1?"":"s"} · ${n} piece${n===1?"":"s"}${s.end?" · "+new Date(s.t).toLocaleDateString(undefined,{month:"short",day:"numeric"}):""}`,live?`<span class="ses-clock num">${sesClock(s)}</span>`:"")}
-     <div class="ses-body">${sesNote()}${s.topics.length?s.topics.map((t,i)=>sesTopicCard(s,t,i)).join(""):`<div class="ses-empty"><b>Ready when ${s.coach?esc(s.coach)+" is":"you are"}</b><span>${s.mode==="prop"?"Prop the phone, tap Film coach, then walk to your spot. Recording starts after a 3-second count.":"Whoever isn't drilling films. Tap Film coach for a demo, Film me for your try."}</span></div>`}</div>
-     ${live?`<div class="ses-dock"><div class="r2"><button class="ses-btn c" data-x="film:c">● Film coach<small>Demo or explain</small></button><button class="ses-btn m" data-x="film:m">● Film me<small>${sesTop(s)?`${esc(sesTName(s,sesTop(s)))} · try ${sesTries(sesTop(s)).length+1}`:"Your try"}</small></button></div>
+     <div class="ses-body">${sesNote()}${s.topics.length?s.topics.map((t,i)=>sesTopicCard(s,t,i)).join(""):`<div class="ses-empty"><b>Ready when ${s.coach?esc(s.coach)+" is":"you are"}</b><span>${s.mode==="prop"?"Prop the phone, tap Film coach, then walk to your spot. Recording starts after a 3-second count.":"Whoever isn't drilling films. Tap Film coach for a demo, Film me for your try."}</span>${s.end?"":`<button class="ses-lk" data-x="qt" style="align-self:center">+ Quick test</button>`}</div>`}</div>
+     ${live?`<div class="ses-dock">${sesRwHtml(s)}<div class="r2"><button class="ses-btn c" data-x="film:c">● Film coach<small>Demo or explain</small></button><button class="ses-btn m" data-x="film:m">● Film me<small>${sesTop(s)?`${esc(sesTName(s,sesTop(s)))} · try ${sesTries(sesTop(s)).length+1}`:"Your try"}</small></button></div>
       <div class="r3"><button class="ses-btn g" data-x="talk">🎙 Talk</button><button class="ses-btn g" data-x="link">🔗 Link</button><button class="ses-btn g" data-x="end">End</button></div>
       ${s.from&&P&&pEl?`<button class="ses-btn g wide" data-x="hide">Back to workout · ${esc(s.from.name||"")}</button>`:""}</div>`
      :`<div class="ses-dock"><div class="r2"><button class="ses-btn g" data-x="delses">Delete session</button><button class="ses-btn g" data-x="back">Close</button></div></div>`}
@@ -5493,20 +5668,20 @@ function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=
      <div class="ses-dock"><div class="r2"><button class="ses-btn g" data-x="talkcancel">Cancel</button><button class="ses-btn m" data-x="talksave">Save</button></div></div>`;return}
   if(v==="replay"){const f=sesPiece(s,SES.p);if(!f){SES.v="board";return sesDraw()}const {t,p}=f,others=sesVidP(t).filter(x=>x.id!==p.id),coach=others.find(x=>x.k==="c"),rt=SES.rate||.5;
     el.innerHTML=`${sesHead(`${sesTName(s,t)} · ${sesLabel(p).toLowerCase()}`,`${fmtDur(p.b-p.a)||"0:01"} · ${rt===1?"1×":rt===.5?"½×":"¼×"}`)}
-     <div class="ses-vid"><video playsinline muted loop></video><em class="${p.k}">${p.k==="c"?"Coach":`Me · try ${p.n}`}</em></div>
-     <div class="ses-body">${sesNote()}<div class="ses-spd">${[[1,"1×"],[.5,"½×"],[.25,"¼×"]].map(([r,l])=>`<button data-x="rate:${r}" aria-pressed="${rt===r}">${l}</button>`).join("")}<button data-x="pp" aria-label="Play or pause">❚❚</button><button data-x="back3">⏮ 3 s</button><button data-x="snd" aria-pressed="${!!SES.snd}">${SES.snd?"🔊":"🔇"}</button></div>
-     ${t.pieces.filter(x=>x.k==="t"&&x.on===p.id).map(x=>sesPieceRow(s,t,x)).join("")}</div>
-     <div class="ses-dock">${s.end?"":`<div class="r2"><button class="ses-btn g" data-x="talkon:${p.id}">🎙 Feedback</button>${others.length?`<button class="ses-btn c" data-x="cmp">⇆ Compare${coach?" with coach":""}</button>`:`<button class="ses-btn g" data-x="star:${p.id}">${p.star?"★ Best try":"☆ Best try"}</button>`}</div>
+     <div class="ses-vid"><video playsinline muted loop></video><em class="${p.k}">${p.k==="c"?"Coach":`Me · try ${p.n}`}</em>${sesStarBtn(s,p,others.length||t.pieces.some(x=>x.k==="l"))}</div>
+     <div class="ses-body">${sesNote()}<div class="ses-spd">${[[1,"1×"],[.5,"½×"],[.25,"¼×"]].map(([r,l])=>`<button data-x="rate:${r}" aria-pressed="${rt===r}">${l}</button>`).join("")}<button data-x="pp" aria-label="Play or pause">❚❚</button><button data-x="back3">⏮ 3 s</button><button data-sx="ink">✎ Draw</button><button data-x="snd" aria-pressed="${!!SES.snd}">${SES.snd?"🔊":"🔇"}</button></div>
+     ${t.pieces.filter(x=>x.k==="t"&&x.on===p.id).map(x=>sesPieceRow(s,t,x)).join("")}${sesInkList(s,t,p)}</div>
+     <div class="ses-dock">${s.end?"":`<div class="r2"><button class="ses-btn g" data-x="talkon:${p.id}">🎙 Feedback</button>${others.length||t.pieces.some(x=>x.k==="l")?`<button class="ses-btn c" data-x="cmp">⇆ Compare${coach?" with coach":""}</button>`:`<button class="ses-btn g" data-x="star:${p.id}">${p.star?"★ Best try":"☆ Best try"}</button>`}</div>
       <div class="r3"><button class="ses-btn m" data-x="film:m">↻ Again</button><button class="ses-btn g" data-x="hw:${t.id}">📋 Homework</button><button class="ses-btn g" data-x="newtopic">New topic</button></div>`}
       <div class="r2"><button class="ses-btn g" data-x="board">Board</button><button class="ses-btn g" data-x="del:${p.id}">Delete</button></div></div>`;
     sesVideo(el.querySelector(".ses-vid video"),p,rt);return}
-  if(v==="cmp"){const f=sesPiece(s,SES.p);if(!f){SES.v="board";return sesDraw()}const {t,p}=f,others=sesVidP(t).filter(x=>x.id!==p.id),C=SES.cmp=SES.cmp&&SES.cmp.p===p.id?SES.cmp:{p:p.id,l:(others.find(x=>x.k==="c")||others[0]||{}).id,sync:null};
-    const L=t.pieces.find(x=>x.id===C.l)||others[0],rt=SES.rate||.5,links=t.pieces.filter(x=>x.k==="l");
+  if(v==="cmp"){const f=sesPiece(s,SES.p);if(!f){SES.v="board";return sesDraw()}const {t,p}=f,others=sesVidP(t).filter(x=>x.id!==p.id),C=SES.cmp=SES.cmp&&SES.cmp.p===p.id?SES.cmp:{p:p.id,l:((p.k==="m"&&others.find(x=>x.rw))||others.find(x=>x.k==="c")||others[0]||t.pieces.find(x=>x.k==="l")||{}).id,sync:null};
+    const L=t.pieces.find(x=>x.id===C.l)||others[0],rt=SES.rate||.5,links=t.pieces.filter(x=>x.k==="l");if(L&&L.k==="l")return sesCmpLink(s,t,p,L,others,links);
     el.innerHTML=`${sesHead(`${sesTName(s,t)} · compare`,C.sync?"Lined up":C.lining?"Pause both on the same moment, then Lock":"Tap Line up to sync them")}
      <div class="ses-split"><div class="ses-vid"><video playsinline muted loop></video><em class="${L.k}">${esc(L.k==="c"?"Coach":"Try "+L.n)}</em></div><div class="ses-vid"><video playsinline muted loop></video><em class="${p.k}">${p.k==="c"?"Coach":`Me · try ${p.n}`}</em></div></div>
      ${C.lining?`<div class="ses-scrubs"><input type="range" min="0" max="1000" value="0" data-in="scrubL" aria-label="Move the left clip"><input type="range" min="0" max="1000" value="0" data-in="scrubR" aria-label="Move the right clip"></div>`:""}
      <div class="ses-body"><div class="ses-spd">${[[1,"1×"],[.5,"½×"],[.25,"¼×"]].map(([r,l])=>`<button data-x="rate:${r}" aria-pressed="${rt===r}">${l}</button>`).join("")}<button data-x="pp" aria-label="Play or pause">❚❚</button><button data-x="${C.lining?"lock":"lineup"}">${C.lining?"Lock":"⇆ Line up"}</button></div>
-      <div class="ses-chips">${others.map(x=>`<button class="ses-chip" data-x="left:${x.id}" aria-pressed="${x.id===L.id}">${esc(x.k==="c"?"Coach":"Try "+x.n)}</button>`).join("")}${links.map(x=>`<a class="ses-chip" href="${esc(sesLinkHref(x))}" ${x.b?`data-end="${x.b}"`:""} target="_blank" rel="noopener">🔗 ${esc((x.title||"Link").slice(0,18))}</a>`).join("")}</div></div>
+      <div class="ses-chips">${others.map(x=>`<button class="ses-chip" data-x="left:${x.id}" aria-pressed="${x.id===L.id}">${esc(x.k==="c"?"Coach":"Try "+x.n+sesMk(t,x,1))}</button>`).join("")}${links.map(x=>`<button class="ses-chip" data-x="left:${x.id}" aria-pressed="false">🔗 ${esc((x.title||"Link").slice(0,18))}</button>`).join("")}</div></div>
      <div class="ses-dock"><div class="r2"><button class="ses-btn g" data-x="talkon:${p.id}" ${s.end?"hidden":""}>🎙 Feedback</button><button class="ses-btn g" data-x="star:${p.id}">${p.star?"★ Best try":"☆ Best try"}</button></div><button class="ses-btn g wide" data-x="replay">Back to the replay</button></div>`;
     const [vl,vr]=el.querySelectorAll(".ses-split video");sesVideo(vl,L,rt,C.sync?C.sync.l:null);sesVideo(vr,p,rt,C.sync?C.sync.r:null);
     if(C.sync){const follow=()=>{if(!SES||SES.v!=="cmp"||!vr.isConnected)return;const want=C.sync.l+(vr.currentTime-C.sync.r);if(want>=L.b||want<L.a){vr.currentTime=C.sync.r;vl.currentTime=C.sync.l}else if(Math.abs(vl.currentTime-want)>.12)vl.currentTime=want;requestAnimationFrame(follow)};requestAnimationFrame(follow)}
@@ -5531,7 +5706,7 @@ function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=
   if(v==="wrap"){const n=s.topics.filter(t=>t.pieces.length),mb=0;
     el.innerHTML=`${sesHead("Session done",`${s.coach?s.coach+" · ":""}${new Date(s.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})} · ${Math.max(1,Math.round(((s.end||Date.now())-s.t)/60000))} min · ${n.length} topic${n.length===1?"":"s"}${s.xp?"":` · +${SES_XP} XP`}`)}
      <div class="ses-body">${sesNote()}<div class="ses-lab">Name each topic</div>
-     ${n.map(t=>{const vp=sesVidP(t)[0];return `<div class="ses-wrow">${vp?sesThumbHtml(vp,true):`<span class="ses-th big"><em>${t.pieces[0].k==="l"?"Link":"Talk"}</em></span>`}<div class="ses-wm"><input class="ses-in" data-in="tname:${t.id}" value="${esc(t.name)}" placeholder="${esc(sesTName(s,t))}"><span class="ses-sub">${sesTries(t).length} tr${sesTries(t).length===1?"y":"ies"} · ${t.pieces.filter(p=>p.k==="t").length} note${t.pieces.filter(p=>p.k==="t").length===1?"":"s"}${t.pieces.some(p=>p.k==="l")?" · link":""}</span></div>
+     ${n.map(t=>{const vp=sesVidP(t)[0];return `<div class="ses-wrow">${vp?sesThumbHtml(vp,true):`<span class="ses-th big"><em>${{l:"Link",q:"Test"}[t.pieces[0].k]||"Talk"}</em></span>`}<div class="ses-wm"><input class="ses-in" data-in="tname:${t.id}" value="${esc(t.name)}" placeholder="${esc(sesTName(s,t))}"><span class="ses-sub">${sesTries(t).length} tr${sesTries(t).length===1?"y":"ies"} · ${t.pieces.filter(p=>p.k==="t").length} note${t.pieces.filter(p=>p.k==="t").length===1?"":"s"}${t.pieces.some(p=>p.k==="l")?" · link":""}${sesQtSum(t)}</span></div>
        ${t.hw?`<i class="ses-k h">Homework</i>`:`<button class="ses-sw" data-x="want:${t.id}" aria-pressed="${!!t.want}" aria-label="Add ${esc(sesTName(s,t))} to take-home"><span></span></button>`}</div>`}).join("")}
      <p class="ses-sub">The switch adds a topic to <b>Take-home</b> with its clips. Set a goal from its Edit button there.</p></div>
      <div class="ses-dock"><div class="r2"><button class="ses-btn g" data-x="later">Later</button><button class="ses-btn m" data-x="wrapsave">Save</button></div></div>`;return}}
@@ -5539,6 +5714,162 @@ function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=
 async function sesVideo(vid,p,rate,at){if(!vid)return;const u=await sesBlob(p.v);if(!u||!vid.isConnected)return;vid.src=u;vid.muted=!SES?.snd;vid.playbackRate=rate||1;
   vid.onloadedmetadata=()=>{try{vid.currentTime=at!=null?at:p.a;vid.playbackRate=rate||1;vid.play().catch(()=>{})}catch(e){}};
   vid.ontimeupdate=()=>{const b=p.b||vid.duration;if(vid.currentTime>=b-.04||vid.currentTime<p.a-.3){vid.currentTime=p.a}}}
+
+/* run on every draw of a session screen: Rewind follows the board, a compare's YouTube player goes with its screen */
+function sesHook(s){sesRwSync(s);sesYtStop();setTimeout(sesInkFill,0)}
+
+/* ---------- Rewind: save the last 30 s (storyboard frame 12) ----------
+   Off unless turned on in setup, and only when the phone is propped. While the board shows, the camera runs with no
+   preview and two MediaRecorders share its stream, started 30 s apart. Each one starts over after 60 s, so the older
+   one always holds 30 to 60 s. Its file is complete from its own start and plays anywhere, which a later timeslice
+   chunk on its own doesn't. Save last 30 s stops it and keeps its last 30 s as a try. Everything is in memory, and
+   nothing is kept until Save. Leaving the board (filming, Talk, a replay), ending the session, closing session mode
+   or the app going to the background closes the camera. Back on the board, it opens again. */
+const RW_KEEP=30,RW_LIFE=60;
+function sesRwWant(s){return !!(SES&&s&&s.rw&&s.mode==="prop"&&!s.end&&SES.v==="board"&&!SES.el.hidden&&!SES.rwBusy&&!SES.rwOff&&document.visibilityState!=="hidden"&&camLive())}
+function sesRwSync(s){if(sesRwWant(s)){if(!SES.rw)sesRwStart()}else sesRwStop()}
+async function sesRwStart(){const W=SES.rw={stream:null,recs:[],tick:0,one:false};
+  try{W.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:CO.facing||"environment",width:{ideal:1280},height:{ideal:720}},audio:true})}
+  catch(e){if(SES&&SES.rw===W){SES.rw=null;SES.rwOff=true;SES.msg="Rewind couldn't open the camera. Check that Hoops Ladder can use the camera and mic.";sesDraw()}return}
+  if(!SES||SES.rw!==W||!sesRwWant(sesFind(SES.sid))){W.stream.getTracks().forEach(x=>x.stop());if(SES&&SES.rw===W)SES.rw=null;return}
+  if(!sesRwRec(W)){sesRwStop();SES.rwOff=true;SES.msg="This phone can't record video here, so Rewind is off.";sesDraw();return}
+  W.tick=setInterval(()=>sesRwTick(W),1000);sesRwPaint()}
+/* one recorder on the shared stream; null if the phone won't start another */
+function sesRwRec(W){const type=pickMime();let mr;
+  try{mr=new MediaRecorder(W.stream,Object.assign({videoBitsPerSecond:2500000},type?{mimeType:type}:{}))}catch(e){try{mr=new MediaRecorder(W.stream)}catch(e2){return null}}
+  const r={mr,chunks:[],t0:performance.now()};mr.ondataavailable=e=>{if(e.data&&e.data.size)r.chunks.push(e.data)};
+  try{mr.start(1000)}catch(e){return null}W.recs.push(r);return r}
+function sesRwDrop(W,r){W.recs.splice(W.recs.indexOf(r),1);r.mr.ondataavailable=null;r.chunks=[];try{if(r.mr.state!=="inactive")r.mr.stop()}catch(e){}}
+function sesRwTick(W){if(!SES||SES.rw!==W){clearInterval(W.tick);return}const age=r=>(performance.now()-r.t0)/1000;
+  for(const r of W.recs.slice())if(age(r)>=RW_LIFE){sesRwDrop(W,r);sesRwRec(W)}
+  if(W.recs.length===1&&!W.one&&age(W.recs[0])>=RW_KEEP&&!sesRwRec(W))W.one=true; // a phone that runs one recorder at a time keeps 0 to 60 s
+  if(!W.recs.length){sesRwStop();SES.rwOff=true;SES.msg="Rewind stopped: the camera stopped recording.";sesDraw();return}
+  sesRwPaint()}
+function sesRwStop(){const W=SES&&SES.rw;if(!W)return;clearInterval(W.tick);for(const r of W.recs.slice())sesRwDrop(W,r);if(W.stream)W.stream.getTracks().forEach(x=>x.stop());W.stream=null;SES.rw=null}
+const sesRwOld=W=>W&&W.recs.slice().sort((a,b)=>a.t0-b.t0)[0];
+function sesRwPaint(){const n=SES&&SES.el.querySelector(".ses-rwn"),r=sesRwOld(SES&&SES.rw);if(!n)return;const sec=r?Math.min(RW_KEEP,Math.floor((performance.now()-r.t0)/1000)):0;
+  n.innerHTML=r?`<b>Rewind on</b> · last ${sec>=RW_KEEP?"30 s":fmtDur(sec)||"0:00"} in memory · no preview`:"<b>Rewind on</b> · starting…";n.parentNode.classList.toggle("wait",!r)}
+async function sesRwSave(){const W=SES&&SES.rw,s=SES&&sesFind(SES.sid),r=sesRwOld(W);if(!s||s.end)return;
+  if(!r||performance.now()-r.t0<2000){SES.msg="Rewind is just starting. Give it a few seconds.";return sesDraw()}
+  const secs=(performance.now()-r.t0)/1000;W.recs.splice(W.recs.indexOf(r),1);SES.rwBusy=true;
+  const got=new Promise(res=>{r.mr.onstop=()=>res(r.chunks.length?new Blob(r.chunks,{type:r.chunks[0].type||r.mr.mimeType||"video/webm"}):null);try{r.mr.stop()}catch(e){res(null)}});
+  sesRwStop();sesDraw();const blob=await got;
+  try{if(!blob)throw new Error("empty");let t=sesTop(s);if(!t)t=sesNewTopic(s);const dur=await vidDur(blob)||secs,{id}=await sesStore(blob,s,{dur,name:sesTName(s,t)+" · rewind"});
+    const p={id:uid("p"),k:"m",rw:1,n:sesTries(t).length+1,v:id,a:+Math.max(0,dur-RW_KEEP).toFixed(2),b:+dur.toFixed(2),t:Date.now()};
+    t.pieces.push(p);sesTouch(s);sesThumbs(s,[p],SESU[id]);if(SES&&SES.sid===s.id){SES.rwBusy=false;SES.p=p.id;SES.v="replay";SES.msg=`Saved the last ${Math.round(p.b-p.a)} s as try ${p.n}.`}}
+  catch(e){if(SES){SES.rwBusy=false;SES.msg=e&&e.name==="QuotaExceededError"?"Your phone is out of space for videos. Delete a few clips and try again.":"Couldn't keep the last 30 s."}}
+  sesDraw()}
+function sesRwHtml(s){if(s.mode!=="prop"||s.end)return "";
+  if(!s.rw)return s.rwx?`<div class="ses-rw off"><span class="ses-rwn">Rewind is off</span><button class="ses-rwx" data-sx="rwon">Turn on</button></div>`:"";
+  if(SES.rwOff)return `<div class="ses-rw wait"><span class="ses-rwdot" aria-hidden="true"></span><span class="ses-rwn">Rewind is paused: the camera didn't open</span><button class="ses-rwx" data-sx="rwon">Try again</button></div>`;
+  return `<div class="ses-rw wait" role="status"><span class="ses-rwdot" aria-hidden="true"></span><span class="ses-rwn"><b>Rewind on</b> · starting…</span><button class="ses-rwx" data-sx="rwoff">Turn off</button></div>
+   <button class="ses-btn rw" data-sx="rwsave" ${SES.rwBusy?"disabled":""}>${SES.rwBusy?"Saving…":"⏪ Save last 30 s"}<small>Keeps the rep your coach just saw</small></button>`}
+function sesRwSetHtml(st){if(st.mode!=="prop")return "";
+  return `<button class="ses-opt" data-sx="rwset" role="switch" aria-checked="${!!st.rw}"><span class="ses-ic">⏪</span><span><b>Rewind (save last 30 s)</b><span>Off by default. Keeps 30 s in memory, no preview. Nothing is kept until you tap Save.</span></span><span class="ses-sw" aria-pressed="${!!st.rw}"><span></span></span></button>`}
+document.addEventListener("visibilitychange",()=>{if(SES&&SES.sid)sesRwSync(sesFind(SES.sid))});
+
+/* ---------- draw on a frame (storyboard frame 22) ----------
+   Draw on a paused replay grabs the frame on a canvas. Line is freehand, Circle and Arrow follow the drag. Save keeps
+   the frame and the drawing as one JPEG in the video store, as a Picture piece (k "d") with the try it's on (on) and
+   the second it shows (at). It lists on the board and under its try's replay, and a voice note can go with it. */
+function sesInkStart(){const s=sesFind(SES.sid),f=s&&sesPiece(s,SES.p),vid=SES.el.querySelector(".ses-vid video");
+  if(!f||!vid||!vid.videoWidth){SES.msg="Wait for the video to show, then tap Draw.";return sesDraw()}
+  vid.pause();const w=Math.min(960,vid.videoWidth),h=Math.round(w*vid.videoHeight/vid.videoWidth),bg=document.createElement("canvas");bg.width=w;bg.height=h;
+  try{bg.getContext("2d").drawImage(vid,0,0,w,h)}catch(e){SES.msg="Couldn't grab that frame.";return sesDraw()}
+  SES.ink={p:f.p.id,at:+vid.currentTime.toFixed(2),bg,marks:[],cur:null,tool:SES.inkTool||"line"};SES.v="ink";sesDraw()}
+function sesInkPaint(cv,I){const c=cv.getContext("2d"),lw=Math.max(4,Math.round(cv.width/110));c.drawImage(I.bg,0,0);c.lineCap="round";c.lineJoin="round";
+  for(const m of I.cur?I.marks.concat([I.cur]):I.marks){c.strokeStyle="#FFD166";c.lineWidth=lw;c.shadowColor="rgba(0,0,0,.6)";c.shadowBlur=lw;c.beginPath();
+    if(m.k==="line"){m.pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));if(m.pts.length===1)c.lineTo(m.pts[0][0]+.1,m.pts[0][1])}
+    else if(m.k==="circle")c.ellipse((m.a[0]+m.b[0])/2,(m.a[1]+m.b[1])/2,Math.abs(m.b[0]-m.a[0])/2,Math.abs(m.b[1]-m.a[1])/2,0,0,Math.PI*2);
+    else{const [x0,y0]=m.a,[x1,y1]=m.b,g=Math.atan2(y1-y0,x1-x0),hd=lw*4;c.moveTo(x0,y0);c.lineTo(x1,y1);c.moveTo(x1-hd*Math.cos(g-.5),y1-hd*Math.sin(g-.5));c.lineTo(x1,y1);c.lineTo(x1-hd*Math.cos(g+.5),y1-hd*Math.sin(g+.5))}
+    c.stroke()}c.shadowBlur=0}
+function sesInkBtns(){const I=SES&&SES.ink;if(!I)return;SES.el.querySelectorAll('[data-sx="inkundo"],[data-sx="inkclear"]').forEach(b=>b.disabled=!I.marks.length);
+  SES.el.querySelectorAll('[data-sx^="inktool:"]').forEach(b=>b.setAttribute("aria-pressed",b.dataset.sx==="inktool:"+I.tool))}
+function sesInkView(s){const el=SES.el;
+  if(SES.v==="pic"){const f=sesPiece(s,SES.pic);if(!f){SES.v="board";return sesDraw()}const {t,p}=f,on=t.pieces.find(x=>x.id===p.on);
+    el.innerHTML=`${sesHead(`${sesTName(s,t)} · picture`,`${on?sesLabel(on):"A try"} at ${mmss(p.at||0)}`)}
+     <div class="ses-ink"><img alt="Drawing on ${esc(on?sesLabel(on).toLowerCase():"a try")} at ${mmss(p.at||0)}" ${CO.thumbs[p.id]?`src="${CO.thumbs[p.id]}"`:`data-inkv="${esc(p.v)}" data-inkp="${p.id}" hidden`}></div>
+     <div class="ses-body fit">${sesNote()}${t.pieces.filter(x=>x.k==="t"&&x.on===p.id).map(x=>sesPieceRow(s,t,x)).join("")}</div>
+     <div class="ses-dock"><div class="r2">${s.end?"":`<button class="ses-btn g" data-x="talkon:${p.id}">🎙 Talk over it</button>`}${on?`<button class="ses-btn g" data-sx="pictry">▶ ${esc(sesLabel(on))}</button>`:""}</div>
+      <div class="r2"><button class="ses-btn g" data-x="board">Board</button><button class="ses-btn g" data-x="del:${p.id}">Delete</button></div></div>`;return}
+  const I=SES.ink,f=I&&sesPiece(s,I.p);if(!f){SES.ink=null;SES.v="board";return sesDraw()}const {t,p}=f;
+  el.innerHTML=`${sesHead(`${sesTName(s,t)} · draw on it`,`${sesLabel(p)} · paused at ${mmss(I.at)}`)}
+   <div class="ses-ink"><canvas aria-label="The paused frame. Drag on it to draw."></canvas></div>
+   <div class="ses-body fit">${sesNote()}<div class="ses-spd">${[["line","╱ Line"],["circle","◯ Circle"],["arrow","↗ Arrow"]].map(([k,l])=>`<button data-sx="inktool:${k}" aria-pressed="${I.tool===k}">${l}</button>`).join("")}<button data-sx="inkundo" aria-label="Undo">↶ Undo</button><button data-sx="inkclear">Clear</button></div>
+    <p class="ses-sub">Drag on the frame to draw. To pick another moment, cancel, move the replay there and pause.</p></div>
+   <div class="ses-dock"><div class="r2"><button class="ses-btn g" data-sx="inkcancel">Cancel</button><button class="ses-btn m" data-sx="inksave">Save as picture</button></div></div>`;
+  const cv=el.querySelector(".ses-ink canvas");cv.width=I.bg.width;cv.height=I.bg.height;sesInkPaint(cv,I);sesInkBtns();
+  const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]};
+  cv.onpointerdown=e=>{e.preventDefault();try{cv.setPointerCapture(e.pointerId)}catch(x){}const q=pt(e);I.cur=I.tool==="line"?{k:"line",pts:[q]}:{k:I.tool,a:q,b:q};sesInkPaint(cv,I)};
+  cv.onpointermove=e=>{if(!I.cur)return;const q=pt(e);if(I.cur.k==="line")I.cur.pts.push(q);else I.cur.b=q;sesInkPaint(cv,I)};
+  cv.onpointerup=cv.onpointercancel=()=>{const m=I.cur;I.cur=null;if(!m)return;if(m.k==="line"||Math.hypot(m.b[0]-m.a[0],m.b[1]-m.a[1])>cv.width/60)I.marks.push(m);sesInkPaint(cv,I);sesInkBtns()}}
+async function sesInkSave(){const I=SES.ink,s=sesFind(SES.sid),f=I&&s&&sesPiece(s,I.p),cv=SES.el.querySelector(".ses-ink canvas");if(!f||!cv)return;
+  if(!I.marks.length){SES.msg="Draw on the frame first.";return sesDraw()}
+  I.cur=null;sesInkPaint(cv,I);const blob=await new Promise(r=>cv.toBlob(r,"image/jpeg",.85));
+  try{if(!blob)throw new Error("empty");const id=uid("v"),meta={id,t:Date.now(),dur:0,size:blob.size,type:"image/jpeg",ses:s.id,name:"Picture",item:null,drill:null};
+    await vtx("readwrite",(m,bl)=>{m.put(meta);bl.put(blob,id)});SESU[id]=URL.createObjectURL(blob);
+    const p={id:uid("p"),k:"d",v:id,on:f.p.id,at:I.at,t:Date.now()};CO.thumbs[p.id]=SESU[id];f.t.pieces.push(p);sesTouch(s);
+    SES.ink=null;SES.v="replay";SES.msg=`Picture saved with ${sesLabel(f.p).toLowerCase()}.`}
+  catch(e){SES.msg=e&&e.name==="QuotaExceededError"?"Your phone is out of space. Delete a few clips and try again.":"Couldn't keep the picture."}
+  sesDraw()}
+function sesInkRow(s,t,p){const on=t.pieces.find(x=>x.id===p.on),th=CO.thumbs[p.id];
+  return `<button class="ses-pc" data-sx="pic:${p.id}"><span class="ses-th d">${th?`<img src="${th}" alt="">`:`<img data-inkv="${esc(p.v)}" data-inkp="${p.id}" alt="" hidden>`}</span><i class="ses-k d">Picture</i><span class="tx">Drawing on ${esc(on?sesLabel(on).toLowerCase():"a try")}</span><span class="tm">${mmss(p.at||0)}</span></button>`}
+const sesInkList=(s,t,p)=>t.pieces.filter(x=>x.k==="d"&&x.on===p.id).map(x=>sesInkRow(s,t,x)).join("");
+/* pictures load from the store after a restart */
+function sesInkFill(){if(!SES)return;for(const im of SES.el.querySelectorAll("img[data-inkv]")){const v=im.dataset.inkv,pid=im.dataset.inkp;im.removeAttribute("data-inkv");
+  sesBlob(v).then(u=>{if(u){CO.thumbs[pid]=u;im.src=u;im.hidden=false}})}}
+
+/* ---------- compare with a link: the YouTube part above your try (storyboard frame 18) ----------
+   The video sits on top (it's landscape) and the try below, each looping its own part. The iframe is YouTube's own
+   embedded player on the privacy-enhanced youtube-nocookie.com host, like the app's demo player (native.js, LEARNING
+   step 14), so MainActivity's frame rule lets it load in the app. Once the IFrame API loads, it attaches to that
+   iframe, loops the marked part (p.a to p.b) on a 200 ms timer, and Play/pause and speed drive both sides. Without
+   the API (offline), the iframe still plays the part by itself. Line up isn't offered: YouTube can't be frame-synced. */
+const sesYtId=u=>{try{const x=new URL(u),h=x.hostname.replace(/^(www|m|music)\./,""),p=x.pathname.split("/").filter(Boolean);
+  const id=h==="youtu.be"?p[0]||"":/(^|\.)youtube(-nocookie)?\.com$/.test(h)?(p[0]==="watch"?x.searchParams.get("v")||"":/^(shorts|embed|live|v)$/.test(p[0])?p[1]||"":""):"";return /^[\w-]{11}$/.test(id)?id:""}catch(e){return ""}};
+let sesYtP=null;
+function sesYtApi(){if(window.YT&&window.YT.Player)return Promise.resolve(window.YT);if(sesYtP)return sesYtP;
+  return sesYtP=new Promise((ok,no)=>{const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{if(prev)try{prev()}catch(e){}ok(window.YT)};
+    if(!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')){const sc=document.createElement("script");sc.src="https://www.youtube.com/iframe_api";sc.onerror=()=>{sesYtP=null;sc.remove();no(new Error("offline"))};document.head.appendChild(sc)}
+    setTimeout(()=>{if(!(window.YT&&window.YT.Player)){sesYtP=null;no(new Error("timeout"))}},12000)})}
+function sesYtStop(){const Y=SES&&SES.yt;if(!Y)return;clearInterval(Y.timer);SES.yt=null}
+function sesCmpLink(s,t,p,L,others,links){const el=SES.el,rt=SES.rate||.5,yid=sesYtId(L.url),a=Math.floor(L.a||0),b=L.b>a?Math.ceil(L.b):0;
+  const part=L.b?`${mmss(L.a)} to ${mmss(L.b)}`:L.a?`from ${mmss(L.a)}`:"from the start",o=location.origin&&location.origin!=="null"?`&origin=${encodeURIComponent(location.origin)}`:"";
+  el.innerHTML=`${sesHead(`${sesTName(s,t)} · compare`,`Link part next to your ${sesLabel(p).toLowerCase()}`)}
+   <div class="ses-stack"><div class="ses-yt">${yid?`<iframe src="https://www.youtube-nocookie.com/embed/${yid}?enablejsapi=1&start=${a}${b?`&end=${b}`:""}&autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3${o}" title="${esc(L.title||"Linked video")}" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
+      :`<div class="ses-ytmsg">This link isn't a YouTube video, so it can't play here.</div>`}<em class="l">Link · ${part}</em></div>
+    <div class="ses-vid"><video playsinline muted loop></video><em class="${p.k}">${p.k==="c"?"Coach":`Me · try ${p.n}`}</em></div></div>
+   <div class="ses-body">${sesNote()}<div class="ses-spd">${[[1,"1×"],[.5,"½×"],[.25,"¼×"]].map(([r,l])=>`<button data-sx="ytrate:${r}" aria-pressed="${rt===r}">${l}</button>`).join("")}<button data-sx="ytpp" aria-label="Play or pause both">❚❚</button><a class="ses-lnk" href="${esc(sesLinkHref(L))}" ${L.b?`data-end="${L.b}"`:""} target="_blank" rel="noopener">Full player</a></div>
+    <p class="ses-sub">Each side loops its own part. Line up isn't available for a link, because YouTube's player can't be synced to a frame.</p>
+    <div class="ses-chips">${others.map(x=>`<button class="ses-chip" data-x="left:${x.id}" aria-pressed="false">${esc(x.k==="c"?"Coach":"Try "+x.n)}</button>`).join("")}${links.map(x=>`<button class="ses-chip" data-x="left:${x.id}" aria-pressed="${x.id===L.id}">🔗 ${esc((x.title||"Link").slice(0,18))}</button>`).join("")}</div></div>
+   <div class="ses-dock"><div class="r2"><button class="ses-btn g" data-x="talkon:${p.id}" ${s.end?"hidden":""}>🎙 Feedback</button><button class="ses-btn g" data-x="star:${p.id}">${p.star?"★ Best try":"☆ Best try"}</button></div><button class="ses-btn g wide" data-x="replay">Back to the replay</button></div>`;
+  sesVideo(el.querySelector(".ses-stack video"),p,rt);
+  const fr=el.querySelector(".ses-yt iframe");if(!fr)return;const Y=SES.yt={pl:null,timer:0,a,b};
+  sesYtApi().then(YT=>{if(!SES||SES.yt!==Y||!fr.isConnected)return;
+    Y.pl=new YT.Player(fr,{events:{onReady:e=>{try{if(SES&&SES.snd)e.target.unMute();e.target.setPlaybackRate(SES&&SES.rate||.5);e.target.seekTo(a,true);e.target.playVideo()}catch(x){}},
+      onStateChange:e=>{if(e.data===YT.PlayerState.ENDED){try{e.target.seekTo(a,true);e.target.playVideo()}catch(x){}}}}});
+    Y.timer=setInterval(()=>{if(!fr.isConnected){clearInterval(Y.timer);return}const pl=Y.pl;try{if(b&&pl&&pl.getCurrentTime&&pl.getCurrentTime()>=b-.15){pl.seekTo(a,true);pl.playVideo()}}catch(x){}},200)}).catch(()=>{})}
+
+/* taps on the screens above (data-sx, so sesClick stays as it is) */
+document.addEventListener("click",e=>{const b=e.target.closest(".ses [data-sx]");if(!b||!SES)return;e.stopPropagation();const [a,...r]=b.dataset.sx.split(":"),id=r.join(":"),s=SES.sid&&sesFind(SES.sid);
+  switch(a){
+   case"rwset":SES.set.rw=!SES.set.rw;return sesDraw();
+   case"rwsave":return sesRwSave();
+   case"rwoff":if(s){s.rw=false;s.rwx=true;persist()}sesRwStop();return sesDraw();
+   case"rwon":if(s){s.rw=true;persist()}SES.rwOff=false;return sesDraw();
+   case"ink":return sesInkStart();
+   case"inktool":if(SES.ink){SES.ink.tool=SES.inkTool=id;sesInkBtns()}return;
+   case"inkundo":case"inkclear":{const I=SES.ink,cv=SES.el.querySelector(".ses-ink canvas");if(!I||!cv)return;if(a==="inkundo")I.marks.pop();else I.marks=[];sesInkPaint(cv,I);sesInkBtns();return}
+   case"inksave":return sesInkSave();
+   case"inkcancel":SES.ink=null;SES.v="replay";return sesDraw();
+   case"pic":SES.picFrom=SES.v==="replay"?"replay":"board";SES.pic=id;SES.v="pic";return sesDraw();
+   case"pictry":{const f=s&&sesPiece(s,SES.pic);if(f&&f.p.on){SES.p=f.p.on;SES.v="replay"}return sesDraw()}
+   case"ytpp":{const v=SES.el.querySelector(".ses-stack video"),pl=SES.yt&&SES.yt.pl;if(!v)return;const go=v.paused;
+     if(go)v.play().catch(()=>{});else v.pause();try{pl&&(go?pl.playVideo():pl.pauseVideo())}catch(x){}b.textContent=go?"❚❚":"▶";return}
+   case"ytrate":{SES.rate=+id;const v=SES.el.querySelector(".ses-stack video");if(v)v.playbackRate=SES.rate;try{SES.yt&&SES.yt.pl&&SES.yt.pl.setPlaybackRate(SES.rate)}catch(x){}
+     SES.el.querySelectorAll('[data-sx^="ytrate:"]').forEach(x=>x.setAttribute("aria-pressed",x===b));return}}});
+/* back from a drawing or a picture returns to where it was opened */
+{const back0=window.sesBack;window.sesBack=function(){if(SES&&SES.v==="ink"){SES.ink=null;SES.v="replay";sesDraw();return true}if(SES&&SES.v==="pic"){SES.v=SES.picFrom||"board";sesDraw();return true}return back0()}}
 
 /* ---------- taps ---------- */
 function sesInput(e){const t=e.target.closest("[data-in]");if(!t||!SES)return;const k=t.dataset.in,s=SES.sid&&sesFind(SES.sid);
@@ -5549,7 +5880,7 @@ function sesInput(e){const t=e.target.closest("[data-in]");if(!t||!SES)return;co
   else if(k==="hwt"&&SES.hw)SES.hw.text=t.value;
   else if(k.startsWith("tname:")&&s){const tp=s.topics.find(x=>x.id===k.slice(6));if(tp){tp.name=t.value.trim();persist()}}}
 function sesClick(e){const b=e.target.closest("[data-x]");if(!b||!SES)return;if(b.tagName==="A")return;e.stopPropagation();const [a,...r]=b.dataset.x.split(":"),id=r.join(":"),s=SES.sid&&sesFind(SES.sid);
-  const vids=()=>[...SES.el.querySelectorAll("video")].filter(x=>x.src);
+  const vids=()=>[...SES.el.querySelectorAll("video")].filter(x=>x.src);if(sesPzClick(a,id,b,s))return;
   switch(a){
    case"back":return window.sesBack();
    case"hide":return sesHide();
@@ -5579,7 +5910,7 @@ function sesClick(e){const b=e.target.closest("[data-x]");if(!b||!SES)return;if(
    case"pp":{const vs=vids(),paused=vs.some(v=>v.paused);for(const v of vs)paused?v.play().catch(()=>{}):v.pause();b.textContent=paused?"❚❚":"▶";return}
    case"back3":{const f=sesPiece(s,SES.p);for(const v of vids())v.currentTime=Math.max(f?f.p.a:0,v.currentTime-3);return}
    case"snd":SES.snd=!SES.snd;for(const v of vids())v.muted=!SES.snd;b.setAttribute("aria-pressed",SES.snd);b.textContent=SES.snd?"🔊":"🔇";return;
-   case"star":{const f=sesPiece(s,id);if(f){f.p.star=!f.p.star;persist()}return sesDraw()}
+   case"star":{const f=sesPiece(s,id);if(f){const on=!f.p.star;sesTries(f.t).forEach(x=>delete x.star);if(on)f.p.star=true;persist()}return sesDraw()}
    case"del":{const f=sesPiece(s,id);if(!f)return;if(!b.dataset.sure){b.dataset.sure="1";b.textContent="Tap again to delete";return}
      f.t.pieces.splice(f.t.pieces.indexOf(f.p),1);f.t.pieces=f.t.pieces.filter(x=>x.on!==f.p.id||x.k!=="t");if(f.p.v&&!s.topics.some(t=>t.pieces.some(x=>x.v===f.p.v)))sesDelVid(f.p.v);persist();SES.v="board";return sesDraw()}
    case"cmp":SES.v="cmp";return sesDraw();
@@ -5607,7 +5938,7 @@ function sesCard(){const s=sesCur(),todo=sesAll().filter(x=>x.end&&!x.wrap&&x.to
    <span>Film your coach and your tries, keep what they say, and add homework on the spot. Nothing to type until you're done.</span>
    ${s?`<button class="btn pri" data-ses="open">Back to session · ${sesClock(s)}</button>`:`<button class="btn pri" data-ses="open">Start coach session</button>`}
    ${todo.map(x=>`<button class="linkbtn" data-ses="wrap:${x.id}">Finish setting up ${when(x)}${x.coach?" with "+esc(x.coach):""} →</button>`).join("")}
-   ${past.length?`<span class="small">Past: ${past.map(x=>`<button class="linkbtn" data-ses="view:${x.id}">${when(x)}${x.coach?" · "+esc(x.coach):""}</button>`).join(" ")}</span>`:""}</div></section>`}
+   ${past.length?`<span class="small">Past: ${past.map(x=>`<button class="linkbtn" data-ses="view:${x.id}">${when(x)}${x.coach?" · "+esc(x.coach):""}</button>`).join(" ")}</span>`:""}${sesCardMore()}</div></section>`}
 function sesPill(){let el=document.getElementById("sespill");const s=sesCur(),show=!!(s&&!SES&&!pEl);
   if(!show){if(el)el.remove();return}
   if(!el){el=document.createElement("button");el.id="sespill";el.className="sespill";el.dataset.ses="open";document.body.appendChild(el)}
@@ -5618,6 +5949,324 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-ses]");if(
   else if(a==="topic"){const [sid,tid]=[id,b.dataset.ses.split(":")[2]],s=sesFind(sid);if(!s)return toast("Clips not found","That session was deleted.");const t=s.topics.find(x=>x.id===tid),p=t&&(sesVidP(t).find(x=>x.k==="c")||sesVidP(t)[0]);sesOpen({view:sid});if(p){SES.p=p.id;SES.v="replay";sesDraw()}}});
 /* a session restored after the app restarts gets its share target back */
 setTimeout(()=>{const s=sesCur();if(s)try{window.hoopsSesShare?.(true,s.coach)}catch(e){}sesPill()},1500);
+/* ---------- transcripts and spoken marks ----------
+   Voice notes and the coach's clips are turned into text after they're saved, never live. sesPcm() decodes the
+   recording to 16 kHz mono PCM and window.hoopsTx (native.js, section 3b) hands it to the phone's on-device
+   recognizer (Android 13+). The text goes on the piece as p.tx; p.txs says why there's none ("fail", "lang", or
+   "none" when no words were heard). In a browser or on an older phone there's no hoopsTx, notes stay audio, and
+   nothing extra shows. The transcript shows under its note or clip, and gives name suggestions at wrap-up.
+   Spoken "my turn", "again" and "done" (beta, off by default, S.coach.sesVoice) listen live while a propped
+   recording runs: window.hoopsSesVoice in the app, the browser's SpeechRecognition elsewhere. Taps always work.
+   This part draws by adding to what sesDraw just drew (sesXPaint, marked data-svx), so the screens stay as they are.
+   See docs/LEARNING.md, step 27. */
+const SES_TXMAX=180;   // seconds of a piece sent to the recognizer
+const SESTX=new Set(),SESASK=new Set(); // pieces being transcribed right now; retries tapped by hand
+let sesTxChain=Promise.resolve(),sesTxAvail=null;
+const sesTxOK=()=>window.hoopsTx?(sesTxAvail=sesTxAvail||Promise.resolve().then(()=>window.hoopsTx.ok()).then(x=>!!x,()=>false)):Promise.resolve(false);
+/* the piece's sound as base64 16-bit PCM, 16 kHz mono; "" when it's too short to hold words, null when it can't be read */
+async function sesPcm(vid,a,b){const AC=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(!AC)return null;
+  const blob=await vtx("readonly",(m,bl)=>rq(bl.get(vid)));if(!blob)return null;
+  const buf=await blob.arrayBuffer(),ctx=new AC(1,16000,16000);
+  const au=await new Promise((res,rej)=>{const p=ctx.decodeAudioData(buf,res,rej);if(p&&p.catch)p.catch(rej)}).catch(()=>null);if(!au)return null;
+  const r=au.sampleRate,i0=Math.max(0,Math.floor((a||0)*r)),i1=Math.min(au.length,b?Math.ceil(b*r):au.length,i0+SES_TXMAX*r);if(i1-i0<r*.4)return"";
+  const ch=[];for(let c=0;c<au.numberOfChannels;c++)ch.push(au.getChannelData(c));
+  const out=new Int16Array(i1-i0);for(let i=i0;i<i1;i++){let v=0;for(const d of ch)v+=d[i];v/=ch.length;out[i-i0]=Math.max(-1,Math.min(1,v))*32767}
+  const u8=new Uint8Array(out.buffer);let s="";for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s)}
+const sesTxTidy=x=>{x=String(x||"").replace(/\s+/g," ").trim().slice(0,2000);return x?x[0].toUpperCase()+x.slice(1):""};
+/* queue pieces (voice notes and coach clips) for a transcript; one at a time, after any recording in progress */
+async function sesTxQ(s,...ps){if(!s||!(await sesTxOK()))return;
+  for(const p of ps){if(!p||!p.v||(p.k!=="t"&&p.k!=="c")||SESTX.has(p.id))continue;SESTX.add(p.id);const ask=SESASK.delete(p.id);
+    sesTxChain=sesTxChain.then(()=>sesTxRun(s.id,p.id,ask)).catch(()=>{}).then(()=>{SESTX.delete(p.id);sesXPaint()})}
+  sesXPaint()}
+async function sesTxRun(sid,pid,ask){
+  // the camera or mic is busy while filming or talking: wait for it (up to 10 minutes)
+  for(let i=0;i<600&&SES&&(SES.rec||SES.talk);i++)await new Promise(r=>setTimeout(r,1000));
+  const find=()=>{const s=sesFind(sid);return s&&sesPiece(s,pid)};let f=find();if(!f)return;
+  let pcm=null;try{pcm=await sesPcm(f.p.v,f.p.k==="t"?0:f.p.a,f.p.k==="t"?0:f.p.b)}catch(e){}
+  let tx="",why=null;
+  if(pcm===null)why="fail";else if(!pcm)why="none";
+  else{try{const r=await window.hoopsTx.run(pcm,{ask:!!ask});tx=sesTxTidy(r&&r.text);if(!tx)why="none"}
+    catch(e){const c=String(e&&(e.code||e.message)||e);why=/nolang/.test(c)?"lang":/unavailable/.test(c)?"":"fail"}}
+  f=find();if(!f)return;const p=f.p;   // look it up again: it may have been deleted, or the progress reloaded
+  if(tx){p.tx=tx;delete p.txs}else if(why)p.txs=why;persist()}
+function sesTxHtml(p){if(p.tx)return `<div class="ses-tx" data-svx>“${esc(p.tx)}”</div>`;
+  if(SESTX.has(p.id))return `<div class="ses-tx w" data-svx>Turning it into text…</div>`;
+  const why={fail:"Couldn't turn this into text.",lang:"The phone is still getting its English speech pack.",none:p.k==="t"?"No words heard.":""}[p.txs];
+  return why?`<div class="ses-tx f" data-svx>${why} <button class="ses-txr" data-stx="${p.id}">Try again</button></div>`:""}
+
+/* name suggestions at wrap-up: the drill, the link's title, then the coach's own words */
+const SES_TERMS=["follow-through","follow through","guide hand","shooting hand","set point","elbow","wrist","fingertips","release","arc","balance","base","footwork","feet","hips","pivot","jab step","triple threat","crossover","between the legs","behind the back","hesitation","in and out","spin move","euro step","layup","floater","reverse layup","finish","free throw","jump shot","pull-up","step-back","catch and shoot","bank shot","hook shot","drop step","post move","close out","box out","rebound","defensive stance","slide","pick and roll","screen","chest pass","bounce pass","handle","dribble","dip","eyes","rim"];
+const SES_STOP=new Set("a an the and or but so to of on in at for with from by is are was be been it its it's this that these those here there now then just like okay ok alright all right um uh yeah yes no you you're your yours i i'm me my we we're us our they them he she what when where how why do does did don't doesn't can can't will gonna going want wanna let's lets see look watch get got go come take make one two three more really very good great nice little bit thing things way want need try again little first want".split(" "));
+function sesTxName(text){const t=" "+String(text||"").toLowerCase().replace(/[^a-z' -]/g," ").replace(/\s+/g," ")+" ";if(t.trim().length<3)return"";
+  const hits=SES_TERMS.map(w=>[w,t.indexOf(" "+w+" ")]).filter(x=>x[1]>=0).sort((x,y)=>x[1]-y[1]).map(x=>x[0].replace("follow through","follow-through"));
+  const cap=w=>w[0].toUpperCase()+w.slice(1);
+  if(hits.length)return [...new Set(hits)].slice(0,2).map(cap).join(" & ");
+  const first=String(text).split(/[.!?]/)[0].toLowerCase().replace(/[^a-z' -]/g," ").split(/\s+/).filter(w=>w.length>2&&!SES_STOP.has(w)).slice(0,3);
+  return first.length?cap(first.join(" ")).slice(0,40):""}
+function sesSug(s,t){const out=[],add=x=>{x=String(x||"").trim().slice(0,60);if(x&&x!==t.name&&!out.includes(x))out.push(x)};
+  if(t.from&&D[t.from])add(D[t.from].name);add((t.pieces.find(p=>p.k==="l"&&p.title)||{}).title);
+  const tx=t.pieces.filter(p=>p.k==="c"&&p.tx).concat(t.pieces.filter(p=>p.k==="t"&&p.tx)).map(p=>p.tx).join(". ");add(sesTxName(tx));
+  return out.slice(0,2)}
+
+/* ---------- spoken marks (beta) ---------- */
+const SESVM={on:false,r:null,bad:null,eng:null,iv:0,last:0,fired:false};
+const sesNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+const sesVmOK=()=>!!(window.hoopsSesVoice||(!sesNative()&&(window.SpeechRecognition||window.webkitSpeechRecognition)));
+function sesVmWant(){const s=SES&&SES.sid&&sesFind(SES.sid),R=SES&&SES.rec;
+  return !!(S.coach.sesVoice&&s&&s.mode==="prop"&&!s.end&&SES.v==="rec"&&R&&R.mr&&R.mr.state==="recording"&&SESVM.bad!==R&&sesVmOK())}
+function sesVmCmd(x){const t=" "+String(x||"").toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ")+" ";
+  if(/ (my turn|my go|my try|me now) /.test(t))return"turn";if(/ (again|one more|another one) /.test(t))return"again";if(/ (done|i m done|finished) /.test(t))return"done";return null}
+function sesVmHeard(text,alts,fin){const R=SES&&SES.rec;if(!SESVM.on||!R||!R.mr||SES.v!=="rec")return;
+  if(SESVM.fired||performance.now()-SESVM.last<1500){if(fin)SESVM.fired=false;return}
+  const me=(R.marks[R.marks.length-1]||{}).k==="m";
+  for(const x of [text].concat(alts||[])){const k=sesVmCmd(x);if(!k)continue;
+    if(k==="turn"&&!me)sesMark("m");else if(k==="again"&&me)sesMark("m");else if(k==="done"&&me)sesRecStop(true);else continue;
+    SESVM.last=performance.now();SESVM.fired=!fin;return}
+  if(fin)SESVM.fired=false}
+function sesVmStart(){const R=SES.rec;if(SESVM.on&&SESVM.r===R)return;sesVmStop();SESVM.on=true;SESVM.r=R;SESVM.fired=false;
+  const fail=()=>{if(SESVM.r!==R)return;SESVM.bad=R;sesVmStop();if(SES&&SES.v==="rec"){const h=SES.el.querySelector(".ses-hint");if(h)h.textContent="Voice isn't working here. Tap instead."}};
+  if(window.hoopsSesVoice){try{Promise.resolve(window.hoopsSesVoice.start(sesVmHeard)).catch(fail)}catch(e){fail()}}
+  else{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;try{const r=new SR();r.continuous=true;r.interimResults=true;r.maxAlternatives=3;r.lang="en-US";SESVM.eng=r;
+      r.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i],al=[];for(let j=1;j<x.length;j++)al.push(x[j].transcript);sesVmHeard(x[0].transcript,al,x.isFinal)}};
+      r.onerror=e=>{if(/not-allowed|service-not-allowed|audio-capture/.test(e.error))fail()};
+      r.onend=()=>{if(SESVM.eng===r)setTimeout(()=>{if(SESVM.eng===r)try{r.start()}catch(e){}},250)};r.start()}catch(e){fail()}}
+  SESVM.iv=setInterval(()=>{if(!sesVmWant())sesVmStop()},1000)}
+function sesVmStop(){if(!SESVM.on)return;SESVM.on=false;SESVM.r=null;clearInterval(SESVM.iv);
+  if(SESVM.eng){const r=SESVM.eng;SESVM.eng=null;try{r.abort()}catch(e){}}else try{window.hoopsSesVoice&&window.hoopsSesVoice.stop()}catch(e){}}
+
+/* adds this part's bits to the screen sesDraw just drew; safe to run again at any time */
+function sesXPaint(){if(!SES||!SES.el)return;const el=SES.el,v=SES.v,s=SES.sid&&sesFind(SES.sid);el.querySelectorAll("[data-svx]").forEach(x=>x.remove());
+  sesVmWant()?sesVmStart():sesVmStop();
+  const vmOn=!!S.coach.sesVoice;
+  if(v==="setup"){const h=el.querySelector('[data-x="mode:hand"]');if(h&&SES.set&&SES.set.mode==="prop"&&sesVmOK())h.insertAdjacentHTML("afterend",
+    `<button class="ses-opt ses-vm" data-svm data-svx aria-pressed="${vmOn}"><span class="ses-ic">🎙</span><span><b>Say “my turn” <i class="ses-beta">Beta</i></b><span>Also “again” and “done” while it records. Tapping still works. Some phones can't listen while filming.</span></span><span class="ses-sw" aria-hidden="true" aria-pressed="${vmOn}"><span></span></span></button>`);return}
+  if(!s)return;
+  if(v==="board"||v==="replay"){for(const t of s.topics)for(const p of t.pieces){if(p.k!=="t"&&p.k!=="c")continue;const h=sesTxHtml(p);if(!h)continue;
+      el.querySelectorAll(`[data-x="talkplay:${p.id}"],.ses-pcs [data-x="play:${p.id}"]`).forEach(r=>r.insertAdjacentHTML("afterend",h))}
+    if(v==="replay"){const f=sesPiece(s,SES.p),sp=el.querySelector(".ses-spd");if(f&&f.p.k==="c"&&sp){const h=sesTxHtml(f.p);if(h)sp.insertAdjacentHTML("afterend",h)}}
+    // pieces saved before transcripts existed, or while the app was closed, get theirs now
+    if(SES.txScan!==s.id){SES.txScan=s.id;const todo=[];for(const t of s.topics)for(const p of t.pieces)if((p.k==="t"||p.k==="c")&&p.tx==null&&!p.txs)todo.push(p);if(todo.length)sesTxQ(s,...todo)}}
+  if(v==="wrap")for(const t of s.topics){const inp=!t.name&&el.querySelector(`[data-in="tname:${t.id}"]`),sg=inp&&sesSug(s,t);if(!sg||!sg.length)continue;
+    inp.parentNode.insertAdjacentHTML("beforeend",`<span class="ses-sug" data-svx>Suggested: ${sg.map(x=>`<button class="ses-sugb" data-ssug="${t.id}" data-n="${esc(x)}">${esc(x)}</button>`).join(" ")}</span>`)}
+  if(v==="rec"&&s.mode==="prop"&&SES.rec&&SES.rec.mr&&sesVmOK()){const R=SES.rec,me=(R.marks[R.marks.length-1]||{}).k==="m",row=el.querySelector(".ses-camfoot .ses-row"),hint=el.querySelector(".ses-camfoot .ses-hint");
+    if(row)row.insertAdjacentHTML("beforeend",`<button class="ses-sm" data-svm data-svx aria-pressed="${vmOn}">🎙 Voice ${vmOn?"on":"off"} · beta</button>`);
+    if(hint&&SESVM.on)hint.textContent=me?"Say “again” for one more, “done” to stop and watch":"Tap or say “my turn” when you take over"}}
+{const o=sesDraw;sesDraw=function(){o.apply(this,arguments);sesXPaint()}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-stx],[data-ssug],[data-svm]");if(!b||!SES)return;e.preventDefault();const s=SES.sid&&sesFind(SES.sid);
+  if(b.dataset.stx!=null){const f=s&&sesPiece(s,b.dataset.stx);if(f){delete f.p.txs;delete f.p.tx;SESASK.add(f.p.id);persist();sesTxQ(s,f.p)}return}
+  if(b.dataset.ssug!=null){const t=s&&s.topics.find(x=>x.id===b.dataset.ssug);if(t){t.name=b.dataset.n;persist();const inp=SES.el.querySelector(`[data-in="tname:${t.id}"]`);if(inp)inp.value=t.name;sesXPaint()}return}
+  S.coach.sesVoice=!S.coach.sesVoice;persist();sesXPaint()});
+/* ---------- session pose: trim the dead seconds, find the handoff (step 27) ----------
+   After a recording is kept, the pose model (the same bundled MediaPipe PoseLandmarker as the form check, here
+   looking for up to two people) reads 4 frames a second in the background. It finds the first and last frames
+   with a person in them (a palm over the lens at the start, the floor at the end), and, in a propped recording
+   with no My turn mark, where the coach's turn ends and yours begins: a stretch with nobody in frame, a change in
+   the main person's size or place, two people becoming one, or a long still gap. It only ever suggests: the topic
+   card shows "Suggested: coach 0:00–0:41, try 0:44–1:10" with Apply, Adjust and Not now, and Apply has Undo.
+   If the model can't load or finds nobody, nothing shows. Frames stay in memory; only the suggestion is kept. */
+let sesPoseP=null,sesPoseQ=Promise.resolve();const SESPOSE={}; // v -> {st:"busy"|"done"|"none"|"fail", i, n}
+function sesPoseLoad(){if(!sesPoseP){sesPoseP=(async()=>{const base=document.baseURI;const v=await import(new URL("vision_bundle.mjs",base).href);
+  const fs=await v.FilesetResolver.forVisionTasks(new URL("wasm",base).href);
+  const buf=new Uint8Array(await (await fetch(new URL("pose_landmarker_lite.task",base).href)).arrayBuffer());
+  return v.PoseLandmarker.createFromOptions(fs,{baseOptions:{modelAssetBuffer:buf,delegate:"CPU"},runningMode:"IMAGE",numPoses:2})})();
+  sesPoseP.catch(()=>{sesPoseP=null})}return sesPoseP}
+/* one person from 33 landmarks (0 to 1 across the frame): centre, height and the points, or null when too little shows */
+function sesPoseBox(lm){const ok=(lm||[]).filter(p=>(p.visibility??1)>.5);if(ok.length<6)return null;
+  const xs=ok.map(p=>p.x),ys=ok.map(p=>p.y),y0=Math.min(...ys),y1=Math.max(...ys);if(y1-y0<.08)return null;
+  return{x:(Math.min(...xs)+Math.max(...xs))/2,y:(y0+y1)/2,h:y1-y0,lm:lm.map(p=>({x:p.x,y:p.y,v:p.visibility??1}))}}
+async function sesPoseFrames(url,dur,on){const pl=await sesPoseLoad();
+  const v=document.createElement("video");v.muted=true;v.playsInline=true;v.preload="auto";v.src=url;await cmpOnce(v,"loadeddata",8000);try{await v.play();v.pause()}catch(e){}
+  try{if(!v.videoWidth)throw new Error("no video");dur=dur||await cmpDuration(v,0);if(!(dur>0))throw new Error("no duration");
+    const fps=Math.min(4,600/dur),n=Math.max(1,Math.floor(dur*fps)),sc=320/Math.max(v.videoWidth,v.videoHeight),cv=document.createElement("canvas");
+    cv.width=Math.round(v.videoWidth*sc);cv.height=Math.round(v.videoHeight*sc);const cx=cv.getContext("2d",{willReadFrequently:true}),F=[];
+    for(let i=0;i<n;i++){while(SES&&SES.rec)await new Promise(r=>setTimeout(r,1000)); // the camera comes first
+      const t=Math.min(dur-.05,(i+.5)/fps);await cmpSeek(v,t);cx.drawImage(v,0,0,cv.width,cv.height);
+      let ps=[];try{const r=pl.detect(cv);ps=(r.landmarks||[]).map(sesPoseBox).filter(Boolean)}catch(e){}
+      F.push({t:+t.toFixed(2),ps});if(on)on(i+1,n)}
+    return F}finally{v.removeAttribute("src");v.load()}}
+/* the heuristic, on frames {t, ps:[{x,y,h,lm}]}: {a, b} where someone is in frame, and h {e, s, why} for a handoff */
+function sesPoseSplit(F,o){o=o||{};const n=F.length;if(n<4)return null;const dt=Math.max(.05,(F[n-1].t-F[0].t)/(n-1)),dur=o.dur||F[n-1].t+dt/2;
+  const M=F.map(f=>(f.ps||[]).reduce((b,p)=>!b||p.h>b.h?p:b,null)),has=M.map(Boolean);
+  const on=has.map((x,i)=>(has[i-1]?1:0)+(x?1:0)+(has[i+1]?1:0)>=2&&x);
+  const first=on.indexOf(true),last=on.lastIndexOf(true);if(first<0)return null;
+  const mo=M.map((p,i)=>{const q=M[i-1];if(!p||!q)return 0;const d=[];if(p.lm&&q.lm)for(let j=0;j<p.lm.length;j++){if(p.lm[j].v>.5&&q.lm[j]&&q.lm[j].v>.5)d.push(Math.hypot(p.lm[j].x-q.lm[j].x,p.lm[j].y-q.lm[j].y))}
+    return(d.length?med(d):Math.hypot(p.x-q.x,p.y-q.y))/Math.max(.05,p.h)});
+  const a=Math.max(0,F[first].t-dt/2-.25),b=Math.min(dur,F[last].t+dt/2+.25),res={a:+a.toFixed(2),b:+b.toFixed(2),h:null};
+  if(!o.split||b-a<8)return res;
+  const pad=Math.ceil(2/dt),lo=first+pad,hi=last-pad;if(hi<=lo)return res;
+  const runs=test=>{const out=[];let s=-1;for(let i=lo;i<=hi+1;i++){const x=i<=hi&&test(i);if(x&&s<0)s=i;if(!x&&s>=0){out.push([s,i-1]);s=-1}}return out.sort((p,q)=>(q[1]-q[0])-(p[1]-p[0]))};
+  const gap=(r,why)=>({e:+(F[r[0]].t-dt/2).toFixed(2),s:+(F[r[1]].t+dt/2).toFixed(2),why});
+  let h=null;
+  /* 1. nobody in frame for a second or more: the coach walks out, you walk in */
+  const empty=runs(i=>!on[i]).find(r=>(r[1]-r[0]+1)*dt>=1);if(empty)h=gap(empty,"empty");
+  /* 2. the main person changes size or place, compared over the 6 seconds either side */
+  if(!h){const w=Math.ceil(6/dt);let best=null;
+    for(let k=lo;k<=hi;k++){if(!has[k])continue;const B=[],A=[];for(let i=Math.max(first,k-w);i<k;i++)if(has[i])B.push(M[i]);for(let i=k;i<=Math.min(last,k+w);i++)if(has[i])A.push(M[i]);
+      if(B.length<6||A.length<6)continue;const hb=med(B.map(p=>p.h)),ha=med(A.map(p=>p.h)),sc=Math.abs(hb-ha)/Math.max(hb,ha)+Math.abs(med(B.map(p=>p.x))-med(A.map(p=>p.x)));
+      if(!best||sc>best.sc+.02)best={k,sc,k2:k};else if(sc>=best.sc-.02&&best.k2===k-1)best.k2=k}
+    if(best&&best.sc>=.3){best.k=Math.round((best.k+best.k2)/2);while(best.k>lo&&!has[best.k])best.k--;let j=best.k-1;while(j>first&&!has[j])j--;h={e:+(F[j].t+dt/2).toFixed(2),s:+(F[best.k].t-dt/2).toFixed(2),why:"person"}}}
+  /* 3. two people in frame becoming one (or one becoming two) */
+  if(!h){const w=Math.ceil(5/dt),c=F.map(f=>Math.min(2,(f.ps||[]).length));let best=null;
+    for(let k=lo;k<=hi;k++){let sb=0,nb=0,sa=0,na=0;for(let i=Math.max(first,k-w);i<k;i++){sb+=c[i];nb++}for(let i=k;i<=Math.min(last,k+w);i++){sa+=c[i];na++}
+      const d=Math.abs(sb/nb-sa/na);if(!best||d>best.d)best={k,d}}
+    if(best&&best.d>=.7)h={e:+(F[best.k].t-dt/2).toFixed(2),s:+(F[best.k].t-dt/2).toFixed(2),why:"count"}}
+  /* 4. a long still stretch (2.5 s or more) with nobody moving */
+  if(!h){const still=runs(i=>!has[i]||mo[i]<.012).find(r=>(r[1]-r[0]+1)*dt>=2.5);if(still)h=gap(still,"still")}
+  if(h&&h.e-a>=1.5&&b-h.s>=1.5&&h.s>=h.e)res.h=h;return res}
+function sesPoseLater(s,t,v,dur,marks){if(!s||!t||!v)return;const split=s.mode==="prop"&&marks&&marks.length===1&&marks[0].k==="c";
+  SESPOSE[v]={st:"wait",i:0,n:0};sesPoseQ=sesPoseQ.then(()=>sesPoseRun(s.id,t.id,v,dur,split)).catch(()=>{})}
+async function sesPoseRun(sid,tid,v,dur,split){const P=SESPOSE[v]=SESPOSE[v]||{};P.st="busy";sesPoseNote(v);
+  let F=null;try{const url=await sesBlob(v);if(!url)throw new Error("gone");F=await sesPoseFrames(url,dur,(i,n)=>{P.i=i;P.n=n;if(i%8===0)sesPoseNote(v)})}
+  catch(e){P.st="fail";P.err=String(e&&e.message||e);sesPoseNote(v);return}
+  let r=null;try{r=sesPoseSplit(F,{dur,split})}catch(e){}
+  const s=sesFind(sid),t=s&&s.topics.find(x=>x.id===tid);P.st=r&&t&&sesPoseSug(s,t,v,r,dur)?"done":"none";sesPoseNote(v)}
+/* the board's progress line, updated in place so a replay or the camera isn't redrawn */
+function sesPoseNote(v){if(!SES)return;const el=SES.el.querySelector(`[data-pose="${v}"]`),P=SESPOSE[v];
+  if(el&&P&&P.st==="busy"){el.textContent=`Checking for setup time and the handoff${P.n?` · ${Math.round(100*P.i/P.n)}%`:"…"}`;return}
+  if(SES.v==="board"&&(el||P&&P.st==="done"))sesDraw()}
+/* a suggestion, from a pose result, for the pieces cut from recording v */
+function sesPoseSug(s,t,v,r,dur){const ps=t.pieces.filter(p=>p.v===v&&(p.k==="c"||p.k==="m")).sort((x,y)=>x.a-y.a);if(!ps.length)return false;
+  let segs;
+  if(r.h&&ps.length===1&&ps[0].k==="c")segs=[{id:ps[0].id,k:"c",a:r.a,b:r.h.e},{k:"m",a:r.h.s,b:r.b}];
+  else{segs=ps.map(p=>Object.assign({id:p.id,k:p.k,a:p.a,b:p.b},p.n?{n:p.n}:{}));const f=segs[0],l=segs[segs.length-1];
+    if(r.a>f.a&&r.a<f.b-1)f.a=r.a;if(r.b<l.b&&r.b>l.a+1)l.b=r.b;
+    if(segs.every((x,i)=>Math.abs(x.a-ps[i].a)<.8&&Math.abs(x.b-ps[i].b)<.8))return false}
+  t.trim=(t.trim||[]).filter(x=>x.v!==v);t.trim.push({v,segs,st:"new",why:r.h?r.h.why:"trim",cut:[+(segs[0].a-ps[0].a).toFixed(1),+(ps[ps.length-1].b-segs[segs.length-1].b).toFixed(1)],dur:+(dur||ps[ps.length-1].b).toFixed(2)});persist();return true}
+const sesTenth=x=>`${Math.floor(x/60)}:${(x%60).toFixed(1).padStart(4,"0")}`;
+const sesSegTxt=x=>`${x.k==="c"?"coach":"try"+(x.n?" "+x.n:"")} ${mmss(x.a)}–${mmss(x.b)}`;
+function sesSugRow(s,t,g){const key=`${t.id}:${g.v}`,txt=g.segs.map(sesSegTxt).join(", ");
+  if(g.st==="applied")return `<div class="ses-sug done"><span><b>Trimmed:</b> ${esc(txt)}</span><div class="ses-sugb"><button data-x="sugundo:${key}">Undo</button></div></div>`;
+  const why={empty:"Found where nobody's in frame between turns.",person:"Found where a different person takes over.",count:"Found where two people become one.",still:"Found a long still gap between turns."}[g.why]||"",
+    cut=[g.cut[0]>=.8?`${g.cut[0].toFixed(1)} s of setup at the start`:"",g.cut[1]>=.8?`${g.cut[1].toFixed(1)} s at the end`:""].filter(Boolean).join(" and ");
+  return `<div class="ses-sug"><span><b>Suggested:</b> ${esc(txt)}</span><small>${esc([why,cut?"Cuts "+cut+".":""].filter(Boolean).join(" "))}</small>
+   <div class="ses-sugb"><button class="ok" data-x="sugok:${key}">Apply</button><button data-x="sugadj:${key}">Adjust</button><button data-x="sugno:${key}">Not now</button></div></div>`}
+function sesSugFind(s,key){const [tid,v]=key.split(":"),t=s&&s.topics.find(x=>x.id===tid),g=t&&(t.trim||[]).find(x=>x.v===v);return g?{t,g}:null}
+function sesSugApply(s,t,g){const ps=t.pieces.filter(p=>p.v===g.v&&(p.k==="c"||p.k==="m"));g.undo=ps.map(p=>({id:p.id,a:p.a,b:p.b}));g.add=[];const ch=[];
+  for(const x of g.segs){let p=x.id&&t.pieces.find(q=>q.id===x.id);
+    if(!p){if(x.id)continue;p={id:uid("p"),k:"m",v:g.v,a:x.a,b:x.b,n:sesTries(t).length+1,t:Date.now()};const at=t.pieces.findIndex(q=>q.id===g.segs[0].id);t.pieces.splice(at>=0?at+1:t.pieces.length,0,p);g.add.push(p.id);x.n=p.n}
+    p.a=+x.a.toFixed(2);p.b=+x.b.toFixed(2);ch.push(p)}
+  g.st="applied";sesTouch(s);sesBlob(g.v).then(u=>{if(u)sesThumbs(s,ch,u)})}
+function sesSugUndo(s,t,g){for(const u of g.undo||[]){const p=t.pieces.find(q=>q.id===u.id);if(p){p.a=u.a;p.b=u.b}}
+  for(const id of g.add||[]){const i=t.pieces.findIndex(q=>q.id===id);if(i>=0)t.pieces.splice(i,1);t.pieces.forEach(q=>{if(q.on===id)q.on=null})}
+  g.segs.forEach(x=>{if(!x.id)delete x.n});g.st="new";delete g.undo;delete g.add;sesTouch(s);sesBlob(g.v).then(u=>{if(u)sesThumbs(s,t.pieces.filter(p=>p.v===g.v&&p.k!=="t"),u)})}
+/* Adjust: nudge each start and end half a second at a time, with the chosen part looping above */
+function sesTrimDraw(el,s){const T=SES.trim,f=sesSugFind(s,T.key);if(!f){SES.v="board";return false}const x=T.segs[T.sel]||T.segs[0];
+  el.innerHTML=`${sesHead("Adjust the cut",`${sesTName(s,f.t)} · nothing changes until you apply`)}
+   <div class="ses-vid"><video playsinline muted loop></video><em class="${x.k}">${esc(sesSegTxt(x))}</em></div>
+   <div class="ses-body"><div class="ses-chips">${T.segs.map((y,i)=>`<button class="ses-chip" data-x="trsel:${i}" aria-pressed="${i===T.sel}">${y.k==="c"?"Coach":"Try"}</button>`).join("")}</div>
+    ${T.segs.map((y,i)=>`<div class="ses-lab">${y.k==="c"?"Coach":"Try"}</div>
+     <div class="ses-step"><span>Starts</span><button data-x="trn:${i}:a:-1" aria-label="Start earlier">−</button><b class="num">${sesTenth(y.a)}</b><button data-x="trn:${i}:a:1" aria-label="Start later">+</button></div>
+     <div class="ses-step"><span>Ends</span><button data-x="trn:${i}:b:-1" aria-label="End earlier">−</button><b class="num">${sesTenth(y.b)}</b><button data-x="trn:${i}:b:1" aria-label="End later">+</button></div>`).join("")}
+    <p class="ses-sub">Each tap moves it half a second. The part you picked loops above.</p></div>
+   <div class="ses-dock"><div class="r2"><button class="ses-btn g" data-x="board">Cancel</button><button class="ses-btn m" data-x="trok">Apply</button></div></div>`;
+  sesVideo(el.querySelector(".ses-vid video"),{v:f.g.v,a:x.a,b:x.b},SES.rate||1);return true}
+
+/* ---------- quick test: "make 10 free throws" ----------
+   A counter inside the session with the workout logger's + and − (+ is a make, − takes back the last shot, + Miss
+   a miss), the same beeps and buzz. Goals: N makes, makes in a time, or N in a row. Done saves a Score piece
+   (k "q": gk the goal kind, goal, made, att, secs, best) in the topic. A topic started from a drill that logs
+   makes can also log the result to that drill's history (xp 0, q 1), so it counts toward the drill's goal. */
+const QT_D={makes:10,time:60,row:5};
+function sesQtLast(s,t,kind){if(!t.from&&!(t.name||"").trim())return null;const key=(t.from||"")+"|"+(t.name||"").trim().toLowerCase();let best=null;
+  for(const x of sesAll()){if((x.coach||"")!==(s.coach||""))continue;for(const y of x.topics){if(((y.from||"")+"|"+(y.name||"").trim().toLowerCase())!==key&&!(t.from&&y.from===t.from))continue;
+    for(const p of y.pieces)if(p.k==="q"&&(!kind||p.gk===kind)&&(!best||p.t>best.t))best=p}}return best}
+function sesQtScore(p){return p.gk==="time"?`${p.made} make${p.made===1?"":"s"} in ${mmss(p.goal)}`:p.gk==="row"?`${p.best||0} in a row (goal ${p.goal})`:`${p.made}/${p.goal} makes`}
+function sesQtRow(p){const pc=pct(p.made,p.att);return `<div class="ses-pc"><span class="ses-ic">🎯</span><i class="ses-k q">Test</i><span class="tx">${esc(sesQtScore(p))} · ${p.att} shot${p.att===1?"":"s"}</span><span class="tm">${pc==null?"":pc+"%"}</span></div>`}
+const sesQtSum=t=>t.pieces.filter(p=>p.k==="q").map(p=>` · test ${esc(sesQtScore(p))}`).join("");
+function sesQtOpen(){const s=sesFind(SES.sid);if(!s||s.end)return;const t=sesTop(s)||sesNewTopic(s),last=sesQtLast(s,t),d=t.from&&D[t.from];sesTouch(s);
+  SES.qt={tid:t.id,kind:last?last.gk:"makes",goal:last?last.goal:QT_D.makes,made:0,att:0,hist:[],run:0,best:0,t0:0,t1:0,canLog:!!(d&&d.log==="makes"),log:!!(d&&d.log==="makes")};
+  SES.v="qt";sesDraw();const Q=SES.qt;clearInterval(sesQtOpen.tick);
+  sesQtOpen.tick=setInterval(()=>{if(!SES||SES.qt!==Q||SES.v!=="qt"){if(!SES||SES.qt!==Q)clearInterval(sesQtOpen.tick);return}if(!Q.t0||Q.t1)return;
+    const c=SES.el.querySelector("[data-qtclock]");if(c)c.textContent=sesQtClock(Q);if(Q.kind==="time"&&Date.now()-Q.t0>=Q.goal*1000){Q.t1=Q.t0+Q.goal*1000;beep(1046,260);try{navigator.vibrate?.([80,60,80])}catch(e){}sesDraw()}},250)}
+const sesQtClock=Q=>{const el=((Q.t1||Date.now())-(Q.t0||Date.now()))/1000;return Q.kind==="time"?mmss(Math.ceil(Math.max(0,Q.goal-el))):mmss(el)};
+const sesQtOver=Q=>Q.kind==="makes"?Q.made>=Q.goal:Q.kind==="row"?Q.run>=Q.goal:!!Q.t1;
+function sesQtShot(hit){const Q=SES.qt;if(!Q||sesQtOver(Q))return;if(!Q.t0)Q.t0=Date.now();
+  Q.att++;Q.hist.push(hit?1:0);if(hit){Q.made++;Q.run++;Q.best=Math.max(Q.best,Q.run)}else Q.run=0;
+  beep(hit?988:440,hit?110:220);try{navigator.vibrate?.(hit?30:[40,60,40])}catch(e){}
+  if(Q.kind!=="time"&&sesQtOver(Q)){Q.t1=Date.now();setTimeout(()=>beep(1318,200),150)}sesDraw()}
+function sesQtUndo(){const Q=SES.qt;if(!Q||!Q.hist.length)return;const h=Q.hist.pop();Q.att--;if(h)Q.made--;
+  let r=0,best=0;for(const x of Q.hist){r=x?r+1:0;best=Math.max(best,r)}Q.run=r;Q.best=best;if(Q.kind!=="time")Q.t1=0;if(!Q.hist.length&&Q.kind!=="time")Q.t0=0;sesDraw()}
+function sesQtSave(s){const Q=SES.qt,t=Q&&s.topics.find(x=>x.id===Q.tid);if(!t||!Q.att)return;
+  const p={id:uid("p"),k:"q",gk:Q.kind,goal:Q.goal,made:Q.made,att:Q.att,secs:Math.round(((Q.t1||Date.now())-(Q.t0||Date.now()))/1000),t:Date.now()};if(Q.kind==="row")p.best=Q.best;
+  t.pieces.push(p);if(!t.name&&t.from&&D[t.from])t.name=D[t.from].name;
+  let more="";const d=t.from&&D[t.from];
+  if(Q.canLog&&Q.log&&d){let se=todaySession();if(!se){se={d:today(),items:[]};S.sessions.push(se)}se.items.push({id:d.id,t:Date.now(),xp:0,m:Q.made,a:Q.att,g:targetPct(d),q:1});more=` Also in your ${d.name} history.`}
+  sesTouch(s);clearInterval(sesQtOpen.tick);SES.qt=null;SES.v="board";SES.msg=`Score saved: ${sesQtScore(p)}.${more}`;sesDraw()}
+function sesQtDraw(el,s){const Q=SES.qt,t=Q&&s.topics.find(x=>x.id===Q.tid);if(!t){SES.v="board";return false}
+  const k=Q.kind,miss=Q.att-Q.made,pc=pct(Q.made,Q.att),over=sesQtOver(Q),last=sesQtLast(s,t,k),d=t.from&&D[t.from];
+  const gl=x=>x==="makes"?`${k==="makes"?Q.goal:QT_D.makes} makes`:x==="time"?k==="time"&&Q.goal!==60?mmss(Q.goal):"1 minute":"In a row";
+  el.innerHTML=`${sesHead(`${sesTName(s,t)} · quick test`,s.coach?`Test from ${s.coach}`:"Quick test",`<span class="ses-clock num" data-qtclock>${sesQtClock(Q)}</span>`)}
+   <div class="ses-body">${sesNote()}<div class="ses-lab">Goal</div>
+    <div class="ses-chips">${["makes","time","row"].map(x=>`<button class="ses-chip" data-x="qtk:${x}" aria-pressed="${k===x}" ${Q.att?"disabled":""}>${gl(x)}</button>`).join("")}</div>
+    ${Q.att?"":`<div class="ses-step"><span>${k==="time"?"Time":k==="row"?"In a row":"Makes"}</span><button data-x="qtg:-1" aria-label="Less">−</button><b class="num">${k==="time"?mmss(Q.goal):Q.goal}</b><button data-x="qtg:1" aria-label="More">+</button></div>`}
+    <div class="ses-qt"><div class="ses-lab">${k==="row"?`In a row · best ${Q.best}`:k==="time"?`Makes in ${mmss(Q.goal)}`:"Makes"}</div>
+     <div class="ses-qrow"><button class="ses-qb" data-x="qtu" aria-label="Take back the last shot" ${Q.hist.length?"":"disabled"}>−</button><b class="num ses-qn">${k==="row"?Q.run:Q.made}${k==="time"?"":`<span>/${Q.goal}</span>`}</b><button class="ses-qb mk" data-x="qtm" aria-label="Make" ${over?"disabled":""}>+</button></div>
+     <button class="ses-btn g wide" data-x="qtx" ${over?"disabled":""}>+ Miss</button>
+     <div class="ses-sub" role="status">${over?"Done · ":""}${miss} miss${miss===1?"":"es"}${pc==null?"":` · ${pc}%`}${k==="row"?` · ${Q.made}/${Q.att} in all`:""}</div></div>
+    ${last?`<p class="ses-sub">Last time${s.coach?" with "+esc(s.coach):""}: ${esc(sesQtScore(last))} on ${new Date(last.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})}.</p>`:""}
+    ${Q.canLog?`<div class="ses-wrow"><div class="ses-wm"><b>Log to ${esc(d.name)}</b><span class="ses-sub">Counts in that drill's history and goal</span></div><button class="ses-sw" data-x="qtlog" aria-pressed="${Q.log}" aria-label="Log to ${esc(d.name)} history"><span></span></button></div>`:""}
+    <p class="ses-sub">+ is a make, − takes back the last shot.${k==="time"?" The clock starts with the first shot.":""}</p></div>
+   <div class="ses-dock"><div class="r2"><button class="ses-btn g" data-x="qtcancel">Cancel</button><button class="ses-btn m" data-x="qtsave" ${Q.att?"":"disabled"}>Done · save score</button></div></div>`;return true}
+
+/* ---------- the hooks the session screen calls ---------- */
+function sesTopicExtra(s,t,cur){let h="";
+  for(const v of new Set(t.pieces.filter(p=>p.v&&(p.k==="c"||p.k==="m")).map(p=>p.v))){const P=SESPOSE[v];if(P&&(P.st==="busy"||P.st==="wait"))h+=`<div class="ses-sub" data-pose="${v}">Checking for setup time and the handoff${P.n?` · ${Math.round(100*P.i/P.n)}%`:"…"}</div>`}
+  if(!s.end)for(const g of t.trim||[])if(g.st!=="off")h+=sesSugRow(s,t,g);
+  if(cur)h+=`<button class="ses-lk" data-x="qt">+ Quick test</button>`;return h}
+function sesPzDraw(el,s,v){if(v==="trim")return sesTrimDraw(el,s);if(v==="qt")return sesQtDraw(el,s);return false}
+function sesPzBack(v){if(v!=="trim"&&v!=="qt")return false;if(v==="qt"){clearInterval(sesQtOpen.tick);SES.qt=null}SES.trim=null;SES.v="board";sesDraw();return true}
+function sesPzClick(a,id,b,s){if(!s)return false;
+  if(a==="sugok"||a==="sugno"||a==="sugundo"||a==="sugadj"){const f=sesSugFind(s,id);if(!f)return true;
+    if(a==="sugok")sesSugApply(s,f.t,f.g);else if(a==="sugundo")sesSugUndo(s,f.t,f.g);else if(a==="sugno"){f.g.st="off";persist()}
+    else{SES.trim={key:id,segs:f.g.segs.map(x=>Object.assign({},x)),sel:0};SES.v="trim"}sesDraw();return true}
+  if(a==="trsel"){SES.trim.sel=+id;sesDraw();return true}
+  if(a==="trn"){const [i,e,d]=id.split(":"),T=SES.trim,x=T.segs[+i],f=sesSugFind(s,T.key);if(!x||!f)return true;const max=f.g.dur||x.b+60;
+    x[e]=+Math.min(max,Math.max(0,x[e]+(+d)*.5)).toFixed(2);if(x.b-x.a<.5){if(e==="a")x.a=+(x.b-.5).toFixed(2);else x.b=+(x.a+.5).toFixed(2)}T.sel=+i;sesDraw();return true}
+  if(a==="trok"){const T=SES.trim,f=sesSugFind(s,T.key);if(f){if(f.g.st==="applied")sesSugUndo(s,f.t,f.g);f.g.segs=T.segs;sesSugApply(s,f.t,f.g)}SES.trim=null;SES.v="board";sesDraw();return true}
+  if(a==="qt"){sesQtOpen();return true}
+  if(a==="qtk"&&SES.qt&&!SES.qt.att){SES.qt.kind=id;SES.qt.goal=QT_D[id];sesDraw();return true}
+  if(a==="qtg"&&SES.qt&&!SES.qt.att){const Q=SES.qt,st=Q.kind==="time"?15:1;Q.goal=Math.min(Q.kind==="time"?600:100,Math.max(st,Q.goal+(+id)*st));sesDraw();return true}
+  if(a==="qtm"||a==="qtx"){sesQtShot(a==="qtm");return true}
+  if(a==="qtu"){sesQtUndo();return true}
+  if(a==="qtlog"&&SES.qt){SES.qt.log=!SES.qt.log;sesDraw();return true}
+  if(a==="qtsave"){sesQtSave(s);return true}
+  if(a==="qtcancel"){return sesPzBack("qt")}
+  return false}
+
+/* ---------- Film this rep against the coach's demo (frame 20) ----------
+   A take-home drill made in a session (item.ses) whose topic kept a coach clip or a link: Film this rep on it puts
+   the coach's clip on the left instead of the app's animation. Chips switch the left side to the link, your try from
+   the session ("Before") or back to the animation. The same applies on an app drill's sheet when the topic came
+   from that drill. The coach clip plays its own part, follows Play both and the speed, and lines up by time from
+   its start when you scrub or step. */
+function sesDemoFor(o){for(const l of coLists())for(const it of l.items){if(!it.ses||(o.item&&it.id!==o.item))continue;const s=sesFind(it.ses.s),t=s&&s.topics.find(x=>x.id===it.ses.t);
+    if(!t||(o.drill&&t.from!==o.drill))continue;if(t.pieces.some(p=>(p.k==="c"&&p.v)||p.k==="l"))return{it,s,t}}return null}
+const sesDemoWho=x=>`${x.s.coach?x.s.coach+"'s":"your coach's"} ${x.t.pieces.some(p=>p.k==="c"&&p.v)?"demo":"video"}`;
+function sesFilmBtn(it){return it.ses&&sesDemoFor({item:it.id})?`<button class="linkbtn" data-sesfilm="${it.id}">Film this rep</button>`:""}
+function sesCmpOpen(x,dd){const {it,s,t}=x,who=s.coach||"Coach",when=new Date(s.t).toLocaleDateString(undefined,{month:"short",day:"numeric"}),srcs=[];
+  const vid=`<video class="cmp-sesv" muted playsinline></video>`,tries=sesTries(t),before=tries.find(p=>p.star)||tries[tries.length-1];
+  t.pieces.filter(p=>p.k==="c"&&p.v).forEach((p,i,all)=>srcs.push({lab:who,chip:`${who} · ${when}${all.length>1?" · "+(i+1):""}`,demos:[{a:vid,t:`${who}'s demo from ${when}. Play both starts it with your clip.`,c:"",p}]}));
+  t.pieces.filter(p=>p.k==="l").forEach(p=>srcs.push({lab:"Link",chip:`🔗 ${(p.title||"Link").slice(0,18)}`,demos:[{a:`<a class="cmp-seslink" href="${esc(sesLinkHref(p))}" ${p.b?`data-end="${p.b}"`:""} target="_blank" rel="noopener">▶ ${esc(p.title||linkLabel(p.url))}${p.b?`<small>${mmss(p.a)}–${mmss(p.b)}</small>`:p.a?`<small>from ${mmss(p.a)}</small>`:""}</a>`,t:`The link ${who} shared. It plays on its own, so it can't line up with your clip.`,c:""}]}));
+  if(before)srcs.push({lab:"Before",chip:`Before · try ${before.n}`,demos:[{a:vid,t:`Your try ${before.n} from the session on ${when}.`,c:"",p:before}]});
+  const anim=dd?cmpDemos(dd):[];if(anim.length)srcs.push({lab:"Demo",chip:"Animation",demos:anim});
+  if(!srcs.length)return false;
+  openCmp(dd?dd.id:"",{d:dd||{id:"",name:it.text,skill:it.skill,steps:[]},demos:srcs[0].demos,ses:{srcs,si:0,it}});return!!CMP}
+function sesCmpDecor(C){const X=C.ses,src=X.srcs[X.si],dm=C.demos[C.di],lab=C.el.querySelector(".cmp-pane:not(.mine) .cmp-lab");if(lab)lab.textContent=src.lab;
+  const box=C.el.querySelector(".cmp-demo");if(box)box.classList.toggle("vid",src.lab!=="Demo");
+  if(X.srcs.length>1){const pn=C.el.querySelector(".cmp-panes");if(pn)pn.insertAdjacentHTML("afterend",`<div class="cmp-row cmp-src" role="group" aria-label="Compare with">${X.srcs.map((y,i)=>`<button class="chip" data-cmses="src:${i}" aria-pressed="${i===X.si}">${esc(y.chip)}</button>`).join("")}</div>`)}
+  const v=C.el.querySelector(".cmp-sesv");X.v=v;X.was=false;if(!v||!dm.p)return;const p=dm.p;
+  sesBlob(p.v).then(u=>{if(!u||!v.isConnected)return;v.src=u;v.onloadedmetadata=()=>{try{v.currentTime=p.a;v.playbackRate=C.rate}catch(e){}};
+    v.ontimeupdate=()=>{const b=p.b||v.duration;if(v.currentTime>=b-.04||v.currentTime<p.a-.3)v.currentTime=p.a}})}
+function sesCmpTick(C){const X=C.ses,v=X.v,p=C.demos[C.di]&&C.demos[C.di].p;if(!v||!p||!v.isConnected||v.readyState<1)return;
+  if(v.playbackRate!==C.rate)v.playbackRate=C.rate;const clip=C.state==="clip"&&C.v,want=!clip||C.playing;
+  if(want&&!X.was&&clip&&C.v.currentTime<.15)v.currentTime=p.a;X.was=want;
+  if(want&&v.paused)v.play().catch(()=>{});else if(!want){if(!v.paused)v.pause();const at=Math.min(p.b||v.duration,p.a+C.v.currentTime);if(Math.abs(v.currentTime-at)>.1)v.currentTime=at}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-sesfilm]");if(b){e.preventDefault();const x=sesDemoFor({item:b.dataset.sesfilm});if(x)sesCmpOpen(x,x.t.from&&D[x.t.from]||null);return}
+  const C=CMP,c=C&&C.ses&&e.target.closest("[data-cmses]");if(c&&C.el.contains(c)){const i=+c.dataset.cmses.split(":")[1];if(C.ses.srcs[i]){C.ses.si=i;C.demos=C.ses.srcs[i].demos;C.di=0;C.dt=0;cmpDraw()}}});
+/* a clip kept from that compare goes with the take-home drill, so its row lists it */
+document.addEventListener("click",e=>{const C=CMP,k=C&&C.ses&&e.target.closest('[data-cm="keep"]');if(!k||!C.el.contains(k)||!C.blob||C.kept)return;e.stopImmediatePropagation();
+  C.kept=true;k.disabled=true;k.textContent="Kept";saveVid(C.blob,{dur:C.dur,name:`Self-review: ${C.ses.it.text}`,drill:C.d.id||null,item:C.ses.it.id})},true);
+window.__hoopsSes=()=>({split:sesPoseSplit,sug:sesPoseSug,pose:SESPOSE,demoFor:sesDemoFor,S,D,draw:sesDraw});
 document.addEventListener("click",e=>{const t=e.target.closest("[data-hw]");if(!t)return;const p=t.dataset.hw.split(":"),[a,id,x]=p;
   if(a==="addopen"){CO.addOpen=true;render();document.getElementById("coName")?.focus();return}
   if(a==="wz"){const W=CO.wiz;if(!W)return;
@@ -6025,6 +6674,44 @@ route();
       if (P && S.settings.pvoice && who !== "play") vStart("play").then(() => drawPlayer()).catch(() => { S.settings.pvoice = false; persist() });
     };
     closePlayer = function () { if (who === "play") vStop(); origClosePlayer.apply(this, arguments) };
+
+    // Coach session (beta, off by default): "my turn", "again" and "done" while a propped recording runs. The page
+    // calls hoopsSesVoice.start(cb) / stop() (sesVmStart in www/index.html) and decides what each phrase does.
+    // The drill player's own voice pauses meanwhile and comes back afterward. The WebView is recording at the same
+    // time, and some phones give the recognizer silence while it does: then nothing is heard and taps still work.
+    let sesCb = null, sesResume = null;
+    window.hoopsSesVoice = {
+      start(cb) {
+        if (!sesResume) sesResume = hooks.voicePause();
+        vStop();
+        sesCb = cb; who = "ses"; fired = false;
+        return Voice.start({ words: ["my turn", "again", "one more", "done"] }).then(() => true, e => {
+          if (who === "ses") who = null;
+          sesCb = null;
+          throw e;
+        });
+      },
+      stop() {
+        sesCb = null;
+        if (who === "ses") vStop();
+        const r = sesResume; sesResume = null;
+        if (r) r();
+      },
+    };
+    Voice.addListener("heard", e => { if (e && who === "ses" && sesCb) try { sesCb(e.text || "", e.alts || [], !!e.final) } catch (x) {} });
+  }
+
+  /* ---------- 3b. Coach session transcripts ----------
+     Voice notes and the coach's clips become text after they're saved. The page decodes the recording to 16 kHz
+     mono PCM and calls hoopsTx.run(); the native HoopsTranscribe plugin (android/.../voice/) feeds it to the
+     phone's on-device recognizer (Android 13+), so the audio never leaves the phone. Without the plugin, or on an
+     older phone, ok() is false and notes stay audio only. See docs/LEARNING.md, step 27. */
+  const Tx = Plug.HoopsTranscribe;
+  if (Tx) {
+    window.hoopsTx = {
+      ok: () => Tx.available().then(r => !!(r && r.ok), () => false),
+      run: (pcm, o) => Tx.transcribe({ pcm, rate: 16000, lang: "en-US", ask: !!(o && o.ask) }),
+    };
   }
 
   /* ---------- 4. Live form check from the camera ----------
@@ -6599,8 +7286,8 @@ route();
      During a coach session the share sheet also shows "Session · <coach>" (a sharing shortcut the page turns on and
      off through hoopsSesShare). A share through it arrives with target "session" and goes to sesShared(), never
      to a take-home drill. Shared videos arrive as a file the plugin copied into the app's cache. They're read back
-     here as a Blob and always go to sesShared(), which puts them in the session or, with none running, keeps them in
-     My videos.
+     here as a Blob and always go to sesShared(), which asks Coach or Me and puts them in the session or, with none
+     running, sends them where the owner chose (asked the first time: My videos, or a new coach session).
      It sits before section 8 because that one stops early on a phone without the HoopsRemote plugin.
      See docs/LEARNING.md, steps 20 and 27. */
   {

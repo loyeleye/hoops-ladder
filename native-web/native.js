@@ -356,6 +356,44 @@
       if (P && S.settings.pvoice && who !== "play") vStart("play").then(() => drawPlayer()).catch(() => { S.settings.pvoice = false; persist() });
     };
     closePlayer = function () { if (who === "play") vStop(); origClosePlayer.apply(this, arguments) };
+
+    // Coach session (beta, off by default): "my turn", "again" and "done" while a propped recording runs. The page
+    // calls hoopsSesVoice.start(cb) / stop() (sesVmStart in www/index.html) and decides what each phrase does.
+    // The drill player's own voice pauses meanwhile and comes back afterward. The WebView is recording at the same
+    // time, and some phones give the recognizer silence while it does: then nothing is heard and taps still work.
+    let sesCb = null, sesResume = null;
+    window.hoopsSesVoice = {
+      start(cb) {
+        if (!sesResume) sesResume = hooks.voicePause();
+        vStop();
+        sesCb = cb; who = "ses"; fired = false;
+        return Voice.start({ words: ["my turn", "again", "one more", "done"] }).then(() => true, e => {
+          if (who === "ses") who = null;
+          sesCb = null;
+          throw e;
+        });
+      },
+      stop() {
+        sesCb = null;
+        if (who === "ses") vStop();
+        const r = sesResume; sesResume = null;
+        if (r) r();
+      },
+    };
+    Voice.addListener("heard", e => { if (e && who === "ses" && sesCb) try { sesCb(e.text || "", e.alts || [], !!e.final) } catch (x) {} });
+  }
+
+  /* ---------- 3b. Coach session transcripts ----------
+     Voice notes and the coach's clips become text after they're saved. The page decodes the recording to 16 kHz
+     mono PCM and calls hoopsTx.run(); the native HoopsTranscribe plugin (android/.../voice/) feeds it to the
+     phone's on-device recognizer (Android 13+), so the audio never leaves the phone. Without the plugin, or on an
+     older phone, ok() is false and notes stay audio only. See docs/LEARNING.md, step 27. */
+  const Tx = Plug.HoopsTranscribe;
+  if (Tx) {
+    window.hoopsTx = {
+      ok: () => Tx.available().then(r => !!(r && r.ok), () => false),
+      run: (pcm, o) => Tx.transcribe({ pcm, rate: 16000, lang: "en-US", ask: !!(o && o.ask) }),
+    };
   }
 
   /* ---------- 4. Live form check from the camera ----------
@@ -930,8 +968,8 @@
      During a coach session the share sheet also shows "Session · <coach>" (a sharing shortcut the page turns on and
      off through hoopsSesShare). A share through it arrives with target "session" and goes to sesShared(), never
      to a take-home drill. Shared videos arrive as a file the plugin copied into the app's cache. They're read back
-     here as a Blob and always go to sesShared(), which puts them in the session or, with none running, keeps them in
-     My videos.
+     here as a Blob and always go to sesShared(), which asks Coach or Me and puts them in the session or, with none
+     running, sends them where the owner chose (asked the first time: My videos, or a new coach session).
      It sits before section 8 because that one stops early on a phone without the HoopsRemote plugin.
      See docs/LEARNING.md, steps 20 and 27. */
   {

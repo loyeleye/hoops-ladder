@@ -13,6 +13,7 @@ import com.ladioyeleye.hoopsladder.music.HoopsMusicPlugin;
 import com.ladioyeleye.hoopsladder.remote.HoopsRemotePlugin;
 import com.ladioyeleye.hoopsladder.remote.RemoteHub;
 import com.ladioyeleye.hoopsladder.share.HoopsSharePlugin;
+import com.ladioyeleye.hoopsladder.voice.HoopsTranscribePlugin;
 import com.ladioyeleye.hoopsladder.voice.HoopsVoicePlugin;
 
 public class MainActivity extends BridgeActivity {
@@ -25,6 +26,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(HoopsAudioPlugin.class);
         registerPlugin(HoopsMusicPlugin.class);
         registerPlugin(HoopsSharePlugin.class);
+        registerPlugin(HoopsTranscribePlugin.class);
         // A link shared into the app reaches onNewIntent() below, including the one that started it (BridgeActivity
         // passes its first intent there too). When Android rebuilds the app after closing it in the background, it
         // hands back that same old intent, so drop it rather than add the link twice.
