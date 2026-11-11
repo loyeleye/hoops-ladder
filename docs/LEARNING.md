@@ -752,3 +752,33 @@ h = 2 ft below the rim.
 **Next.** Ball tracking will plug into these drills one part at a time: Rim Line Shots reads left/right from the
 phone behind you, Depth Calls reads where the ball lands past the front of the rim, and Arc Calls reads the entry
 angle, each from the camera position that drill already asks for.
+
+## Step 22. Warm-up and cool-down routines
+
+Every recommended workout already started with the 4-minute Body Warm-Up and ended with the 3-minute Cool-Down
+Stretch. Now there's a choice of each, and any of them can be run on its own, like before a game.
+
+| Routine | Kind | Length | For |
+|---|---|---|---|
+| Body Warm-Up | warm-up | 4 min | Most days (the default) |
+| Full Dynamic Warm-Up | warm-up | 8 min | Long sessions, cold gyms, stiff days: high knees, butt kicks, carioca, world's greatest stretch |
+| Easy Start Warm-Up | warm-up | 7 min | Stiff knees, ankles or hips, or coming back from time off: starts on the spot, no hops or fast runs |
+| Pre-Game Warm-Up | warm-up | 9 min | With a ball before a game: dynamic moves, handles, form shots, layups, mid-range, two sprints |
+| Cool-Down Stretch | cool-down | 3 min | Most days (the default) |
+| Full Cool-Down | cool-down | 8 min | After a hard session or a game: legs, hips, lower back and shoulders |
+
+**Picking yours.** On the Today tab the warm-up and cool-down rows now have the ⇄ button. It opens *Pick your
+warm-up* (or cool-down); the one you pick goes into every recommended workout until you change it
+(`S.settings.rt = {warm, cool}`). Longer routines take their minutes out of the workout like any other drill.
+
+**Drills → Body.** A fourth tab lists every routine, marks the one your workouts use, and opens any of them to run
+on its own. The workout builder lists them in their own *Warm-up and cool-down* group, and with *Keep Cold 3s and
+the warm-up first* on, any warm-up stays first and any cool-down stays last.
+
+**Switch sides.** Halfway through a part that says *each leg*, *each side*, *each foot* or *each arm*, the timer
+beeps and says "Switch sides". Halfway through *both directions* or *one way, then the other* it says "Other way".
+
+**How it's built.** A routine is an ordinary timer drill with `body: true` and `rt: "warm"` or `rt: "cool"`, so the
+player, XP and history work as before. `rtPick(k)` returns your pick (or the default), `FIXED` covers every routine
+so the recommender never swaps them out, and `slotOf()` puts them in the *Body warm-up* and *Cool-down* slots.
+Adding a routine (like a club's own warm-up) is one more entry in `DRILLS` with `rt` set.
