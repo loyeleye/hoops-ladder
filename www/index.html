@@ -3272,7 +3272,7 @@ function drawRunner(){
    ${d.grid?`<div class="hgrid"><h3 class="partshead">${esc(d.grid.title)}</h3><table><thead><tr>${d.grid.head.map(h=>`<th scope="col">${esc(h)}</th>`).join("")}</tr></thead><tbody>${d.grid.rows.map(r=>`<tr><th scope="row">${esc(r[0])}</th>${r.slice(1).map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table><p class="small muted" style="margin:6px 0 0">${esc(d.grid.note)}</p></div>`:""}
    ${STEP_CLIPS[d.id]?`<p class="small muted" style="margin:0">▶ opens ${d.skill==="f"||d.coachClips?"a coach":"SeeMikeDunn"} showing that step on YouTube.</p>`:""}
    ${d.cam?`<div class="tip camtip"><b>Phone setup${d.cam.view==="behind"?", behind you":", side-on"}:</b> ${esc(d.cam.text)}</div>`:""}
-   ${filmCard(d)}
+   ${repCard(d)}
    <div class="cue">${esc(d.cue)}</div>${d.clips?`<div class="tip">${d.clips==="film"?"<b>Hands-free:</b> clips play on their own with a beep on each cut. After every 6 it asks how many you read wrong.":"Tap your read after each clip. It logs your score."}</div><div class="evbox ${d.ev}"><b>Evidence: ${CEV[d.ev]}.</b> ${esc(d.evn)}</div>`:d.cond?`<div class="tip"><b>Hands-free:</b> each ${(d.unit||"set").toLowerCase()} starts on a beep and the timer runs it. ${d.ask?`In the rest it asks: ${esc(d.ask.q.toLowerCase())} Skip it and it logs as “${esc(d.ask.a[0])}”.`:d.tapEnd?`Tap the phone as you pass it at the finish to log your time${d.tapEnd.target?` against ${d.tapEnd.target} s`:""}.`:"Nothing to tap until the end."}</div><div class="evbox ${d.ev}"><b>Evidence: ${CEV[d.ev]}.</b> ${esc(d.evn)}</div>`:""}${d.skill==="s"?`<div class="tip"><b>Today's one cue:</b> ${esc(CUES[todayCue().i].t)}. Think only this between shots. Change it on the Today tab.</div>`:""}${d.stages&&d.between?`<div class="tip"><b>Before each round:</b> ${esc(d.between)}</div>`:""}${heavy}${tgt}
    ${recCard(d)}
    ${src?`<div class="src">Source: ${src}</div>`:""}
@@ -3968,7 +3968,7 @@ function closeReadMove(){const M=RM;if(!M)return;RM=null;freeVid(M.v);unOverlay(
 let FRP=null;
 const FR_SETS=2,FR_PER=6;
 function openFilm(){const deck=clipDeck(FR_SETS*FR_PER);if(deck.length<4)return;const el=overlay("frd","Film Reads");
-  el.innerHTML=`<div class="bar top"><span class="small" id="frMeta">Get ready</span><button class="btn sec small" data-fr="pause">Pause</button><button class="hx dk" data-fr="end" aria-label="End">×</button></div>
+  el.innerHTML=`<div class="bar top"><button class="btn sec small" data-fr="pause">Pause</button><span class="small" id="frMeta">Get ready</span><button class="hx dk" data-fr="end" aria-label="End">×</button></div>
    <div class="fr-stage"><video id="frV" muted playsinline></video><div class="fr-flash" id="frFlash" hidden>React</div></div><div class="fr-low" id="frLow"></div>`;
   FRP={el,v:el.querySelector("#frV"),deck,ans:[],sd:0,done:0,paused:false,stop:false,restLeft:0};
   el.addEventListener("click",e=>{const F=FRP;const b=e.target.closest("[data-fr]");if(!b||!F)return;const k=b.dataset.fr;
@@ -4795,7 +4795,7 @@ function cmpWhat(d){if(d.skill==="s")return CHECKS[d.id]?CHECKS[d.id].join(" and
    self-review clip of this drill, the card leads with it: tap the thumbnail to watch it, then film again or check it.
    It sits in the sheet, so nothing here is ever tapped mid-rep. Not a fold: folds never go on drill sheets. */
 const filmClip=d=>CO.vids.find(v=>v.drill===d.id||(!v.drill&&v.name===`Self-review: ${d.name}`))||null;
-function filmCard(d){const cmp=cmpDemos(d).length>0,chk=!!CHECKS[d.id];if(!cmp&&!chk)return"";
+function repCard(d){const cmp=cmpDemos(d).length>0,chk=!!CHECKS[d.id];if(!cmp&&!chk)return"";
   if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
   const w=cmpWhat(d),v=filmClip(d),th=v&&CO.thumbs[v.id];
   const chkTxt=chk?`The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")} from one shot filmed ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}.`:"";
@@ -4814,7 +4814,7 @@ function filmCard(d){const cmp=cmpDemos(d).length>0,chk=!!CHECKS[d.id];if(!cmp&&
      ${cmp&&chk?chkLink:""}`;
   return `<section class="checkit filmcard" id="filmcard" aria-labelledby="filmcardH"><b id="filmcardH">Film this rep</b>${body}</section>`}
 /* redraw the card in an open sheet once clips load, or after a clip is kept or deleted */
-function filmUp(){if(!R||$("#sheet").hidden)return;const c=$("#filmcard");if(!c)return;c.outerHTML=filmCard(R.d);filmThumb()}
+function filmUp(){if(!R||$("#sheet").hidden)return;const c=$("#filmcard");if(!c)return;c.outerHTML=repCard(R.d);filmThumb()}
 async function filmThumb(){const t=$("#filmcard [data-th]");if(t&&!t.querySelector("img")){const u=await coThumb(t.dataset.th);if(u&&t.isConnected&&!t.querySelector("img"))t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`)}}
 
 function openCmp(id){const d=D[id];if(!d)return;closeCmp();const demos=cmpDemos(d);if(!demos.length)return;
