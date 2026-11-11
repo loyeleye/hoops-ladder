@@ -80,8 +80,8 @@ body.wk-on:not(.wk-hide).mz-on main{padding-bottom:calc(184px + 60px)!important}
 /* player plate */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--ink)}
 .plate{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ink);color:var(--bg)}
-/* The slim plate stays pinned on every tab. Jumps to a section or anchor stop below it (the plate is about 60px, 108px on Drills with the skill tabs). */
-#view .sechead,#view [id]{scroll-margin-top:124px}
+/* The slim plate stays pinned on every tab. --plate-h tracks its live height (set from JS), so every jump to a section, anchor or focused control stops below it, whatever the tab or whether the levels are open. */
+html{scroll-padding-top:calc(var(--plate-h,60px) + 12px)}
 .plate .wrap{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding-block:12px}
 .lvl{grid-row:span 2;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;position:relative}
 .lvl svg{position:absolute;inset:0}
@@ -2998,7 +2998,10 @@ function progLadder(){const rows=ladderHist(),d=D.s_ladder;if(!rows.length)retur
    <div class="card hist">${d.stages.map((st,i)=>{const x=last.lad[i];return `<div><span>${esc(st)}</span><span class="muted">${best[i]!=null?`best ${best[i]}`:""}</span><b class="num">${x?(x[1]>=d.stageN?x[0]:x[0]+"+ ("+x[1]+" made)"):"–"}</b></div>`}).join("")}</div>
    <p class="muted small" style="margin:0">Last ladder on ${new Date(last.d+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}. Where the count jumps is where your shot starts to change.</p></section>`}
 const state={tab:"today",drillTab:"s",range:"30"};
-function route(){const h=location.hash.slice(1);state.tab=["today","drills","progress","form","coach"].includes(h)?h:"today";render()}
+/* A new tab opens at its top. Without this it kept the last tab's scroll spot and opened part-way down, with its title under the pinned plate. */
+let routedTab=null;
+function route(){const h=location.hash.slice(1);state.tab=["today","drills","progress","form","coach"].includes(h)?h:"today";const moved=routedTab!==null&&routedTab!==state.tab;routedTab=state.tab;render();if(moved)window.scrollTo(0,0)}
+if(window.ResizeObserver)new ResizeObserver(([e])=>document.documentElement.style.setProperty("--plate-h",Math.ceil(e.target.getBoundingClientRect().height)+"px")).observe(document.getElementById("plate"));
 function render(){planRoll();renderPlate();
   $("#view").innerHTML=state.tab==="today"?viewToday():state.tab==="drills"?viewDrills():state.tab==="form"?viewForm():state.tab==="coach"?viewCoach():viewProgress();afterFormRender();afterCoachRender();
   document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));wkBar()}
