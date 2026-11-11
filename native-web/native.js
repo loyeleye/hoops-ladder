@@ -345,7 +345,7 @@
         if (who === "play") { vStop(); S.settings.pvoice = false; persist(); drawPlayer() }
         else vStart("play").then(() => { S.settings.pvoice = true; persist(); drawPlayer(); say("Voice on.") }).catch(() => drawPlayer());
       };
-      top.insertBefore(b, top.lastElementChild);
+      top.appendChild(b);
       const h = pEl.querySelector(".bt-hint");
       if (on && h) h.insertAdjacentHTML("beforeend", `<br>Say “pause”, “go”, “lost it”, “faster”, “slower” or “skip”.`);
     };
