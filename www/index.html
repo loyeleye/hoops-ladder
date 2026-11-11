@@ -746,6 +746,10 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .sesto{display:flex;flex-direction:column;gap:4px;color:#C7CFDE}.sesto select{background:#1C2844;color:#F2F5FA;border:1px solid #2A3858;border-radius:10px;padding:8px 10px;font:inherit;font-size:15px;min-height:44px}
 .ses-mk{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#FFD166;margin-left:4px}.ses-mk.l{color:#7FD1A8}
 .ses-star{position:absolute;right:8px;top:8px;min-height:40px;padding:0 12px;border-radius:10px;border:0;background:rgba(5,8,15,.72);color:#FFD166;font-weight:800;font-size:14px}
+.snd{z-index:75}.snd-pc[aria-pressed="true"]{border-color:#F07A35}.snd-pc[aria-pressed="true"] .ses-ic{background:#F07A35;color:#1A0C03;font-weight:800}
+.snd-pc .tx{white-space:normal}.snd-note{min-height:96px;resize:vertical;font-size:14.5px;line-height:1.4}
+.snd .ses-opt[aria-pressed="true"]{border:2px solid #F07A35}.snd .ses-opt[aria-pressed="true"] .ses-sw{background:#F07A35}.snd .ses-opt[aria-pressed="true"] .ses-sw span{left:22px}
+.snd-prev{display:flex;align-items:center;justify-content:center}.snd-prev canvas{max-width:100%;max-height:100%;display:block}
 .ses-pc small{display:block;font-size:11.5px;color:#7F8BA3;overflow:hidden;text-overflow:ellipsis}.ses-pc.off{opacity:.45}
 .ses-seg{flex:0 0 auto;display:flex;background:#1C2844;border-radius:10px;padding:2px;gap:2px}.ses-seg button{min-height:40px;min-width:52px;border:0;border-radius:8px;background:none;color:#C7CFDE;font-weight:700;font-size:13px;padding:0 8px}
 .ses-seg button[aria-pressed="true"]:first-child{background:#3557C9;color:#fff}.ses-seg button[aria-pressed="true"]:last-child{background:#F07A35;color:#1A0C03}
@@ -5380,7 +5384,8 @@ function sesStill(url,at){return new Promise(res=>{const v=document.createElemen
   v.onseeked=()=>{try{const w=240,h=Math.round(w*(v.videoHeight||1)/(v.videoWidth||1)),c=document.createElement("canvas");c.width=w;c.height=h||240;c.getContext("2d").drawImage(v,0,0,c.width,c.height);c.toBlob(b=>fin(b),"image/jpeg",.7)}catch(e){fin(null)}};
   v.onerror=()=>fin(null)})}
 async function sesThumbs(s,ps,url){for(const p of ps){const b=await sesStill(url,p.a||0);if(b){try{await vtx("readwrite",(m,bl)=>bl.put(b,p.id+":t"))}catch(e){}CO.thumbs[p.id]=URL.createObjectURL(b)}}sesDraw()}
-async function sesDelVid(id){try{await vtx("readwrite",(m,bl)=>{m.delete(id);bl.delete(id);bl.delete(id+":t")})}catch(e){}if(SESU[id]){URL.revokeObjectURL(SESU[id]);delete SESU[id]}}
+/* a try saved from a shot burst points at the burst's own video: leave that one for the burst to clean up */
+async function sesDelVid(id){try{await vtx("readwrite",(m,bl)=>new Promise(res=>{const r=m.get(id);r.onsuccess=()=>{if(!(r.result&&r.result.burst)){m.delete(id);bl.delete(id);bl.delete(id+":t")}res()};r.onerror=()=>res()}))}catch(e){}if(SESU[id]){URL.revokeObjectURL(SESU[id]);delete SESU[id]}}
 
 /* ---------- opening and closing ---------- */
 function sesOpen(o={}){const s=sesCur();if(SES){SES.el.hidden=false}else{const el=document.createElement("div");el.className="ses";el.setAttribute("role","dialog");el.setAttribute("aria-label","Coach session");document.body.appendChild(el);
@@ -5399,7 +5404,7 @@ function sesStart(){const st=SES.set,name=(st.coach||"").trim();
   const s={id:uid("s"),t:Date.now(),last:Date.now(),coach:name,mode:st.mode,rw:st.mode==="prop"&&!!st.rw,topics:[],cur:-1,from:st.from||null};
   S.coach.lastCoach=name||S.coach.lastCoach;S.coach.sesMode=st.mode;(S.coach.ok=S.coach.ok||{})[name||"_"]=true;
   if(st.from)sesNewTopic(s,st.from.name).from=st.from.drill;
-  sesAll().push(s);persist();SES.sid=s.id;SES.v="board";try{window.hoopsSesShare?.(true,name)}catch(e){}sesDraw();sesPill();sesPendGo()}
+  sesAll().push(s);sesTakeSaved(s);persist();SES.sid=s.id;SES.v="board";try{window.hoopsSesShare?.(true,name)}catch(e){}sesDraw();sesPill();sesPendGo()}
 function sesEnd(){const s=sesFind(SES.sid);if(!s)return;if(!s.end)s.end=Date.now();persist();try{window.hoopsSesShare?.(false)}catch(e){}
   if(!s.topics.some(t=>t.pieces.length)){sesAll().splice(sesAll().indexOf(s),1);persist();sesHide();toast("Session ended","Nothing was filmed, so there's nothing to keep.");return}
   SES.v="wrap";sesDraw()}
@@ -5623,11 +5628,11 @@ function sesThumbHtml(p,big){const th=CO.thumbs[p.id];return `<span class="ses-t
 function sesPieceRow(s,t,p){if(p.k==="d")return sesInkRow(s,t,p);if(p.k==="q")return sesQtRow(p);const kk={c:"Coach",m:"Me",t:"Talk",l:"Link"}[p.k];
   if(p.k==="l")return `<a class="ses-pc" href="${esc(sesLinkHref(p))}" ${p.b?`data-end="${p.b}"`:""} target="_blank" rel="noopener"><span class="ses-ic">🔗</span><i class="ses-k l">Link</i><span class="tx">${esc(p.title||linkLabel(p.url))}</span><span class="tm">${p.b?`${mmss(p.a)}–${mmss(p.b)}`:p.a?`from ${mmss(p.a)}`:""}</span></a>`;
   if(p.k==="t"){const on=p.on&&t.pieces.find(x=>x.id===p.on),pl=sesAudio&&sesAudio._p===p.id;return `<button class="ses-pc" data-x="talkplay:${p.id}"><span class="ses-ic">${pl?"❚❚":"▶"}</span><i class="ses-k t">Talk</i><span class="tx">${on?`About ${esc(sesLabel(on).toLowerCase())}`:"Voice note"}</span><span class="tm">${fmtDur(p.dur)||"0:01"}</span></button>`}
-  return `<button class="ses-pc" data-x="play:${p.id}">${sesThumbHtml(p)}<i class="ses-k ${p.k}">${kk}</i><span class="tx">${p.k==="m"?`${p.rw?"Rewind · ":""}Try ${p.n}${sesMk(t,p)}`:"Coach on camera"}</span><span class="tm">${fmtDur(p.b-p.a)||"0:01"}</span></button>`}
+  return `<button class="ses-pc" data-x="play:${p.id}">${sesThumbHtml(p)}<i class="ses-k ${p.k}">${kk}</i><span class="tx">${p.k==="m"?`${p.rw?"Rewind · ":""}Try ${p.n}${sesMk(t,p)}`:"Coach on camera"}${p.note?`<small>${esc(p.note)}</small>`:""}${p.sent?`<small>Sent ${new Date(p.sent).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</small>`:""}</span><span class="tm">${fmtDur(p.b-p.a)||"0:01"}</span></button>`}
 function sesTopicCard(s,t,i){const cur=!s.end&&i===s.cur;
   return `<div class="ses-topic${cur?" cur":""}"><div class="ses-th-h"><button class="ses-tn" data-x="cur:${t.id}">${esc(sesTName(s,t))}${cur?" · now":""}</button>${t.hw?`<i class="ses-k h">Homework</i>`:t.from?`<span class="ses-sub">from workout</span>`:""}</div>
    ${t.pieces.length?`<div class="ses-pcs">${t.pieces.map(p=>sesPieceRow(s,t,p)).join("")}</div>`:`<div class="ses-sub">Nothing yet. Film coach, Film me, Talk or Link adds to this topic.</div>`}
-   ${!s.end&&t.pieces.length&&!t.hw?`<button class="ses-lk" data-x="hw:${t.id}">+ Homework</button>`:""}${sesTopicExtra(s,t,cur)}</div>`}
+   ${!s.end&&t.pieces.length&&!t.hw?`<button class="ses-lk" data-x="hw:${t.id}">+ Homework</button>`:""}${sesVidP(t).length?`<button class="ses-lk" data-x="sendt:${t.id}">↗ Send to a coach</button>`:""}${sesTopicExtra(s,t,cur)}</div>`}
 function sesHead(title,sub,right){return `<div class="ses-top"><button class="ses-back" data-x="back" aria-label="Back">‹</button><div class="ses-tt"><b>${esc(title)}</b>${sub?`<span>${esc(sub)}</span>`:""}</div>${right||""}</div>`}
 const sesNote=()=>{const m=SES.msg;SES.msg="";return m?`<div class="ses-msg" role="status">${esc(m)}</div>`:""};
 function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=SES.v;if(/^sx/.test(v))return sesXDraw(el,s);
@@ -5640,7 +5645,7 @@ function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=
      <button class="ses-opt" data-x="mode:prop" aria-pressed="${st.mode==="prop"}"><span class="ses-ic">📐</span><span><b>Propped up</b><span>One recording per turn. A 3-second count, then tap My turn when you take over.</span></span></button>
      <button class="ses-opt" data-x="mode:hand" aria-pressed="${st.mode==="hand"}"><span class="ses-ic">🤳</span><span><b>Someone's holding it</b><span>One short clip per rep.</span></span></button>${sesRwSetHtml(st)}
      ${asked?"":`<div class="ses-ask"><b>${st.coach?`First session with ${esc(st.coach)}`:"Before you film"}</b><span>Ask ${st.coach?esc(st.coach):"your coach"} if it's OK to film them. Their video and voice stay on this phone.</span><button class="ses-btn ok" data-x="okyes">They said yes</button></div>`}
-     <p class="ses-sub">Propped tip: waist height or higher, rim in frame for shooting drills.</p></div>
+     ${sesSavedHtml(st.coach)}<p class="ses-sub">Propped tip: waist height or higher, rim in frame for shooting drills.</p></div>
      <div class="ses-dock"><button class="ses-btn go" data-x="start" ${asked?"":"disabled"}>Start</button></div>`;return}
   if(!s){sesHide();return}sesHook(s);if(v==="ink"||v==="pic")return sesInkView(s);
   if(sesPzDraw(el,s,v))return;
@@ -5673,7 +5678,7 @@ function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=
      ${t.pieces.filter(x=>x.k==="t"&&x.on===p.id).map(x=>sesPieceRow(s,t,x)).join("")}${sesInkList(s,t,p)}</div>
      <div class="ses-dock">${s.end?"":`<div class="r2"><button class="ses-btn g" data-x="talkon:${p.id}">🎙 Feedback</button>${others.length||t.pieces.some(x=>x.k==="l")?`<button class="ses-btn c" data-x="cmp">⇆ Compare${coach?" with coach":""}</button>`:`<button class="ses-btn g" data-x="star:${p.id}">${p.star?"★ Best try":"☆ Best try"}</button>`}</div>
       <div class="r3"><button class="ses-btn m" data-x="film:m">↻ Again</button><button class="ses-btn g" data-x="hw:${t.id}">📋 Homework</button><button class="ses-btn g" data-x="newtopic">New topic</button></div>`}
-      <div class="r2"><button class="ses-btn g" data-x="board">Board</button><button class="ses-btn g" data-x="del:${p.id}">Delete</button></div></div>`;
+      <div class="r3"><button class="ses-btn g" data-x="board">Board</button><button class="ses-btn g" data-x="send:${p.id}">↗ Send</button><button class="ses-btn g" data-x="del:${p.id}">Delete</button></div></div>`;
     sesVideo(el.querySelector(".ses-vid video"),p,rt);return}
   if(v==="cmp"){const f=sesPiece(s,SES.p);if(!f){SES.v="board";return sesDraw()}const {t,p}=f,others=sesVidP(t).filter(x=>x.id!==p.id),C=SES.cmp=SES.cmp&&SES.cmp.p===p.id?SES.cmp:{p:p.id,l:((p.k==="m"&&others.find(x=>x.rw))||others.find(x=>x.k==="c")||others[0]||t.pieces.find(x=>x.k==="l")||{}).id,sync:null};
     const L=t.pieces.find(x=>x.id===C.l)||others[0],rt=SES.rate||.5,links=t.pieces.filter(x=>x.k==="l");if(L&&L.k==="l")return sesCmpLink(s,t,p,L,others,links);
@@ -5914,6 +5919,8 @@ function sesClick(e){const b=e.target.closest("[data-x]");if(!b||!SES)return;if(
    case"del":{const f=sesPiece(s,id);if(!f)return;if(!b.dataset.sure){b.dataset.sure="1";b.textContent="Tap again to delete";return}
      f.t.pieces.splice(f.t.pieces.indexOf(f.p),1);f.t.pieces=f.t.pieces.filter(x=>x.on!==f.p.id||x.k!=="t");if(f.p.v&&!s.topics.some(t=>t.pieces.some(x=>x.v===f.p.v)))sesDelVid(f.p.v);persist();SES.v="board";return sesDraw()}
    case"cmp":SES.v="cmp";return sesDraw();
+   case"send":{const f=sesPiece(s,id);if(f)sendPieces(s,f.t,f.p.id);return}
+   case"sendt":{const t=s.topics.find(x=>x.id===id);if(t)sendPieces(s,t,null);return}
    case"left":SES.cmp.l=id;SES.cmp.sync=null;return sesDraw();
    case"lineup":SES.cmp.lining=true;SES.cmp.sync=null;return sesDraw();
    case"lock":{const [vl,vr]=SES.el.querySelectorAll(".ses-split video");SES.cmp.sync={l:vl.currentTime,r:vr.currentTime};SES.cmp.lining=false;return sesDraw()}
@@ -6295,6 +6302,169 @@ document.addEventListener("change",e=>{const el=e.target;
   if(el.id==="coEdit"){coEditText(el.dataset.item,el.value);return}
   if((el.id==="coCap"||el.id==="coPick")&&el.files&&el.files[0]){const file=el.files[0],item=CO.capFor||null;CO.capFor=null;el.value="";
     saveVid(file,{item,name:file.name,t:el.id==="coPick"&&file.lastModified?file.lastModified:Date.now()})}});
+
+/* ---------- Send to coach: pick clips, then one short highlight clip and a note, or save them for a coach's next session ----------
+   Works on segments, so it doesn't care where the clips came from. A segment is {v (video id in hoopsLadder.videos),
+   a, b (seconds in that video), label ("Shot 3", "Try 2"), note ("elbow out 14°"), pf (pose frames or null), on (picked),
+   ref (the shot or piece, handed back to onDone)}. Shot bursts open it with sendShots(burst, shots), coach sessions
+   with sendPieces(s, t, pieceId). Making the clip plays each picked segment once at normal speed onto a canvas, after a
+   short title card and with the skeleton if asked, while MediaRecorder records the canvas: about as long as the clip.
+   The file goes to the app cache only for the share, and the cache's share folder is emptied 10 minutes later, on the
+   next send and when the app starts, so nothing extra stays on the phone. A single whole clip with no skeleton is shared
+   as it is. Save for <coach> keeps only the segments (no copy of the video) in S.coach.saved; the next session with that
+   coach, or the one running now, gets them as tries in a topic of their own. See docs/LEARNING.md, step 28. */
+const SND_CARD=.8,SND_W=960; // title card seconds before each segment; the clip's long side in pixels
+let SND=null; // the open sheet: {el, segs, title, skel, hasPf, note, edited, coach, busy, prog, cv, onDone, err}
+const sndPicked=()=>SND?SND.segs.filter(x=>x.on):[];
+const sndKey=c=>(c||"").trim().toLowerCase();
+/* the shot's two biggest issues, in words a coach reads at a glance (compute()'s keys; labels from the shot's own M otherwise) */
+const SND_SAY={drift:v=>`head drifts ${v>0?"forward":"back"} ${Math.abs(v).toFixed(0)}%`,knee:v=>`knee ${v}° at the dip`,
+  seq:v=>v<0?`legs finish ${Math.abs(v).toFixed(2)} s before the ball`:`long pause at the set point (${v.toFixed(2)} s)`,
+  tilt:v=>v>0?`ball out in front of the elbow ${v}°`:`ball behind the head ${-v}°`,ext:v=>`arm extension ${v}°`,hold:v=>`follow-through ${v} s`,
+  tempo:v=>`dip to release ${v} s`,bElbow:v=>`elbow ${v>0?"out":"in"} ${Math.abs(v)}°`,bLine:v=>v>0?`ball leaves outside the shoulder (${v}%)`:`ball crosses the face (${v}%)`,
+  bGuide:v=>`guide hand pushes (${v}%)`,bSway:v=>`hips drift ${Math.abs(v)}%`,bStance:v=>`stance ${v}× shoulders`};
+function sndShotNote(sh){const st=sh.st||{},vals=sh.vals||{},rank={fix:0,watch:1};
+  const ks=Object.keys(st).filter(k=>st[k] in rank).sort((x,y)=>rank[st[x]]-rank[st[y]]).slice(0,2);
+  const say=k=>{const m=(sh.m||[]).find(x=>x.k===k);if(SND_SAY[k]&&vals[k]!=null)return SND_SAY[k](vals[k]);return m?`${m.l.toLowerCase()} ${m.v}`:k};
+  if(!ks.length)return Object.keys(st).length?"clean":"";return ks.map(say).join(", ")}
+/* from a shot burst (the burst thread's viewer: BURST_ACTIONS) */
+async function sendShots(burst,shots){shots=(shots||[]).filter(sh=>sh&&sh.v);if(!shots.length){toast("Nothing to send","These shots' videos were cleared from this phone.");return}
+  const segs=[];for(const sh of shots){let pf=null;try{if(typeof burstShotFrames==="function")pf=await burstShotFrames(sh)}catch(e){}
+    segs.push({v:sh.v,a:sh.a,b:sh.b,label:`Shot ${sh.n}`,note:sndShotNote(sh),pf,hand:burst.hand,on:true,ref:sh})}
+  sendOpen({segs,title:"Shot burst",when:burst.t,skel:true,
+    onDone:(how,picked)=>{for(const x of picked){if(how==="save")x.ref.keep=true;else x.ref.sent=Date.now()}persist()}})}
+/* from a coach session: a topic's clips, with the coach's feedback transcripts as the note */
+function sendPieces(s,t,focus){const vp=sesVidP(t);if(!vp.length)return;
+  const said=p=>t.pieces.filter(x=>x.k==="t"&&x.on===p.id&&x.tx).map(x=>`“${x.tx.length>140?x.tx.slice(0,137)+"…":x.tx}”`).join(" ");
+  const segs=vp.map(p=>({v:p.v,a:p.a||0,b:p.b||0,label:p.k==="c"?"Coach":`Try ${p.n}${p.star?" ★":""}`,note:[p.note||"",said(p)].filter(Boolean).join(" "),pf:null,
+    on:focus?p.id===focus:p.k==="m",ref:p}));
+  sendOpen({segs,title:`${sesTName(s,t)}${s.coach?" with "+s.coach:""}`,when:t.t||s.t,skel:false,onDone:(how,picked)=>{if(how==="share"){for(const x of picked)x.ref.sent=Date.now();persist()}}})}
+function sendOpen(o){sndClose();sndSweep();const el=document.createElement("div");el.className="ses snd";el.setAttribute("role","dialog");el.setAttribute("aria-label","Send to coach");
+  document.body.appendChild(el);document.body.style.overflow="hidden";
+  SND={el,segs:o.segs,title:o.title||"Training clips",when:o.when||Date.now(),hasPf:o.segs.some(x=>x.pf),skel:!!o.skel,note:"",edited:false,coach:S.coach.lastCoach||"",busy:false,prog:"",onDone:o.onDone||null};
+  SND.skel=SND.skel&&SND.hasPf;el.addEventListener("click",sndClick);el.addEventListener("input",sndInput);sndDraw()}
+function sndClose(){if(!SND)return;SND.stop=true;SND.el.remove();SND=null;if(!SES&&!document.querySelector(".covid")&&(!$("#sheet")||$("#sheet").hidden))document.body.style.overflow=""}
+{const back=window.sesBack;window.sesBack=function(){if(SND){if(!SND.busy)sndClose();else SND.stop=true;return true}return back()}}
+const sndLen=x=>Math.max(.1,(x.b||0)-(x.a||0));
+/* where each segment starts in the highlight clip (after its title card) */
+function sndTimes(segs){let t=0;return segs.map(x=>{t+=SND_CARD;const at=t;t+=sndLen(x);return at})}
+function sndAutoNote(){const ps=sndPicked(),at=sndTimes(ps),d=new Date(SND.when).toLocaleDateString(undefined,{month:"short",day:"numeric"});
+  return [`${SND.title} (${d})`,...ps.map((x,i)=>`${x.label}, ${mmss(at[i])}${x.note?": "+x.note:""}`)].join("\n")}
+function sndDraw(){if(!SND)return;const el=SND.el,ps=sndPicked(),tot=ps.reduce((a,x)=>a+SND_CARD+sndLen(x),0),cs=sesCoaches(),B=SND.busy;
+  if(!SND.edited)SND.note=sndAutoNote();
+  const who=SND.coach?`Save for ${SND.coach}`:"Save for next session";
+  el.innerHTML=`${sesHead("Send to coach",B?SND.prog:`${ps.length} of ${SND.segs.length} picked${ps.length?` · about ${fmtDur(Math.ceil(tot))||"0:01"} clip`:""}`)}
+   ${B?`<div class="ses-vid snd-prev" aria-label="Making the clip"></div>`:""}
+   <div class="ses-body">${SND.err?`<div class="ses-msg" role="status">${esc(SND.err)}</div>`:""}
+    ${B?`<p class="ses-sub">Making the clip: each pick plays once at normal speed while the phone records it. Keep Hoops Ladder open.</p>`:`
+    <div class="ses-lab">Pick the clips</div>
+    <div class="ses-pcs">${SND.segs.map((x,i)=>`<button class="ses-pc snd-pc" data-sn="tog:${i}" aria-pressed="${!!x.on}"><span class="ses-ic">${x.on?"✓":""}</span><span class="tx">${esc(x.label)}${x.note?`<small>${esc(x.note)}</small>`:""}</span><span class="tm">${fmtDur(Math.round(sndLen(x)))||"0:01"}</span></button>`).join("")}</div>
+    ${SND.hasPf?`<button class="ses-opt" data-sn="skel" aria-pressed="${SND.skel}"><span class="ses-ic">🦴</span><span><b>Show the skeleton</b><span>Draws the pose lines on the clip, shooting arm in orange.</span></span><span class="ses-sw" aria-hidden="true"><span></span></span></button>`:""}
+    <label class="ses-lab" for="sndNote">Note</label><textarea class="ses-in snd-note" id="sndNote" data-sn-in="note" rows="${Math.min(8,ps.length+2)}">${esc(SND.note)}</textarea>
+    ${SND.edited?`<button class="ses-lk" data-sn="renote">Start the note again from the picks</button>`:""}
+    <div class="ses-lab">Coach</div>
+    <div class="ses-chips">${cs.slice(0,5).map(c=>`<button class="ses-chip" data-sn="coach:${esc(c)}" aria-pressed="${sndKey(SND.coach)===sndKey(c)}">${esc(c)}</button>`).join("")}<button class="ses-chip" data-sn="coach:" aria-pressed="${!SND.coach}">Any coach</button></div>
+    <p class="ses-sub"><b>Send</b> makes one short clip of your picks, with a title card naming each one, and opens your phone's share list with the note. The clip is deleted from Hoops Ladder after you share it. <b>${esc(who)}</b> puts them in ${SND.coach?esc(SND.coach)+"'s":"your"} next coach session as tries, with nothing copied.</p>`}</div>
+   <div class="ses-dock">${B?`<button class="ses-btn g wide" data-sn="stop">Stop</button>`:`<div class="r2"><button class="ses-btn g" data-sn="save" ${ps.length?"":"disabled"}>${esc(who)}<small>Adds them as tries</small></button><button class="ses-btn m" data-sn="send" ${ps.length?"":"disabled"}>Send<small>Clip and note</small></button></div>`}</div>`;
+  if(B&&SND.cv)el.querySelector(".snd-prev").appendChild(SND.cv)}
+function sndClick(e){const b=e.target.closest("[data-sn],[data-x]");if(!b||!SND)return;e.stopPropagation();
+  if(b.dataset.x==="back"){if(SND.busy)SND.stop=true;else sndClose();return}
+  const [a,...r]=(b.dataset.sn||"").split(":"),id=r.join(":");
+  if(a==="tog"){const x=SND.segs[+id];if(x)x.on=!x.on;SND.err="";return sndDraw()}
+  if(a==="skel"){SND.skel=!SND.skel;return sndDraw()}
+  if(a==="coach"){SND.coach=id;return sndDraw()}
+  if(a==="renote"){SND.edited=false;return sndDraw()}
+  if(a==="stop"){SND.stop=true;return}
+  if(a==="save")return sndSave();
+  if(a==="send")return sndSend()}
+function sndInput(e){if(SND&&e.target.dataset.snIn==="note"){SND.note=e.target.value;SND.edited=true}}
+
+/* ---------- Save for a coach: the picks wait in S.coach.saved for that coach's next session ---------- */
+function sndSave(){const ps=sndPicked();if(!ps.length)return;const coach=SND.coach.trim();
+  const k={id:uid("k"),coach,t:SND.when,title:`${SND.title} · ${new Date(SND.when).toLocaleDateString(undefined,{month:"short",day:"numeric"})}`,segs:ps.map(x=>({v:x.v,a:+(+x.a).toFixed(2),b:+(+x.b).toFixed(2),label:x.label,note:x.note||""}))};
+  (S.coach.saved=Array.isArray(S.coach.saved)?S.coach.saved:[]).push(k);
+  try{SND.onDone?.("save",ps)}catch(e){}persist();sndClose();
+  const s=sesCur();if(s&&(!coach||sndKey(s.coach)===sndKey(coach))){const n=sesTakeSaved(s);toast("Added to this session",`${n} tr${n===1?"y":"ies"} in a new topic.`);return}
+  toast(coach?`Saved for ${coach}`:"Saved for your next session",`${ps.length} clip${ps.length===1?"":"s"} will be tries in ${coach?coach+"'s":"the"} next coach session.`)}
+const sesSavedFor=coach=>(Array.isArray(S.coach.saved)?S.coach.saved:[]).filter(k=>!k.coach||sndKey(k.coach)===sndKey(coach));
+/* a session with that coach started (or is running): each saved set becomes its own topic of tries */
+function sesTakeSaved(s){const ks=sesSavedFor(s.coach);if(!ks.length)return 0;let n=0;
+  for(const k of ks){const t={id:uid("t"),name:k.title||"Saved clips",pieces:[],t:k.t,saved:k.id};
+    k.segs.forEach((x,i)=>t.pieces.push({id:uid("p"),k:"m",v:x.v,a:x.a,b:x.b,n:i+1,note:`${x.label}${x.note?": "+x.note:""}`,t:k.t}));
+    s.topics.push(t);n+=t.pieces.length;
+    const byV={};for(const p of t.pieces)(byV[p.v]=byV[p.v]||[]).push(p);
+    for(const [v,ps] of Object.entries(byV))sesBlob(v).then(u=>{if(u)sesThumbs(s,ps,u)})}
+  S.coach.saved=S.coach.saved.filter(k=>!ks.includes(k));sesTouch(s);return n}
+/* is a video still used by a session or a saved set? The shot burst cleanup keeps it if so */
+const sesUsesVid=v=>!!v&&(sesAll().some(s=>s.topics.some(t=>t.pieces.some(p=>p.v===v)))||(Array.isArray(S.coach.saved)?S.coach.saved:[]).some(k=>k.segs.some(x=>x.v===v)));
+function sesSavedHtml(coach){const ks=sesSavedFor(coach),n=ks.reduce((a,k)=>a+k.segs.length,0);if(!n)return"";
+  return `<div class="ses-msg">${n} saved clip${n===1?"":"s"} ${n===1?"goes":"go"} into this session as tries.</div>`}
+
+/* ---------- Send: build the highlight clip, then share it with the note ---------- */
+async function sndSend(){const ps=sndPicked();if(!ps.length||SND.busy)return;const note=SND.note,S0=SND;S0.err="";
+  const whole=ps.length===1&&!(S0.skel&&ps[0].pf);let file=null;
+  if(whole){const x=ps[0];const m=await vtx("readonly",mm=>rq(mm.get(x.v))).catch(()=>null);if(m&&x.a<=.3&&(!m.dur||x.b>=m.dur-.5||!x.b)){const bl=await vtx("readonly",(mm,bb)=>rq(bb.get(x.v))).catch(()=>null);if(bl)file=new File([bl],sndName(bl.type),{type:bl.type})}}
+  if(!file){if(!sndCanBuild()){S0.err="This phone can't make a clip here, so the full videos are sent instead.";file=null}
+    else{S0.busy=true;S0.prog="Getting ready…";sndDraw();
+      try{const blob=await sndBuild(ps,S0.skel,S0);if(blob)file=new File([blob],sndName(blob.type),{type:blob.type})}
+      catch(e){S0.err=e&&e.message==="stopped"?"Stopped. Nothing was sent.":`Couldn't make the clip. ${e&&e.message||"Try again."}`}
+      S0.busy=false;S0.cv=null;if(SND!==S0)return;sndDraw();if(!file)return}}
+  let files=file?[file]:[];
+  if(!files.length){for(const v of [...new Set(ps.map(x=>x.v))]){const bl=await vtx("readonly",(mm,bb)=>rq(bb.get(v))).catch(()=>null);if(bl)files.push(new File([bl],sndName(bl.type,files.length+1),{type:bl.type}))}
+    if(!files.length){S0.err="Those videos are gone from this phone.";return sndDraw()}}
+  try{navigator.clipboard?.writeText?.(note).catch(()=>{})}catch(e){}
+  const ok=await sndShare(files,note);if(!ok)return;
+  try{S0.onDone?.("share",ps)}catch(e){}persist();if(SND===S0)sndClose();
+  toast("Sent","The note is copied too, in case the app you picked left it out.")}
+const sndName=(type,i)=>`hoops-${new Date().toISOString().slice(0,10)}${i?"-"+i:""}.${/mp4/.test(type||"")?"mp4":/quicktime/.test(type||"")?"mov":"webm"}`;
+const sndCanBuild=()=>!!(window.MediaRecorder&&HTMLCanvasElement.prototype.captureStream);
+/* the app shares through a temp file in the cache's share folder; the browser shares the file straight from memory */
+async function sndShare(files,text){const FS=CP("Filesystem"),SH=CP("Share");
+  if(FS&&SH){try{const uris=[];for(const f of files)uris.push(await natWrite(f,"CACHE","share/"+f.name));
+      await SH.share({title:"Clips for my coach",text,files:uris,dialogTitle:"Send to coach"});clearTimeout(sndSweep.t);sndSweep.t=setTimeout(sndSweep,10*60e3);return true}
+    catch(e){if(/cancel/i.test(e?.message||"")){sndSweep();return false}toast("Couldn't share","Try again in a moment.");return false}}
+  try{if(navigator.canShare?.({files})){await navigator.share({files,text,title:"Clips for my coach"});return true}}catch(e){if(e?.name==="AbortError")return false}
+  for(const f of files)await coSave(f);toast("Saved the clip","Send it from your files. The note is copied, so paste it in the message.");return true}
+/* empty the share folder: only ever holds copies made for a share sheet */
+function sndSweep(){const FS=CP("Filesystem");if(!FS)return;FS.rmdir({path:"share",directory:"CACHE",recursive:true}).catch(()=>{})}
+setTimeout(sndSweep,8000);
+/* play each segment onto a canvas and record it: a title card, then the segment at normal speed */
+async function sndBuild(segs,skel,st){const urls={},vid=document.createElement("video");vid.muted=true;vid.playsInline=true;vid.preload="auto";
+  const free=()=>{for(const u of Object.values(urls))URL.revokeObjectURL(u);vid.removeAttribute("src");vid.load()};
+  const load=async v=>{if(!urls[v]){const bl=await vtx("readonly",(m,bb)=>rq(bb.get(v))).catch(()=>null);if(!bl)return false;urls[v]=URL.createObjectURL(bl)}
+    if(vid.dataset.v!==v){vid.dataset.v=v;const p=once(vid,"loadeddata",8000);vid.src=urls[v];await p}return vid.videoWidth>0};
+  const seekTo=async t=>{const p=once(vid,"seeked",2000);vid.currentTime=Math.max(0,t);await p};
+  try{if(!await load(segs[0].v))throw new Error("The first video is gone from this phone.");
+    const sc=SND_W/Math.max(vid.videoWidth,vid.videoHeight),W=Math.round(vid.videoWidth*Math.min(1,sc)/2)*2,H=Math.round(vid.videoHeight*Math.min(1,sc)/2)*2;
+    const cv=document.createElement("canvas");cv.width=W;cv.height=H;const c=cv.getContext("2d");st.cv=cv;sndDraw();
+    const type=pickMime(),stream=cv.captureStream(30);let mr;
+    try{mr=new MediaRecorder(stream,Object.assign({videoBitsPerSecond:3000000},type?{mimeType:type}:{}))}catch(e){mr=new MediaRecorder(stream)}
+    const chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};const stopped=new Promise(r=>mr.onstop=r);
+    const tick=()=>new Promise(r=>requestAnimationFrame(r));
+    mr.start(500);
+    for(let i=0;i<segs.length;i++){const x=segs[i];if(st.stop)break;st.prog=`Making the clip · ${i+1} of ${segs.length}`;const h=SND===st&&st.el.querySelector(".ses-tt span");if(h)h.textContent=st.prog;
+      if(!await load(x.v))continue;await seekTo(x.a||0);
+      const t0=performance.now();while(performance.now()-t0<SND_CARD*1000&&!st.stop){sndFrame(c,W,H,vid,x,false,true);await tick()}
+      const end=x.b>x.a?x.b:(vid.duration||x.a+5);vid.play().catch(()=>{});const wall=performance.now(),lim=(end-(x.a||0))*1000+4000;
+      while(!st.stop&&vid.currentTime<end-.02&&!vid.ended&&performance.now()-wall<lim){sndFrame(c,W,H,vid,x,skel,false);await tick()}
+      vid.pause()}
+    if(st.stop){mr.onstop=null;try{mr.stop()}catch(e){}throw new Error("stopped")}
+    sndFrame(c,W,H,vid,segs[segs.length-1],skel,false);await tick();mr.stop();await stopped;stream.getTracks().forEach(t=>t.stop());
+    return chunks.length?new Blob(chunks,{type:mr.mimeType||type||"video/webm"}):null}
+  finally{free()}}
+/* one frame: the video fitted in, the skeleton if asked, a band with the label and note, or the title card */
+function sndFrame(c,W,H,vid,x,skel,card){c.fillStyle="#05080F";c.fillRect(0,0,W,H);const vw=vid.videoWidth||W,vh=vid.videoHeight||H,k=Math.min(W/vw,H/vh),dw=vw*k,dh=vh*k,dx=(W-dw)/2,dy=(H-dh)/2;
+  try{c.drawImage(vid,dx,dy,dw,dh)}catch(e){}const u=Math.max(W,H)/40;
+  if(skel&&x.pf&&x.pf.f){const P=x.pf,fr=P.f[Math.round((vid.currentTime-(P.t0||0))*(P.fps||10))];
+    if(fr){const sx=dw/(P.cw||vw),sy=dh/(P.ch||vh),s=SIDE[x.hand==="L"?"L":"R"],hot=new Set([s.sh,s.el,s.wr]),pt=j=>fr[j]&&fr[j][2]>.3?[dx+fr[j][0]*sx,dy+fr[j][1]*sy]:null;c.lineCap="round";
+      for(const [a,b] of BONES){const A=pt(a),B=pt(b);if(!A||!B)continue;const h=hot.has(a)&&hot.has(b);c.strokeStyle=h?"#F07A35":"rgba(255,255,255,.9)";c.lineWidth=u*(h?.32:.2);c.beginPath();c.moveTo(A[0],A[1]);c.lineTo(B[0],B[1]);c.stroke()}
+      for(const j of [0,11,12,13,14,15,16,23,24,25,26,27,28]){const A=pt(j);if(!A)continue;c.fillStyle=hot.has(j)?"#F07A35":"#fff";c.beginPath();c.arc(A[0],A[1],u*(hot.has(j)?.3:.22),0,7);c.fill()}}}
+  c.textBaseline="middle";
+  if(card){c.fillStyle="rgba(5,8,15,.72)";c.fillRect(0,0,W,H);c.fillStyle="#F07A35";c.font=`800 ${Math.round(u*2.4)}px "Saira Condensed",sans-serif`;c.textAlign="center";c.fillText(x.label.toUpperCase(),W/2,H/2-(x.note?u*1.2:0));
+    if(x.note){c.fillStyle="#F2F5FA";c.font=`600 ${Math.round(u*1.05)}px Barlow,sans-serif`;sndWrap(c,x.note,W/2,H/2+u*1.3,W*.86,u*1.35,3)}c.textAlign="left";return}
+  c.font=`700 ${Math.round(u*.95)}px Barlow,sans-serif`;const txt=x.label+(x.note?" · "+x.note:""),bh=u*2;c.fillStyle="rgba(5,8,15,.66)";c.fillRect(0,H-bh,W,bh);c.fillStyle="#F2F5FA";
+  let t2=txt;while(t2.length>4&&c.measureText(t2).width>W-u*1.2)t2=t2.slice(0,-2);c.fillText(t2===txt?txt:t2.trimEnd()+"…",u*.6,H-bh/2)}
+function sndWrap(c,txt,x,y,w,lh,max){const ws=txt.split(/\s+/);let line="",n=0;for(const wd of ws){const t=line?line+" "+wd:wd;if(c.measureText(t).width>w&&line){c.fillText(line,x,y+n*lh);n++;line=wd;if(n>=max)return}else line=t}if(line&&n<max)c.fillText(line,x,y+n*lh)}
 
 /* ---------- boot + sync ---------- */
 route();
