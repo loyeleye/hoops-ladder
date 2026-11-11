@@ -2721,12 +2721,12 @@ function viewDrills(){
    <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div></section>${k==="f"?finCard(0):""}`}
 
 /* Drills → Conditioning: your warm-up and cool-down on one card (open it to see all and change), then the athletic drills */
-const condTags=(d,lib)=>`${d.clips?'<span class="tag rd">Film</span>':lib&&(state.condGrp||"all")!=="all"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard</span>':""}`;
+const condTags=(d,lib)=>`${d.clips==="read"?'<span class="tag rd">Film</span>':lib&&(state.condGrp||"all")!=="all"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard</span>':""}`;
 function viewBody(){const open=!!state.rtOpen,g=state.condGrp||"all";
   const grp=k=>{const cur=rtPick(k).id;return `<div class="sechead"><h2>${k==="warm"?"Warm-ups":"Cool-downs"}</h2><button class="linkbtn" data-rec="rt:${k}" style="padding:0">Change yours ›</button></div>
    <div class="list">${RTS(k).map((d,i)=>`<div class="planline">${drillRow(d,i+1,{why:d.id===cur?{k:"fixed",t:`Your ${RT_NAME[k]}: in every workout`}:{k:"note",t:d.short||""}})}</div>`).join("")}</div>`};
   const w=rtPick("warm"),c=rtPick("cool");
-  const list=DRILLS.filter(d=>d.cond&&!d.clips&&(g==="all"||d.cond===g)).sort((a,b)=>a.unlock-b.unlock);
+  const list=DRILLS.filter(d=>d.cond&&d.clips!=="read"&&(g==="all"||d.cond===g)).sort((a,b)=>a.unlock-b.unlock);
   const why=d=>{const x=condGate(d);return !x.ok?{k:"skip",t:x.rest?"Rest day today":"Over today's leg cap"}:x.trim?{k:"light",t:`${x.n} ${(d.unit||"set").toLowerCase()}s left under today's cap`}:null};
   return `<div id="drillpanel" role="tabpanel" aria-labelledby="tab-b"><section><div class="sechead"><h2>Warm-up and cool-down</h2><button class="linkbtn" data-cond="rt" aria-expanded="${open}" style="padding:0">${open?"Done":"See all and change ›"}</button></div>
    ${open?`<p class="muted small" style="margin:0">Your recommended workout starts with your warm-up and ends with your cool-down. Pick which ones, or open any routine to run it on its own, like before a game or after club night. Each one is a timer that calls the next move, and tells you when to switch sides.</p>${grp("warm")}${grp("cool")}`
@@ -2735,7 +2735,7 @@ function viewBody(){const open=!!state.rtOpen,g=state.condGrp||"all";
    <p class="muted small" style="margin:0">Footwork, defense, jumping, speed and strength, all solo. Hands-free while you move: each set starts on a beep, and anything to log is asked in the rest with big buttons. Every drill shows how well it's backed: <b>Studied</b> (trials found it works), <b>Injury prevention</b> (part of programs that cut injuries) or <b>Coaching</b> (standard practice, no trial). The dots show difficulty.</p>
    <div class="chips" role="group" aria-label="Group">${[["all","All"],...Object.entries(CGR)].map(([k,v])=>`<button class="chip" data-cond="g:${k}" aria-pressed="${k===g}">${v}</button>`).join("")}</div>
    <p class="small muted" style="margin:0">${esc(CGB[g])}</p>
-   ${legCard()}${g==="all"||g==="fd"?`<p class="small muted" style="margin:0">Read the Move, Film Reads and your clip library are in <a href="#coach" class="linkbtn" style="padding:0">Coach › Film room</a>.</p>`:""}
+   ${legCard()}${g==="all"||g==="fd"?`<p class="small muted" style="margin:0">Film Reads plays clips of you from your clip library, on the <a href="#form" class="linkbtn" style="padding:0">Form tab</a>. Read the Move, its off-court version, is in <a href="#coach" class="linkbtn" style="padding:0">Coach › Film room</a>.</p>`:""}
    <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true,why:why(d)})).join("")}</div></section></div>`}
 document.addEventListener("click",e=>{const t=e.target.closest("[data-cond]");if(!t)return;const [k,a,b]=t.dataset.cond.split(":");
   if(k==="g")state.condGrp=a;else if(k==="rt")state.rtOpen=!state.rtOpen;
@@ -3175,7 +3175,7 @@ function drawRunner(){
   const bl=baseline(d),tgt=d.gm?gmTip(d):(d.log==="makes"||d.log==="spots")?`<div class="tip">Your goal: <b class="num">${targetPct(d)}%</b>${d.goal?` · finish at ${d.goal} makes`:""}. ${bl?`Your average over your last ${bl.n>1?bl.n+" sessions":"session"} is ${bl.p}%, so the goal is ${GOAL_UP} points above it. It moves when your numbers move.`:`A starter goal. After your first session it becomes your own average plus ${GOAL_UP} points.`}</div>`:"";
   $("#sheet").innerHTML=`<header><div class="wrap"><h2 id="sheetTitle">${esc(d.dynamic&&weakSpot()?d.name+": "+SPOT[weakSpot().id].name:d.name)}</h2><button class="x" aria-label="Close drill">×</button></div></header>
   <div class="sbody"><div class="wrap">
-   <div class="row">${d.clips?'<span class="tag rd">Film</span>':`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}${d.cond?`${d.clips?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard · counts toward leg load</span>':""}`:""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
+   <div class="row">${d.clips==="read"?'<span class="tag rd">Film</span>':`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}${d.cond?`${d.clips==="read"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard · counts toward leg load</span>':""}`:""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
    <p style="margin:0">${esc(d.what)}</p>
    ${d.read?`<div class="why">Why decision reps: drills where you already know the next move look clean but don't show up in games. Here the choice comes late, so your hands react instead of recite. Do these after your mechanics work.</div>`:""}
    ${hasParts(d)?`<h3 class="partshead">The parts · ${fmt(totalOf(d))}</h3><ol class="steps">${d.phases.map((p,i)=>`<li><div class="srow">${partAnim(d,i)}<div><b>${esc(p[0])}</b> · ${p[1]}s<div class="small muted">${esc(d.mv?BV.note(d.id+":"+i):HV.note(d.id+"p:"+i))}</div>${clipLinks(d,i)}</div></div></li>`).join("")}</ol><h3 class="partshead">Coaching points</h3>`:""}
@@ -3200,7 +3200,7 @@ function drawDock(){
   if(R.finished)return drawRate();
   if(d.clips){clipsSoon();const n=CL.list.length,ok=n>=CLIP_MIN;
     el.innerHTML=`<div class="phases"><span class="prow2"><span>${!CL.loaded?"Checking your clip library…":ok?`${n} takes in your library · ${n*2} clips with mirroring`:`${n} of ${CLIP_MIN} takes needed to start`}</span></span></div>
-     ${ok?`<button class="btn pri" data-k="clips">Start · ${d.clips==="film"?"about 5 min":"12 clips"}</button>`:""}<button class="btn ${ok?"sec small":"pri"}" data-k="cliplib">${ok?"Your clip library":"Record your clips"}</button>
+     ${ok?`<button class="btn pri" data-k="clips">Start · ${d.clips==="film"?"about 5 min":"12 clips"}</button>`:""}<button class="btn ${ok?"sec small":"pri"}" data-k="cliplib">${ok?"Your clip library":"Record your clips on the Form tab ›"}</button>
      <span class="small muted" style="text-align:center">${d.clips==="film"?"Prop the phone at eye level, about 2 m away, and stand in your stance facing it.":"Works anywhere, even on the couch."}</span>`;return bind()}
   if(d.cond){const g=condGate(D[d.id]),n=phasesOf(d).filter(p=>!/^rest\b/i.test(p[0])).length,u=(d.unit||"set").toLowerCase();
     el.innerHTML=`<div class="phases"><span class="prow2"><span>${n} ${u}${n===1?"":"s"} × ${d.set[1]} s · ${d.rest} s rest${d.bigRest?` · ${fmt(d.bigRest[1])} after every ${d.bigRest[0]}`:""}</span></span></div>
@@ -3458,7 +3458,7 @@ function act(k){
   if(k==="keep"){R.confirm=false;return drawDock()}
   if(k==="anyway"){CAP_ANY[d.id]=today();return openRunner(d.id)}
   if(k==="clips")return d.clips==="film"?openFilm():openReadMove();
-  if(k==="cliplib")return openLib();
+  if(k==="cliplib"){if(CL.list.length>=CLIP_MIN)return openLib();closeRunner(true);location.hash="#form";setTimeout(()=>document.getElementById("cliplib")?.scrollIntoView({block:"start"}),120);return}
   if(k==="discard"){return closeRunner(true)}
   if(k==="make"||k==="miss"){
     const hit=k==="make";
@@ -3763,7 +3763,7 @@ function cdb(){return cdbP||(cdbP=new Promise((a,b)=>{let r;try{r=indexedDB.open
   r.onsuccess=()=>a(r.result);r.onerror=()=>{cdbP=null;b(r.error)}}))}
 async function ctx(mode,fn){const db=await cdb();return new Promise((a,b)=>{const t=db.transaction(["meta","blobs"],mode);let out;Promise.resolve(fn(t.objectStore("meta"),t.objectStore("blobs"))).then(v=>out=v,b);t.oncomplete=()=>a(out);t.onerror=t.onabort=()=>b(t.error)})}
 async function loadClips(){try{CL.list=(await ctx("readonly",m=>rq(m.getAll()))).filter(c=>FMV.some(m=>m.k===c.mv));CL.err=""}catch(e){CL.list=[];CL.err="This browser won't let the app keep clips (private mode or storage turned off)."}
-  CL.loaded=true;CL.busy=false;libDraw();if(R&&R.d&&R.d.clips)drawDock();else if(!LIB&&!CR&&state.tab==="coach"){const y=window.scrollY;render();window.scrollTo(0,y)}}
+  CL.loaded=true;CL.busy=false;libDraw();if(R&&R.d&&R.d.clips)drawDock();else if(!LIB&&!CR&&(state.tab==="form"||state.tab==="drills"&&state.drillTab==="b")){const y=window.scrollY;render();window.scrollTo(0,y)}}
 const clipsSoon=()=>{if(!CL.loaded&&!CL.busy){CL.busy=true;loadClips()}};
 const clipCount=k=>CL.list.filter(c=>c.mv===k).length;
 async function saveClip(blob,o){const id=uid("cl");await ctx("readwrite",(m,bl)=>{m.put({id,t:Date.now(),mv:o.mv,go:o.go,cut:o.cut,auto:o.auto,size:blob.size,type:blob.type||"video/webm"});bl.put(blob,id)});
@@ -3938,10 +3938,10 @@ const fsReduce=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* the Coach tab card */
 let fsCopyText="";
 /* Coach › Film room: the read drills that play clips of you, next to Film study. Read the Move works anywhere; Film Reads is on court. */
-function filmRoom(){const ds=DRILLS.filter(d=>d.clips);
+function filmRoom(){const ds=DRILLS.filter(d=>d.clips==="read");
   return `<section><div class="sechead"><h2>Film room</h2><span class="muted small">your own clips</span></div>
    <div class="list">${ds.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div>
-   ${clipCard()}</section>`}
+   <p class="small muted" style="margin:0">Plays clips of you from your clip library, on the <a href="#form" class="linkbtn" style="padding:0">Form tab</a>.</p></section>`}
 function filmCard(){const f=fsLog(),lv=f.lv,extra=Object.keys(f.dia).length+Object.keys(f.flag).length;
   return `<section><div class="sechead"><h2>Film study</h2><div class="seg" role="group" aria-label="Film study level">${["B","I"].map(k=>`<button data-fs="lv:${k}" aria-pressed="${lv===k}">${FS_LV[k]}</button>`).join("")}</div></div>
    <p class="muted small" style="margin:0">Make the read on real film. A breakdown by an NBA, pro or college player plays muted and stops at the decision. You pick, then hear them explain it. ${lv==="B"?"Basics plays the starter moments and highlights the players who matter.":"Intermediate adds pick and roll and help reads, and highlights nobody, so spotting who matters is part of the read."}</p>
@@ -4371,7 +4371,8 @@ function viewForm(){
   ${FC.status==="nopose"&&FC.keys.length?`<section><div class="keys">${FC.keys.map(k=>`<figure><img src="${k.url}" alt="${esc(k.label)}"><figcaption>${esc(k.label)}</figcaption></figure>`).join("")}</div></section>`:""}
   ${(res&&res.ok)||FC.status==="nopose"?`<section>${FC.canCoach?`<button class="btn sec" data-coach="1" ${FC.coachBusy?"disabled":""}>Ask the coach about this shot</button>`:""}${FC.coach?`<div class="card coach" id="fcCoach">${esc(FC.coach)}</div>`:""}</section>`:""}
   <section><div class="sechead"><h2>Recent checks</h2></div>${hist.length?`<div class="card hist">${hist.map(h=>`<div><span>${new Date(h.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="muted">${h.w==="b"?`Behind · elbow ${h.v.bElbow>0?"+":""}${h.v.bElbow}° · ball line ${h.v.bLine>0?"+":""}${h.v.bLine}%`:`Line ${h.v.drift>0?"+":""}${h.v.drift}% · arm ${h.v.ext}° · timing ${h.v.seq>=0?"+":""}${h.v.seq}s${h.v.entry!=null?` · entry ${h.v.entry}°`:h.v.arc!=null?` · arc ${h.v.arc}°`:""}`}</span><b class="num">${Object.values(h.st).filter(x=>x==="good").length}/${Object.keys(h.st).length}</b></div>`).join("")}</div>`:`<div class="empty">Your form checks show up here so you can see if your balance and timing improve.</div>`}</section>
-  ${myVideos()}`}
+  ${myVideos()}
+  <section id="cliplib"><div class="sechead"><h2>Clip library</h2><span class="muted small">for Film Reads and Read the Move</span></div>${clipCard()}</section>`}
 async function afterFormRender(){if(state.tab!=="form"||!FC.res||!FC.res.ok)return;const cv=$("#fcCanvas");if(!cv)return;
   cv.onclick=FC.arcMode?arcTap:null;cv.style.cursor=FC.arcMode?"crosshair":"";
   if(FC.arcMode)await drawArc(cv);else await drawFrame(FC.idx,cv)}
