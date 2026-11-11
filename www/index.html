@@ -417,6 +417,36 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .covid video.mir{transform:scaleX(-1)}
 .covid .bar{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:10px 16px}
 .covid .bar>.small{flex:1;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmp{position:fixed;inset:0;z-index:75;background:#05080F;color:#F2F5FA;overflow-y:auto;overscroll-behavior:contain;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) calc(16px + env(safe-area-inset-bottom,0px)) env(safe-area-inset-left,0px);--ink:#F2F5FA;--bg:#05080F;--surface:#111A2C;--surface-2:#1A2540;--line:#2E3B5C;--muted:#9AA6BF}
+.cmp .btn{color:var(--ink)}.cmp .btn.pri{color:var(--accent-ink)}
+.cmp-top{position:sticky;top:0;z-index:2;display:flex;gap:10px;align-items:center;padding:10px 16px;background:#05080F}
+.cmp-title{flex:1;min-width:0;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmp-panes{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;height:min(58vh,560px);scroll-margin-top:60px}
+.cmp-pane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#000;border-radius:14px;overflow:hidden}
+.cmp-lab{position:absolute;top:8px;left:8px;z-index:1;font:700 12px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;background:rgba(5,8,15,.7);padding:5px 8px;border-radius:999px}
+.cmp-pane.mine .cmp-lab{background:var(--accent);color:var(--accent-ink)}
+.cmp-demo,.cmp-mine{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative}
+.cmp-demo{background:var(--wood,#E7C79C)}
+.cmp-demo .sw{width:100%;max-height:100%}.cmp-demo .sw::after{display:none}
+.cmp-demo svg,.cmp-demo img{display:block;width:100%!important;height:auto!important;max-height:100%;border:0;border-radius:0}
+.cmp-demo .vanim{aspect-ratio:1}.cmp-demo .vanim:not(.sq){aspect-ratio:200/160}
+.cmp-mine video,.cmp-mine canvas{width:100%;height:100%;object-fit:contain;display:block;background:#000}
+.cmp-mine .mir{transform:scaleX(-1)}
+.cmp-empty{display:flex;flex-direction:column;gap:10px;align-items:stretch;justify-content:center;padding:36px 10px 12px;text-align:center}
+.cmp-empty p{margin:0;font-size:13.5px;color:#C9D2E3}
+.cmp-empty .filebtn{display:block;cursor:pointer}
+.cmp-big{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(64px,22vw,120px);font-weight:800;text-shadow:0 2px 12px rgba(0,0,0,.6);pointer-events:none}
+.cmp-rec{position:absolute;top:8px;right:8px;font:700 13px/1 var(--display);letter-spacing:.06em;color:#fff;background:#C13C2A;padding:5px 8px;border-radius:999px;text-shadow:none}
+.cmp-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;padding:10px 16px 0}
+.cmp-seek{flex:1;min-width:120px;accent-color:var(--accent)}
+.cmp-steps{padding-top:10px}
+.cmp-step{margin:8px 16px 0;color:#C9D2E3}
+.cmp-step .clips{display:inline-flex;flex-wrap:wrap;gap:6px;margin-left:6px}
+.cmp-notes{padding:14px 16px 0}
+.cmp-notes .list{display:flex;flex-direction:column;gap:8px}
+.cmp-notes .metric{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.cmp-notes .linkbtn{color:var(--accent)}
+.cmp-notes .sechead h2{color:var(--ink)}
 .covid .btn.sec{background:rgba(255,255,255,.14);color:#fff;border:0;text-decoration:none}
 .covid .btn.sec[aria-pressed="true"]{background:#F2F5FA;color:#12203A}
 .covid .seg{background:rgba(255,255,255,.1);border:0}.covid .seg button{color:#C9D2E3}.covid .seg button[aria-pressed="true"]{background:#F2F5FA;color:#12203A}
@@ -2896,6 +2926,7 @@ function drawRunner(){
    ${d.grid?`<div class="hgrid"><h3 class="partshead">${esc(d.grid.title)}</h3><table><thead><tr>${d.grid.head.map(h=>`<th scope="col">${esc(h)}</th>`).join("")}</tr></thead><tbody>${d.grid.rows.map(r=>`<tr><th scope="row">${esc(r[0])}</th>${r.slice(1).map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table><p class="small muted" style="margin:6px 0 0">${esc(d.grid.note)}</p></div>`:""}
    ${STEP_CLIPS[d.id]?`<p class="small muted" style="margin:0">▶ opens ${d.skill==="f"||d.coachClips?"a coach":"SeeMikeDunn"} showing that step on YouTube.</p>`:""}
    ${d.cam?`<div class="tip camtip"><b>Phone setup${d.cam.view==="behind"?", behind you":", side-on"}:</b> ${esc(d.cam.text)}</div>`:""}
+   ${cmpCard(d)}
    ${CHECKS[d.id]?`<div class="checkit"><div><b>Check it on video</b><span class="small">Film one shot ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}. The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")}.</span></div><a class="btn sec small" href="#form" data-check="${d.id}">Check it</a></div>`:""}
    <div class="cue">${esc(d.cue)}</div>${d.skill==="s"?`<div class="tip"><b>Today's one cue:</b> ${esc(CUES[todayCue().i].t)}. Think only this between shots. Change it on the Today tab.</div>`:""}${d.stages&&d.between?`<div class="tip"><b>Before each round:</b> ${esc(d.between)}</div>`:""}${heavy}${tgt}
    ${recCard(d)}
@@ -3904,7 +3935,7 @@ async function openVid(id){const m=CO.vids.find(v=>v.id===id);if(!m)return;let b
   const file=new File([blob],`hoops-${new Date(m.t).toISOString().slice(0,10)}.${ext}`,{type:m.type});
   const canShare=!!(CP("Share")&&CP("Filesystem"))||!!(navigator.canShare&&(()=>{try{return navigator.canShare({files:[file]})}catch(e){return false}})());
   const el=document.createElement("div");el.className="covid";el.setAttribute("role","dialog");el.setAttribute("aria-label","Training video");
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-vv="close">Close</button><span class="small">${new Date(m.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}${f?" · "+esc(f.it.text):""}</span></div>
+  el.innerHTML=`<div class="bar"><button class="btn sec small" data-vv="close">Close</button><span class="small">${new Date(m.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}${f?" · "+esc(f.it.text):m.name?" · "+esc(m.name):""}</span></div>
    <video id="coPlay" src="${u}" playsinline preload="auto"></video>
    <div class="bar vctl"><button class="btn sec small" data-vv="step:-1" aria-label="Back one frame">◀</button><button class="btn sec small vplay" data-vv="play">Play</button><button class="btn sec small" data-vv="step:1" aria-label="Forward one frame">▶</button>
     <input type="range" id="coSeek" min="0" max="1000" value="0" step="1" aria-label="Position"><span class="num small" id="coTime">0:00</span></div>
@@ -3935,6 +3966,234 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-vv],[data-
   else if(a==="del"){if(t.dataset.sure){delVid(V.id);return}t.dataset.sure="1";t.textContent="Tap again to delete";t.classList.add("warnbtn")}});
 document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(CO.view)closeVid();else if(CO.rec)closeRec()});
 
+/* ---------- self-review: film a rep and watch it next to the demo ----------
+   The drill's demo loops on the left and your clip plays on the right, at the same speed (1×, ½×, ¼×). The pose
+   model reads your clip at 10 frames a second, like the form check, and adds up to three notes, each with a
+   "See it" button that jumps your clip to that moment. Shooting drills reuse the form check's own numbers (the
+   drill's own checks first); handling and finishing get simpler body checks. Nothing leaves the phone: Keep saves
+   the clip to My videos on the Coach tab. See docs/LEARNING.md, step 25. */
+let CMP=null;
+const CMP_FPS=10;
+function cmpDemos(d){const out=[];if(!d)return out;
+  if(hasParts(d))d.phases.forEach((p,i)=>{const a=partAnim(d,i);if(a)out.push({a,t:`${p[0]}. ${HV.note(d.id+"p:"+i)}`,c:clipLinks(d,i)})});
+  (d.steps||[]).forEach((s,i)=>{const a=stepAnim(d,i);if(a)out.push({a,t:s,c:stepClips(d,i)})});
+  return out}
+const cmpView=d=>CHECK_VIEW[d.id]||(d.cam&&d.cam.view)||"side";
+function cmpWhat(d){if(d.skill==="s")return CHECKS[d.id]?CHECKS[d.id].join(" and "):cmpView(d)==="behind"?"your elbow, ball line and guide hand":"your balance, timing and release";
+  if(d.skill==="h")return"stance, eyes up and staying level";if(d.skill==="f")return"knee drive, reach and landing";return""}
+function cmpCard(d){if(!cmpDemos(d).length)return"";const w=cmpWhat(d);
+  return `<div class="checkit cmpcard"><div><b>Film a rep</b><span class="small">Watch your rep next to the demo${w?`, with notes on ${esc(w)}`:""}. It stays on this phone.</span></div><button class="btn sec small" data-cmp="${d.id}">Compare</button></div>`}
+
+function openCmp(id){const d=D[id];if(!d)return;closeCmp();const demos=cmpDemos(d);if(!demos.length)return;
+  const el=document.createElement("div");el.className="cmp";el.setAttribute("role","dialog");el.setAttribute("aria-label","Compare your rep with the demo");
+  document.body.appendChild(el);document.body.style.overflow="hidden";
+  CMP={el,d,demos,di:0,state:"empty",rate:1,mir:false,bones:true,playing:false,dt:0,last:0,raf:0,
+    stream:null,mr:null,chunks:[],cd:0,recT0:0,timer:0,blob:null,url:"",v:null,cv:null,cw:0,ch:0,dur:0,frames:null,res:null,status:"",msg:"",seeking:false};
+  cmpDraw();CMP.raf=requestAnimationFrame(cmpLoop)}
+function closeCmp(){const C=CMP;if(!C)return;CMP=null;cancelAnimationFrame(C.raf);clearInterval(C.timer);cmpStopCam(C);
+  if(C.v){C.v.pause();C.v.removeAttribute("src");C.v.load()}if(C.url)URL.revokeObjectURL(C.url);C.el.remove();
+  if(!$("#sheet")||$("#sheet").hidden)document.body.style.overflow=""}
+function cmpStopCam(C){if(C.mr&&C.mr.state==="recording"){C.mr.onstop=null;try{C.mr.stop()}catch(e){}}C.mr=null;C.stream?.getTracks().forEach(t=>t.stop());C.stream=null}
+
+function cmpDraw(){const C=CMP;if(!C)return;const d=C.d,dm=C.demos[C.di],has=C.state==="clip";
+  const seg=(k,vals,cur,lab,f)=>`<div class="seg" role="group" aria-label="${lab}">${vals.map(v=>`<button data-cm="${k}:${v}" aria-pressed="${v===cur}">${f(v)}</button>`).join("")}</div>`;
+  const dl=S.settings.cmpDelay||5,ln=S.settings.cmpLen||6;
+  let mine="";
+  if(C.state==="empty")mine=`<div class="cmp-empty"><p>${esc(d.cam?d.cam.text:"Prop the phone up 10 to 15 ft away, about waist high, with your whole body in frame, feet included.")}</p>
+     ${camLive()?`<button class="btn pri small" data-cm="cam">Record a rep</button>`:""}<label class="btn sec small filebtn" for="cmpFile">${camLive()?"Pick a clip":"Film or pick a clip"}</label>
+     <input type="file" id="cmpFile" accept="video/*" hidden></div>`;
+  else if(C.state==="cam"||C.state==="count"||C.state==="rec")mine=`<video class="cmp-live${CO.facing==="user"?" mir":""}" autoplay muted playsinline></video>
+     <div class="cmp-big num" aria-live="assertive">${C.state==="count"?C.cd:C.state==="rec"?`<span class="cmp-rec">● REC</span>`:""}</div>`;
+  else if(C.state==="load")mine=`<div class="cmp-empty"><p>Opening your clip…</p></div>`;
+  else mine=`<canvas class="cmp-cv${C.mir?" mir":""}" width="${C.cw}" height="${C.ch}" aria-label="Your rep"></canvas>`;
+  const ctl=C.state==="cam"?`<div class="cmp-row">${seg("delay",[5,10],dl,"Start in",v=>`Start in ${v}s`)}${seg("len",[6,10],ln,"Record for",v=>`${v}s`)}</div>
+      <div class="cmp-row"><button class="btn sec small" data-cm="back">Back</button><button class="btn sec small" data-cm="flip">Flip camera</button><button class="btn pri small" data-cm="go">Start</button></div>`
+    :C.state==="count"||C.state==="rec"?`<div class="cmp-row"><button class="btn sec small" data-cm="stop">${C.state==="rec"?"Stop":"Cancel"}</button></div>`
+    :has?`<div class="cmp-row"><button class="btn pri small cmp-play" data-cm="play">${C.playing?"Pause":"Play both"}</button><button class="btn sec small" data-cm="step:-1" aria-label="Back one frame">◀</button><button class="btn sec small" data-cm="step:1" aria-label="Forward one frame">▶</button>
+        <input type="range" class="cmp-seek" min="0" max="1000" value="0" step="1" aria-label="Your clip position"></div>
+      <div class="cmp-row">${seg("rate",[1,.5,.25],C.rate,"Speed",v=>v===1?"1×":v===.5?"½×":"¼×")}<button class="btn sec small" data-cm="mir" aria-pressed="${C.mir}">Mirror me</button>${C.frames?`<button class="btn sec small" data-cm="bones" aria-pressed="${C.bones}">Skeleton</button>`:""}</div>
+      <div class="cmp-row"><button class="btn sec small" data-cm="redo">Film again</button><button class="btn sec small" data-cm="keep"${C.kept?" disabled":""}>${C.kept?"Kept":"Keep clip"}</button></div>`
+    :`<div class="cmp-row">${seg("rate",[1,.5,.25],C.rate,"Demo speed",v=>v===1?"1×":v===.5?"½×":"¼×")}</div>`;
+  C.el.innerHTML=`<div class="cmp-top"><button class="btn sec small" data-cm="close">Close</button><div class="cmp-title">${esc(d.name)}</div></div>
+   <div class="cmp-panes"><div class="cmp-pane"><div class="cmp-lab">Demo</div><div class="cmp-demo">${dm.a}</div></div><div class="cmp-pane mine"><div class="cmp-lab">You</div><div class="cmp-mine">${mine}</div></div></div>
+   ${C.demos.length>1?`<div class="cmp-row cmp-steps" role="group" aria-label="Demo step">${C.demos.map((_,i)=>`<button class="chip" data-cm="demo:${i}" aria-pressed="${i===C.di}">Step ${i+1}</button>`).join("")}</div>`:""}
+   <p class="cmp-step small">${esc(dm.t)}${dm.c||""}</p>
+   <div class="cmp-ctl">${ctl}</div>
+   <div class="cmp-notes" role="status">${cmpNotes()}</div>`;
+  C.tb=[...C.el.querySelectorAll(".cmp-demo svg[data-tb]")].map(s=>TB.make(s,s.dataset.tb)).filter(Boolean);
+  if(C.stream){const lv=C.el.querySelector(".cmp-live");if(lv)lv.srcObject=C.stream}
+  C.el.querySelector("#cmpFile")?.addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(f)cmpSetClip(f,0)});
+  const sk=C.el.querySelector(".cmp-seek");if(sk){sk.addEventListener("input",()=>{if(!C.v||!C.dur)return;C.seeking=true;cmpPause();C.v.currentTime=C.dur*sk.value/1000});sk.addEventListener("change",()=>{C.seeking=false})}
+  cmpPaint()}
+
+/* one loop drives the demo (at the chosen speed) and paints your clip with the skeleton on top */
+function cmpLoop(now){const C=CMP;if(!C)return;const dt=C.last?Math.min(.1,(now-C.last)/1000):0;C.last=now;
+  const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(C.state!=="clip"||C.playing)C.dt+=dt*C.rate;
+  const t=still?1.2:C.dt;for(const el of C.el.querySelectorAll(".cmp-demo svg")){const a=el.dataset;if(a.bv)BV.render(el,a.bv,still?.4:t);else if(a.hv)HV.render(el,a.hv,t);else if(a.sv)SV.render(el,a.sv,t);else if(a.fv)FV.render(el,a.fv,t)}
+  for(const g of C.tb||[])g(t+1.2);
+  if(C.state==="clip"){cmpPaint();const sk=C.el.querySelector(".cmp-seek");if(sk&&!C.seeking&&C.dur)sk.value=Math.round(1000*C.v.currentTime/C.dur)}
+  C.raf=requestAnimationFrame(cmpLoop)}
+function cmpPaint(){const C=CMP;if(!C||C.state!=="clip"||!C.v)return;const cv=C.el.querySelector(".cmp-cv");if(!cv)return;const c=cv.getContext("2d");
+  try{c.drawImage(C.v,0,0,C.cw,C.ch)}catch(e){return}
+  if(!C.bones||!C.frames)return;const i=Math.round(C.v.currentTime*CMP_FPS),fr=C.frames[Math.min(C.frames.length-1,Math.max(0,i))];if(!fr||!fr.lm)return;
+  const acc=getComputedStyle(document.documentElement).getPropertyValue("--accent").trim()||"#E2601A",hot=new Set(C.res&&C.res.hot||[]);
+  c.lineCap="round";for(const [a,b] of BONES){const A=fr.lm[a],B=fr.lm[b];if(A.v<.3||B.v<.3)continue;const h=hot.has(a)&&hot.has(b);c.strokeStyle=h?acc:"rgba(255,255,255,.85)";c.lineWidth=h?5:3;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(B.x,B.y);c.stroke()}
+  for(const j of [0,11,12,13,14,15,16,23,24,25,26,27,28]){const P=fr.lm[j];if(P.v<.3)continue;c.fillStyle=hot.has(j)?acc:"#fff";c.beginPath();c.arc(P.x,P.y,hot.has(j)?4.5:3.5,0,7);c.fill()}}
+function cmpPause(){const C=CMP;if(!C)return;C.playing=false;C.v?.pause();const b=C.el.querySelector(".cmp-play");if(b)b.textContent="Play both"}
+function cmpPlay(){const C=CMP;if(!C||!C.v)return;if(C.playing){cmpPause();return}
+  if(C.v.ended||C.v.currentTime>=C.dur-.05){C.v.currentTime=0;C.dt=0}else if(C.v.currentTime<.05)C.dt=0;
+  C.v.playbackRate=C.rate;C.v.play().then(()=>{C.playing=true;const b=C.el.querySelector(".cmp-play");if(b)b.textContent="Pause"}).catch(()=>{})}
+
+/* your clip: from the in-app camera (with a countdown, so you can get to your spot) or a file */
+async function cmpCam(){const C=CMP;if(!C)return;cmpStopCam(C);
+  try{C.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:CO.facing,width:{ideal:1280},height:{ideal:720}},audio:false})}
+  catch(e){if(CMP!==C)return;C.state="empty";cmpDraw();toast("Couldn't open the camera","Allow the camera for Hoops Ladder, or use Pick a clip.");return}
+  if(CMP!==C){C.stream.getTracks().forEach(t=>t.stop());return}C.state="cam";cmpDraw()}
+function cmpGo(){const C=CMP;if(!C||!C.stream)return;C.cd=S.settings.cmpDelay||5;C.state="count";cmpDraw();beep(660,90);
+  C.timer=setInterval(()=>{if(CMP!==C)return;C.cd--;if(C.cd>0){beep(660,90);const b=C.el.querySelector(".cmp-big");if(b)b.textContent=C.cd;return}clearInterval(C.timer);cmpRec()},1000)}
+function cmpRec(){const C=CMP;if(!C||!C.stream)return;const type=pickMime();let mr;
+  try{mr=new MediaRecorder(C.stream,Object.assign({videoBitsPerSecond:2500000},type?{mimeType:type}:{}))}catch(e){try{mr=new MediaRecorder(C.stream)}catch(e2){C.state="cam";cmpDraw();toast("Recording isn't supported here","Use Pick a clip instead.");return}}
+  C.mr=mr;C.chunks=[];mr.ondataavailable=e=>{if(e.data&&e.data.size)C.chunks.push(e.data)};
+  mr.onstop=()=>{if(CMP!==C)return;clearInterval(C.timer);const dur=(Date.now()-C.recT0)/1000,blob=new Blob(C.chunks,{type:mr.mimeType||type||"video/webm"});C.mr=null;cmpStopCam(C);beep(1046,120);
+    if(blob.size)cmpSetClip(blob,dur);else{C.state="empty";cmpDraw()}};
+  beep(1318,200);mr.start(500);C.recT0=Date.now();C.state="rec";cmpDraw();
+  const len=S.settings.cmpLen||6;C.timer=setInterval(()=>{if((Date.now()-C.recT0)/1000>=len&&mr.state==="recording")mr.stop()},200)}
+function cmpStop(){const C=CMP;if(!C)return;clearInterval(C.timer);if(C.state==="rec"&&C.mr){C.mr.stop();return}C.state="cam";cmpDraw()}
+const cmpOnce=(el,ev,ms)=>new Promise(res=>{let done=false;const f=()=>{if(!done){done=true;res()}};el.addEventListener(ev,f,{once:true});setTimeout(f,ms)});
+async function cmpSeek(v,t){if(Math.abs(v.currentTime-t)<1e-3)return;const p=cmpOnce(v,"seeked",1500);v.currentTime=t;await p}
+/* recorded WebM has no duration until the end is read: jump far ahead once so the browser works it out */
+async function cmpDuration(v,fallback){if(isFinite(v.duration)&&v.duration>0)return v.duration;const p=cmpOnce(v,"seeked",3000);v.currentTime=1e7;await p;const d=isFinite(v.duration)&&v.duration>0?v.duration:fallback;await cmpSeek(v,0);return d}
+async function cmpSetClip(blob,dur){const C=CMP;if(!C)return;cmpPause();if(C.v){C.v.removeAttribute("src");C.v.load()}if(C.url)URL.revokeObjectURL(C.url);
+  Object.assign(C,{state:"load",blob,frames:null,res:null,kept:false,status:"",msg:"",dt:0});cmpDraw();
+  const v=document.createElement("video");v.muted=true;v.playsInline=true;v.setAttribute("playsinline","");v.preload="auto";C.url=URL.createObjectURL(blob);v.src=C.url;
+  await cmpOnce(v,"loadeddata",8000);if(CMP!==C)return;try{await v.play();v.pause()}catch(e){}
+  if(!v.videoWidth){C.state="empty";cmpDraw();toast("Couldn't open that clip","Try recording a new one.");return}
+  C.dur=await cmpDuration(v,dur||0);await cmpSeek(v,0);if(CMP!==C)return;
+  const sc=480/Math.max(v.videoWidth,v.videoHeight);C.cw=Math.round(v.videoWidth*sc);C.ch=Math.round(v.videoHeight*sc);
+  C.v=v;C.state="clip";v.addEventListener("ended",()=>{if(CMP===C)cmpPause()});cmpDraw();cmpRead(C)}
+
+/* read the pose in every tenth of a second, then pick the notes for this drill */
+async function cmpRead(C){C.status="busy";C.msg="Loading the pose model…";cmpNotesDraw();
+  let pl=null;try{pl=await loadPose()}catch(e){}
+  if(CMP!==C)return;if(!pl){C.status="nopose";cmpNotesDraw();return}
+  const v=document.createElement("video");v.muted=true;v.playsInline=true;v.preload="auto";v.src=C.url;await cmpOnce(v,"loadeddata",8000);try{await v.play();v.pause()}catch(e){}
+  const cv=document.createElement("canvas");cv.width=C.cw;cv.height=C.ch;const cx=cv.getContext("2d",{willReadFrequently:true});
+  const dur=Math.min(C.dur||0,12),n=Math.max(1,Math.floor(dur*CMP_FPS)),F=[];
+  for(let i=0;i<n;i++){if(CMP!==C)return;const t=Math.min(i/CMP_FPS+.001,(C.dur||dur)-.01);await cmpSeek(v,t);cx.drawImage(v,0,0,C.cw,C.ch);
+    let lm=null;try{const r=pl.detect(cv);lm=r.landmarks&&r.landmarks[0]}catch(e){}
+    F.push({t,lm:lm?lm.map(p=>({x:p.x*C.cw,y:p.y*C.ch,v:p.visibility??1})):null});
+    if(i%3===0){C.msg=`Reading your rep: frame ${i+1} of ${n}`;cmpNotesDraw()}}
+  v.removeAttribute("src");v.load();if(CMP!==C)return;
+  C.frames=F;try{C.res=cmpCheck(C.d,F,CMP_FPS)}catch(e){C.res={ok:false,msg:"Couldn't read this clip. Try one rep with your whole body in frame."}}
+  C.status="done";cmpDraw()}
+function cmpNotesDraw(){const C=CMP;const el=C&&C.el.querySelector(".cmp-notes");if(el)el.innerHTML=cmpNotes()}
+function cmpNotes(){const C=CMP;if(!C||C.state!=="clip")return"";
+  if(C.status==="busy")return `<p class="small muted">${esc(C.msg)}</p>`;
+  if(C.status==="nopose")return `<p class="small muted">The pose model couldn't load on this phone, so there are no notes. Compare by eye.</p>`;
+  const r=C.res;if(!r)return"";if(!r.ok)return `<p class="small">${esc(r.msg)}</p>`;
+  const pill=st=>`<span class="pill ${st}">${{good:"Good",watch:"Watch",fix:"Fix"}[st]}</span>`;
+  return `<div class="sechead"><h2>What the app saw</h2><span class="muted small">${r.sum}</span></div>
+   <div class="list">${r.notes.map(m=>`<div class="metric"><div class="mh"><b>${esc(m.label)}</b>${pill(m.st)}<span class="num mv">${esc(m.val)}</span></div><p>${esc(m.text)}</p>
+     <div class="row small">${m.at!=null?`<button class="linkbtn" data-cm="at:${m.at}">See it in your clip →</button>`:""}${m.st!=="good"&&m.drill&&D[m.drill]&&m.drill!==C.d.id?`<button class="linkbtn" data-open="${m.drill}">Drill: ${esc(D[m.drill].name)} →</button>`:""}</div></div>`).join("")}</div>
+   <p class="small muted">Read by the pose model on your phone from one camera angle, so it's a rough guide. Trust what you see side by side too.</p>`}
+
+const CMP_RANK={fix:0,watch:1,good:2};
+function cmpPick(M,focus){if(M.length<=3)return [...M].sort((a,b)=>CMP_RANK[a.st]-CMP_RANK[b.st]);const f=M.filter(m=>focus.has(m.label)).sort((a,b)=>CMP_RANK[a.st]-CMP_RANK[b.st]);
+  const o=M.filter(m=>!focus.has(m.label)&&m.st!=="good").sort((a,b)=>CMP_RANK[a.st]-CMP_RANK[b.st]);
+  let out=f.concat(o).slice(0,3);if(!out.length)out=M.filter(m=>m.st==="good").slice(0,2);return out}
+const cmpSum=M=>{const g=M.filter(m=>m.st==="good").length,w=M.filter(m=>m.st==="watch").length,x=M.filter(m=>m.st==="fix").length;return `${g} good · ${w} to watch · ${x} to fix`};
+function cmpCheck(d,F,fps){if(d.skill==="s")return cmpShoot(d,F,fps);if(d.skill==="h")return cmpHandle(d,F,fps);if(d.skill==="f")return cmpFinish(d,F,fps);
+  return{ok:false,msg:"No camera checks for this drill yet. Use the side-by-side to compare."}}
+
+/* shooting: the form check's own numbers for the drill's camera angle, the drill's own checks first */
+function cmpShoot(d,F,fps){const res=cmpView(d)==="behind"?computeBehind(F,fps):computeSide(F,fps);if(!res.ok)return res;
+  const at={drift:res.r,knee:res.p,seq:res.sp,tilt:res.sp,ext:res.r,hold:Math.min(F.length-1,res.r+3),tempo:res.p,stall:res.sp,bElbow:res.sp,bLine:res.r,bGuide:res.r,bSway:res.r,bStance:res.p};
+  const M=res.M.filter(m=>m.st!=="info").map(m=>({...m,at:F[at[m.k]??res.r]?.t}));
+  return{ok:true,notes:cmpPick(M,new Set(CHECKS[d.id]||[])),sum:cmpSum(M),hot:res.arm?Object.values(res.arm):(s=>[s.sh,s.el,s.wr])(SIDE[S.settings.hand||"R"])}}
+
+/* shared pose helpers for the body checks */
+function cmpBody(F){const vis=(f,j)=>!!(f.lm&&f.lm[j]&&f.lm[j].v>.4);
+  const ok=f=>vis(f,11)&&vis(f,12)&&vis(f,23)&&vis(f,24)&&((vis(f,25)&&vis(f,27))||(vis(f,26)&&vis(f,28)));
+  const idx=F.map((f,i)=>ok(f)?i:-1).filter(i=>i>=0),L=i=>F[i].lm,mid=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+  const legs=i=>[[23,25,27],[24,26,28]].filter(([h,k,a])=>vis(F[i],h)&&vis(F[i],k)&&vis(F[i],a));
+  /* knee angle, and how much the thigh shows top to bottom against the shin: bent knees shorten the thigh from the front and the side */
+  const knee=i=>med(legs(i).map(([h,k,a])=>ang(L(i)[h],L(i)[k],L(i)[a])));
+  const thigh=i=>med(legs(i).map(([h,k,a])=>(L(i)[k].y-L(i)[h].y)/Math.max(1,L(i)[a].y-L(i)[k].y)));
+  const hip=i=>mid(L(i)[23],L(i)[24]),sh=i=>mid(L(i)[11],L(i)[12]);
+  const foot=i=>{const a=[27,28].filter(j=>vis(F[i],j)).map(j=>L(i)[j].y);return a.length?Math.max(...a):null};
+  const H=med(idx.map(i=>{const f=foot(i);return f==null?0:f-sh(i).y}).filter(x=>x>0))||1;
+  return{vis,idx,L,knee,thigh,hip,sh,foot,H}}
+const cmpPct=(n,of)=>of?Math.round(100*n/of):0;
+
+/* handling: low stance, eyes up, staying level */
+function cmpHandle(d,F,fps){const B=cmpBody(F),{idx,L,vis}=B;
+  if(idx.length<8)return{ok:false,msg:"Couldn't find your body in enough frames. Film with your whole body, feet included, in frame."};
+  const bent=i=>B.knee(i)<=155||B.thigh(i)<=.9,nb=idx.filter(bent).length,pb=cmpPct(nb,idx.length);
+  const tall=idx.reduce((b,i)=>B.knee(i)>B.knee(b)?i:b,idx[0]);
+  const M=[];
+  M.push({k:"stance",label:"Low stance",val:`${pb}% of the rep`,st:pb>=75?"good":pb>=50?"watch":"fix",at:F[tall].t,
+    text:pb>=75?"You stay down in a bent-knee stance, like the demo.":`Your knees are close to straight for ${100-pb}% of the rep. Sit lower, knees bent and chest up, so the ball travels less and you're ready to move.`});
+  /* eyes: from the front or the side, the nose drops toward the shoulders when you look down at the ball */
+  const hd=idx.filter(i=>vis(F[i],0)&&(vis(F[i],7)||vis(F[i],8))).map(i=>{const e=[7,8].filter(j=>vis(F[i],j)).map(j=>L(i)[j].y),ey=e.reduce((a,b)=>a+b,0)/e.length,s=B.sh(i).y;return{i,h:(L(i)[0].y-ey)/Math.max(1,s-ey)}});
+  if(hd.length>=6){const dn=hd.filter(x=>x.h>.45),pu=100-cmpPct(dn.length,hd.length),worst=hd.reduce((b,x)=>x.h>b.h?x:b,hd[0]);
+    M.push({k:"eyes",label:"Eyes up",val:`${pu}% of the rep`,st:pu>=80?"good":pu>=60?"watch":"fix",at:F[worst.i].t,
+      text:pu>=80?"Your head stays up through the rep.":`Your head drops toward the ball for about ${100-pu}% of the rep. Pick a spot at eye level (the rim, a cone, a mark on the wall) and feel the ball instead of watching it.`})}
+  /* level: hips bobbing up and down with each dribble */
+  /* median distance from the median hip height, scaled to match a standard deviation, so one bad pose frame doesn't count */
+  const hy=idx.map(i=>B.hip(i).y),m=med(hy),sd=1.48*med(hy.map(y=>Math.abs(y-m)))/B.H*100;
+  const hi=idx.reduce((b,i)=>B.hip(i).y<B.hip(b).y?i:b,idx[0]);
+  M.push({k:"level",label:"Stay level",val:`±${sd.toFixed(1)}%`,st:sd<=3?"good":sd<=5?"watch":"fix",at:F[hi].t,
+    text:sd<=3?"Your hips stay at one height while you work the ball.":`Your hips move up and down about ${sd.toFixed(0)}% of your height. Stay at one level: the ball moves, your body doesn't.`});
+  return{ok:true,notes:cmpPick(M,new Set()),sum:cmpSum(M),hot:[23,24,25,26,27,28]}}
+
+/* finishing: find the jump (hips at their highest), then knee drive and reach at the top, and a soft landing */
+function cmpFinish(d,F,fps){const B=cmpBody(F),{idx,L,vis}=B;
+  if(idx.length<8)return{ok:false,msg:"Couldn't find your body in enough frames. Film from the side with your whole body, feet included, in frame."};
+  const pk=idx.reduce((b,i)=>B.hip(i).y<B.hip(b).y?i:b,idx[0]),base=med(idx.map(i=>B.hip(i).y)),rise=(base-B.hip(pk).y)/B.H*100;
+  if(rise<4)return{ok:false,msg:"Couldn't find a jump in this clip. Film the whole rep, from the last steps to the landing, with your feet in frame."};
+  const M=[];
+  /* knee drive: the higher knee at the top, against the thigh's length when you stand */
+  const T=med(idx.map(i=>Math.max(L(i)[25].y,L(i)[26].y)-B.hip(i).y).filter(x=>x>0))||B.H*.3;
+  const kn=[25,26].filter(j=>vis(F[pk],j)).map(j=>L(pk)[j].y);
+  if(kn.length){const kd=Math.min(1,Math.max(0,(Math.min(...kn)-B.hip(pk).y)/T)),a=Math.round(Math.acos(kd)*180/Math.PI);
+    M.push({k:"drive",label:"Knee drive",val:`${a}°`,st:a>=60?"good":a>=45?"watch":"fix",at:F[pk].t,
+      text:a>=60?"You drive your knee up toward hip height at takeoff, which carries you up and protects the ball.":"Your lead knee stays low at takeoff. Drive it up toward your hip as you jump: it lifts you higher and shields the ball."})}
+  /* reach: the higher hand at the top of the jump */
+  const near=idx.filter(i=>Math.abs(i-pk)<=3);let best=null;
+  for(const i of near)for(const [s,e,w] of [[11,13,15],[12,14,16]])if(vis(F[i],s)&&vis(F[i],e)&&vis(F[i],w)&&(!best||L(i)[w].y<best.y))best={y:L(i)[w].y,i,ext:ang(L(i)[s],L(i)[e],L(i)[w]),hd:L(i)[0].y};
+  if(best){const up=best.y<best.hd-.05*B.H,ex=Math.round(best.ext);
+    M.push({k:"reach",label:"Reach at the top",val:`${ex}°`,st:up&&ex>=150?"good":up?"watch":"fix",at:F[best.i].t,
+      text:up&&ex>=150?"Your finishing arm goes up long, so you release the ball high, close to the glass.":up?"Your hand gets above your head but your arm stays bent. Reach all the way up so the ball leaves as high as it can.":"Your hand stays below your head at the top of the jump. Reach up to the glass and finish high, away from the shot blocker."})}
+  /* landing: knees bend in the half second after the hips come back down */
+  const aft=idx.filter(i=>i>pk),land=aft.find(i=>B.hip(i).y>=base-.03*B.H)??aft.find(i=>B.hip(i).y>=B.hip(pk).y+.5*(base-B.hip(pk).y));
+  if(land!=null){const after=idx.filter(i=>i>=land&&i<=land+fps*.6),soft=after.some(i=>B.knee(i)<=150||B.thigh(i)<=.85),mk=Math.round(Math.min(...after.map(B.knee)));
+    M.push({k:"land",label:"Soft landing",val:soft?"Soft":"Stiff",st:soft?"good":"watch",at:F[land].t,
+      text:soft?"You land with bent knees, balanced and ready for the next play.":`You land with nearly straight legs (${mk}°). Land on both feet with your knees bent, which is easier on your knees and keeps you ready for the rebound.`})}
+  if(!M.length)return{ok:false,msg:"Couldn't see your knees and hands at the top of the jump. Film from the side with your whole body in frame."};
+  return{ok:true,notes:cmpPick(M,new Set()),sum:cmpSum(M),hot:[23,24,25,26,11,12,13,14,15,16]}}
+
+document.addEventListener("click",e=>{const o=e.target.closest("[data-cmp]");if(o){openCmp(o.dataset.cmp);return}
+  const C=CMP;if(!C)return;if(e.target.closest("[data-open]")&&C.el.contains(e.target)){closeCmp();return}const t=e.target.closest("[data-cm]");if(!t||!C.el.contains(t))return;const a=t.dataset.cm;
+  if(a==="close")closeCmp();
+  else if(a==="cam")cmpCam();
+  else if(a==="back"){cmpStopCam(C);C.state="empty";cmpDraw()}
+  else if(a==="flip"){CO.facing=CO.facing==="user"?"environment":"user";cmpCam()}
+  else if(a==="go")cmpGo();
+  else if(a==="stop")cmpStop();
+  else if(a.startsWith("delay:")){S.settings.cmpDelay=+a.slice(6);persist();cmpDraw()}
+  else if(a.startsWith("len:")){S.settings.cmpLen=+a.slice(4);persist();cmpDraw()}
+  else if(a.startsWith("demo:")){C.di=+a.slice(5);C.dt=0;cmpDraw()}
+  else if(a.startsWith("rate:")){C.rate=+a.slice(5);if(C.v)C.v.playbackRate=C.rate;C.el.querySelectorAll('[data-cm^="rate:"]').forEach(b=>b.setAttribute("aria-pressed",b===t))}
+  else if(a==="play")cmpPlay();
+  else if(a.startsWith("step:")){if(!C.v)return;cmpPause();C.v.currentTime=Math.max(0,Math.min(C.dur,C.v.currentTime+(+a.slice(5))/CMP_FPS))}
+  else if(a.startsWith("at:")){if(!C.v)return;cmpPause();C.v.currentTime=+a.slice(3);C.el.querySelector(".cmp-panes")?.scrollIntoView({behavior:"smooth",block:"start"})}
+  else if(a==="mir"){C.mir=!C.mir;t.setAttribute("aria-pressed",C.mir);C.el.querySelector(".cmp-cv")?.classList.toggle("mir",C.mir)}
+  else if(a==="bones"){C.bones=!C.bones;t.setAttribute("aria-pressed",C.bones)}
+  else if(a==="redo"){cmpPause();C.state="empty";C.frames=null;C.res=null;cmpDraw()}
+  else if(a==="keep"){if(!C.blob)return;C.kept=true;t.disabled=true;t.textContent="Kept";saveVid(C.blob,{dur:C.dur,name:`Self-review: ${C.d.name}`})}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&CMP){e.stopImmediatePropagation();closeCmp()}},true);
+
 /* ---------- the Coach tab ---------- */
 const CHECK_SVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 function hwLinks(it){return (it.links||[]).map(l=>safeUrl(l.url)?`<a href="${esc(l.url)}" target="_blank" rel="noopener">▶ ${esc(l.title||linkLabel(l.url))}</a>`:"").join("")}
@@ -3954,7 +4213,7 @@ function hwRow(it){const open=CO.open===it.id,clips=CO.vids.filter(v=>v.item===i
   </div>`}
 function vCard(v){const th=CO.thumbs[v.id],f=v.item&&coFind(v.item);
   return `<button class="vcard" data-hw="vid:${v.id}"><span class="vthumb" data-th="${v.id}">${th?`<img src="${th}" alt="">`:""}${v.dur?`<b>${fmtDur(v.dur)}</b>`:""}</span>
-   <span><b>${f?esc(f.it.text):"Training clip"}</b>${new Date(v.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})} · ${fmtMB(v.size)}</span></button>`}
+   <span><b>${f?esc(f.it.text):v.name?esc(v.name):"Training clip"}</b>${new Date(v.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})} · ${fmtMB(v.size)}</span></button>`}
 function viewCoach(){if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
   const ls=coLists(),all=ls.flatMap(l=>l.items),left=all.filter(x=>!x.done).length,coaches=[...new Set(ls.map(l=>l.coach).filter(Boolean))];
   const name=CO.name||S.coach.lastCoach||"",free=CO.vids.filter(v=>!v.item||(!coFind(v.item)&&!(CO.wiz&&v.item===CO.wiz.id)));
@@ -4094,6 +4353,7 @@ route();
       if (clip) { if (!press(clip, '[data-yt="close"]')) clip.remove(); return true; }
       if (CO.view) { closeVid(); return true; }
       if (CO.rec) { closeRec(); return true; }
+      if (CMP) { closeCmp(); return true; }
       if (seeEl) { if (!press(seeEl, '[data-s="resume"]')) closeSee(); return true; }
       if (pEl && P) {
         // The rating screen has its own Save and Discard, so back stays put rather than throwing the workout away.
