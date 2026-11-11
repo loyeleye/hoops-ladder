@@ -1075,3 +1075,35 @@ for a session you don't want to keep.
 
 **Not built yet** (from the storyboard): auto-stop when the phone tips toward the floor, and splitting one imported
 clip that has both the coach and you in it.
+
+## Step 28. Send clips to a coach
+
+You film a shot burst at Shoot360, or a coach session, and want another coach to see a few of the reps. *Send to
+coach* picks the clips, makes one short highlight clip of just those, and hands it to any app with a note like
+`Shot 3, 0:04: elbow out 14°`. Or *Save for Mo* drops them into Mo's next coach session as tries.
+
+**Segments, not videos.** The sheet works on a list of segments `{v, a, b, label, note, pf}`: a video id in the
+`hoopsLadder.videos` store, start and end seconds inside it, a label, a note, and pose frames for the skeleton (or
+null). So it doesn't care where clips come from. Shot bursts call `sendShots(burst, shots)` (from the burst viewer's
+`BURST_ACTIONS`), and a coach session calls `sendPieces(session, topic, pieceId)` from *↗ Send* on a replay or
+*↗ Send to a coach* on a topic. A shot's note is its two worst checks from its `vals`/`st` (`sndShotNote`). A
+session try's note is the coach's spoken feedback transcript, if there is one.
+
+**Making the clip.** `sndBuild` plays each picked segment once at normal speed into a hidden `<video>`, and draws it
+on a canvas every animation frame: a 0.8 s title card first, then the video with a label band and, if switched on,
+the skeleton. `canvas.captureStream(30)` feeds a `MediaRecorder`, so building takes about as long as the clip. The
+note's times are where each segment starts in the finished clip. A single whole clip with no skeleton is shared as it
+is, with no re-encode. If the phone can't record a canvas, the full videos are shared instead.
+
+**Sharing, then gone.** In the app the clip is written to the cache's `share/` folder, handed to `@capacitor/share`
+with the note as text, and the note is copied to the clipboard too, since some apps drop shared text. The `share/`
+folder is emptied 10 minutes later, on the next send and when the app starts. It isn't deleted the moment the share
+sheet closes, because some apps (WhatsApp, for one) read the file after you come back. In a browser the file is
+shared from memory, or saved as a download.
+
+**Save for a coach.** `S.coach.saved` keeps `{coach, t, title, segs}` with no copy of the video. When a session with
+that coach starts (or one is already running), `sesTakeSaved` turns each saved set into a topic of tries, each with
+its note. *Any coach* goes into the next session, whoever it's with. The setup screen says how many are waiting.
+These tries point at the shot burst's own video, so deleting the session never deletes a video whose meta has
+`burst`, and the burst's cleanup skips any video `sesUsesVid(v)` says is still used. Sent shots get `shot.sent` and
+saved ones `shot.keep`, which keep their video past the 14-day cleanup. Code: `snd*`, `sendShots`, `sendPieces`.
