@@ -430,7 +430,7 @@ section{display:flex;flex-direction:column;gap:10px}
 .metric.arc .btn{margin-top:8px}
 .bt-cue{margin-top:10px;font-size:16px;opacity:.75}
 .mdir.one{grid-template-columns:auto 1fr}
-.bigtap .bt-sw{align-self:center;margin-top:8px;position:relative;z-index:2;background:color-mix(in srgb,var(--bg) 14%,transparent);color:var(--bg);border:0}
+.bigtap .bt-sw,.bigtap .bt-film{align-self:center;margin-top:8px;position:relative;z-index:2;background:color-mix(in srgb,var(--bg) 14%,transparent);color:var(--bg);border:0}
 .bigtap .bt-sw[aria-pressed="true"]{background:var(--good);color:#fff}
 .camtip b{color:var(--accent)}
 .c3{display:grid;grid-template-columns:1fr auto auto auto;gap:6px 12px;font-size:14px;align-items:center}
@@ -3598,12 +3598,17 @@ let micOK=!!(window.SpeechRecognition||window.webkitSpeechRecognition);try{navig
 function bigTop(){return `<div class="bt-top"><button class="btn sec small" data-b="undo" ${R.hist.length||R.sm?"":"disabled"}>Undo</button><button class="btn sec small" data-b="ear" aria-pressed="${!!media}">Earbuds</button>${micOK||voice?`<button class="btn sec small" data-b="voice" aria-pressed="${!!voice}">Voice</button>`:""}<button class="btn sec small" data-b="exit">Done</button></div>`}
 function drawBig(){if(!bigEl||!R)return;const d=R.d,p=pct(R.m,R.a),last=R.hist[R.hist.length-1];
   if(R.mode==="sets"){const s=setSpec(),wait=d.timed&&!R.t0;
+    /* Film the next set: only in the rest after a logged set (no misses yet on the next one) and only for drills whose
+       sheet card offers Compare. It opens that same compare screen on top; R and this screen stay as they are under it,
+       and earbuds, clicker and voice keep logging the set while you film. */
+    if(R.cmpN==null)R.cmpN=cmpDemos(d).length;const rest=!!s&&!wait&&R.setNo>0&&!R.sm&&R.cmpN>0;
     bigEl.innerHTML=`${bigTop()}
      <div class="bt-mid"><div class="bt-label">${esc(s?s.label||d.name:"Finished")}</div>
       <div class="bt-set">${s?`Set ${(R.setNo||0)+1} · ${s.kind==="goal"?`make ${s.n}`:`${s.n} shot${s.n===1?"":"s"}`}`:""}</div>
       ${wait?`<div class="bt-last">Tap or click to start the clock</div>`:`<div class="bt-count num ${R.sm?"ms":""}">${R.sm}<span> missed</span></div>`}
       <div class="bt-pct">Total ${R.m}/${R.a}${p==null?"":" · "+p+"%"}${d.goal?` · ${R.m} of ${d.goal} makes`:d.att?` · ${R.a} of ${d.att}`:d.per?` · ${R.a} of ${d.per*5}`:""}${d.timed&&R.t0?` · <span class="num" id="btClock">${fmt((Date.now()-R.t0)/1000)}</span>`:""}</div></div>
      ${d.skill==="s"?`<div class="bt-cue">${R.rtip?"Fix: "+esc(R.rtip):"Cue: "+esc(CUES[todayCue().i].t)}</div>`:d.skill==="f"&&R.tip?`<div class="bt-cue">${esc(R.tip)}${R.hand==="W"&&R.call!=="Weak hand"?" · weak hand":""}</div>`:""}
+     ${rest?`<button class="btn sec small bt-film" data-b="film" aria-label="Film the next set and watch it next to the demo">Film the next set</button>`:""}
      ${s&&s.kind==="att"&&!wait?`<div class="bt-padl">Or tap how many went in</div><div class="bt-pad">${[...Array(s.n+1)].map((_,k)=>`<button class="btn ${k===s.n?"full":""}" data-b="n:${k}">${k}</button>`).join("")}</div>`:""}
      <div class="bt-hint">${s&&s.kind==="goal"?"Make "+s.n+". ":""}Don't touch anything while you shoot. Each miss: tap anywhere (or swipe the way it missed, diagonal for long-left and so on)${media?", click your earbuds":""}${voice?', or say "miss"':""}. Set done: hold${media?", double-click":""}${voice?', say "done" or the number made':""}.${media?" Triple-click: undo.":""}</div>`}
   else bigEl.innerHTML=`<div class="bt-zones" aria-hidden="true"><div class="z mk"><b>Make</b><span>tap the top half · or hold</span></div><div class="z ms"><b>Miss</b><span>tap the bottom half · or swipe the way it missed</span></div></div>${bigTop()}
@@ -3613,7 +3618,7 @@ function drawBig(){if(!bigEl||!R)return;const d=R.d,p=pct(R.m,R.a),last=R.hist[R
    <div class="bt-hint">Swipe the way the ball missed: up long, down short, sideways left or right, diagonal for both (up-left = long and left)${media?" · Earbuds: click = miss, double-click = make, triple-click = undo":""}${voice?' · Say "make", "swish", "miss", a direction like "long left", or "undo"':""}</div>`;
   const pc=bigEl.querySelector(".bt-pct");if(pc&&pc.innerHTML.startsWith(" · "))pc.innerHTML=pc.innerHTML.slice(3);
   bigEl.querySelectorAll("[data-b]").forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.b;
-    if(k==="exit"){closeBig();lockOff();drawDock()}else if(k==="undo")sig("u");else if(k==="ear"){media?stopMedia():startMedia();drawBig()}else if(k==="voice"){voice?stopVoice():startVoice();drawBig()}else if(k==="sw"){const l=R.hist[R.hist.length-1];if(l&&l.hit&&!l.chunk){l.sw=!l.sw;if(l.sw)beep(1318,80)}drawBig()}else if(k.startsWith("n:"))sig(k)})}
+    if(k==="exit"){closeBig();lockOff();drawDock()}else if(k==="undo")sig("u");else if(k==="ear"){media?stopMedia():startMedia();drawBig()}else if(k==="voice"){voice?stopVoice():startVoice();drawBig()}else if(k==="sw"){const l=R.hist[R.hist.length-1];if(l&&l.hit&&!l.chunk){l.sw=!l.sw;if(l.sw)beep(1318,80)}drawBig()}else if(k.startsWith("n:"))sig(k);else if(k==="film")openCmp(R.d.id)})}
 setInterval(()=>{const c=document.getElementById("btClock");if(c&&R&&R.t0)c.textContent=fmt((Date.now()-R.t0)/1000)},500);
 function bigRec(hit,dir,sw){if(!R||R.finished)return;
   const before=bigLabel();act(hit?(sw&&R.d.skill==="s"?"swish":"make"):dir?"miss:"+dir:"miss");beep(hit?988:440,hit?110:220);try{navigator.vibrate?.(hit?30:[40,60,40])}catch(e){}
@@ -3635,10 +3640,12 @@ function stopMedia(){if(!media)return;try{media.pause()}catch(e){}for(const k in
    One press = a, two quick presses or a long press = b, three presses or a back key = u. */
 const KEY_A=new Set([" ","Enter","ArrowRight","ArrowDown","PageDown","AudioVolumeUp","AudioVolumeDown","VolumeUp","VolumeDown","Unidentified"]),KEY_U=new Set(["ArrowLeft","ArrowUp","PageUp","Backspace"]);
 let kN=0,kT=null,kDown=0;
-document.addEventListener("keydown",e=>{if(!bigEl||!R)return;
+/* with the compare screen open over the sets screen, a key aimed at one of its controls goes to that control, not the log */
+let kSkip=false;const cmpKey=e=>!!(CMP&&CMP.el.contains(e.target)&&e.target.closest("button,input,select,label,a,[tabindex]"));
+document.addEventListener("keydown",e=>{if(!bigEl||!R)return;if(cmpKey(e)){kSkip=true;return}kSkip=false;
   if(KEY_U.has(e.key)){e.preventDefault();if(!e.repeat)sig("u");return}
   if(!KEY_A.has(e.key))return;e.preventDefault();if(e.repeat||kDown)return;kDown=performance.now()},true);
-document.addEventListener("keyup",e=>{if(!bigEl||!R||!KEY_A.has(e.key))return;e.preventDefault();const held=kDown?performance.now()-kDown:0;kDown=0;
+document.addEventListener("keyup",e=>{if(!bigEl||!R||!KEY_A.has(e.key))return;if(kSkip||cmpKey(e)){kSkip=false;return}e.preventDefault();const held=kDown?performance.now()-kDown:0;kDown=0;
   if(held>600){clearTimeout(kT);kN=0;sig("b");return}
   kN++;clearTimeout(kT);kT=setTimeout(()=>{const n=kN;kN=0;sig(n>=3?"u":n===2?"b":"a")},380)},true);
 /* voice: the browser's own speech recognition, listening only for a few words. Pages that can't use the mic say so and fall back. */
