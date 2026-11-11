@@ -802,6 +802,23 @@ const DRILLS=[
   what:"From your shooting coach: pivots are what level up your game. Start under the basket, spin-throw the ball out to a lane-line mark, run it down, gather on two feet, then pivot a full 180 and shoot. Four shots at each spot, one per pivot, all the way around the lane and the free throw line. It's on the clock: record your time and beat it next time.",
   steps:["Spots: the lane-line marks where players line up for a free throw, four on each side (the block and the three marks above it), plus the free throw line in the middle. Go up the right side, across the free throw line, then down the left. Four shots at each spot.","Start under the basket. Spin-throw the ball out to the mark with backspin so it stops right there.","As soon as it leaves your hand, run to the ball and gather it on two feet, back to the rim. Landing on both feet means you haven't picked a pivot foot yet. Keep the jump stop low: the feet barely leave the floor.","Shot 1, front pivot on the left foot: the right foot steps forward and around a full 180 until you face the rim. Shoot.","Shot 2, reverse pivot on the left foot: the right foot swings back and around a full 180. Shoot.","Shot 3, front pivot on the right foot: the left foot steps forward and around. Shoot.","Shot 4, reverse pivot on the right foot: the left foot swings back and around. Shoot.","Keep the ball away from the defender as you turn: chin it and keep it on the side away from them, and sweep the free leg through to make space. Square up, then rise onto your toes and shoot. No jump needed.","Get your rebound, go back under the basket and throw to the next rep. The clock starts on your first tap and runs to the last shot. Beat your best time next session."],
   cue:"Ball away from the defender. Turn the full 180, square up, shoot.",src:[{label:"From your shooting coach",url:""},YTT("S9eWP-Qg7Jg",40,"Foxboro Cable Access: the four pivots"),YTT("MV2N0tjfdbo",0,"ShotMechanics: reverse pivots for space")]},
+ // ---------- SHOOTING: off-the-move catches by yourself (ShotMechanics) ----------
+ {id:"s_spinout",skill:"s",name:"Two-Bounce Spin-Outs",role:"volume",unlock:3,mins:6,log:"makes",att:20,t0:35,tstep:1,tmax:55,coachClips:true,
+  what:"A game pass is rarely perfect. Throw the ball out past the arc from the baseline, let it bounce twice, and turn into your shot as you catch it. Wherever you end up catching it is where you shoot from.",
+  steps:["Start on the baseline. Throw the ball up the floor so it lands past the 3-point line.","Let it bounce twice. Time your steps so you meet it on the second bounce.","Catch and turn in one motion: as your hands touch the ball, your body is already coming around to the rim.","If the throw comes up short, shoot from where you catch it anyway. Then go back to the baseline on the other side."],
+  cue:"Catch and turn in one motion.",src:[YTT("LDScIl0O1Ps",45,"ShotMechanics: two-bounce spin-outs")]},
+ {id:"s_curl",skill:"s",name:"Out-Curl Mid-Range",role:"volume",unlock:4,mins:6,log:"makes",att:20,t0:40,tstep:1,tmax:55,coachClips:true,
+  what:"Catching while moving away from the basket, like when a defender pushes you off your spot. Throw the ball out from the block, curl around the elbow to get it, and find the rim early.",
+  steps:["Start by the block. Throw the ball out toward the elbow with one bounce (two is fine).","Curl around the elbow and go get it.","Get your eyes on the rim as you gather, not at the last second. Shoulders come all the way around early.","Shoot the mid-range, then do the same from the other block."],
+  cue:"Eyes on the rim as you gather.",src:[YTT("LDScIl0O1Ps",229,"ShotMechanics: out curls from the mid-range")]},
+ {id:"s_btb",skill:"s",name:"Behind-the-Back Pull-Ups",role:"volume",unlock:6,mins:6,log:"makes",att:20,t0:35,tstep:1,tmax:55,coachClips:true,
+  what:"A one-dribble pull-up after a behind-the-back change of direction, wing to wing. Easy to run by yourself because you go get your own rebound and keep moving.",
+  steps:["Start on a wing. Spin the ball out to yourself and catch it ready to attack.","Behind the back toward the outside, one dribble, pull up from about 15 ft.","Get your rebound and dribble-sprint to the other wing with your outside hand.","Plant, behind the back with that outside hand to change direction, and pull up again. Move the spot around: corners, wings, top."],
+  cue:"Eyes up to the rim as you pop.",src:[YTT("LDScIl0O1Ps",161,"ShotMechanics: behind-the-back mid-range")]},
+ {id:"s_sprint3",skill:"s",name:"Baseline Sprint 3s",role:"volume",unlock:5,mins:6,log:"makes",att:20,t0:25,tstep:2,tmax:45,coachClips:true,
+  what:"Shooting and conditioning together, with no rebounder needed. Shoot a corner 3, sprint after your own shot, then sprint to the other corner for the next one. A good way to end a workout.",
+  steps:["Start in a corner. Spin the ball out to yourself and shoot a catch-and-shoot 3.","As soon as it leaves your hand, sprint after it and catch it as early as you can.","Sprint out to the opposite corner, set your feet and shoot fast. Don't take your time setting up.","Long rebound? Shoot from the 3-point line wherever it took you, then go back to the corners."],
+  cue:"Fast feet, quick target, same shot.",src:[YTT("LDScIl0O1Ps",383,"ShotMechanics: baseline sprint 3s")]},
  // ---------- SHOOTING: the three parts of a shot (left/right, depth, arc) ----------
  // Each one works on one part on its own. cam says where to put the phone for that part; focus names the part.
  {id:"s_rimline",skill:"s",name:"Rim Line Shots",role:"volume",focus:"lr",unlock:2,mins:6,log:"makes",att:30,stages:["5 ft, straight on","Free throw line","Top of the key"],stageBy:"shots",stageN:10,t0:45,tstep:1,tmax:65,
@@ -936,6 +953,16 @@ const DRILLS=[
   what:"Attack, cross, and stop on balance.",
   steps:["Push out at speed, cross, and stop under control in two quick steps.","Ball stays tight to the body on the stop."],
   cue:"Stop low, not tall.",src:[YT("ILoveBasketballTV · Coach Meech","q-tg_pGEXfU")]},
+ {id:"h_btbcatch",skill:"h",name:"Behind-the-Back Catch",role:"handle",unlock:1,mins:3,log:"timer",
+  phases:[["Right hand: one dribble behind the back, catch in two hands",40],["Left hand: one dribble behind the back, catch in two hands",40],["Alternate hands, catch, back to the center",40]],
+  what:"A beginner step for the behind-the-back dribble: one dribble behind you, then catch it and bring it back to the center. The catch is the hard part, so that's all this works on.",
+  steps:["Get low, feet wide outside your shoulders, hips down, knees bent.","Dribble once behind your back, under your seat, and catch it with two hands. Bring it back to the center.","Catch with your hand close to your leg, not reaching out wide, so the ball has less distance to drop.","Push the ball through far enough that your dribbling hand could almost hit your other thigh. Don't flick it with your wrist."],
+  cue:"Hand by your leg for the catch.",src:[YTT("q-tg_pGEXfU",91,"ILoveBasketballTV · Coach Meech: behind-the-back catches")]},
+ {id:"h_over",skill:"h",name:"Bounce Over an Object",role:"handle",unlock:2,mins:3,log:"timer",
+  phases:[["Right hand: side to side over the object",40],["Left hand: side to side over the object",40],["Right hand again, faster",30],["Left hand again, faster",30]],
+  what:"One hand bounces the ball on each side of a low object right in front of you: a cone, a shoe, anything not too high. It builds control because the ball has to stick to your hand before you can move it.",
+  steps:["Get low. Put the object right in front of you, in the middle of your stance.","Bounce the ball on one side, then move it over the top and bounce it on the other side. Same hand the whole time.","Don't swing the ball into the object. Bounce it over the top.","Pound it hard so it comes back up into your hand with power. A soft dribble is too weak to move across, especially on the way back."],
+  cue:"Pound it, let it stick, then move it.",src:[YTT("q-tg_pGEXfU",313,"ILoveBasketballTV · Coach Meech: bounce over an object")]},
  {id:"h_two",skill:"h",name:"Two-Ball Pounds",role:"handle",unlock:2,mins:3,log:"timer",
   phases:[["Together",30],["Alternating",30],["High–low",30],["Together, moving forward",40]],
   what:"Two balls force your weak hand to keep up.",steps:["Wide base, eyes up.","Keep both balls in rhythm. If one gets away, reset and keep going."],
@@ -1074,7 +1101,32 @@ const DRILLS=[
   steps:["Set a cone on each 45 (both wings), on the 3-point line. Start under the basket and dribble out to the right cone. Baseline loop: dribble around the outside of the cone so you come off its baseline side, then attack the rim along the baseline. After the finish, grab the ball and dribble straight out to the left cone for the same loop.","Middle loop: go around the cone the other way, so you come off its inside and attack the rim through the lane. Again one cone, then the other.","Finish 1, outside-hand layup: the hand on the side you're finishing on (right cone, baseline loop: right hand), off the inside foot, ball to the top corner of the square.","Finish 2, inside-hand layup: the other hand, the one closer to the middle. It keeps the ball away from a defender on your side.","Finish 3, outside-hand reverse: keep going under the rim and finish on the far side with the outside hand. Let the rim shield the ball.","Finish 4, inside-hand reverse: the same reverse, finished with the inside hand. At the left cone every hand flips."],
   grid:{title:"Hand and takeoff foot",note:"The same for the baseline loop and the middle loop. Takeoff foot is the one you jump off, opposite the finishing hand.",head:["Finish","Right cone","Left cone"],
    rows:[["Outside-hand layup","Right hand · left foot","Left hand · right foot"],["Inside-hand layup","Left hand · right foot","Right hand · left foot"],["Outside-hand reverse","Right hand · left foot, on the far side of the rim","Left hand · right foot, on the far side of the rim"],["Inside-hand reverse","Left hand · right foot, on the far side of the rim","Right hand · left foot, on the far side of the rim"]]},
-  cue:"Tight around the cone, soft off the glass.",src:[{label:"From your coach",url:""},YTT("0K0jO7X98dU",5,"Elite Hoops: Cone Layups (closest match)"),YTT("HaLql0ueNpY",205,"Breakthrough: reverse finishes")]}
+  cue:"Tight around the cone, soft off the glass.",src:[{label:"From your coach",url:""},YTT("0K0jO7X98dU",5,"Elite Hoops: Cone Layups (closest match)"),YTT("HaLql0ueNpY",205,"Breakthrough: reverse finishes")]},
+ // ---------- FINISHING: from YouTube, Nov 2026 (TheincPro and By Any Means) ----------
+ {id:"f_x",skill:"f",name:"X Layups",role:"fin",unlock:2,mins:3,log:"makes",goal:10,timed:true,ft:"Layup",t0:60,tstep:2,tmax:85,
+  what:"A race against the clock. Cones at both elbows. Drive in from one cone and score, get the rebound, go around the other cone and drive in from there. Ten makes as fast as you can, then beat your time next session.",
+  steps:["Set a cone at each elbow. Start at one and drive to the rim for a layup.","Get your rebound and dribble out around the other cone, inside and out.","Drive in from that side and score with that side's hand. Keep alternating.","Go as hard as you can. The clock starts on your first tap and stops on your tenth make."],
+  cue:"Full speed, soft finish.",src:[YTT("N8omkdkVLRE",13,"TheincPro: X layups")]},
+ {id:"f_kd",skill:"f",name:"KD Rip to Reverse",role:"fin",unlock:4,mins:3,log:"makes",goal:10,timed:true,ft:"Reverse",t0:50,tstep:2,tmax:75,
+  what:"Catch on the wing, open up toward the middle with a reverse pivot, attack the middle of the paint and finish with a reverse on the other side of the rim. Ten makes on the clock.",
+  steps:["Spin the ball out to the wing (a cone there helps) and catch it.","Reverse pivot to open up toward the middle of the floor.","Attack hard into the middle of the paint.","Keep going to the other side of the rim and finish with a reverse. Rebound, spin it out to the other wing, repeat."],
+  cue:"Open to the middle, finish on the far side.",src:[YTT("N8omkdkVLRE",106,"TheincPro: KD rips with reverse finishes")]},
+ {id:"f_nojump",skill:"f",name:"No-Jump Finishes",role:"fin",unlock:3,mins:4,log:"makes",att:20,ft:"Layup",t0:45,tstep:2,tmax:70,
+  what:"Finish without jumping: keep your running stride through the finish, look up at the rim and flick the ball up. It builds soft touch at full speed without slowing down.",
+  steps:["Drive in at a good speed.","Don't jump. Keep the same stride going through the finish.","Look up at the rim and flick the ball up quickly, keeping your momentum going forward.","Try it from the side, the other side, and the front of the rim."],
+  cue:"Keep the stride, flick it soft.",src:[YTT("zh2JLinO-ws",267,"By Any Means: no-jump finishing")]},
+ {id:"f_knee",skill:"f",name:"Knee-Touch Finishes",role:"fin",unlock:5,mins:4,log:"makes",att:16,ft:"Layup",t0:40,tstep:2,tmax:65,
+  what:"Jump off one foot or two, touch one or both knees in the air, then finish. It trains body control in the air, cradling the ball into the finish, and bringing your knees up so you're more compact and stable. A normal layup jump is enough.",
+  steps:["Take off from one foot or two, no bigger than a normal layup.","In the air, touch one knee or both with the ball or your hand.","Cradle the ball back up and finish soft off the glass.","Land on both feet under control. Mix one-foot and two-foot takeoffs."],
+  cue:"Knees up, stay compact, finish soft.",src:[YTT("zh2JLinO-ws",194,"By Any Means: knee-touch finishes")]},
+ {id:"f_tornado",skill:"f",name:"Tornado Finishes",role:"fin",unlock:7,mins:5,log:"makes",att:16,ft:"Layup",t0:30,tstep:2,tmax:55,
+  what:"An advanced spin finish: push across, bring the opposite foot over, then take one step as you spin back to the rim and put it up with the inside hand. Controlling the ball while you spin fast is the whole drill.",
+  steps:["Push across the lane and bring your opposite foot over.","Take one step as you spin back toward the rim.","Keep the ball under control through the spin, then finish with the inside hand.","Harder: try to get all the way to the other side of the rim."],
+  cue:"Control the spin, then the ball.",src:[YTT("zh2JLinO-ws",236,"By Any Means: tornado finishes")]},
+ {id:"f_eyes",skill:"f",name:"Eyes-Closed Finishes",role:"fin",unlock:8,mins:5,log:"makes",att:16,ft:"Layup",t0:30,tstep:2,tmax:55,
+  what:"Drive with your eyes closed and open them as late as you can, ideally after you take off, then adjust to where you are around the rim. It makes easy layups hard again. Only on an empty court with nothing near the basket.",
+  steps:["Clear the area: no people, balls or chairs near the basket.","Start a few dribbles out. Close your eyes and drive in at different angles, with different moves.","Open your eyes as late as you can, after you take off if possible.","Find the rim and finish. Slow down first if you need to, then build the speed back up."],
+  cue:"Open late, adjust, finish soft.",src:[YTT("zh2JLinO-ws",334,"By Any Means: eyes-closed finishing")]}
 ];
 function daysSinceHandle(){for(let i=S.sessions.length-1;i>=0;i--){const se=S.sessions[i];if(se.d<today()&&se.items.some(it=>(D[it.id]||{}).skill==="h"))return Math.round((new Date(today())-new Date(se.d))/864e5)}return null}
 const D2R=()=>Object.assign({lo:70,hi:110,gap:1,n:4,work:60,rest:30},S.settings.d2r||{});
@@ -1161,7 +1213,31 @@ const COND=[
  {id:"c_farmers",cond:"sp",unlock:7,hard:true,ev:"co",name:"Farmers",meta:"Full and half court in 17 s",unit:"Run",set:["Full court and back, half court and back. Tap the phone at the end",30],nsets:4,rest:60,tapEnd:{target:17},
   what:"Smart's high school conditioning: baseline to baseline and back, then to half court and back, all inside 17 seconds.",
   steps:["Baseline to baseline and back.","Then to half court and back.","Tap the phone as you finish. Beat 17 seconds. Rest 60.","Start with 4. Never more than 8."],
-  cue:"Touch every line.",evn:"A coaching conditioning test. Do it only after the speed and strength drills feel easy.",src:[YTT("o1Eid7669zY",397,"Marcus Smart Teaches Defense · 6:37")]}
+  cue:"Touch every line.",evn:"A coaching conditioning test. Do it only after the speed and strength drills feel easy.",src:[YTT("o1Eid7669zY",397,"Marcus Smart Teaches Defense · 6:37")]},
+ // ---------- from YouTube, Nov 2026: Breakthrough defensive footwork, the Hokie drill, multi-direction sprints ----------
+ {id:"c_push",cond:"fd",unlock:1,ev:"co",name:"Push Step and Settle",meta:"3 × 30 s · called side",set:["Push step on each call",30],nsets:3,rest:30,ask:WRONG,
+  calls:["Push left","Push right"],gap:[1.4,2.6],
+  what:"The first step for staying in front: a push step that explodes off early, then settle back into your stance. The phone calls the side.",
+  steps:["Stance facing the phone, feet wide, hips down.","On each call, push off the far foot and step that way. Don't cross your feet.","Settle back into a low stance right away, ready for the next call.","In the rest, answer one question: how many did you get wrong?"],
+  cue:"Explode off early, settle low.",evn:"A coaching drill from Breakthrough Basketball. Reacting to a call beats planned slides for game carry-over, the same idea as Called Slides.",src:[YTT("s46bufWWJ6c",29,"Breakthrough: push step")]},
+ {id:"c_quick",cond:"fd",unlock:4,ev:"co",name:"Foot-Fire Quick Turns",meta:"3 × 30 s · called side",set:["Foot fire, quick turn on each call",30],nsets:3,rest:40,ask:WRONG,
+  calls:["Turn left","Turn right"],gap:[1.8,3.2],
+  what:"For when a driver gets a step on your hip. Run in place with quick feet (foot fire). On each call, both feet come off the floor and you quick-turn 45° that way, with chest and head still facing the ball, then turn back.",
+  steps:["Low stance, then foot fire: quick, short steps in place.","On the call, a quick hop turn to 45° on that side. Chest and head stay facing the ball handler.","Don't turn all the way and open the gate, or you can't cut off a counter move. Turn back and keep the feet going.","Harder (the video's next step): after the turn, two push steps and a sprint back to the start. In the rest, say how many you got wrong."],
+  cue:"Turn 45°, eyes stay on the ball.",evn:"A coaching drill from Breakthrough Basketball. Reaction to a call, like Called Slides. No trial on this exact drill.",src:[YTT("s46bufWWJ6c",69,"Breakthrough: foot fire, quick turn"),YTT("s46bufWWJ6c",101,"Breakthrough: quick turn, push step, sprint back")]},
+ {id:"c_recover",cond:"fd",unlock:7,hard:true,ev:"co",name:"Turn-and-Sprint Recovery",meta:"3 × 40 s · called side",set:["Foot fire, then turn and sprint on each call",40],nsets:3,rest:60,ask:WRONG,
+  calls:["Beaten left","Beaten right"],gap:[3,5],
+  what:"For when the driver is a couple of steps past you and a push step can't catch up. Quick turn, cross over your feet and sprint to where the driver is going, not where they are. Running into them is how fouls happen.",
+  steps:["Foot fire in a low stance.","On the call, quick turn that way, cross over and sprint two steps.","Sprint to the spot ahead of the driver. Head and eyes stay up on the ball, never facing the baseline.","Come back to the start and get the feet going again for the next call."],
+  cue:"Run to where they're going.",evn:"A coaching drill from Breakthrough Basketball. Hard minutes count toward today's leg-load cap.",src:[YTT("s46bufWWJ6c",144,"Breakthrough: turn and sprint")]},
+ {id:"c_multi",cond:"sp",unlock:4,hard:true,ev:"co",name:"Multi-Direction Sprints",meta:"6 runs · 20 s each",unit:"Run",set:["Sprint, backpedal, crossover run, curve back",20],nsets:6,rest:40,
+  what:"Conditioning that moves like a game instead of straight-line suicides. Sprint to half court, switch to a backpedal, then a crossover run, and curve back around the circle or the top of the key.",
+  steps:["Start on the baseline. On the beep, sprint to half court.","Switch to a backpedal, then turn into a crossover run (carioca-style) the other way.","Finish with a curved run around the center circle or the top of the key, sprinting back.","Walk until the next beep. Nothing to log."],
+  cue:"Every direction, not just straight lines.",evn:"Coaching advice from By Any Means Basketball. Close to Repeated Sprints with a Cut, where a college trial found direction changes beat straight sprints.",src:[YTT("sPO_61SOahU",64,"By Any Means: multi-directional conditioning")]},
+ {id:"c_hokie",cond:"sp",unlock:7,hard:true,ev:"co",name:"Hokie Drill",meta:"6 reps · rim, half court, nail",unit:"Rep",set:["3 jumps at the rim, sprint to half court, back to the nail for a shot",25],nsets:6,rest:35,jc:3,ask:{q:"Did the shot go in?",a:["Made it","Missed it"]},
+  what:"A warm-up and conditioning drill with a shot at the end. Three straight-up jumps at the rim with the ball, drop it, sprint to half court, then come back to the nail (the middle of the free throw line) and shoot on tired legs.",
+  steps:["Under the basket with the ball. Three straight-up jumps, reaching the ball as high as you can toward the rim or backboard. Don't drift back.","Drop the ball and sprint to half court.","Sprint back, pick up the ball and shoot from the nail right away.","Later, move the shot around: one wing, the nail, the other wing. In the rest, say whether it went in."],
+  cue:"Straight up, sprint, shoot tired.",evn:"A coaching drill from Championship Productions. Each rep is 3 jump contacts toward today's cap.",src:[{label:"Championship Productions: the Hokie drill",url:"https://www.youtube.com/watch?v=NlGG6s1DeVw"}]}
 ];
 function condPhases(d,n){const u=d.unit||"Set",out=[];for(let i=1;i<=n;i++){out.push([`${u} ${i} of ${n}: ${d.set[0]}`,d.set[1]]);
   if(i<n){const big=d.bigRest&&i%d.bigRest[0]===0;out.push([big?"Rest · long break":"Rest",big?d.bigRest[1]:d.rest])}else if(d.ask||d.tapEnd)out.push(["Rest · last check",15])}return out}
@@ -1238,6 +1314,8 @@ const CLIPS={
  h_splits:[[[MH,218,281]],[[MH,218,281]],[[LAB,255,264,"Forward"],[LAB,263,284,"Back"]]],
  h_zig:[[[MH,281,333]],[[MH,333,387]],[[MH,387,432]]],
  h_stop:[[[CM,630,693]],[[CM,693,790]]],
+ h_btbcatch:[[[CM,91,192]],[[CM,91,192]],[[CM,91,192]]],
+ h_over:[[[CM,313,412]],[[CM,313,412]],[[CM,313,412]],[[CM,313,412]]],
  h_retreat:[[[PT,1644,1722]],[[PT,1726,1758]],[[PT,1766,1798]],[[PT,1807,1838]]],
  h_r_cross:[[[MH,55,84,"The crossover"]]],
  h_2walk:[[["uGQN1qe-sDE",11,19]],[["uGQN1qe-sDE",18,26]],[["uGQN1qe-sDE",26,35]]],
@@ -1249,6 +1327,21 @@ const CLIPS={
 const LINE="ylkakvH03Uc",ROLL="8lkDKSxLOvo",ELB="0wAcGEwTBUo",FT="Yr1OWS_Zsgw",GUIDE="AulCgque6pw",LONG="iTwkhWAa_P4",LEGS="5_6ujYdbv5E",DROP1="856CyuXGMhQ";
 for(const d of DRILLS)if(d.mv&&!CLIPS[d.id])CLIPS[d.id]=d.mv.map(k=>MCLIP[k]||null);
 const STEP_CLIPS={
+ s_spinout:[[["LDScIl0O1Ps",45,100,"The throw"]],[["LDScIl0O1Ps",100,135,"Catch on the second bounce"]],[["LDScIl0O1Ps",100,135,"Catch and turn"]],[["LDScIl0O1Ps",135,161,"Short throws"]]],
+ s_curl:[[["LDScIl0O1Ps",229,250,"The throw"]],[["LDScIl0O1Ps",229,265,"The curl"]],[["LDScIl0O1Ps",250,280,"Eyes up on the gather"]],[["LDScIl0O1Ps",280,304,"Other side"]]],
+ s_btb:[[["LDScIl0O1Ps",161,180]],[["LDScIl0O1Ps",161,190]],[["LDScIl0O1Ps",190,229]],[["LDScIl0O1Ps",190,229]]],
+ s_sprint3:[[["LDScIl0O1Ps",383,400]],[["LDScIl0O1Ps",383,420]],[["LDScIl0O1Ps",400,430]],[["LDScIl0O1Ps",430,460,"Long rebounds"]]],
+ f_x:[[["N8omkdkVLRE",13,60,"X layups"]],[["N8omkdkVLRE",13,60]],[["N8omkdkVLRE",60,106,"Full speed"]],null],
+ f_kd:[[["N8omkdkVLRE",106,130,"Spin out and catch"]],[["N8omkdkVLRE",115,145,"Reverse pivot"]],[["N8omkdkVLRE",130,160]],[["N8omkdkVLRE",145,188,"Reverse finish"]]],
+ f_nojump:[[["zh2JLinO-ws",267,293]],null,null,null],
+ f_knee:[[["zh2JLinO-ws",194,236]],null,null,null],
+ f_tornado:[[["zh2JLinO-ws",236,267]],null,null,null],
+ f_eyes:[null,[["zh2JLinO-ws",334,373]],null,null],
+ c_push:[null,[["s46bufWWJ6c",29,40]],null,null],
+ c_quick:[null,[["s46bufWWJ6c",40,100,"The quick turn"]],null,[["s46bufWWJ6c",101,131,"Push steps and sprint back"]]],
+ c_recover:[null,[["s46bufWWJ6c",131,200,"Turn and sprint"]],[["s46bufWWJ6c",200,223]],null],
+ c_multi:[[["sPO_61SOahU",64,141]],null,null,null],
+ c_hokie:[[["NlGG6s1DeVw",0,30]],[["NlGG6s1DeVw",0,30]],[["NlGG6s1DeVw",30,60]],[["NlGG6s1DeVw",60,76,"Three spots"]]],
  s_line:[[[LINE,23,44]],[[LINE,55,82]],[[LINE,72,97,"On the line vs leaning"]],[[LINE,143,186,"Drop, raise, shot"]]],
  s_rollup:[[[ROLL,59,67]],[[ROLL,63,80]],[[ROLL,74,112]],[[ROLL,112,166]]],
  s_elbow:[[[ELB,12,30,"Legs locked"]],[[ELB,30,39,"On one knee"]],[[ELB,39,46,"Sitting"]],[[ELB,20,30]]],
@@ -2522,7 +2615,7 @@ const RTS=k=>DRILLS.filter(d=>d.rt===k),RT_DEF={warm:"b_body",cool:"b_cool"},RT_
 function rtPick(k){const d=D[(S.settings.rt||{})[k]];return d&&d.rt===k?d:D[RT_DEF[k]]}
 const FIXED=new Set(["s_cold","s_tired",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
 /* drills that load the legs: left out on a "Legs heavy" or "Game tonight" day */
-const JUMPY=new Set(["f_power","f_bump","f_contact","f_spots","f_chair","s_tired","h_zig","h_stop"]);
+const JUMPY=new Set(["f_power","f_bump","f_contact","f_spots","f_chair","s_tired","h_zig","h_stop","s_sprint3","f_knee","f_tornado","f_eyes"]);
 const FREQ_LABEL={auto:"Auto",every:"Every workout",weekly:"Weekly",custom:"Custom",never:"Never suggest"};
 const DOW=["Mo","Tu","We","Th","Fr","Sa","Su"],DOWL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const fq=id=>(S.rec.freq||{})[id]||{k:"auto"};
@@ -3209,7 +3302,7 @@ function drawRunner(){
    ${hasParts(d)?`<h3 class="partshead">The parts · ${fmt(totalOf(d))}</h3><ol class="steps">${d.phases.map((p,i)=>`<li><div class="srow">${partAnim(d,i)}<div><b>${esc(p[0])}</b> · ${p[1]}s<div class="small muted">${esc(d.mv?BV.note(d.id+":"+i):HV.note(d.id+"p:"+i))}</div>${clipLinks(d,i)}</div></div></li>`).join("")}</ol><h3 class="partshead">Coaching points</h3>`:""}
    <ol class="steps">${d.steps.map((s,i)=>`<li>${!d.mv&&hasAnim(d)?`<div class="srow">${stepAnim(d,i)}<div>${esc(s)}${stepClips(d,i)}</div></div>`:`${esc(s)}${stepClips(d,i)}`}</li>`).join("")}</ol>
    ${d.grid?`<div class="hgrid"><h3 class="partshead">${esc(d.grid.title)}</h3><table><thead><tr>${d.grid.head.map(h=>`<th scope="col">${esc(h)}</th>`).join("")}</tr></thead><tbody>${d.grid.rows.map(r=>`<tr><th scope="row">${esc(r[0])}</th>${r.slice(1).map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table><p class="small muted" style="margin:6px 0 0">${esc(d.grid.note)}</p></div>`:""}
-   ${STEP_CLIPS[d.id]?`<p class="small muted" style="margin:0">▶ opens ${d.skill==="f"||d.coachClips?"a coach":"SeeMikeDunn"} showing that step on YouTube.</p>`:""}
+   ${STEP_CLIPS[d.id]?`<p class="small muted" style="margin:0">▶ opens ${d.skill!=="s"||d.coachClips?"a coach":"SeeMikeDunn"} showing that step on YouTube.</p>`:""}
    ${d.cam?`<div class="tip camtip"><b>Phone setup${d.cam.view==="behind"?", behind you":", side-on"}:</b> ${esc(d.cam.text)}</div>`:""}
    ${cmpCard(d)}
    ${CHECKS[d.id]?`<div class="checkit"><div><b>Check it on video</b><span class="small">Film one shot ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}. The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")}.</span></div><a class="btn sec small" href="#form" data-check="${d.id}">Check it</a></div>`:""}
