@@ -179,7 +179,6 @@ section{display:flex;flex-direction:column;gap:10px}
 .pq-a button{font:inherit;font-size:20px;font-weight:700;padding:16px 12px;border-radius:14px;border:2px solid color-mix(in srgb,var(--bg) 35%,transparent);background:color-mix(in srgb,var(--bg) 10%,transparent);color:inherit;min-height:60px}
 .pq-a button[aria-pressed="true"]{background:var(--bg);color:var(--ink);border-color:var(--bg)}
 .condrow .sechead{margin-top:6px}
-.covid .barpad{width:64px}
 .cllib .bar .btn,.clrec .bar .btn,.rmv .bar .btn,.frd .bar .btn{width:auto;flex:0 0 auto}
 .lib-body{overflow-y:auto;padding:0 16px 20px;display:flex;flex-direction:column;gap:12px}.lib-body p{margin:0}
 .lib-tip{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;font-size:14px}
@@ -319,9 +318,14 @@ section{display:flex;flex-direction:column;gap:10px}
 .sheet{position:fixed;inset:0;z-index:20;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
 .sheet[hidden]{display:none!important}
 .sheet header{background:var(--ink);color:var(--bg)}
-.sheet header .wrap{display:flex;align-items:center;gap:10px;padding-block:12px}
+.sheet header .wrap{display:flex;align-items:center;gap:10px;padding-block:8px;min-height:60px}
 .sheet header h2{font-size:22px;text-transform:uppercase;flex:1;min-width:0}
-.x{border:0;background:color-mix(in srgb,var(--bg) 14%,transparent);color:var(--bg);width:36px;height:36px;border-radius:50%;font-size:20px;line-height:1}
+/* one sheet header: title left, a 44px × right. .hx on light sheets, .hx.dk on dark ones (drill header, video and film) */
+.hx{flex:0 0 44px;width:44px;height:44px;margin-left:auto;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--ink);font-size:26px;line-height:1;cursor:pointer}
+.hx.dk{background:rgba(255,255,255,.14);color:#F2F5FA}
+.covid .bar.top,.cmp-top,.ytsheet .yt-top,.livefc .lf-top{flex-wrap:nowrap;gap:8px;padding:8px 16px;min-height:60px}
+.covid .bar.top>.btn{flex:0 0 auto;width:auto}
+.covid .bar.top>span.small{text-align:left;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em}
 .sbody{flex:1;overflow-y:auto}
 .sbody .wrap{padding-block:14px 20px;display:flex;flex-direction:column;gap:14px}
 .steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
@@ -372,6 +376,10 @@ section{display:flex;flex-direction:column;gap:10px}
 .checkit{display:flex;align-items:center;gap:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px}
 .checkit>div{flex:1;display:flex;flex-direction:column;gap:2px}
 .checkit .btn{text-decoration:none;white-space:nowrap;color:var(--ink)}
+.filmcard{flex-direction:column;align-items:stretch;gap:8px}.filmcard>b{font-size:16px}.filmcard .row{gap:8px}.filmcard .linkbtn{align-self:flex-start;padding:0;text-decoration:none}
+.checkit.filmcard>.row{flex-direction:row;flex-wrap:wrap;align-items:center}
+.checkit.filmcard>.filmlast{flex-direction:row;gap:12px;align-items:center}.filmlast>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.filmlast .vthumb{flex:none;width:72px;border:1px solid var(--line);border-radius:10px;overflow:hidden;padding:0;cursor:pointer}
 .metric.focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .focusnote{border-left:4px solid var(--accent)}
 .clip{display:inline-flex;align-items:center;min-height:36px;padding:6px 12px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-size:13px;font-weight:600;text-decoration:none}
@@ -546,7 +554,7 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .covid .bar>.small{flex:1;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cmp{position:fixed;inset:0;z-index:75;background:#05080F;color:#F2F5FA;overflow-y:auto;overscroll-behavior:contain;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) calc(16px + env(safe-area-inset-bottom,0px)) env(safe-area-inset-left,0px);--ink:#F2F5FA;--bg:#05080F;--surface:#111A2C;--surface-2:#1A2540;--line:#2E3B5C;--muted:#9AA6BF}
 .cmp .btn{color:var(--ink)}.cmp .btn.pri{color:var(--accent-ink)}
-.cmp-top{position:sticky;top:0;z-index:2;display:flex;gap:10px;align-items:center;padding:10px 16px;background:#05080F}
+.cmp-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;background:#05080F}
 .cmp-title{flex:1;min-width:0;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cmp-panes{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;height:min(58vh,560px);scroll-margin-top:60px}
 .cmp-pane{position:relative;min-width:0;min-height:0;display:flex;flex-direction:column;background:#000;border-radius:14px;overflow:hidden}
@@ -639,7 +647,6 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .optmain{display:flex;flex-direction:column;gap:2px;text-align:left;border:0;background:none;padding:10px 12px;width:100%}
 .optmain b{font-size:15px;line-height:1.2}.optmain span{font-size:13px;color:var(--muted)}.optmain em{color:var(--warn);font-style:normal;font-weight:600}
 .rs-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.rs-x{border:0;background:var(--surface-2);border-radius:50%;width:36px;height:36px;font-size:22px;line-height:1;flex:0 0 36px}
 .rs-p{margin:0;font-size:15px}
 .rs-list{display:flex;flex-direction:column;gap:6px}
 .rs-alt{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:10px 12px}
@@ -2671,7 +2678,7 @@ function slotOf(d){if(d.cond)return"Conditioning";if(d.id==="s_cold")return"Cold
   return d.read?"Shot · decisions":"Shot · volume"}
 const ORDER=["Cold shots","Body warm-up","Warm-up","Live","Handle · mechanics","Handle · decisions","Finishing","Shot · form","3-point test","Shot · decisions","Shot · volume","Finisher","Tired shots","Conditioning","Cool-down"];
 const bodyToday=()=>{const b=S.rec.body;return b&&b.d===today()&&b.k!=="good"?b.k:null};
-const planMins=()=>bodyToday()==="game"?20:S.settings.mins;
+const planMins=()=>bodyToday()==="game"?(S.rec.body.only?D.b_game.mins:20):S.settings.mins;
 function nwCount(mins){const v=(S.rec.nw||{})[mins];return v==null?NW_DEF[mins]??2:v}
 function swapMap(){const s=S.rec.swaps;return s&&s.d===today()?s.map:{}}
 function customToday(){const p=S.rec.plan;if(!p||(p.d!==today()&&!p.stay))return null;return S.rec.workouts.find(w=>w.id===p.w)||null}
@@ -2689,7 +2696,9 @@ function plan0(){
   const add=(d,why,prio)=>{if(!d||used.has(d.id))return;const to=sw[d.id];let sx=false;if(to&&D[to]&&!used.has(to)&&!FIXED.has(d.id)){used.add(d.id);d=D[to];sx=true;why=why&&why.k==="need"?why:{k:"swap",t:"Swapped in"}}
     if(used.has(d.id))return;cand.push({slot:slotOf(d),d,why,prio,sx});used.add(d.id)};
   const light=body?{k:"light",t:"Lighter today"}:null;
-  add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(rtPick("warm"),{k:"fixed",t:"Always before handling"},"must");
+  /* game tonight: the Pre-Game Warm-Up (with a ball) replaces the everyday one; "warm-up only" is just that */
+  if(body==="game"&&S.rec.body.only){const o=[{slot:slotOf(D.b_game),d:D.b_game,why:{k:"fixed",t:"Before your game"},prio:"must"}];o.over=[];o.mins=D.b_game.mins;o.body=body;o.ml=ml;return o}
+  add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(body==="game"?D.b_game:rtPick("warm"),{k:"fixed",t:body==="game"?"Game tonight: warm up with a ball":"Always before handling"},"must");
   const tired=mins!==20&&!body;if(tired)add(D.s_tired,{k:"fixed",t:"Always near the end"},"must");
   add(rtPick("cool"),null,"must");
   for(const id of S.rec.added)if(D[id]&&!D[id].body&&(!D[id].partner||S.settings.partner))add(D[id],{k:"you",t:"You added it"},"added");
@@ -2705,9 +2714,12 @@ function plan0(){
     RH=DRILLS.filter(d=>d.skill==="h"&&d.read&&d.log==="react"),VOL=DRILLS.filter(d=>d.skill==="s"&&!FIXED.has(d.id)&&d.id!=="s_5spot"&&d.id!=="s_ft"&&(d.role==="volume"||(d.read&&d.role==="core"))),
     WARM=DRILLS.filter(d=>d.role==="warm");
   const POOL={s:[FORM,VOL],h:[H,RH],f:[F,F]},focus=S.rec.start&&S.rec.start.focus;
+  /* 3s are the main goal. Under 45 minutes the test is the short 5-Spot (6 per spot, about 7 min), reserved before the other picks
+     so it fits; at 45 it's the full 10 per spot. Both feed the same 3-point numbers. */
+  const t3=lastDone("s_5spot"),t3due=mins===45||!t3||t3===day||daysAgo(t3)>=2,sh=mins<45;SHORT5=null;
+  if(t3due&&ok(D.s_5spot)&&!body){if(sh){SHORT5=day;add({...D.s_5spot,per:6},{k:"fixed",t:"Your 3-point test, short: 6 per spot"},"fav")}else add(D.s_5spot,{k:"fixed",t:"Your 3-point test, every other session"},"fav")}
   fill(H);fill(F);
-  const t3=lastDone("s_5spot"),t3due=mins===45||!t3||t3===day||daysAgo(t3)>=2;
-  if(t3due&&ok(D.s_5spot))add(D.s_5spot,{k:"fixed",t:"Your 3-point test, every other session"},"fav");
+  if(t3due&&body&&ok(D.s_5spot))add(D.s_5spot,{k:"fixed",t:"Your 3-point test, every other session"},"fav");
   fill(FORM);
   if(POOL[focus])fill(POOL[focus][0]);
   {const w=pick(WARM)||D.h_lab;if(ok(w))add(w,{k:"fixed",t:"Ball warm-up, if there's time"},"fav")}
@@ -2830,11 +2842,11 @@ function viewToday(){
      return `<button class="btn pri upnext" data-open="${up[0].d.id}">Up next: ${esc(up[0].d.name)}<small>Opens the drill and its logger</small></button>`})()}
    ${cueCard()}
    ${ws?`<div class="card focus">${courtSVG({data:spotTotals(30),size:96})}<div class="small"><div class="label">Focus spot</div><b>${SPOT[ws.id].name}</b> is your coldest spot over 30 days at <b class="num">${Math.round(ws.p*100)}%</b>. Weak Spot Reps will target it.</div></div>`:""}
-   <div class="plantotal"><span>${p.length} drills${nNeed?` · ${nNeed} for what needs work`:""}</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min on the court</b></div>
+   <div class="plantotal"><span>${p.length} drill${p.length===1?"":"s"}${nNeed?` · ${nNeed} for what needs work`:""}</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min on the court</b></div>
    <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}<div class="planline${x.skip?" skipped":""}">${drillRow(x.d,i+1,{next:upIds.has(x.d.id),why:x.why})}${cw?`<button class="optb" data-rec="wopt:${x.d.id}" aria-label="${esc(x.d.name)}: skip today or remove">${MOREICON}</button>`:x.d.rt?`<button class="optb" data-rec="rt:${x.d.rt}" aria-label="${esc(x.d.name)}: pick your ${RT_NAME[x.d.rt]}">${SWAPICON}</button>`:!FIXED.has(x.d.id)?`<button class="optb" data-rec="opt:${x.d.id}" aria-label="${esc(x.d.name)}: why it's here, swap or how often">${SWAPICON}</button>`:`<span class="optb ph" aria-hidden="true"></span>`}</div>`).join("")}</div>
    ${cw&&ts?(()=>{const other=[...new Set(ts.items.map(it=>it.id))].filter(id=>D[id]&&!p.some(x=>x.d.id===id));return other.length?`<p class="muted small" style="margin:0">Also done today: ${other.map(id=>esc(D[id].name)).join(", ")}.</p>`:""})():""}
    ${cw?"":overflowCard(p)}
-   <p class="muted small" style="margin:0">${cw?`${esc(cw.name)} runs in the order you saved it${S.rec.plan&&S.rec.plan.stay?" and stays on until you switch":", today only. Tomorrow goes back to the recommended plan"}. Switch to another workout any time: drills you've done today stay done. Tap ⋯ to skip a drill today. `:`Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The plan fills those slots with drills you added, what needs work, your schedule, favorites and one new drill, as many as fit the minutes you picked. Each drill says why it's here. Tap ⇄ to swap it or set how often it comes back. `}The Up next button always starts the next drill (outlined), and timed drills in a row play back to back. You can also tap any drill to do it out of order.</p></section>
+   <p class="muted small" style="margin:0">${cw?`${esc(cw.name)} runs in the order you saved it${S.rec.plan&&S.rec.plan.stay?" and stays on until you switch":", today only. Tomorrow goes back to the recommended plan"}. Switch to another workout any time: drills you've done today stay done. Tap ⋯ to skip a drill today. `:`Each drill says why it's here. Tap ⇄ to swap it or set how often it comes back. `}You can tap any drill to do it out of order. <button class="linkbtn" data-rec="how" style="padding:0">How today is built ›</button></p></section>
   ${coachTodayCard()}`}
 
 function cueCard(){const c=todayCue(),open=!!state.cueOpen;
@@ -2911,7 +2923,7 @@ function viewProgress(){
   <section><div class="sechead"><h2>Sessions</h2><span class="muted small">${shots} shots logged</span></div>
    ${progHeat()}
    ${recent.length?`<div class="card hist">${recent.map(se=>`<div><span>${new Date(se.d+"T12:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><span class="muted">${se.items.length} drill${se.items.length>1?"s":""}</span><b class="num">+${se.items.reduce((a,it)=>a+it.xp,0)} XP</b></div>`).join("")}</div>`:`<div class="empty">No sessions yet. Finish any drill on the Today tab and it's logged here with the XP you earned.</div>`}</section>
-  ${progPicks()}`}
+  <section><button class="planrow" data-rec="how"><span><span class="label">Favorites, schedules, reset learning</span><b>How today is built</b></span><span class="v">Open ›</span></button></section>`}
 
 /* Session calendar: the last 16 weeks, shaded by drills done that day. Hidden until asked for, with no streak or
    run-length count, so it reads as a log and never as a chain to keep alive. */
@@ -3031,7 +3043,7 @@ function bsOpen(html,label){bsClose(true);bsEl=document.createElement("div");bsE
   bsEl.innerHTML=`<div class="psee-back" data-rec="close"></div><div class="psee-card" tabindex="-1">${html}</div>`;document.body.appendChild(bsEl);bsEl.querySelector(".psee-card").focus({preventScroll:true})}
 function bsSet(html){if(!bsEl)return bsOpen(html);const c=bsEl.querySelector(".psee-card"),y=c.scrollTop;c.innerHTML=html;c.scrollTop=y}
 function bsClose(quiet){if(bsEl){bsEl.remove();bsEl=null}if(quiet)return;if(R){const c=$("#sheet .reccard");if(c)c.outerHTML=recCard(R.d)}render()}
-const bsTop=(lab,title)=>`<div class="psee-grab"></div><div class="rs-top"><div>${lab?`<div class="label">${esc(lab)}</div>`:""}<h3>${esc(title)}</h3></div><button class="rs-x" data-rec="close" aria-label="Close">×</button></div>`;
+const bsTop=(lab,title)=>`<div class="psee-grab"></div><div class="rs-top"><div>${lab?`<div class="label">${esc(lab)}</div>`:""}<h3>${esc(title)}</h3></div><button class="hx" data-rec="close" aria-label="Close">×</button></div>`;
 function toastU(h,m,undo,label="Undo",ms=6000){const host=$("#toastHost");host.innerHTML=`<div class="toast act" role="status"><span><b>${esc(h)}</b>${esc(m)}</span>${undo?`<button data-rec="undo">${esc(label)}</button>`:""}</div>`;toastU.fn=undo||null;clearTimeout(toast.t);toast.t=setTimeout(()=>{host.innerHTML="";toastU.fn=null},ms)}
 const nwLabel=v=>v>=NW_ALL?"Every drill":v===0?"Off":String(v);
 function setFreq(id,k){const f=S.rec.freq;if(k==="auto")delete f[id];else if(k==="weekly")f[id]={k,day:(new Date().getDay()+6)%7};else if(k==="custom")f[id]={k,mode:"week",n:2};else f[id]={k};persist()}
@@ -3093,8 +3105,9 @@ function planRow(p){const cw=p.custom,mins=cw?wMins(cw):p.mins;
   return `<button class="planrow" data-rec="plan"><span><span class="label">${cw?"Plan · yours, today only":p.body?"Plan · lightened":"Plan"}</span><b>${cw?esc(cw.name):"Recommended"} · ${mins} min</b></span><span class="v">Change ▾</span></button>`}
 /* Today's setup in one strip: the optional body check (before the first drill only), then the partner and heavy-ball switches */
 function setupStrip(body){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;
-  const note=k==="heavy"?"Same minutes, but no Tired 3s runs, no two-foot jump or contact drills, and lighter footwork.":k==="game"?"20 minutes of form and touch: no volume shooting, no jump or contact drills.":"";
-  return `<div class="setup">${body?`<div class="label">How's the body today? <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">Optional</span></div><div class="chips" role="group" aria-label="How's the body today">${[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]].map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${k===v?"✓ ":""}${t}</button>`).join("")}</div>${note?`<p class="small muted" style="margin:0">${note}</p>`:""}`:""}
+  const note=k==="heavy"?"Same minutes, but no Tired 3s runs, no two-foot jump or contact drills, and lighter footwork.":k==="game"?(S.rec.body.only?"Just the Pre-Game Warm-Up, about 10 minutes. Do it at the gym before tip-off.":"20 minutes of form and touch with the Pre-Game Warm-Up: no volume shooting, no jump or contact drills."):"";
+  const gm=k==="game"?`<div class="chips" role="group" aria-label="Game tonight">${[["tune","Tune-up · 20 min"],["warm","At the gym now: warm-up only"]].map(([v,t])=>{const on=(v==="warm")===!!S.rec.body.only;return `<button class="chip" data-rec="gmode:${v}" aria-pressed="${on}">${on?"✓ ":""}${t}</button>`}).join("")}</div>`:"";
+  return `<div class="setup">${body?`<div class="label">How's the body today? <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">Optional</span></div><div class="chips" role="group" aria-label="How's the body today">${[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]].map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${k===v?"✓ ":""}${t}</button>`).join("")}</div>${gm}${note?`<p class="small muted" style="margin:0">${note}</p>`:""}`:""}
    <div class="row"><label class="toggle"><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}> Partner today</label><label class="toggle"><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}> I have a heavy ball</label></div></div>`}
 function addedCard(ids){const names=ids.map(id=>D[id].name);
   return `<div class="addedcard"><b>You added ${esc(names.length>2?names.length+" drills":names.join(" and "))}.</b> Put ${names.length>1?"them":"it"} in today's workout, or keep ${names.length>1?"them":"it"} for your next recommended one?<div class="psee-btns"><button class="btn sec small" data-rec="addin">Add ${names.length>1?"them":"it"} in</button><button class="btn sec small" data-rec="keepnext">Keep for next</button></div></div>`}
@@ -3254,9 +3267,11 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "unhide":setFreq(b,"auto");return render();
   case "pause":S.rec.paused[b]=addDays(today(),14);persist();bsClose();return toastU("Paused",`${D[b].name} is off your plan for 2 weeks.`,()=>{delete S.rec.paused[b];persist();render()});
   case "nw":return bsOpen(nwHTML(),"Needs work");
+  case "how":return bsOpen(howHTML(),"How today is built");
   case "nwset":{const m=+b;let v=nwCount(m);v=+c>0?(v>=NW_MAX?NW_ALL:v+1):(v>=NW_ALL?NW_MAX:Math.max(0,v-1));S.rec.nw={...S.rec.nw,[m]:v};persist();render();return bsSet(nwHTML())}
   case "nwreset":S.rec.nw={...NW_DEF};persist();render();return bsSet(nwHTML());
   case "add":return toggleAdd(b);
+  case "gmode":{if(S.rec.body&&S.rec.body.k==="game"){S.rec.body.only=b==="warm";persist()}return render()}
   case "body":{const cur=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;S.rec.body=cur===b?null:{d:today(),k:b};persist();return render()}
   case "lvl":state.start={...(state.start||{level:"regular",focus:"bal"}),level:b};return render();
   case "focus":state.start={...(state.start||{level:"regular",focus:"bal"}),focus:b};return render();
@@ -3266,7 +3281,7 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "addin":S.rec.plan.extra=[...new Set([...(S.rec.plan.extra||[]),...S.rec.added])];persist();return render();
   case "keepnext":state.keepNext=today();return render();
   case "recap":return openRecap();
-  case "reset":if(b==="yes"){S.rec.pref={};S.rec.gadj={};S.rec.log=[];S.rec.swaps=null;persist();state.resetAsk=false;toast("Reset","The app starts learning your drills again from here.")}else state.resetAsk=b!=="no";return render();
+  case "reset":if(b==="yes"){S.rec.pref={};S.rec.gadj={};S.rec.log=[];S.rec.swaps=null;persist();state.resetAsk=false;toast("Reset","The app starts learning your drills again from here.")}else state.resetAsk=b!=="no";if(bsEl&&bsEl.getAttribute("aria-label")==="How today is built")bsSet(howHTML());return render();
   case "bview":B.view=b;bsSet(builderHTML());if(b==="pick"){const q=$("#bq");if(q)q.focus()}return;
   case "bpick":{const j=B.items.indexOf(b);if(j>=0)B.items.splice(j,1);else B.items.push(b);const el=$("#bpick"),q=B.q.trim().toLowerCase();if(el)el.innerHTML=bPickList(DRILLS.filter(d=>!q||d.name.toLowerCase().includes(q)));const done=bsEl&&bsEl.querySelector('[data-rec="bview:list"]');if(done)done.textContent=`Done adding · ${B.items.length} drill${B.items.length===1?"":"s"}`;return}
   case "bmv":{B.items=bItems();const j=B.items.indexOf(b),to=j+ +c;const lo=B.keep?pinFirst(B.items).length:0,hi=B.items.length-1-(B.keep?pinLast(B.items).length:0);if(to<lo||to>hi)return;[B.items[j],B.items[to]]=[B.items[to],B.items[j]];return bsSet(builderHTML())}
@@ -3292,9 +3307,9 @@ function progClimb(){const c30=cutOf(30),c60=cutOf(60);
    <div class="stats"><div class="stat"><b>${p3==null?"–":p3+"%"}</b><span>5-Spot 3s${p3!=null&&p3o!=null?` · ${p3>=p3o?"+":""}${p3-p3o} vs last month`:""}</span></div><div class="stat"><b>${gap==null?"–":gap}</b><span>Weak-hand gap, points</span></div><div class="stat"><b>${dpd==null?"–":dpd}</b><span>Drops per timed drill</span></div></div>
    ${goals.length||lowered.length?`<div class="card hist">${goals.slice(0,5).map(g=>`<div><span>${esc(g.d.name)}</span><span class="muted">${g.now>g.first?"raised":"lowered"}</span><b class="num">${g.first} → ${g.now}%</b></div>`).join("")}${lowered.filter(x=>!goals.some(g=>g.d.id===x.id)).map(x=>`<div><span>${esc(D[x.id].name)}</span><span class="muted">lowered after Hard (${fmtD(x.d)})</span><b class="num">${x.a}%</b></div>`).join("")}</div>`:`<div class="empty">Goals move with your numbers: hit them and they rise. Your raised goals show up here.</div>`}
    ${tt?`<div class="card"><div class="label">Time by skill, 4 weeks</div><div class="balbar">${["s","h","f"].map(k=>`<i class="${k}" style="width:${100*t[k]/tt}%"></i>`).join("")}</div><div class="small muted" style="margin-top:6px">Shooting ${Math.round(100*t.s/tt)}% · Handling ${Math.round(100*t.h/tt)}% · Finishing ${Math.round(100*t.f/tt)}%</div></div>`:""}</section>`}
-function progPicks(){const favs=DRILLS.filter(d=>!d.body&&isFav(d.id)).sort((a,b)=>favScore(b.id)-favScore(a.id)).slice(0,5),sched=Object.keys(S.rec.freq).filter(id=>D[id]&&!["auto","never"].includes(fq(id).k)),hidden=Object.keys(S.rec.freq).filter(id=>D[id]&&fq(id).k==="never"),
+function howHTML(){const favs=DRILLS.filter(d=>!d.body&&isFav(d.id)).sort((a,b)=>favScore(b.id)-favScore(a.id)).slice(0,5),sched=Object.keys(S.rec.freq).filter(id=>D[id]&&!["auto","never"].includes(fq(id).k)),hidden=Object.keys(S.rec.freq).filter(id=>D[id]&&fq(id).k==="never"),
    quiet=DRILLS.filter(d=>!d.body&&favScore(d.id)>=2&&daysAgo(lastDone(d.id))>=14&&daysAgo(lastDone(d.id))<Infinity).slice(0,3),paused=Object.keys(S.rec.paused||{}).filter(id=>D[id]&&S.rec.paused[id]>today());
-  return `<section><div class="sechead"><h2>How the app picks</h2></div><div class="card hist">
+  return `${bsTop("Today's plan","How today is built")}<p class="small" style="margin:0 0 10px">Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The Up next button always starts the next drill, and timed drills in a row play back to back.</p><div class="card hist">
    <div><span>Needs-work drills per workout</span><span></span><button class="linkbtn" data-rec="nw" style="padding:0">${[20,30,45].map(m=>nwLabel(nwCount(m))).join(" / ")} ›</button></div>
    ${favs.length?`<div><span>Favorites</span><span></span><span class="small">${favs.map(d=>esc(d.name)).join(", ")}</span></div>`:""}
    ${sched.map(id=>`<div><span>${esc(D[id].name)}</span><span></span><button class="linkbtn" data-rec="freq:${id}" style="padding:0">${fqText(id)} ›</button></div>`).join("")}
@@ -3302,7 +3317,7 @@ function progPicks(){const favs=DRILLS.filter(d=>!d.body&&isFav(d.id)).sort((a,b
    ${paused.map(id=>`<div><span>${esc(D[id].name)}</span><span class="muted">paused</span><span class="small">until ${new Date(S.rec.paused[id]+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span></div>`).join("")}
    ${hidden.map(id=>`<div><span>${esc(D[id].name)}</span><span class="muted">hidden</span><button class="linkbtn" data-rec="unhide:${id}" style="padding:0">Show again</button></div>`).join("")}</div>
    ${state.resetAsk?`<div class="confirm"><b>Reset what the app has learned?</b><span class="small">Favorites from your ratings and swaps, and goal changes from Easy and Hard, go back to zero. Your history, schedules and workouts stay.</span><div class="psee-btns"><button class="btn sec small" data-rec="reset:no">Keep it</button><button class="btn miss small" data-rec="reset:yes">Reset</button></div></div>`:`<button class="linkbtn" data-rec="reset">Reset learning</button>`}
-   <p class="muted small" style="margin:0">Every drill is open. Each workout fills its slots with drills you added, what needs work, your schedule, favorites and one new drill. The app only suggests Advanced drills after you hit your Builder goals in that skill 3 times. XP: every finished drill earns base XP, plus a point per make, a bonus for hitting your goal, and a bonus for clean reps. Levels are medals only. Each goal is your average over your last 3 sessions of that drill plus 3 points, moved a step by Easy or Hard on the recap.</p></section>`}
+   <p class="muted small" style="margin:0">Every drill is open. Each workout fills its slots with drills you added, what needs work, your schedule, favorites and one new drill. The app only suggests Advanced drills after you hit your Builder goals in that skill 3 times. XP: every finished drill earns base XP, plus a point per make, a bonus for hitting your goal, and a bonus for clean reps. Levels are medals only. Each goal is your average over your last 3 sessions of that drill plus 3 points, moved a step by Easy or Hard on the recap.</p>`}
 
 /* ---------- audio ---------- */
 let ac=null;
@@ -3346,7 +3361,7 @@ function drawRunner(){
   const src=(d.src||[]).map(s=>s.url?`<a href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}</a>`:esc(s.label)).join(" · ");
   const heavy=d.heavy&&S.settings.heavy?`<div class="tip"><b>Heavy ball:</b> run the stationary rounds with the heavy ball, then switch to your regular ball for anything moving. The regular ball will feel light and quick after.</div>`:"";
   const bl=baseline(d),tgt=d.gm?gmTip(d):(d.log==="makes"||d.log==="spots")?`<div class="tip">Your goal: <b class="num">${targetPct(d)}%</b>${d.goal?` · finish at ${d.goal} makes`:""}. ${bl?`Your average over your last ${bl.n>1?bl.n+" sessions":"session"} is ${bl.p}%, so the goal is ${GOAL_UP} points above it. It moves when your numbers move.`:`A starter goal. After your first session it becomes your own average plus ${GOAL_UP} points.`}</div>`:"";
-  $("#sheet").innerHTML=`<header><div class="wrap"><h2 id="sheetTitle">${esc(d.dynamic&&weakSpot()?d.name+": "+SPOT[weakSpot().id].name:d.name)}</h2><button class="x" aria-label="Close drill">×</button></div></header>
+  $("#sheet").innerHTML=`<header><div class="wrap"><h2 id="sheetTitle">${esc(d.dynamic&&weakSpot()?d.name+": "+SPOT[weakSpot().id].name:d.name)}</h2><button class="x hx dk" aria-label="Close drill">×</button></div></header>
   <div class="sbody"><div class="wrap">
    <div class="row">${d.clips==="read"?'<span class="tag rd">Film</span>':`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}${d.cond?`${d.clips==="read"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard · counts toward leg load</span>':""}`:""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
    <p style="margin:0">${esc(d.what)}</p>
@@ -3356,15 +3371,14 @@ function drawRunner(){
    ${d.grid?`<div class="hgrid"><h3 class="partshead">${esc(d.grid.title)}</h3><table><thead><tr>${d.grid.head.map(h=>`<th scope="col">${esc(h)}</th>`).join("")}</tr></thead><tbody>${d.grid.rows.map(r=>`<tr><th scope="row">${esc(r[0])}</th>${r.slice(1).map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table><p class="small muted" style="margin:6px 0 0">${esc(d.grid.note)}</p></div>`:""}
    ${STEP_CLIPS[d.id]?`<p class="small muted" style="margin:0">▶ opens ${d.skill!=="s"||d.coachClips?"a coach":"SeeMikeDunn"} showing that step on YouTube.</p>`:""}
    ${d.cam?`<div class="tip camtip"><b>Phone setup${d.cam.view==="behind"?", behind you":", side-on"}:</b> ${esc(d.cam.text)}</div>`:""}
-   ${cmpCard(d)}
-   ${CHECKS[d.id]?`<div class="checkit"><div><b>Check it on video</b><span class="small">Film one shot ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}. The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")}.</span></div><a class="btn sec small" href="#form" data-check="${d.id}">Check it</a></div>`:""}
+   ${repCard(d)}
    <div class="cue">${esc(d.cue)}</div>${d.clips?`<div class="tip">${d.clips==="film"?"<b>Hands-free:</b> clips play on their own with a beep on each cut. After every 6 it asks how many you read wrong.":"Tap your read after each clip. It logs your score."}</div><div class="evbox ${d.ev}"><b>Evidence: ${CEV[d.ev]}.</b> ${esc(d.evn)}</div>`:d.cond?`<div class="tip"><b>Hands-free:</b> each ${(d.unit||"set").toLowerCase()} starts on a beep and the timer runs it. ${d.ask?`In the rest it asks: ${esc(d.ask.q.toLowerCase())} Skip it and it logs as “${esc(d.ask.a[0])}”.`:d.tapEnd?`Tap the phone as you pass it at the finish to log your time${d.tapEnd.target?` against ${d.tapEnd.target} s`:""}.`:"Nothing to tap until the end."}</div><div class="evbox ${d.ev}"><b>Evidence: ${CEV[d.ev]}.</b> ${esc(d.evn)}</div>`:""}${d.skill==="s"?`<div class="tip"><b>Today's one cue:</b> ${esc(CUES[todayCue().i].t)}. Think only this between shots. Change it on the Today tab.</div>`:""}${d.stages&&d.between?`<div class="tip"><b>Before each round:</b> ${esc(d.between)}</div>`:""}${heavy}${tgt}
    ${recCard(d)}
    ${src?`<div class="src">Source: ${src}</div>`:""}
   </div></div>
   <div class="dock"><div class="wrap" id="dock"></div></div>`;
   $("#sheet .x").onclick=()=>closeRunner();
-  fvStart();
+  fvStart();filmThumb();
   drawDock()}
 
 function drawDock(){
@@ -3476,7 +3490,8 @@ function goalVariant(d){const k=glKind(d);if(!k)return d;const x=glOf(d.id)[k];i
   else if(k==="stage"){v.stageN=x;if(v.goal)v.goal=x*v.stages.length;else v.att=x*v.stages.length}
   else v.phases=d.phases.map(p=>[p[0],Math.max(5,Math.round(p[1]*x/5)*5)]);
   return v}
-const drillGoal=d=>d&&goalVariant(gmVariant(d));
+let SHORT5=null;
+const drillGoal=d=>{if(!d)return d;const v=goalVariant(gmVariant(d));return d.id==="s_5spot"&&SHORT5===today()&&!customToday()?{...v,per:Math.min(v.per,6)}:v};
 function goalEdit(d){const k=glKind(d);if(!k||R.a||R.t0)return"";const cus=glOf(d.id)[k]!=null;
   const lab={k:"In a row",per:"Shots per spot",n:d.goal?"Makes":"Shots",stage:d.stageBy==="makes"?"Makes per part":"Shots per part",sec:"Time",time:"Time"}[k];
   const v=k==="sec"||k==="time"?fmt(totalOf(d)):glVal(d,k);
@@ -3829,7 +3844,7 @@ function seeIds(d,pi){if(!d)return[];const own=d.id+":"+pi;if(window.BV&&BV.has(
 function openSee(){if(!P)return;const di=P.stage==="rest"?P.i+1:P.i,d=P.items[di],pi=P.stage==="work"?P.pi:0,ids=seeIds(d,pi);if(!ids.length)return;
   if(P.running)togglePlay();closeSee();const part=phasesOf(d)[pi][0],own=ids.length===1&&!!ids[0].own;
   seeEl=document.createElement("div");seeEl.className="psee";seeEl.setAttribute("role","dialog");seeEl.setAttribute("aria-label","How to do it");
-  seeEl.innerHTML=`<div class="psee-back" data-s="close"></div><div class="psee-card"><div class="psee-grab"></div><div class="label">How to do it</div><h3>${esc(own?part:d.name)}</h3>
+  seeEl.innerHTML=`<div class="psee-back" data-s="close"></div><div class="psee-card"><div class="psee-grab"></div><div class="rs-top"><div><div class="label">How to do it</div><h3>${esc(own?part:d.name)}</h3></div><button class="hx" data-s="close" aria-label="Close">×</button></div>
    <div class="psee-list">${ids.map(x=>`<div class="psee-item">${x.a}<p>${esc(x.t)}</p></div>`).join("")}</div>
    <div class="psee-btns">${P.stage==="work"?`<button class="btn sec small" data-s="restart">Restart this part</button>`:""}<button class="btn pri small" data-s="resume">Resume</button></div></div>`;
   document.body.appendChild(seeEl);seeEl.addEventListener("click",e=>{e.stopPropagation();const b=e.target.closest("[data-s]");if(!b)return;const k=b.dataset.s;
@@ -3980,7 +3995,7 @@ function openLib(){if(LIB)return;const el=overlay("cllib","Your clip library");L
     else if(k==="clr"){if(LIB.arm!==a){LIB.arm=a;libDraw();return}LIB.arm=null;await clearClips(a)}})}
 function closeLib(){if(!LIB)return;unOverlay(LIB.el);LIB=null;if(R&&R.d&&R.d.clips)drawDock();else if(state.tab==="drills")render()}
 function libDraw(){if(!LIB)return;const n=CL.list.length,tot=FMV.length*TAKES,next=FMV.find(m=>clipCount(m.k)<TAKES);
-  LIB.el.innerHTML=`<div class="bar"><button class="btn sec small" data-cl="close">Close</button><span class="small">Your clip library</span><span class="barpad"></span></div>
+  LIB.el.innerHTML=`<div class="bar top"><span class="small">Your clip library</span><button class="hx dk" data-cl="close" aria-label="Close">×</button></div>
    <div class="lib-body"><p>You play the ball handler. Film each move ${TAKES} times. The app cuts each take where you commit to the move and also plays it mirrored, so ${tot} takes become ${tot*2} clips. About 20 minutes on a court.</p>
    <div class="lib-tip"><b>Set up like a defender.</b> Phone on a ball bag or tripod at chest height, about 2 m away, with your whole body in frame. Each take: hold your stance with the ball, then go on the beep. Make the moves the way you'd make them in a game.</div>
    ${CL.err?`<p class="small">${esc(CL.err)}</p>`:""}
@@ -3994,7 +4009,7 @@ let CR=null,crFace="user";
 async function openClipRec(k){const m=FMV.find(x=>x.k===k);if(!m)return;
   if(!(navigator.mediaDevices?.getUserMedia&&window.MediaRecorder)){toast("Recording isn't supported here","This browser can't record from the camera.");return}
   const el=overlay("clrec","Record clips of "+m.n);
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-cr="close">Close</button><span class="small">${esc(m.n)}</span><button class="btn sec small" data-cr="flip">Flip</button></div>
+  el.innerHTML=`<div class="bar top"><span class="small">${esc(m.n)}</span><button class="btn sec small" data-cr="flip">Flip</button><button class="hx dk" data-cr="close" aria-label="Close">×</button></div>
    <div class="cr-stage"><video id="crLive" autoplay muted playsinline></video><div class="cr-msg"><b id="crBig"></b><span id="crSub"></span></div></div><div class="cr-low" id="crLow"></div>`;
   CR={el,k,m,stream:null,stop:false,state:"idle",mr:null};
   el.addEventListener("click",e=>{const b=e.target.closest("[data-cr]");if(!b)return;const a=b.dataset.cr;
@@ -4028,7 +4043,7 @@ function closeClipRec(){const C=CR;if(!C)return;CR=null;C.stop=true;if(C.mr&&C.m
 /* Read the Move: a clip stops as the handler commits; tap where it's going, then see the rest */
 let RM=null;
 function openReadMove(){const deck=clipDeck(12);if(deck.length<4)return;const el=overlay("rmv","Read the Move");
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-rm="end">End</button><span class="small" id="rmMeta"></span><span class="barpad"></span></div><div class="fr-stage"><video id="rmV" muted playsinline></video></div><div class="rm-ans" id="rmAns"></div>`;
+  el.innerHTML=`<div class="bar top"><span class="small" id="rmMeta"></span><button class="hx dk" data-rm="end" aria-label="End">×</button></div><div class="fr-stage"><video id="rmV" muted playsinline></video></div><div class="rm-ans" id="rmAns"></div>`;
   RM={el,v:el.querySelector("#rmV"),deck,i:0,right:0,ans:[],state:"play"};
   el.addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;const k=b.dataset.rm;
     if(k.startsWith("a:"))rmAnswer(k.slice(2));else if(k==="end"){if(RM.ans.length>=4&&RM.state!=="end"){RM.deck=RM.deck.slice(0,RM.ans.length);rmEnd()}else closeReadMove()}else if(k==="close")closeReadMove();
@@ -4042,7 +4057,7 @@ async function rmNext(){const M=RM;if(!M)return;M.state="play";rmDraw();await pl
 async function rmAnswer(k){const M=RM;if(!M||M.state!=="ask")return;const c=M.deck[M.i];M.ok=k===c.read;if(M.ok)M.right++;M.ans.push(k);M.state="show";rmDraw();beep(M.ok?988:330,140);
   await revealClip(M.v,c);await zz(500);if(RM!==M)return;M.i++;if(M.i>=M.deck.length)rmEnd();else rmNext()}
 function rmEnd(){const M=RM;M.state="end";freeVid(M.v);const n=M.ans.length,p=Math.round(100*M.right/n),prev=lastRead();
-  M.el.innerHTML=`<div class="bar"><span class="barpad"></span><span class="small">Read the Move</span><span class="barpad"></span></div><div class="rm-end"><div class="label">Read right</div><div class="rm-big num">${M.right} of ${n}</div>
+  M.el.innerHTML=`<div class="bar top"><span class="small">Read the Move</span></div><div class="rm-end"><div class="label">Read right</div><div class="rm-big num">${M.right} of ${n}</div>
    <p>${p}%${prev?` · last time ${prev[0]} of ${prev[1]}`:""}. ${p>=75?"Sharp. Try Film Reads on the court next.":"Watch the hips: they turn before the ball goes."}</p>
    <button class="btn pri" data-rm="save">Save · +${rmXp(M)} XP</button><button class="btn sec small" data-rm="close">Discard</button></div>`}
 function lastRead(){for(let i=S.sessions.length-1;i>=0;i--){const it=[...S.sessions[i].items].reverse().find(x=>x.id==="c_read"&&x.rm);if(it)return it.rm}return null}
@@ -4052,7 +4067,7 @@ function closeReadMove(){const M=RM;if(!M)return;RM=null;freeVid(M.v);unOverlay(
 let FRP=null;
 const FR_SETS=2,FR_PER=6;
 function openFilm(){const deck=clipDeck(FR_SETS*FR_PER);if(deck.length<4)return;const el=overlay("frd","Film Reads");
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-fr="pause">Pause</button><span class="small" id="frMeta">Get ready</span><button class="btn sec small" data-fr="end">End</button></div>
+  el.innerHTML=`<div class="bar top"><button class="btn sec small" data-fr="pause">Pause</button><span class="small" id="frMeta">Get ready</span><button class="hx dk" data-fr="end" aria-label="End">×</button></div>
    <div class="fr-stage"><video id="frV" muted playsinline></video><div class="fr-flash" id="frFlash" hidden>React</div></div><div class="fr-low" id="frLow"></div>`;
   FRP={el,v:el.querySelector("#frV"),deck,ans:[],sd:0,done:0,paused:false,stop:false,restLeft:0};
   el.addEventListener("click",e=>{const F=FRP;const b=e.target.closest("[data-fr]");if(!b||!F)return;const k=b.dataset.fr;
@@ -4077,7 +4092,7 @@ function frRestDraw(F,s){const a=F.ans[s],last=s+1>=FR_SETS;F.el.querySelector("
   frSet(F,"#frLow",`<div class="pq" style="margin:0 auto"><div class="pq-q">${esc(WRONG.q)}</div><div class="pq-a">${WRONG.a.map((l,i)=>`<button data-fr="ans:${s}:${i}" aria-pressed="${a===i}">${esc(l)}</button>`).join("")}</div>
    <div class="pmeta">${a==null?`Skip it and set ${s+1} logs as “${WRONG.a[0]}”`:"Got it"} · <span id="frCd" class="num">${fmt(F.restLeft/1000)}</span></div><button class="btn sec small" data-fr="skip">${last?"Finish":"Next set now"}</button></div>`)}
 function frEnd(F){F.stop=true;lockOff();freeVid(F.v);const sd=F.sd,c=WRONG.a.map(()=>0);for(let i=0;i<sd;i++)c[F.ans[i]??0]++;
-  F.el.innerHTML=`<div class="bar"><span class="barpad"></span><span class="small">Film Reads</span><span class="barpad"></span></div><div class="rm-end"><div class="label">Done</div><div class="rm-big num">${F.done} clips</div>
+  F.el.innerHTML=`<div class="bar top"><span class="small">Film Reads</span></div><div class="rm-end"><div class="label">Done</div><div class="rm-big num">${F.done} clips</div>
    <p>${sd} of ${FR_SETS} sets${sd?" · wrong reads: "+WRONG.a.map((l,j)=>c[j]?`${c[j]} set${c[j]===1?"":"s"} ${l.toLowerCase()}`:"").filter(Boolean).join(", "):""}</p>
    <button class="btn pri" data-fr="save">Save · +${frXp(F)} XP</button><button class="btn sec small" data-fr="close">Discard</button></div>`}
 function closeFilm(){const F=FRP;if(!F)return;FRP=null;F.stop=true;lockOff();freeVid(F.v);unOverlay(F.el)}
@@ -4145,7 +4160,7 @@ function fsNoCC(p){try{p.setOption("captions","track",{})}catch(x){}try{p.unload
 let FSQ=null;
 function openFS(id){const set=FILM_SETS.find(s=>s.id===id);if(!set||FSQ)return;const lv=fsLog().lv,list=fsList(set,lv);if(!list.length)return;
   const el=overlay("fsq","Film study: "+set.name);
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-fq="end">End</button><span class="small" id="fqMeta"></span><span class="barpad"></span></div>
+  el.innerHTML=`<div class="bar top"><span class="small" id="fqMeta"></span><button class="hx dk" data-fq="end" aria-label="End">×</button></div>
    <div class="fq-box"><div class="fq-yt" id="fqYT"><div class="fq-msg">Loading the video…</div></div></div><div class="fq-sheet" id="fqSheet"></div>`;
   FSQ={el,set,lv,list,i:0,right:0,res:[],st:"load",player:null,ready:false,vid:"",ed:null,cc:0};
   FSQ.tm=setInterval(fsTick,50);
@@ -4197,7 +4212,7 @@ function fsNext(){const Q=FSQ;if(!Q)return;try{Q.player&&Q.ready&&(Q.player.paus
 function fsEnd(){const Q=FSQ;if(!Q)return;const n=Q.res.length;if(!n)return closeFS();
   const f=fsLog(),prev=fsLast(Q.set.id);f.runs.push({s:Q.set.id,lv:Q.lv,r:Q.right,n,d:today()});if(f.runs.length>60)f.runs.splice(0,f.runs.length-60);persist();
   clearInterval(Q.tm);try{Q.player&&Q.player.destroy()}catch(x){}Q.player=null;Q.st="end";const p=Math.round(100*Q.right/n);
-  Q.el.innerHTML=`<div class="bar"><span class="barpad"></span><span class="small">Film study</span><span class="barpad"></span></div><div class="rm-end"><div class="label">${esc(Q.set.name)} · ${FS_LV[Q.lv]}</div><div class="label">Read right</div><div class="rm-big num">${Q.right} of ${n}</div>
+  Q.el.innerHTML=`<div class="bar top"><span class="small">Film study</span></div><div class="rm-end"><div class="label">${esc(Q.set.name)} · ${FS_LV[Q.lv]}</div><div class="label">Read right</div><div class="rm-big num">${Q.right} of ${n}</div>
    <p>${prev?`Last time ${prev.r} of ${prev.n}. `:""}${p>=75?"Sharp reads.":p>=50?"Good start. The misses are the ones to watch again.":"These get easier the more film you watch. Run it again in a few days."}</p>
    <button class="btn pri" data-fq="close">Done</button><button class="btn sec small" data-fq="again">Run it again</button></div>`}
 
@@ -4747,7 +4762,7 @@ function vdb(){return vdbP||(vdbP=new Promise((a,b)=>{let r;try{r=indexedDB.open
   r.onsuccess=()=>a(r.result);r.onerror=()=>{vdbP=null;b(r.error)}}))}
 async function vtx(mode,fn){const db=await vdb();return new Promise((a,b)=>{const t=db.transaction(["meta","blobs"],mode);let out;Promise.resolve(fn(t.objectStore("meta"),t.objectStore("blobs"))).then(v=>out=v,b);t.oncomplete=()=>a(out);t.onerror=t.onabort=()=>b(t.error)})}
 async function loadVids(){try{CO.vids=(await vtx("readonly",m=>rq(m.getAll()))).sort((a,b)=>b.t-a.t);CO.vidErr=""}catch(e){CO.vids=[];CO.vidErr="This browser won't let the app keep videos (private mode or storage turned off)."}
-  CO.vidsLoaded=true;try{const e=await navigator.storage?.estimate?.();CO.usage=e?e.usage:null}catch(e){}if(state.tab==="coach"||state.tab==="form")render()}
+  CO.vidsLoaded=true;CO.loading=false;try{const e=await navigator.storage?.estimate?.();CO.usage=e?e.usage:null}catch(e){}if(state.tab==="coach"||state.tab==="form")render();filmUp()}
 async function coThumb(id){if(CO.thumbs[id]!==undefined)return CO.thumbs[id];CO.thumbs[id]=null;try{const b=await vtx("readonly",(m,bl)=>rq(bl.get(id+":t")));if(b)CO.thumbs[id]=URL.createObjectURL(b)}catch(e){}return CO.thumbs[id]}
 function makeThumb(blob){return new Promise(res=>{const v=document.createElement("video"),u=URL.createObjectURL(blob);let done=false;
   const fin=b=>{if(done)return;done=true;URL.revokeObjectURL(u);v.removeAttribute("src");v.load();res(b)};
@@ -4758,7 +4773,7 @@ function vidDur(blob){return new Promise(res=>{const v=document.createElement("v
   v.onloadedmetadata=()=>{clearTimeout(t);const d=isFinite(v.duration)?v.duration:0;URL.revokeObjectURL(u);res(d)};v.onerror=()=>{clearTimeout(t);URL.revokeObjectURL(u);res(0)}})}
 async function saveVid(blob,o={}){toast("Saving…","Keeping the clip on this phone.");
   try{const id=uid("v"),dur=o.dur||await vidDur(blob),th=await makeThumb(blob);
-    const meta={id,t:o.t||Date.now(),dur:Math.round(dur),size:blob.size,type:blob.type||"video/mp4",item:o.item||null,name:o.name||""};
+    const meta={id,t:o.t||Date.now(),dur:Math.round(dur),size:blob.size,type:blob.type||"video/mp4",item:o.item||null,name:o.name||"",drill:o.drill||null};
     await vtx("readwrite",(m,bl)=>{m.put(meta);bl.put(blob,id);if(th)bl.put(th,id+":t")});
     try{if(navigator.storage?.persist&&!(await navigator.storage.persisted?.()))await navigator.storage.persist()}catch(e){}
     await loadVids();const f=meta.item&&coFind(meta.item),w=meta.item&&CO.wiz&&CO.wiz.id===meta.item;toast("Saved on this phone",f?`Clip added to “${f.it.text}”.`:w?`Clip attached to “${CO.wiz.text||"this drill"}”.`:"It's in My videos on the Form tab. It never leaves this phone.")}
@@ -4778,7 +4793,7 @@ function recCtl(item,cls){return camLive()?`<button class="btn ${cls}" data-hw="
 function pickMime(){for(const t of["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"])try{if(MediaRecorder.isTypeSupported(t))return t}catch(e){}return""}
 async function openRec(item){closeVid();dictStop();const el=document.createElement("div");el.className="covid corec";el.setAttribute("role","dialog");el.setAttribute("aria-label","Record a training video");
   const f=item&&coFind(item),wl=item&&CO.wiz&&CO.wiz.id===item&&CO.wiz.text;
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-rc="close">Close</button><span class="small">${f?esc(f.it.text):wl?esc(wl):"New clip"}</span><button class="btn sec small" data-rc="flip">Flip</button></div>
+  el.innerHTML=`<div class="bar top"><span class="small">${f?esc(f.it.text):wl?esc(wl):"New clip"}</span><button class="btn sec small" data-rc="flip">Flip</button><button class="hx dk" data-rc="close" aria-label="Close">×</button></div>
    <video id="coLive" autoplay muted playsinline></video>
    <div class="bar recbar"><span class="num rect" id="coRecT">0:00</span><button class="recbtn" data-rc="go" aria-label="Start recording"><i></i></button><span class="small recnote">Saved on this phone only</span></div>`;
   document.body.appendChild(el);document.body.style.overflow="hidden";CO.rec={el,item,chunks:[],mr:null,stream:null,t0:0,timer:0};await recStream()}
@@ -4827,7 +4842,7 @@ async function openVid(id){const m=CO.vids.find(v=>v.id===id);if(!m)return;let b
   const file=new File([blob],`hoops-${new Date(m.t).toISOString().slice(0,10)}.${ext}`,{type:m.type});
   const canShare=!!(CP("Share")&&CP("Filesystem"))||!!(navigator.canShare&&(()=>{try{return navigator.canShare({files:[file]})}catch(e){return false}})());
   const el=document.createElement("div");el.className="covid";el.setAttribute("role","dialog");el.setAttribute("aria-label","Training video");
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-vv="close">Close</button><span class="small">${new Date(m.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}${f?" · "+esc(f.it.text):m.name?" · "+esc(m.name):""}</span></div>
+  el.innerHTML=`<div class="bar top"><span class="small">${new Date(m.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}${f?" · "+esc(f.it.text):m.name?" · "+esc(m.name):""}</span><button class="hx dk" data-vv="close" aria-label="Close">×</button></div>
    <video id="coPlay" src="${u}" playsinline preload="auto"></video>
    <div class="bar vctl"><button class="btn sec small" data-vv="step:-1" aria-label="Back one frame">◀</button><button class="btn sec small vplay" data-vv="play">Play</button><button class="btn sec small" data-vv="step:1" aria-label="Forward one frame">▶</button>
     <input type="range" id="coSeek" min="0" max="1000" value="0" step="1" aria-label="Position"><span class="num small" id="coTime">0:00</span></div>
@@ -4873,8 +4888,33 @@ function cmpDemos(d){const out=[];if(!d)return out;
 const cmpView=d=>CHECK_VIEW[d.id]||(d.cam&&d.cam.view)||"side";
 function cmpWhat(d){if(d.skill==="s")return CHECKS[d.id]?CHECKS[d.id].join(" and "):cmpView(d)==="behind"?"your elbow, ball line and guide hand":"your balance, timing and release";
   if(d.skill==="h")return"stance, eyes up and staying level";if(d.skill==="f")return"knee drive, reach and landing";return""}
-function cmpCard(d){if(!cmpDemos(d).length)return"";const w=cmpWhat(d);
-  return `<div class="checkit cmpcard"><div><b>Film a rep</b><span class="small">Watch your rep next to the demo${w?`, with notes on ${esc(w)}`:""}. It stays on this phone.</span></div><button class="btn sec small" data-cmp="${d.id}">Compare</button></div>`}
+/* Film this rep: the drill sheet's one video card. It joins what were two cards, "Film a rep · Compare" (self-review
+   next to the demo) and "Check it on video" (the form check's measured numbers). With no clip it offers one record
+   button (Compare when the drill has a demo, else the form check), plus the form check as a text link. Once you keep a
+   self-review clip of this drill, the card leads with it: tap the thumbnail to watch it, then film again or check it.
+   It sits in the sheet, so nothing here is ever tapped mid-rep. Not a fold: folds never go on drill sheets. */
+const filmClip=d=>CO.vids.find(v=>v.drill===d.id||(!v.drill&&v.name===`Self-review: ${d.name}`))||null;
+function repCard(d){const cmp=cmpDemos(d).length>0,chk=!!CHECKS[d.id];if(!cmp&&!chk)return"";
+  if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
+  const w=cmpWhat(d),v=filmClip(d),th=v&&CO.thumbs[v.id];
+  const chkTxt=chk?`The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")} from one shot filmed ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}.`:"";
+  const cmpTxt=cmp?`Film a rep and watch it next to the demo${w?`, with notes on ${esc(w)}`:""}.`:"";
+  const cmpBtn=(cls,lab)=>`<button class="btn ${cls} small" data-cmp="${d.id}" aria-label="${lab} and compare it with the demo">${lab}</button>`;
+  const chkBtn=`<a class="btn sec small" href="#form" data-check="${d.id}" aria-label="Check one shot with the form check">Check it</a>`;
+  const chkLink=`<a class="linkbtn" href="#form" data-check="${d.id}">Or measure one shot with the form check →</a>`;
+  const when=v?new Date(v.t).toLocaleDateString(undefined,{month:"short",day:"numeric"}):"";
+  const body=v
+    ?`<div class="filmlast"><button class="vthumb" data-hw="vid:${v.id}" data-th="${v.id}" aria-label="Watch your last clip of this drill, from ${when}">${th?`<img src="${th}" alt="">`:""}${v.dur?`<b>${fmtDur(v.dur)}</b>`:""}</button>
+       <div><span class="small"><b>Last clip</b> · ${when}${v.dur?` · ${fmtDur(v.dur)}`:""}</span><span class="small muted">Tap it to watch, slow it down or send it to your coach.</span></div></div>
+     <span class="small">${cmp&&chk?`Film again to watch it next to the demo, or check one shot to measure ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc":x)).join(" and ")}.`:cmp?cmpTxt:chkTxt}</span>
+     <div class="row">${cmp?cmpBtn("sec","Film again"):""}${chk?chkBtn:""}</div>`
+    :`<span class="small">${cmp?cmpTxt:chkTxt} It stays on this phone.</span>
+     <div class="row">${cmp?cmpBtn("sec","Film a rep"):`<a class="btn sec small" href="#form" data-check="${d.id}" aria-label="Film one shot for the form check">Film a shot</a>`}</div>
+     ${cmp&&chk?chkLink:""}`;
+  return `<section class="checkit filmcard" id="filmcard" aria-labelledby="filmcardH"><b id="filmcardH">Film this rep</b>${body}</section>`}
+/* redraw the card in an open sheet once clips load, or after a clip is kept or deleted */
+function filmUp(){if(!R||$("#sheet").hidden)return;const c=$("#filmcard");if(!c)return;c.outerHTML=repCard(R.d);filmThumb()}
+async function filmThumb(){const t=$("#filmcard [data-th]");if(t&&!t.querySelector("img")){const u=await coThumb(t.dataset.th);if(u&&t.isConnected&&!t.querySelector("img"))t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`)}}
 
 function openCmp(id){const d=D[id];if(!d)return;closeCmp();const demos=cmpDemos(d);if(!demos.length)return;
   const el=document.createElement("div");el.className="cmp";el.setAttribute("role","dialog");el.setAttribute("aria-label","Compare your rep with the demo");
@@ -4906,7 +4946,7 @@ function cmpDraw(){const C=CMP;if(!C)return;const d=C.d,dm=C.demos[C.di],has=C.s
       <div class="cmp-row">${seg("rate",[1,.5,.25],C.rate,"Speed",v=>v===1?"1×":v===.5?"½×":"¼×")}<button class="btn sec small" data-cm="mir" aria-pressed="${C.mir}">Mirror me</button>${C.frames?`<button class="btn sec small" data-cm="bones" aria-pressed="${C.bones}">Skeleton</button>`:""}</div>
       <div class="cmp-row"><button class="btn sec small" data-cm="redo">Film again</button><button class="btn sec small" data-cm="keep"${C.kept?" disabled":""}>${C.kept?"Kept":"Keep clip"}</button></div>`
     :`<div class="cmp-row">${seg("rate",[1,.5,.25],C.rate,"Demo speed",v=>v===1?"1×":v===.5?"½×":"¼×")}</div>`;
-  C.el.innerHTML=`<div class="cmp-top"><button class="btn sec small" data-cm="close">Close</button><div class="cmp-title">${esc(d.name)}</div></div>
+  C.el.innerHTML=`<div class="cmp-top"><div class="cmp-title">${esc(d.name)}</div><button class="hx dk" data-cm="close" aria-label="Close">×</button></div>
    <div class="cmp-panes"><div class="cmp-pane"><div class="cmp-lab">Demo</div><div class="cmp-demo">${dm.a}</div></div><div class="cmp-pane mine"><div class="cmp-lab">You</div><div class="cmp-mine">${mine}</div></div></div>
    ${C.demos.length>1?`<div class="cmp-row cmp-steps" role="group" aria-label="Demo step">${C.demos.map((_,i)=>`<button class="chip" data-cm="demo:${i}" aria-pressed="${i===C.di}">Step ${i+1}</button>`).join("")}</div>`:""}
    <p class="cmp-step small">${esc(dm.t)}${dm.c||""}</p>
@@ -5083,7 +5123,7 @@ document.addEventListener("click",e=>{const o=e.target.closest("[data-cmp]");if(
   else if(a==="mir"){C.mir=!C.mir;t.setAttribute("aria-pressed",C.mir);C.el.querySelector(".cmp-cv")?.classList.toggle("mir",C.mir)}
   else if(a==="bones"){C.bones=!C.bones;t.setAttribute("aria-pressed",C.bones)}
   else if(a==="redo"){cmpPause();C.state="empty";C.frames=null;C.res=null;cmpDraw()}
-  else if(a==="keep"){if(!C.blob)return;C.kept=true;t.disabled=true;t.textContent="Kept";saveVid(C.blob,{dur:C.dur,name:`Self-review: ${C.d.name}`})}});
+  else if(a==="keep"){if(!C.blob)return;C.kept=true;t.disabled=true;t.textContent="Kept";saveVid(C.blob,{dur:C.dur,name:`Self-review: ${C.d.name}`,drill:C.d.id})}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&CMP){e.stopImmediatePropagation();closeCmp()}},true);
 
 /* ---------- the Coach tab ---------- */
@@ -5320,7 +5360,7 @@ route();
     st.textContent = `
 .ytsheet{position:fixed;inset:0;z-index:80;background:#05080F;color:#F2F5FA;display:flex;flex-direction:column;
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
-.ytsheet .yt-top{display:flex;align-items:center;gap:10px;padding:10px 16px}
+.ytsheet .yt-top{display:flex;align-items:center}
 .ytsheet .yt-title{flex:1;min-width:0;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ytsheet .yt-stage{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
 .ytsheet .yt-box{position:relative;width:100%;max-height:100%;aspect-ratio:16/9;background:#000}
@@ -5363,7 +5403,7 @@ route();
       el.setAttribute("role", "dialog");
       el.setAttribute("aria-label", "Demo clip");
       V = { el, player: null, id: c.id, a: c.start, b: end > c.start ? end : 0, label, url: c.url, loop: end > c.start, rate: 1, timer: 0 };
-      el.innerHTML = `<div class="yt-top"><div class="yt-title">${esc(label || "Demo")}</div><button class="btn sec small" data-yt="close">Close</button></div>
+      el.innerHTML = `<div class="yt-top"><div class="yt-title">${esc(label || "Demo")}</div><button class="hx dk" data-yt="close" aria-label="Close">×</button></div>
         <div class="yt-stage"><div class="yt-box"><div class="yt-msg">Loading the clip…</div></div></div><div class="yt-ctl">${ctl()}</div>`;
       el.addEventListener("click", e => {
         const b = e.target.closest("[data-yt]");
@@ -5572,7 +5612,7 @@ route();
     st.textContent = `
 .livefc{position:fixed;inset:0;z-index:80;background:#05080F;color:#F2F5FA;display:flex;flex-direction:column;
   padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
-.livefc .lf-top{display:flex;align-items:center;gap:8px;padding:10px 16px}
+.livefc .lf-top{display:flex;align-items:center}
 .livefc .lf-title{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em}
 .livefc .lf-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .livefc video,.livefc canvas{position:absolute;max-width:100%;max-height:100%}
@@ -5627,7 +5667,7 @@ route();
       el.setAttribute("role", "dialog");
       el.setAttribute("aria-label", "Live form check");
       el.innerHTML = `<div class="lf-top"><div class="lf-title">Live <span class="lf-n" style="opacity:.7"></span></div>
-        <button class="btn sec small" data-lf="talk" aria-pressed="true">Cues</button><button class="btn sec small" data-lf="flip">Flip</button><button class="btn sec small" data-lf="close">Done</button></div>
+        <button class="btn sec small" data-lf="talk" aria-pressed="true">Cues</button><button class="btn sec small" data-lf="flip">Flip</button><button class="hx dk" data-lf="close" aria-label="Done">×</button></div>
         <div class="lf-stage"><video playsinline muted autoplay></video><canvas></canvas><div class="lf-msg" role="status">Starting the camera…</div><div class="lf-cue" aria-live="polite"></div></div>
         <div class="lf-shot"><span>${filmTip()} Shoot when you're ready.</span></div>`;
       document.body.appendChild(el);
