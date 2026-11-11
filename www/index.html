@@ -6956,7 +6956,9 @@ route();
 .livefc .lf-shot span.fix{background:#C13C2A}.livefc .lf-shot span.watch{background:#6b4a05}.livefc .lf-shot span.good{background:#1E8657}
 .livefc .btn.sec{background:#1C2844;border-color:#2A3858;color:#F2F5FA}
 .livefc .lf-kb{position:absolute;left:12px;top:12px;font-size:12.5px;font-weight:600;background:rgba(5,8,15,.72);border-radius:999px;padding:3px 10px;z-index:2}.livefc .lf-kb:empty{display:none}
-.livefc .lf-place{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(5,8,15,.88);border-radius:14px;padding:12px 14px;font-size:14px;z-index:3}
+.livefc .lf-place{position:absolute;left:12px;right:12px;bottom:12px;max-height:72%;overflow-y:auto;overscroll-behavior:contain;background:rgba(5,8,15,.88);border-radius:14px;padding:12px 14px;font-size:14px;z-index:3}
+.livefc .lf-place [data-lf="ready"]{position:sticky;bottom:0;box-shadow:0 -8px 14px rgba(5,8,15,.9)}
+.livefc .lf-court{display:block;width:auto;max-width:100%;max-height:150px;margin:8px auto 0}.livefc .lf-side{max-height:70px}
 .livefc .lf-place b{font-family:var(--display);font-size:18px;text-transform:uppercase}
 .livefc .lf-place ul{margin:8px 0 10px;padding-left:18px}.livefc .lf-place li{margin:4px 0}
 .livefc .lf-seg{display:flex;gap:6px;margin-top:8px}.livefc .lf-seg button{flex:1;border-radius:999px;border:1px solid #2A3858;background:#1C2844;color:#F2F5FA;padding:7px 8px;font:inherit;font-weight:600}
@@ -6995,6 +6997,47 @@ route();
       const b = L.el.querySelector("[data-lf=talk]"); b.setAttribute("aria-pressed", L.talk !== "off"); b.textContent = "Cues: " + { say: "Voice", buzz: "Buzz", off: "Off" }[L.talk];
     }
     // Before the first shot: where to put the phone, over the live picture so you can line it up. Ready starts counting.
+    // The phone's spot on a half court (the film study court, 10 px a foot, basket at the top), with you at the top of
+    // the key facing the rim, and the camera's view as the film study's glowing cone.
+    function placeSvg(kind) {
+      const you = [250, 250], hand = S.settings.hand === "L" ? -1 : 1;
+      const low = S.settings.lfLow, d = low ? 175 : 140; // on the floor: farther back, so your hands at the release stay in
+      const cam = kind === "front" ? [250, 84] : kind === "side" ? [250 + hand * d, 250] : [250, Math.min(395, 250 + d)];
+      const a = Math.atan2(you[1] - cam[1], you[0] - cam[0]), h = .42, Rr = Math.hypot(you[0] - cam[0], you[1] - cam[1]) + 70;
+      const x1 = cam[0] + Math.cos(a - h) * Rr, y1 = cam[1] + Math.sin(a - h) * Rr, x2 = cam[0] + Math.cos(a + h) * Rr, y2 = cam[1] + Math.sin(a + h) * Rr;
+      const deg = a * 180 / Math.PI + 90; // you face the rim (up): the wedge on your circle points that way
+      return `<svg class="fsc in lf-court" viewBox="0 0 500 400" role="img" aria-label="Half court: you at the top of the key facing the rim, the phone ${kind === "front" ? "under the basket facing you" : kind === "side" ? "level with you on your shooting-hand side" : "behind you, on the line to the rim"}, and what it sees.">
+        <defs><radialGradient id="lfcam" gradientUnits="userSpaceOnUse" cx="${cam[0]}" cy="${cam[1]}" r="${Rr}"><stop offset="0" style="stop-color:var(--read);stop-opacity:1"/><stop offset=".75" style="stop-color:var(--read);stop-opacity:.5"/><stop offset="1" style="stop-color:var(--read);stop-opacity:0"/></radialGradient></defs>
+        <rect class="paint" x="170" y="0" width="160" height="190"/><path class="ln" d="M190 190 A60 60 0 0 0 310 190"/><path class="ln" d="M30 0 L30 141.5 A237.5 237.5 0 0 0 470 141.5 L470 0"/>
+        <path class="ln" d="M210 52 A40 40 0 0 0 290 52"/><line class="ln" x1="220" y1="40" x2="280" y2="40" style="stroke-width:4"/><circle class="ln" cx="250" cy="52" r="7.5"/><rect class="ln" x="1.5" y="1.5" width="497" height="397" rx="2"/>
+        <g class="glow" style="animation:none;opacity:.55"><path d="M${cam[0]} ${cam[1]} L${x1} ${y1} A${Rr} ${Rr} 0 0 1 ${x2} ${y2} Z" fill="url(#lfcam)"/></g>
+        <path d="M${cam[0]} ${cam[1]} L${x1} ${y1} M${cam[0]} ${cam[1]} L${x2} ${y2}" style="stroke:var(--read);stroke-width:2;stroke-dasharray:5 4;opacity:.8" fill="none"/>
+        <circle cx="${you[0]}" cy="${you[1]}" r="19" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <path d="M${you[0] - 9} ${you[1] - 8} L${you[0]} ${you[1] - 27} L${you[0] + 9} ${you[1] - 8} Z" style="fill:var(--accent);stroke:var(--surface);stroke-width:2;stroke-linejoin:round"/><circle class="off" cx="${you[0]}" cy="${you[1]}" r="12"/>
+        <g transform="translate(${cam[0]} ${cam[1]}) rotate(${deg})"><rect x="-9" y="-14" width="18" height="28" rx="4" style="fill:var(--ink);stroke:var(--surface);stroke-width:2"/><circle cx="0" cy="-8" r="3" style="fill:var(--read)"/></g>
+        <rect class="tagbg" x="${Math.max(6, Math.min(424, cam[0] - 35))}" y="${kind === "front" ? cam[1] + 20 : kind === "side" ? cam[1] + 22 : cam[1] - 52}" width="70" height="22" rx="11"/><text class="tagtx" x="${Math.max(6, Math.min(424, cam[0] - 35)) + 35}" y="${(kind === "front" ? cam[1] + 20 : kind === "side" ? cam[1] + 22 : cam[1] - 52) + 15.5}" text-anchor="middle">PHONE</text>
+        <rect class="tagbg o" x="${you[0] - 22}" y="${you[1] + 24}" width="44" height="22" rx="11"/><text class="tagtx o" x="${you[0]}" y="${you[1] + 39.5}" text-anchor="middle">YOU</text></svg>`;
+    }
+    // Side view: how high the phone sits and what it sees of you, raised (tripod, chair, ledge) or on the floor.
+    function heightSvg() {
+      const low = !!S.settings.lfLow, gy = 118, px = 330, ft = 12.5, cam = [low ? 92 : 122, low ? gy - 6 : gy - 3.2 * ft];
+      const mid = [px, gy - 3.4 * ft], a = Math.atan2(mid[1] - cam[1], mid[0] - cam[0]), h = .5, Rr = Math.hypot(mid[0] - cam[0], mid[1] - cam[1]) + 60;
+      const x1 = cam[0] + Math.cos(a - h) * Rr, y1 = cam[1] + Math.sin(a - h) * Rr, x2 = cam[0] + Math.cos(a + h) * Rr, y2 = cam[1] + Math.sin(a + h) * Rr;
+      const head = gy - 5.6 * ft, hip = gy - 3 * ft, sh = gy - 4.6 * ft, deg = a * 180 / Math.PI;
+      const stand = low ? "" : `<path d="M${cam[0]} ${cam[1] + 8} L${cam[0] - 12} ${gy} M${cam[0]} ${cam[1] + 8} L${cam[0] + 12} ${gy} M${cam[0]} ${cam[1] + 8} L${cam[0]} ${gy}" style="stroke:var(--wood-line);stroke-width:3;stroke-linecap:round" fill="none"/>`;
+      return `<svg class="fsc in lf-court lf-side" viewBox="0 0 500 140" role="img" aria-label="Side view: the phone ${low ? "on the floor, tilted up" : "raised to about waist height and level"}, aimed at your middle, with your whole body and your hands at the release inside its view.">
+        <defs><radialGradient id="lfcam2" gradientUnits="userSpaceOnUse" cx="${cam[0]}" cy="${cam[1]}" r="${Rr}"><stop offset="0" style="stop-color:var(--read);stop-opacity:1"/><stop offset=".75" style="stop-color:var(--read);stop-opacity:.5"/><stop offset="1" style="stop-color:var(--read);stop-opacity:0"/></radialGradient>
+        <clipPath id="lfcl"><rect x="0" y="0" width="500" height="${gy}"/></clipPath></defs>
+        <rect x="1.5" y="1.5" width="497" height="137" rx="2" class="ln"/><line class="ln" x1="0" y1="${gy}" x2="500" y2="${gy}"/>
+        <g clip-path="url(#lfcl)"><path d="M${cam[0]} ${cam[1]} L${x1} ${y1} A${Rr} ${Rr} 0 0 1 ${x2} ${y2} Z" fill="url(#lfcam2)" opacity=".55"/>
+        <path d="M${cam[0]} ${cam[1]} L${x1} ${y1} M${cam[0]} ${cam[1]} L${x2} ${y2}" style="stroke:var(--read);stroke-width:2;stroke-dasharray:5 4;opacity:.8" fill="none"/></g>
+        ${stand}
+        <g style="stroke:var(--accent);stroke-width:5;stroke-linecap:round;fill:none"><path d="M${px} ${sh} L${px} ${hip} M${px} ${hip} L${px - 7} ${gy - 1.6 * ft} L${px - 3} ${gy - 2} M${px} ${hip} L${px + 7} ${gy - 1.6 * ft} L${px + 4} ${gy - 2} M${px} ${sh + 3} L${px + 9} ${head - 2} L${px + 7} ${head - 22}"/></g>
+        <circle cx="${px}" cy="${head + 6}" r="8" style="fill:var(--accent)"/><circle class="ball" cx="${px + 7}" cy="${head - 30}" r="7"/>
+        <g transform="translate(${cam[0]} ${cam[1]}) rotate(${deg})"><rect x="-4" y="-11" width="8" height="22" rx="2" style="fill:var(--ink);stroke:var(--surface);stroke-width:1.5"/></g>
+        <text class="edge" x="${(cam[0] + px) / 2}" y="${gy + 15}" text-anchor="middle">${low ? "15 TO 20 FT" : "10 TO 15 FT"}</text>
+        <text class="edge" x="${cam[0]}" y="${low ? gy - 20 : cam[1] - 16}" text-anchor="middle">${low ? "TILT UP" : "WAIST HIGH"}</text></svg>`;
+    }
     function drawPlace() {
       const box = L && L.el.querySelector(".lf-place");
       if (!box) return;
@@ -7005,11 +7048,16 @@ route();
       box.hidden = false;
       box.innerHTML = `<b>Place the phone</b>
         <div class="lf-seg"><button data-lf="view" data-v="behind" aria-pressed="${B && !F}">Behind</button><button data-lf="view" data-v="front" aria-pressed="${F}">In front</button><button data-lf="view" data-v="side" aria-pressed="${!B}">Side</button></div>
-        <ul>${F
+        ${placeSvg(F ? "front" : B ? "behind" : "side")}
+        <div class="lf-seg"><button data-lf="height" data-v="up" aria-pressed="${!S.settings.lfLow}">Raised</button><button data-lf="height" data-v="low" aria-pressed="${!!S.settings.lfLow}">On the floor</button></div>
+        ${heightSvg()}
+        <ul>${S.settings.lfLow
+          ? "<li>On the floor, lean it back a little so it looks up at you, and move it farther away, 15 to 20 ft, so your hands at the release stay in the picture. Keep it clear of rolling balls.</li>"
+          : "<li>Raised on a tripod, chair or ledge, about waist height, held level (not tilted).</li>"}${F
           ? "<li>Straight in front of you, facing you, on the line from the rim to where you shoot, for example under the basket. Not off to an angle: that throws off the elbow and ball-line numbers.</li><li>That shows left and right, like from behind: your elbow, the ball's line, your guide hand. Keep it out of the way of passes and rebounds.</li>"
           : B
-          ? "<li>Behind you, on the straight line from you to the rim. That shows left and right: your elbow, the ball's line, your guide hand.</li><li>About 10 to 15 ft back, at waist height. At a Shoot360, prop it at the back of your lane, out of the way of the machine's passes and the net.</li>"
-          : "<li>Level with where you shoot, off to your shooting-hand side, so your shooting arm faces the phone. That shows balance, timing, set point and arc.</li><li>About 10 to 15 ft away, at waist height, out of the way of the ball and the rebound.</li>"}
+          ? "<li>Behind you, on the straight line from you to the rim. That shows left and right: your elbow, the ball's line, your guide hand.</li><li>On the line, 10 to 15 ft back (farther on the floor). At a Shoot360, prop it at the back of your lane, out of the way of the machine's passes and the net.</li>"
+          : "<li>Level with where you shoot, off to your shooting-hand side, so your shooting arm faces the phone. That shows balance, timing, set point and arc.</li><li>10 to 15 ft away (farther on the floor), out of the way of the ball and the rebound.</li>"}
         <li>Your whole body in the picture, feet included, with room above your hands at the release. Check the skeleton sits on you, then tap Ready.</li></ul>
         <button class="btn pri" data-lf="ready" style="width:100%">Ready</button>`;
     }
@@ -7038,6 +7086,7 @@ route();
         if (b.dataset.lf === "close") closeLive();
         else if (b.dataset.lf === "talk") { L.talk = { say: "buzz", buzz: "off", off: "say" }[L.talk] || "say"; S.settings.lfCue = L.talk; persist(); drawTop(); }
         else if (b.dataset.lf === "keep") buLiveKeep(L);
+        else if (b.dataset.lf === "height") { S.settings.lfLow = b.dataset.v === "low"; persist(); if (K && !K.burst.shots.length) K.burst.low = !!S.settings.lfLow; drawPlace(); }
         else if (b.dataset.lf === "ready") { L.ready = true; drawPlace(); }
         else if (b.dataset.lf === "view") { const v = b.dataset.v; S.settings.fcView = v === "front" ? "behind" : v; S.settings.fcFront = v === "front"; persist(); L.buf = []; L.up = 0;
           if (K && !K.burst.shots.length) { K.burst.view = fcView(); K.burst.front = !!S.settings.fcFront && fcView() === "behind"; }
