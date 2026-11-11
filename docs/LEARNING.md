@@ -1146,4 +1146,8 @@ lined up at the release. Hold a chip to select several. *Send to coach…* (step
 ★, *Keep*, or was sent or saved for a coach (`shot.sent`, `shot.keep`), and never while a coach session still uses it
 (`sesUsesVid`). The Form tab's *Shot bursts* fold shows how much the videos use and *Free up space* lists bursts by
 size with *Delete videos* (numbers stay). Burst videos no shot points at, from the app closing mid-burst, go after an
-hour. Code: `bu*`, `burstOpen`, `buSweep`, and `burstFind`, `burstShotUrl`, `burstShotFrames` on `window` for the page.
+hour.
+
+**Back.** Android's back button (step 11's `hoopsBack`) asks `burstBack()` and `liveBack()` first. In the viewer it
+leaves compare or a selection, then closes. While a clip is being read it cancels. On the live camera it does what
+the × does: saves the session's form entry and opens the shots it kept. Code: `bu*`, `burstOpen`, `buSweep`, and `burstFind`, `burstShotUrl`, `burstShotFrames` on `window` for the page.

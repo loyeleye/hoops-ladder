@@ -61,6 +61,10 @@
       if (clip) { if (!press(clip, '[data-yt="close"]')) clip.remove(); return true; }
       // Coach session mode (step 27) sits over the player and the tabs: back steps out of its current screen.
       if (window.sesBack && window.sesBack()) return true;
+      // Shot bursts (step 29): the viewer steps out of compare or a selection, then closes; reading a clip cancels;
+      // the live form check does what Done does (saves and opens the shots it kept).
+      if (window.burstBack && window.burstBack()) return true;
+      if (window.liveBack && window.liveBack()) return true;
       const film = document.querySelector(".fsq");
       if (film) { if (!press(film, '[data-fq="ecancel"]') && !press(film, '[data-fq="end"]') && !press(film, '[data-fq="close"]')) closeFS(); return true; }
       if (CO.view) { closeVid(); return true; }
@@ -667,6 +671,7 @@
       else if (L.talk === "buzz") try { navigator.vibrate?.(worst ? [60, 80, 60] : 40); } catch (e) {}
     }
 
+    window.liveBack = () => { if (!L) return false; closeLive(); return true; };
     function closeLive() {
       if (!L) return;
       const shots = L.shots;
@@ -1054,6 +1059,14 @@
     el.addEventListener("pointerdown", buPress);
     buDraw();
   }
+  window.burstBack = () => {
+    if (BC) { BC.stop = true; return true; }
+    if (!BV) return false;
+    if (BV.pick || BV.cmp != null) { BV.pick = false; BV.cmp = null; buDraw(); return true; }
+    if (BV.sel.size) { BV.sel.clear(); buDraw(); return true; }
+    burstClose();
+    return true;
+  };
   function burstClose() {
     if (!BV) return;
     cancelAnimationFrame(BV.raf);
