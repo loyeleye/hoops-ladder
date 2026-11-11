@@ -2269,7 +2269,7 @@ const LVL_NAME=["","Starter","Builder","Advanced"];
 const lvlOf=d=>d.unlock<=2?1:d.unlock<=5?2:3;
 const pipsHTML=d=>{const L=lvlOf(d);return `<span class="dpips" role="img" aria-label="${LVL_NAME[L]}" title="${LVL_NAME[L]}">${[1,2,3].map(i=>`<i class="${i<=L?"on":""}"></i>`).join("")}</span>`};
 const NW_DEF={20:1,30:2,45:2},NW_ALL=99,NW_MAX=6;
-/* warm-up and cool-down routines: you pick one of each (Today's plan ⇄, or Drills → Body) and every recommended workout uses it */
+/* warm-up and cool-down routines: you pick one of each (Today's plan ⇄, or Drills → Conditioning) and every recommended workout uses it */
 const RTS=k=>DRILLS.filter(d=>d.rt===k),RT_DEF={warm:"b_body",cool:"b_cool"},RT_NAME={warm:"warm-up",cool:"cool-down"};
 function rtPick(k){const d=D[(S.settings.rt||{})[k]];return d&&d.rt===k?d:D[RT_DEF[k]]}
 const FIXED=new Set(["s_cold","s_tired",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
@@ -2391,7 +2391,7 @@ function renderPlate(){
   $("#plate").classList.toggle("compact",state.tab==="drills"&&plateSmall);placeInd(false)}
 /* Drills tab: the skill switch lives in the sticky plate so it stays reachable while scrolling a long ladder.
    Switching updates the tabs in place (keeps focus, lets the underline slide), re-renders only the list, and remembers each ladder's scroll spot. */
-const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"],["b","Body"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)",b:"var(--warn)"},tabScroll={};let plateSmall=false;
+const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"],["b","Conditioning"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)",b:"var(--warn)"},tabScroll={};let plateSmall=false;
 function skillTabs(){const k=state.drillTab;
   return `<div class="wrap sktabs" role="tablist" aria-label="Skill">${SKT.map(([v,l])=>`<button role="tab" id="tab-${v}" aria-controls="drillpanel" data-dtab="${v}" aria-selected="${k===v}" tabindex="${k===v?0:-1}">${l}</button>`).join("")}<i class="ind" aria-hidden="true"></i></div>`}
 function placeInd(anim){const b=$("#tab-"+state.drillTab),ind=$(".sktabs .ind");if(!b||!ind)return;
@@ -2440,7 +2440,7 @@ function drillRow(d,i,opts={}){
   const w=opts.why, lib=opts.lib&&!d.body, f=lib?fq(d.id).k:"auto";
   return `<button class="drill ${done?"done":""} ${opts.next?"next":""}" data-open="${d.id}">
    <span class="ix">${done?"✓":i}</span>
-   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}<span class="tag ${d.body?"p":d.skill}">${d.body?"Body":SKS[d.skill]}</span>${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}<span>${tgt}</span></span></span>
+   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SKS[d.skill]}</span>${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}<span>${tgt}</span></span></span>
    <span class="go">${done?"Again":"Go"}</span></button>`}
 
 function weekDots(){
@@ -2487,7 +2487,7 @@ function viewDrills(){
    <p class="muted small" style="margin:0">${k==="f"?"Low-lift finishes: soft touch off the glass, two-foot stops, floaters, same-foot finishes and reverses that use the rim. No backboard slaps or big jumps. Then decision reps where the phone picks the finish.":k==="s"?"Form work from SeeMikeDunn, a tracked 3-point test, then decision reps that make the catch unpredictable.":"Mechanics from In The Lab, Phil Handy and ILB coaches, then decision reps where your phone calls the move so you react instead of recite."} Every drill is open. The dots show difficulty: one for Starter, two for Builder, three for Advanced. Open any drill to add it to your next workout or set how often it comes back.</p>
    <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div></section>${k==="f"?finCard(0):""}`}
 
-/* Drills → Body: every warm-up and cool-down, which one your workouts use, and a way to run any of them on its own */
+/* Drills → Conditioning: every warm-up and cool-down, which one your workouts use, and a way to run any of them on its own */
 function viewBody(){const grp=k=>{const cur=rtPick(k).id;return `<div class="sechead"><h2>${k==="warm"?"Warm-ups":"Cool-downs"}</h2><button class="linkbtn" data-rec="rt:${k}" style="padding:0">Change yours ›</button></div>
    <div class="list">${RTS(k).map((d,i)=>`<div class="planline">${drillRow(d,i+1,{why:d.id===cur?{k:"fixed",t:`Your ${RT_NAME[k]}: in every workout`}:{k:"mix",t:d.short||""}})}</div>`).join("")}</div>`};
   return `<section id="drillpanel" role="tabpanel" aria-labelledby="tab-b"><div class="sechead"><h2>Warm-up and cool-down</h2></div>
@@ -2691,7 +2691,7 @@ function openOpt(id){const p=plan(),x=p.find(y=>y.d.id===id);if(!x)return;const 
    <button class="btn pri" data-rec="go:${id}">Open the drill</button>`,"Why this drill")}
 /* pick your warm-up or cool-down: every recommended workout uses it until you change it */
 function rtHTML(k){const cur=rtPick(k).id;
-  return bsTop(k==="warm"?"Before you train":"After you train",k==="warm"?"Pick your warm-up":"Pick your cool-down")+`<p class="rs-p">Every recommended workout uses the one you pick until you change it. You can also run any of them on its own from Drills → Body, like before a game.</p>
+  return bsTop(k==="warm"?"Before you train":"After you train",k==="warm"?"Pick your warm-up":"Pick your cool-down")+`<p class="rs-p">Every recommended workout uses the one you pick until you change it. You can also run any of them on its own from Drills → Conditioning, like before a game.</p>
    <div class="opts" role="radiogroup" aria-label="${k==="warm"?"Warm-ups":"Cool-downs"}">${RTS(k).map(d=>`<div class="opt${d.id===cur?" on":""}"><button class="optmain" role="radio" aria-checked="${d.id===cur}" data-rec="rtset:${k}:${d.id}"><b>${esc(d.name)} · ${Math.round(totalOf(d)/60)} min</b><span>${esc(d.short||"")}</span></button><button class="linkbtn" data-rec="go:${d.id}">See the moves ›</button></div>`).join("")}</div>
    <button class="btn pri" data-rec="close">Done</button>`}
 function freqHTML(id){const f=fq(id),d=D[id],m=realMins(d),mins=S.settings.mins,share=Math.round(100*m/mins);
@@ -2740,14 +2740,14 @@ function builderHTML(){
   const ids=bItems(),mins=Math.round(ids.reduce((a,id)=>a+realMins(D[id]),0)),shots=ids.reduce((a,id)=>a+shotsOf(D[id]),0);
   return bsTop(B.id?"Edit workout":"New workout",B.name||"New workout")+`<label class="label" for="bname">Name</label><input class="rs-in" id="bname" value="${esc(B.name)}" placeholder="Sunday Shooting" maxlength="40" autocomplete="off">
    <div class="plantotal"><span>${ids.length} drill${ids.length===1?"":"s"}${shots?` · about ${shots} shots`:""}</span><b>About ${mins} min</b></div>
-   ${ids.length?`<div class="rs-list">${ids.map((id,i)=>{const d=D[id],pin=B.keep&&(id==="s_cold"||!!(d&&d.rt));return `<div class="brow"><span class="bn">${i+1}</span><span class="bname"><b>${esc(d.name)}</b><small>${d.body?"Body":SKS[d.skill]} · ${realMins(d)} min${pin?` · stays ${d.rt==="cool"?"last":"first"}`:""}</small></span>${pin?"":`<button data-rec="bmv:${id}:-1" aria-label="Move ${esc(d.name)} up">↑</button><button data-rec="bmv:${id}:1" aria-label="Move ${esc(d.name)} down">↓</button>`}<button data-rec="brm:${id}" aria-label="Remove ${esc(d.name)}">×</button></div>`}).join("")}</div>`:`<div class="empty">No drills yet. Add some from the library.</div>`}
+   ${ids.length?`<div class="rs-list">${ids.map((id,i)=>{const d=D[id],pin=B.keep&&(id==="s_cold"||!!(d&&d.rt));return `<div class="brow"><span class="bn">${i+1}</span><span class="bname"><b>${esc(d.name)}</b><small>${d.body?"Conditioning":SKS[d.skill]} · ${realMins(d)} min${pin?` · stays ${d.rt==="cool"?"last":"first"}`:""}</small></span>${pin?"":`<button data-rec="bmv:${id}:-1" aria-label="Move ${esc(d.name)} up">↑</button><button data-rec="bmv:${id}:1" aria-label="Move ${esc(d.name)} down">↓</button>`}<button data-rec="brm:${id}" aria-label="Remove ${esc(d.name)}">×</button></div>`}).join("")}</div>`:`<div class="empty">No drills yet. Add some from the library.</div>`}
    ${shots>250?`<p class="rs-warn"><b>About ${shots} shots.</b> That's a big day for your shooting shoulder. Fine once a week.</p>`:""}
    ${needsWarm(ids)?`<p class="rs-warn">This workout has finishing or jump work, so the body warm-up goes in first when you save.</p>`:""}
    <button class="btn sec" data-rec="bview:pick">+ Add drills</button>
    <label class="toggle"><input type="checkbox" id="bkeep" ${B.keep?"checked":""}> Keep Cold 3s and the warm-up first, the stretch last</label>
    ${B.del?`<div class="confirm"><b>Delete ${esc(B.name||"this workout")}?</b><div class="psee-btns"><button class="btn sec small" data-rec="bdel:no">Keep it</button><button class="btn miss small" data-rec="bdel:yes">Delete</button></div></div>`:""}
    <div class="psee-btns">${B.id?`<button class="btn sec small" data-rec="bdel:ask">Delete</button>`:`<button class="btn sec small" data-rec="plan">Cancel</button>`}<button class="btn pri small" data-rec="bsave" ${ids.length?"":"disabled"}>Save</button></div>`}
-function bPickList(L){return ["b","s","h","f"].map(k=>{const rows=L.filter(d=>k==="b"?d.body:d.skill===k&&!d.body);if(!rows.length)return"";return `<div class="label" style="margin-top:6px">${k==="b"?"Warm-up and cool-down":SK[k]}</div><div class="rs-list">${rows.map(d=>{const on=B.items.includes(d.id);return `<button class="rs-alt${on?" on":""}" data-rec="bpick:${d.id}" aria-pressed="${on}"><span><b>${esc(d.name)}</b><small>${d.body?"Body":pipsHTML(d)} ${realMins(d)} min</small></span><span class="go">${on?"✓":"+"}</span></button>`}).join("")}</div>`}).join("")}
+function bPickList(L){return ["b","s","h","f"].map(k=>{const rows=L.filter(d=>k==="b"?d.body:d.skill===k&&!d.body);if(!rows.length)return"";return `<div class="label" style="margin-top:6px">${k==="b"?"Warm-up and cool-down":SK[k]}</div><div class="rs-list">${rows.map(d=>{const on=B.items.includes(d.id);return `<button class="rs-alt${on?" on":""}" data-rec="bpick:${d.id}" aria-pressed="${on}"><span><b>${esc(d.name)}</b><small>${d.body?"Conditioning":pipsHTML(d)} ${realMins(d)} min</small></span><span class="go">${on?"✓":"+"}</span></button>`}).join("")}</div>`}).join("")}
 document.addEventListener("input",e=>{if(!B)return;if(e.target.id==="bname")B.name=e.target.value;if(e.target.id==="bq"){B.q=e.target.value;const q=B.q.trim().toLowerCase(),el=$("#bpick");if(el)el.innerHTML=bPickList(DRILLS.filter(d=>!q||d.name.toLowerCase().includes(q)))}});
 document.addEventListener("change",e=>{if(B&&e.target.id==="bkeep"){B.keep=e.target.checked;bsSet(builderHTML())}});
 document.addEventListener("change",e=>{if(e.target.id!=="wstay")return;S.rec.stay=e.target.checked;if(S.rec.plan&&customToday())S.rec.plan.stay=S.rec.stay;persist();render();bsSet(planHTML())});
