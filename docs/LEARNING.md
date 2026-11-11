@@ -1116,7 +1116,9 @@ look at later or send to a coach (step 28), without filling the phone with minut
 **Live form check › Keep video** (on by default, `S.settings.lfKeep`). Before anything counts, a *Place the phone*
 card sits over the live picture: *Behind* (on the line to the rim, 10 to 15 ft back, waist height, at the back
 of a Shoot360 lane, clear of the machine's passes and the net), *In front* (straight on, facing you, from under the
-basket) or *Side*. It sets the same Camera switch as the Form tab. *In front* uses the
+basket) or *Side*. It sets the same Camera switch as the Form tab. A small half court (the film study court) shows the phone's spot
+for each choice, with you at the top of the key, a wedge on your circle pointing at the rim, and the phone's view
+as a glowing cone (`placeSvg`). Side goes to your shooting-hand side. *In front* uses the
 behind checks (`S.settings.fcFront`, `burst.front`): they're measured from your own shoulders and the higher wrist,
 so a straight-on front view reads the same, mirrored. An angled view foreshortens the arm, so the tips say straight on. *Ready* starts counting shots. The shot finder is unchanged (step 16).
 

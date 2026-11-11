@@ -448,6 +448,7 @@
 .livefc .btn.sec{background:#1C2844;border-color:#2A3858;color:#F2F5FA}
 .livefc .lf-kb{position:absolute;left:12px;top:12px;font-size:12.5px;font-weight:600;background:rgba(5,8,15,.72);border-radius:999px;padding:3px 10px;z-index:2}.livefc .lf-kb:empty{display:none}
 .livefc .lf-place{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(5,8,15,.88);border-radius:14px;padding:12px 14px;font-size:14px;z-index:3}
+.livefc .lf-court{display:block;width:auto;max-width:100%;max-height:150px;margin:8px auto 0}
 .livefc .lf-place b{font-family:var(--display);font-size:18px;text-transform:uppercase}
 .livefc .lf-place ul{margin:8px 0 10px;padding-left:18px}.livefc .lf-place li{margin:4px 0}
 .livefc .lf-seg{display:flex;gap:6px;margin-top:8px}.livefc .lf-seg button{flex:1;border-radius:999px;border:1px solid #2A3858;background:#1C2844;color:#F2F5FA;padding:7px 8px;font:inherit;font-weight:600}
@@ -486,6 +487,26 @@
       const b = L.el.querySelector("[data-lf=talk]"); b.setAttribute("aria-pressed", L.talk !== "off"); b.textContent = "Cues: " + { say: "Voice", buzz: "Buzz", off: "Off" }[L.talk];
     }
     // Before the first shot: where to put the phone, over the live picture so you can line it up. Ready starts counting.
+    // The phone's spot on a half court (the film study court, 10 px a foot, basket at the top), with you at the top of
+    // the key facing the rim, and the camera's view as the film study's glowing cone.
+    function placeSvg(kind) {
+      const you = [250, 250], hand = S.settings.hand === "L" ? -1 : 1;
+      const cam = kind === "front" ? [250, 84] : kind === "side" ? [250 + hand * 140, 250] : [250, 395];
+      const a = Math.atan2(you[1] - cam[1], you[0] - cam[0]), h = .42, Rr = Math.hypot(you[0] - cam[0], you[1] - cam[1]) + 70;
+      const x1 = cam[0] + Math.cos(a - h) * Rr, y1 = cam[1] + Math.sin(a - h) * Rr, x2 = cam[0] + Math.cos(a + h) * Rr, y2 = cam[1] + Math.sin(a + h) * Rr;
+      const deg = a * 180 / Math.PI + 90; // you face the rim (up): the wedge on your circle points that way
+      return `<svg class="fsc in lf-court" viewBox="0 0 500 400" role="img" aria-label="Half court: you at the top of the key facing the rim, the phone ${kind === "front" ? "under the basket facing you" : kind === "side" ? "level with you on your shooting-hand side" : "behind you, on the line to the rim"}, and what it sees.">
+        <defs><radialGradient id="lfcam" gradientUnits="userSpaceOnUse" cx="${cam[0]}" cy="${cam[1]}" r="${Rr}"><stop offset="0" style="stop-color:var(--read);stop-opacity:1"/><stop offset=".75" style="stop-color:var(--read);stop-opacity:.5"/><stop offset="1" style="stop-color:var(--read);stop-opacity:0"/></radialGradient></defs>
+        <rect class="paint" x="170" y="0" width="160" height="190"/><path class="ln" d="M190 190 A60 60 0 0 0 310 190"/><path class="ln" d="M30 0 L30 141.5 A237.5 237.5 0 0 0 470 141.5 L470 0"/>
+        <path class="ln" d="M210 52 A40 40 0 0 0 290 52"/><line class="ln" x1="220" y1="40" x2="280" y2="40" style="stroke-width:4"/><circle class="ln" cx="250" cy="52" r="7.5"/><rect class="ln" x="1.5" y="1.5" width="497" height="397" rx="2"/>
+        <g class="glow" style="animation:none;opacity:.55"><path d="M${cam[0]} ${cam[1]} L${x1} ${y1} A${Rr} ${Rr} 0 0 1 ${x2} ${y2} Z" fill="url(#lfcam)"/></g>
+        <path d="M${cam[0]} ${cam[1]} L${x1} ${y1} M${cam[0]} ${cam[1]} L${x2} ${y2}" style="stroke:var(--read);stroke-width:2;stroke-dasharray:5 4;opacity:.8" fill="none"/>
+        <circle cx="${you[0]}" cy="${you[1]}" r="19" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <path d="M${you[0] - 9} ${you[1] - 8} L${you[0]} ${you[1] - 27} L${you[0] + 9} ${you[1] - 8} Z" style="fill:var(--accent);stroke:var(--surface);stroke-width:2;stroke-linejoin:round"/><circle class="off" cx="${you[0]}" cy="${you[1]}" r="12"/>
+        <g transform="translate(${cam[0]} ${cam[1]}) rotate(${deg})"><rect x="-9" y="-14" width="18" height="28" rx="4" style="fill:var(--ink);stroke:var(--surface);stroke-width:2"/><circle cx="0" cy="-8" r="3" style="fill:var(--read)"/></g>
+        <rect class="tagbg" x="${Math.max(6, Math.min(424, cam[0] - 35))}" y="${kind === "front" ? cam[1] + 20 : kind === "side" ? cam[1] + 22 : cam[1] - 52}" width="70" height="22" rx="11"/><text class="tagtx" x="${Math.max(6, Math.min(424, cam[0] - 35)) + 35}" y="${(kind === "front" ? cam[1] + 20 : kind === "side" ? cam[1] + 22 : cam[1] - 52) + 15.5}" text-anchor="middle">PHONE</text>
+        <rect class="tagbg o" x="${you[0] - 22}" y="${you[1] + 24}" width="44" height="22" rx="11"/><text class="tagtx o" x="${you[0]}" y="${you[1] + 39.5}" text-anchor="middle">YOU</text></svg>`;
+    }
     function drawPlace() {
       const box = L && L.el.querySelector(".lf-place");
       if (!box) return;
@@ -496,6 +517,7 @@
       box.hidden = false;
       box.innerHTML = `<b>Place the phone</b>
         <div class="lf-seg"><button data-lf="view" data-v="behind" aria-pressed="${B && !F}">Behind</button><button data-lf="view" data-v="front" aria-pressed="${F}">In front</button><button data-lf="view" data-v="side" aria-pressed="${!B}">Side</button></div>
+        ${placeSvg(F ? "front" : B ? "behind" : "side")}
         <ul>${F
           ? "<li>Straight in front of you, facing you, on the line from the rim to where you shoot, for example under the basket. Not off to an angle: that throws off the elbow and ball-line numbers.</li><li>That shows left and right, like from behind: your elbow, the ball's line, your guide hand. Keep it out of the way of passes and rebounds.</li>"
           : B
