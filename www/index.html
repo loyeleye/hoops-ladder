@@ -45,6 +45,19 @@ h1,h2,h3{font-family:var(--display);letter-spacing:.01em;line-height:1.05;margin
 .label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 main{padding-block:12px 112px;display:flex;flex-direction:column;gap:18px}
+.fold{border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.fold>summary{display:flex;align-items:center;gap:10px;min-height:52px;padding:8px 14px;cursor:pointer;list-style:none}
+.fold>summary::-webkit-details-marker{display:none}
+.fold .fh{font:700 18px/1.1 var(--display);text-transform:uppercase;letter-spacing:.01em;white-space:nowrap}
+.fold .fsum{flex:1;min-width:0;text-align:right;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fold .fchev{flex:none;color:var(--muted);transition:transform .2s ease-out}.fold[open] .fchev{transform:rotate(180deg)}
+.fold>.fbody{overflow:hidden;padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
+.fold>.fbody>.card,.fold>.fbody>.legcard{border:0;padding:0;background:none;box-shadow:none}
+@media (prefers-reduced-motion:reduce){.fold .fchev{transition:none}}
+.fold .fbody>.card>.label:first-child{display:none}
+.dsearch{position:relative}.dsearch input{width:100%;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0 40px 0 16px;font:500 15px var(--body)}
+.dsearch input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.dsearch button{position:absolute;right:4px;top:4px;width:36px;height:36px;border:0;border-radius:18px;background:none;color:var(--muted);font-size:18px}
 .wk-bar{position:fixed;left:8px;right:8px;bottom:calc(var(--tabh,64px) + 8px);z-index:6;display:none}
 body.wk-on .wk-bar{display:block}body.wk-on.wk-hide .wk-bar{display:none}
 body.wk-on:not(.wk-hide) main{padding-bottom:calc(112px + 76px)}
@@ -2650,7 +2663,7 @@ function placeInd(anim){const b=$("#tab-"+state.drillTab),ind=$(".sktabs .ind");
 function setDrillTab(k,focus){const old=state.drillTab;if(k===old){if(focus)$("#tab-"+k)?.focus();return}
   tabScroll[old]=window.scrollY;state.drillTab=k;
   document.querySelectorAll(".sktabs [role=tab]").forEach(b=>{const on=b.dataset.dtab===k;b.setAttribute("aria-selected",on);b.tabIndex=on?0:-1});
-  placeInd(true);$("#view").innerHTML=viewDrills();
+  placeInd(true);if(state.dq){state.dq="";$("#view").innerHTML=viewDrills()}else{const l=$("#dladder");if(l)l.innerHTML=viewLadder();else $("#view").innerHTML=viewDrills()}
   const sec=$("#drillpanel");if(sec)sec.classList.add("shfb".indexOf(k)>"shfb".indexOf(old)?"enter-r":"enter-l");
   window.scrollTo(0,tabScroll[k]||0);if(focus)$("#tab-"+k)?.focus()}
 document.addEventListener("keydown",e=>{const t=e.target.closest?.(".sktabs [role=tab]");if(!t)return;
@@ -2727,7 +2740,19 @@ function viewToday(){
 function cueCard(){const c=todayCue(),open=!!state.cueOpen;
   return `<div class="card small cuecard${open?" open":""}"><div class="cueline"><span class="label">Today's one cue</span><button class="linkbtn" data-cueopen="1" aria-expanded="${open}">${open?"Done":"Change ›"}</button></div><b class="cuebig">${esc(CUES[c.i].t)}</b>${open?`<div class="muted">${esc(CUES[c.i].w)} ${esc(c.why)}</div>
    <div class="chips" role="group" aria-label="Pick today's cue">${CUES.map((x,i)=>`<button class="chip" data-cue="${i}" aria-pressed="${i===c.i}">${esc(x.t)}</button>`).join("")}</div>`:""}</div>`}
-function viewDrills(){
+/* Drills: one search box over every drill (all four skills, routines too). Typing swaps the ladder for results in place. */
+function drillHits(q){q=q.trim().toLowerCase();if(!q)return[];const ws=q.split(/\s+/);
+  return DRILLS.filter(d=>{const t=[d.name,d.meta,d.short,d.intro,...(d.steps||[]),d.cond&&CGR[d.cond],d.body?"conditioning warm-up cool-down":SK[d.skill]].filter(Boolean).join(" ").toLowerCase();return ws.every(w=>t.includes(w))})
+   .sort((a,b)=>(b.name.toLowerCase().includes(q)?1:0)-(a.name.toLowerCase().includes(q)?1:0))}
+function drillResults(q){const h=drillHits(q);return h.length?`<div class="sechead"><h2>Results</h2><span class="muted small">${h.length} drill${h.length>1?"s":""}</span></div><div class="list">${h.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div>`:`<div class="empty">No drills match “${esc(q)}”.</div>`}
+function viewDrills(){const q=state.dq||"";
+  return `<div class="dsearch" role="search"><input type="search" id="dq" placeholder="Search all drills" aria-label="Search all drills" value="${esc(q)}" autocomplete="off" enterkeyhint="search">${q?`<button data-dqclear="1" aria-label="Clear search">×</button>`:""}</div>
+  <div id="dres">${q?drillResults(q):""}</div><div id="dladder"${q?" hidden":""}>${viewLadder()}</div>`}
+document.addEventListener("input",e=>{if(e.target.id!=="dq")return;state.dq=e.target.value;const r=$("#dres"),l=$("#dladder"),q=state.dq.trim();
+  if(r)r.innerHTML=q?drillResults(q):"";if(l)l.hidden=!!q;const box=e.target.parentElement;let x=box.querySelector("[data-dqclear]");
+  if(q&&!x)box.insertAdjacentHTML("beforeend",`<button data-dqclear="1" aria-label="Clear search">×</button>`);else if(!q&&x)x.remove()});
+document.addEventListener("click",e=>{if(!e.target.closest("[data-dqclear]"))return;state.dq="";const i=$("#dq");if(i){i.value="";i.dispatchEvent(new Event("input",{bubbles:true}));i.focus()}});
+function viewLadder(){
   const k=state.drillTab;if(k==="b")return viewBody();
   const list=DRILLS.filter(d=>d.skill===k&&!d.body).sort((a,b)=>a.unlock-b.unlock||(a.read?1:0)-(b.read?1:0));
   return `<section id="drillpanel" role="tabpanel" aria-labelledby="tab-${k}"><div class="sechead"><h2>${k==="s"?"Shooting":k==="h"?"Handling":"Finishing"} ladder</h2></div>
@@ -2746,10 +2771,10 @@ function viewBody(){const open=!!state.rtOpen,g=state.condGrp||"all";
    ${open?`<p class="muted small" style="margin:0">Your recommended workout starts with your warm-up and ends with your cool-down. Pick which ones, or open any routine to run it on its own, like before a game or after club night. Each one is a timer that calls the next move, and tells you when to switch sides.</p>${grp("warm")}${grp("cool")}`
     :`<div class="list">${drillRow(w,1,{why:{k:"fixed",t:"Your warm-up: in every workout"}})}${drillRow(c,2,{why:{k:"fixed",t:"Your cool-down: in every workout"}})}</div>`}</section>
    <section class="condrow"><div class="sechead"><h2>Athletic drills</h2></div>
-   <p class="muted small" style="margin:0">Footwork, defense, jumping, speed and strength, all solo. Hands-free while you move: each set starts on a beep, and anything to log is asked in the rest with big buttons. Every drill shows how well it's backed: <b>Studied</b> (trials found it works), <b>Injury prevention</b> (part of programs that cut injuries) or <b>Coaching</b> (standard practice, no trial). The dots show difficulty.</p>
+   <p class="muted small" style="margin:0">Footwork, defense, jumping, speed and strength, all solo.</p>${fold("condhow","How these drills work","Hands-free · tags explained",`<p class="muted small" style="margin:0">Hands-free while you move: each set starts on a beep, and anything to log is asked in the rest with big buttons. Every drill shows how well it's backed: <b>Studied</b> (trials found it works), <b>Injury prevention</b> (part of programs that cut injuries) or <b>Coaching</b> (standard practice, no trial). The dots show difficulty.</p>`,false)}
    <div class="chips" role="group" aria-label="Group">${[["all","All"],...Object.entries(CGR)].map(([k,v])=>`<button class="chip" data-cond="g:${k}" aria-pressed="${k===g}">${v}</button>`).join("")}</div>
    <p class="small muted" style="margin:0">${esc(CGB[g])}</p>
-   ${legCard()}${g==="all"||g==="fd"?`<p class="small muted" style="margin:0">Film Reads plays clips of you from your clip library, on the <a href="#form" class="linkbtn" style="padding:0">Form tab</a>. Read the Move, its off-court version, is in <a href="#coach" class="linkbtn" style="padding:0">Coach › Film room</a>.</p>`:""}
+   ${(()=>{const c=legCaps(),t=legLoad(today());return fold("legload","Leg load today",`Jumps ${t.j}/${c.j} · hard min ${Math.round(t.h*10)/10}/${c.h}`,legCard(),false)})()}${g==="all"||g==="fd"?`<p class="small muted" style="margin:0">Film Reads plays clips of you from your clip library, on the <a href="#form" class="linkbtn" style="padding:0" data-gofold="clips">Form tab</a>. Read the Move, its off-court version, is in <a href="#coach" class="linkbtn" style="padding:0">Coach › Film room</a>.</p>`:""}
    <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true,why:why(d)})).join("")}</div></section></div>`}
 document.addEventListener("click",e=>{const t=e.target.closest("[data-cond]");if(!t)return;const [k,a,b]=t.dataset.cond.split(":");
   if(k==="g")state.condGrp=a;else if(k==="rt")state.rtOpen=!state.rtOpen;
@@ -2782,7 +2807,7 @@ function viewProgress(){
      `<section><div class="sechead"><h2>Trend</h2><div class="legend"><span><i style="background:var(--accent)"></i>3PT %</span><span><i style="background:var(--read)"></i>FT %</span></div></div>
    ${series.length>=2?`<div class="card">${spark(series)}</div>`:`<div class="empty">Log the 5-Spot 3s on two different days and your 3-point trend line shows up here.</div>`}</section>`].filter(Boolean);
     const empty=x=>x.includes('class="empty"')&&!/class="(card|stats|stat)[ "]/.test(x),full=parts.filter(x=>!empty(x)),wait=parts.filter(empty);
-    return full.join("")+(wait.length?`<section><details class="fills"><summary><span>Fills in as you log</span><span class="muted small">${wait.length} more</span></summary>${wait.join("")}</details></section>`:"")})()}
+    return full.join("")+(wait.length?`<section>${fold("fills","Fills in as you log",`${wait.length} more`,wait.join(""),false)}</section>`:"")})()}
   <section><div class="sechead"><h2>Sessions</h2><span class="muted small">${shots} shots logged</span></div>
    ${progHeat()}
    ${recent.length?`<div class="card hist">${recent.map(se=>`<div><span>${new Date(se.d+"T12:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><span class="muted">${se.items.length} drill${se.items.length>1?"s":""}</span><b class="num">+${se.items.reduce((a,it)=>a+it.xp,0)} XP</b></div>`).join("")}</div>`:`<div class="empty">No sessions yet. Finish any drill on the Today tab and it's logged here with the XP you earned.</div>`}</section>
@@ -2843,6 +2868,21 @@ function render(){planRoll();renderPlate();
    It shares that dock with the music controls (Android app): workout row on top in orange, music row under it in white,
    drawn as one card. "Playing" is kept for music only. Hidden on Today while the Up next button is on screen,
    and under any sheet (sheets cover it). Nothing in it can be tapped mid-drill: it never shows over a drill screen. */
+/* Folds: multi-open accordion sections (each opens on its own, never closes another). The closed header always says
+   what's inside ("My videos · 3 clips"), and each fold remembers open/closed on this phone. Never used on Today,
+   drill sheets or the player, so a fold never costs a tap mid-workout. Opens in ~200 ms; instant with reduced motion. */
+const FOLDK="hoopsLadder.folds";let FOLDS={};try{FOLDS=JSON.parse(localStorage.getItem(FOLDK)||"{}")||{}}catch(e){}
+const foldOpen=(k,def)=>k in FOLDS?!!FOLDS[k]:!!def;
+const CHEV=`<svg class="fchev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function fold(k,title,sum,body,def){return `<details class="fold" data-fold="${k}"${foldOpen(k,def)?" open":""}><summary><span class="fh">${title}</span><span class="fsum">${sum}</span>${CHEV}</summary><div class="fbody">${body}</div></details>`}
+function foldSet(k,v){FOLDS[k]=v;try{localStorage.setItem(FOLDK,JSON.stringify(FOLDS))}catch(e){}}
+document.addEventListener("click",e=>{const sm=e.target.closest("details.fold>summary");if(!sm)return;const d=sm.parentElement,b=d.querySelector(":scope>.fbody");e.preventDefault();
+  const opening=!d.open;foldSet(d.dataset.fold,opening);
+  const still=matchMedia("(prefers-reduced-motion: reduce)").matches||!b||!b.animate;
+  if(opening){d.open=true;if(still)return;const h=b.scrollHeight;b.animate([{height:"0px",opacity:0},{height:h+"px",opacity:1}],{duration:200,easing:"ease-out"})}
+  else{if(still){d.open=false;return}const h=b.scrollHeight;const a=b.animate([{height:h+"px",opacity:1},{height:"0px",opacity:0}],{duration:150,easing:"ease-in"});a.onfinish=()=>{d.open=false}}});
+document.addEventListener("click",e=>{const a=e.target.closest("[data-gofold]");if(a){foldSet(a.dataset.gofold,true)}});
+function openFold(k){foldSet(k,true);const d=document.querySelector(`details.fold[data-fold="${k}"]`);if(d)d.open=true}
 let wkObs=null;
 function wkBar(){let el=document.getElementById("wkbar");if(!el){el=document.createElement("div");el.id="wkbar";el.className="wk-bar";el.setAttribute("role","region");el.setAttribute("aria-label","Workout");document.body.appendChild(el);
     el.addEventListener("click",e=>{const b=e.target.closest("[data-wk]");if(!b)return;const ids=b.dataset.wk.split(",");const d=D[ids[0]];if(!d)return;if(d.log==="timer"||d.log==="react")startPlayer(ids,false);else openRunner(ids[0])})}
@@ -3486,7 +3526,7 @@ function act(k){
   if(k==="keep"){R.confirm=false;return drawDock()}
   if(k==="anyway"){CAP_ANY[d.id]=today();return openRunner(d.id)}
   if(k==="clips")return d.clips==="film"?openFilm():openReadMove();
-  if(k==="cliplib"){if(CL.list.length>=CLIP_MIN)return openLib();closeRunner(true);location.hash="#form";setTimeout(()=>document.getElementById("cliplib")?.scrollIntoView({block:"start"}),120);return}
+  if(k==="cliplib"){if(CL.list.length>=CLIP_MIN)return openLib();closeRunner(true);foldSet("clips",true);location.hash="#form";setTimeout(()=>document.getElementById("cliplib")?.scrollIntoView({block:"start"}),120);return}
   if(k==="discard"){return closeRunner(true)}
   if(k==="make"||k==="miss"){
     const hit=k==="make";
@@ -3967,9 +4007,8 @@ const fsReduce=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
 let fsCopyText="";
 /* Coach › Film room: the read drills that play clips of you, next to Film study. Read the Move works anywhere; Film Reads is on court. */
 function filmRoom(){const ds=DRILLS.filter(d=>d.clips==="read");
-  return `<section><div class="sechead"><h2>Film room</h2><span class="muted small">your own clips</span></div>
-   <div class="list">${ds.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div>
-   <p class="small muted" style="margin:0">Plays clips of you from your clip library, on the <a href="#form" class="linkbtn" style="padding:0">Form tab</a>.</p></section>`}
+  return `<section>${fold("filmroom","Film room",`Read the Move · ${CL.list.length>=CLIP_MIN?"ready":"needs your clips"}`,`<div class="list">${ds.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div>
+   <p class="small muted" style="margin:0">Plays clips of you from your clip library, on the <a href="#form" class="linkbtn" style="padding:0" data-gofold="clips">Form tab</a>.</p>`,false)}</section>`}
 function filmCard(){const f=fsLog(),lv=f.lv,extra=Object.keys(f.dia).length+Object.keys(f.flag).length;
   return `<section><div class="sechead"><h2>Film study</h2><div class="seg" role="group" aria-label="Film study level">${["B","I"].map(k=>`<button data-fs="lv:${k}" aria-pressed="${lv===k}">${FS_LV[k]}</button>`).join("")}</div></div>
    <p class="muted small" style="margin:0">Make the read on real film. A breakdown by an NBA, pro or college player plays muted and stops at the decision. You pick, then hear them explain it. ${lv==="B"?"Basics plays the starter moments and highlights the players who matter.":"Intermediate adds pick and roll and help reads, and highlights nobody, so spotting who matters is part of the read."}</p>
@@ -4371,10 +4410,10 @@ const focusSort=M=>{const f=focusSet();return [...M].sort((a,b)=>f.has(b.label)-
 /* My videos: clips you film of yourself, kept on this phone. Lives on Form, beside form check; clips filmed for a coach's drill stay under that drill on Coach. */
 function myVideos(){if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
   const free=CO.vids.filter(v=>!v.item||(!coFind(v.item)&&!(CO.wiz&&v.item===CO.wiz.id)));
-  return `<section><div class="sechead"><h2>My videos</h2>${CO.vids.length?`<span class="muted small">${CO.vids.length} clip${CO.vids.length>1?"s":""}${CO.usage?` · ${fmtMB(CO.vids.reduce((a,v)=>a+v.size,0))}`:""}</span>`:""}</div>
+  return `<section>${fold("vids","My videos",CO.vids.length?`${CO.vids.length} clip${CO.vids.length>1?"s":""}${CO.usage?` · ${fmtMB(CO.vids.reduce((a,v)=>a+v.size,0))}`:""}`:"No clips yet",`
    <div class="row">${recCtl("","pri small")}<label class="btn sec small filebtn" for="coPick" data-hw="pick:">Add a clip</label></div>
    ${CO.vidErr?`<div class="empty">${esc(CO.vidErr)}</div>`:free.length?`<div class="vgrid">${free.map(vCard).join("")}</div>`:CO.vids.length?"":`<div class="empty">Film your reps to watch them back, slow them down, or show your coach next session. Clips you film for a drill on your list show up under that drill.</div>`}
-   <p class="muted small" style="margin:0">Videos are kept only on this phone and are never uploaded. Deleting the app deletes them, so use Save to phone for any you want to keep.</p></section>
+   <p class="muted small" style="margin:0">Videos are kept only on this phone and are never uploaded. Deleting the app deletes them, so use Save to phone for any you want to keep.</p>`,false)}</section>
    <input type="file" id="coCap" accept="video/*" capture="environment" hidden><input type="file" id="coPick" accept="video/*" hidden>`}
 function viewForm(){
   const hand=S.settings.hand||"R",res=FC.res,busy=FC.status==="busy";
@@ -4400,7 +4439,7 @@ function viewForm(){
   ${(res&&res.ok)||FC.status==="nopose"?`<section>${FC.canCoach?`<button class="btn sec" data-coach="1" ${FC.coachBusy?"disabled":""}>Ask the coach about this shot</button>`:""}${FC.coach?`<div class="card coach" id="fcCoach">${esc(FC.coach)}</div>`:""}</section>`:""}
   <section><div class="sechead"><h2>Recent checks</h2></div>${hist.length?`<div class="card hist">${hist.map(h=>`<div><span>${new Date(h.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="muted">${h.w==="b"?`Behind · elbow ${h.v.bElbow>0?"+":""}${h.v.bElbow}° · ball line ${h.v.bLine>0?"+":""}${h.v.bLine}%`:`Line ${h.v.drift>0?"+":""}${h.v.drift}% · arm ${h.v.ext}° · timing ${h.v.seq>=0?"+":""}${h.v.seq}s${h.v.entry!=null?` · entry ${h.v.entry}°`:h.v.arc!=null?` · arc ${h.v.arc}°`:""}`}</span><b class="num">${Object.values(h.st).filter(x=>x==="good").length}/${Object.keys(h.st).length}</b></div>`).join("")}</div>`:`<div class="empty">Your form checks show up here so you can see if your balance and timing improve.</div>`}</section>
   ${myVideos()}
-  <section id="cliplib"><div class="sechead"><h2>Clip library</h2><span class="muted small">for Film Reads and Read the Move</span></div>${clipCard()}</section>`}
+  <section id="cliplib">${fold("clips","Clip library",`${CL.list.length} of ${FMV.length*TAKES} takes · Film Reads, Read the Move`,clipCard(),false)}</section>`}
 async function afterFormRender(){if(state.tab!=="form"||!FC.res||!FC.res.ok)return;const cv=$("#fcCanvas");if(!cv)return;
   cv.onclick=FC.arcMode?arcTap:null;cv.style.cursor=FC.arcMode?"crosshair":"";
   if(FC.arcMode)await drawArc(cv);else await drawFrame(FC.idx,cv)}
