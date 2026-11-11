@@ -167,6 +167,18 @@ section{display:flex;flex-direction:column;gap:10px}
 .hist{display:flex;flex-direction:column}
 .hist div{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
 .hist div:last-child{border-bottom:0}
+.heat{display:grid;grid-template-columns:auto 1fr;gap:6px}
+.heat .dl{display:grid;grid-template-rows:repeat(7,1fr);gap:3px;font-size:10px;color:var(--muted);line-height:1}
+.heat .dl span{display:flex;align-items:center;height:100%}
+.heat .wk{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:3px}
+.heat .wk i{display:block;aspect-ratio:1;border-radius:3px;background:var(--surface-2);border:1px solid var(--line);cursor:pointer;padding:0}
+.heat .wk i.l1{background:color-mix(in srgb,var(--muted) 30%,var(--surface-2));border-color:transparent}
+.heat .wk i.l2{background:color-mix(in srgb,var(--muted) 55%,var(--surface-2));border-color:transparent}
+.heat .wk i.l3{background:color-mix(in srgb,var(--muted) 85%,var(--surface-2));border-color:transparent}
+.heat .wk i.fut{visibility:hidden}
+.heat .wk i.sel{outline:2px solid var(--ink);outline-offset:1px}
+.heatcap{min-height:1.4em;margin:8px 0 0}
+.linkbtn.heatbtn{color:var(--muted);font-weight:600;font-size:13px;text-decoration:underline;text-underline-offset:3px}
 .empty{border:1px dashed var(--line);border-radius:var(--r);padding:16px;color:var(--muted);font-size:14px;text-align:center}
 
 /* tabbar */
@@ -2315,9 +2327,27 @@ function viewProgress(){
   <section><div class="sechead"><h2>Trend</h2><div class="legend"><span><i style="background:var(--accent)"></i>3PT %</span><span><i style="background:var(--read)"></i>FT %</span></div></div>
    ${series.length>=2?`<div class="card">${spark(series)}</div>`:`<div class="empty">Log the 5-Spot 3s on two different days and your 3-point trend line shows up here.</div>`}</section>
   <section><div class="sechead"><h2>Sessions</h2><span class="muted small">${shots} shots logged</span></div>
+   ${progHeat()}
    ${recent.length?`<div class="card hist">${recent.map(se=>`<div><span>${new Date(se.d+"T12:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><span class="muted">${se.items.length} drill${se.items.length>1?"s":""}</span><b class="num">+${se.items.reduce((a,it)=>a+it.xp,0)} XP</b></div>`).join("")}</div>`:`<div class="empty">No sessions yet. Finish any drill on the Today tab and it's logged here with the XP you earned.</div>`}</section>
   ${progPicks()}`}
 
+/* Session calendar: the last 16 weeks, shaded by drills done that day. Hidden until asked for, with no streak or
+   run-length count, so it reads as a log and never as a chain to keep alive. */
+const HEAT_WEEKS=16;
+function heatDays(){const by={};for(const se of S.sessions){if(!se.items.length)continue;const b=by[se.d]||(by[se.d]={n:0,xp:0});b.n+=se.items.length;b.xp+=se.items.reduce((a,it)=>a+(it.xp||0),0)}return by}
+function heatCap(k,b){const d=new Date(k+"T12:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});return b?`${d} · ${b.n} drill${b.n>1?"s":""} · +${b.xp} XP`:`${d} · rest day`}
+function progHeat(){
+  if(!S.settings.heat)return `<button class="linkbtn heatbtn" data-heat="1" aria-expanded="false">Show session calendar</button>`;
+  const by=heatDays(),now=new Date(),dow=(now.getDay()+6)%7,start=new Date(now);start.setDate(now.getDate()-dow-(HEAT_WEEKS-1)*7);
+  const tk=today(),cells=[];let active=0;
+  for(let i=0;i<HEAT_WEEKS*7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=dkey(d),b=by[k];
+    if(k>tk){cells.push(`<i class="fut" aria-hidden="true"></i>`);continue}
+    if(b)active++;const l=!b?"":b.n>=5?"l3":b.n>=3?"l2":"l1";
+    cells.push(`<i class="${l}" role="img" data-hday="${k}" aria-label="${esc(heatCap(k,b))}"></i>`)}
+  const dl="M,,W,,F,,".split(",").map(x=>`<span>${x}</span>`).join("");
+  return `<div class="card"><div class="heat"><div class="dl" aria-hidden="true">${dl}</div><div class="wk" role="group" aria-label="Sessions over the last ${HEAT_WEEKS} weeks">${cells.join("")}</div></div>
+   <p class="muted small heatcap" id="heatCap">${active} training day${active===1?"":"s"} in the last ${HEAT_WEEKS} weeks. Darker means more drills. Tap a day for details. Rest days are part of training.</p>
+   <button class="linkbtn heatbtn" data-heat="0" aria-expanded="true">Hide calendar</button></div>`}
 function progConsistency(){const days=state.range==="30"?30:0,fresh=drillPct(["s_5spot"],days),cold=drillPct(["s_cold"],days),tired=drillPct(["s_tired"],days),bs=bestStreak(days),ss=spotStreaks(days);
   const gap=(x,lab)=>x.a&&fresh.a?`${lab} ${x.p<=fresh.p?`${fresh.p-x.p} points below`:`${x.p-fresh.p} points above`} your fresh 5-Spot ${fresh.p}%.`:"";
   const notes=[gap(cold,"Cold, you shoot"),gap(tired,"Tired, you shoot")].filter(Boolean).join(" ");
@@ -2354,7 +2384,9 @@ function render(){renderPlate();
   document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"))}
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-open],[data-mins],[data-dtab],[data-range],[data-hand],[data-jump],[data-coach],[data-play],[data-cue],[data-arc],[data-fcview],[data-arcd]");if(!t)return;
+  const t=e.target.closest("[data-open],[data-mins],[data-dtab],[data-range],[data-hand],[data-jump],[data-coach],[data-play],[data-cue],[data-arc],[data-fcview],[data-arcd],[data-heat],[data-hday]");if(!t)return;
+  if(t.dataset.heat){S.settings.heat=t.dataset.heat==="1";persist();render();return}
+  if(t.dataset.hday){const by=heatDays(),c=$("#heatCap");document.querySelectorAll(".heat .sel").forEach(x=>x.classList.remove("sel"));t.classList.add("sel");if(c)c.textContent=heatCap(t.dataset.hday,by[t.dataset.hday]);return}
   if(t.dataset.fcview){S.settings.fcView=t.dataset.fcview;persist();reView();return}
   if(t.dataset.arcd){S.settings.arcDist=+t.dataset.arcd;persist();if(FC.arc&&!FC.arc.err){FC.arc.dist=S.settings.arcDist;FC.arc.entry=entryOf(FC.arc.launch,FC.arc.dist);const f=(S.forms||[])[S.forms.length-1];if(f&&f.t>=(FC.savedAt||0)){f.v.entry=FC.arc.entry;f.v.ad=FC.arc.dist;persist()}}render();return}
   if(t.dataset.cue){S.settings.cue={d:today(),i:+t.dataset.cue};persist();render();return}
