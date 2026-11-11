@@ -5402,8 +5402,10 @@ function sesOpen(o={}){const s=sesCur();if(SES){SES.el.hidden=false}else{const e
   sesDraw();sesPill()}
 function sesHide(){if(!SES)return;sesStopCam();sesRwStop();sesStopTalk();SES.el.remove();SES=null;if(!document.querySelector(".covid")&&(!$("#sheet")||$("#sheet").hidden))document.body.style.overflow="";sesPill();if(state.tab==="coach")render()}
 window.sesBack=function(){if(!SES)return false;const v=SES.v;if(/^sx/.test(v)||v==="setup"&&sesQ.length)return sesXBack();if(sesPzBack(v))return true;
-  if(v==="rec"){sesRecStop(false);return true}if(v==="talk"){sesStopTalk();SES.v=SES.back||"board";sesDraw();return true}
-  if(v==="replay"||v==="cmp"||v==="link"||v==="hw"){SES.v=v==="cmp"?"replay":v==="hw"&&SES.hw&&SES.hw.from==="wrap"?"wrap":"board";sesDraw();return true}
+  // Back keeps a recording that has started (Delete is on the replay) and cancels one still counting down.
+  if(v==="rec"){const R=SES.rec;sesRecStop(!!(R&&R.mr&&R.mr.state==="recording"));return true}if(v==="saving")return true;
+  if(v==="talk"){sesStopTalk();SES.v=SES.back||"board";sesDraw();return true}
+  if(v==="replay"||v==="cmp"||v==="link"||v==="hw"){SES.v=v==="cmp"?"replay":v==="hw"?(SES.hw&&SES.hw.from)||"board":v==="replay"&&SES.repFrom==="wrap"&&(sesFind(SES.sid)||{}).end?"wrap":"board";sesDraw();return true}
   sesHide();return true};
 function sesStart(){const st=SES.set,name=(st.coach||"").trim();
   const s={id:uid("s"),t:Date.now(),last:Date.now(),coach:name,mode:st.mode,rw:st.mode==="prop"&&!!st.rw,topics:[],cur:-1,from:st.from||null};
@@ -5910,7 +5912,7 @@ function sesClick(e){const b=e.target.closest("[data-x]");if(!b||!SES)return;if(
    case"link":SES.link={url:"",title:"",a:0,b:0};SES.v="link";return sesDraw();
    case"linksave":{const k=SES.link;if(!k||!/^https?:\/\//i.test(k.url)){SES.msg="Paste a link that starts with http.";return sesDraw()}let t=sesTop(s);if(!t)t=sesNewTopic(s);
      t.pieces.push({id:uid("p"),k:"l",url:k.url,title:k.title||"",a:k.a||0,b:k.b>k.a?k.b:0,t:Date.now()});if(!t.name&&k.title)t.name=k.title;sesTouch(s);SES.link=null;SES.v="board";SES.msg="Link added.";return sesDraw()}
-   case"play":SES.p=id;SES.v="replay";return sesDraw();
+   case"play":SES.repFrom=SES.v==="wrap"?"wrap":"board";SES.p=id;SES.v="replay";return sesDraw();
    case"replay":SES.v="replay";return sesDraw();
    case"board":SES.v="board";return sesDraw();
    case"cur":{const i=s.topics.findIndex(x=>x.id===id);if(i>=0&&!s.end){s.cur=i;sesTouch(s)}return sesDraw()}
