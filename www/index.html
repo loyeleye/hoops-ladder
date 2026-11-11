@@ -55,6 +55,7 @@ main{padding-block:12px 112px;display:flex;flex-direction:column;gap:18px}
 .fold>.fbody>.card,.fold>.fbody>.legcard{border:0;padding:0;background:none;box-shadow:none}
 @media (prefers-reduced-motion:reduce){.fold .fchev{transition:none}}
 .fold .fbody>.card>.label:first-child{display:none}
+.fold .fsum .warn{color:var(--warn);font-weight:700}
 .dsearch{position:relative}.dsearch input{width:100%;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0 40px 0 16px;font:500 15px var(--body)}
 .dsearch input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
 .dsearch button{position:absolute;right:4px;top:4px;width:36px;height:36px;border:0;border-radius:18px;background:none;color:var(--muted);font-size:18px}
@@ -2774,7 +2775,7 @@ function viewBody(){const open=!!state.rtOpen,g=state.condGrp||"all";
    <p class="muted small" style="margin:0">Footwork, defense, jumping, speed and strength, all solo.</p>${fold("condhow","How these drills work","Hands-free · tags explained",`<p class="muted small" style="margin:0">Hands-free while you move: each set starts on a beep, and anything to log is asked in the rest with big buttons. Every drill shows how well it's backed: <b>Studied</b> (trials found it works), <b>Injury prevention</b> (part of programs that cut injuries) or <b>Coaching</b> (standard practice, no trial). The dots show difficulty.</p>`,false)}
    <div class="chips" role="group" aria-label="Group">${[["all","All"],...Object.entries(CGR)].map(([k,v])=>`<button class="chip" data-cond="g:${k}" aria-pressed="${k===g}">${v}</button>`).join("")}</div>
    <p class="small muted" style="margin:0">${esc(CGB[g])}</p>
-   ${(()=>{const c=legCaps(),t=legLoad(today());return fold("legload","Leg load today",`Jumps ${t.j}/${c.j} · hard min ${Math.round(t.h*10)/10}/${c.h}`,legCard(),false)})()}${g==="all"||g==="fd"?`<p class="small muted" style="margin:0">Film Reads plays clips of you from your clip library, on the <a href="#form" class="linkbtn" style="padding:0" data-gofold="clips">Form tab</a>. Read the Move, its off-court version, is in <a href="#coach" class="linkbtn" style="padding:0">Coach › Film room</a>.</p>`:""}
+   ${(()=>{const c=legCaps(),t=legLoad(today());return fold("legload","Leg load today",`${t.j>=c.j*.8||t.h>=c.h*.8?`<span class="warn">`:"<span>"}Jumps ${t.j}/${c.j} · hard min ${Math.round(t.h*10)/10}/${c.h}</span>`,legCard(),false)})()}${g==="all"||g==="fd"?`<p class="small muted" style="margin:0">Film Reads plays clips of you from your clip library, on the <a href="#form" class="linkbtn" style="padding:0" data-gofold="clips">Form tab</a>. Read the Move, its off-court version, is in <a href="#coach" class="linkbtn" style="padding:0">Coach › Film room</a>.</p>`:""}
    <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true,why:why(d)})).join("")}</div></section></div>`}
 document.addEventListener("click",e=>{const t=e.target.closest("[data-cond]");if(!t)return;const [k,a,b]=t.dataset.cond.split(":");
   if(k==="g")state.condGrp=a;else if(k==="rt")state.rtOpen=!state.rtOpen;
@@ -2877,10 +2878,15 @@ const CHEV=`<svg class="fchev" viewBox="0 0 16 16" width="16" height="16" aria-h
 function fold(k,title,sum,body,def){return `<details class="fold" data-fold="${k}"${foldOpen(k,def)?" open":""}><summary><span class="fh">${title}</span><span class="fsum">${sum}</span>${CHEV}</summary><div class="fbody">${body}</div></details>`}
 function foldSet(k,v){FOLDS[k]=v;try{localStorage.setItem(FOLDK,JSON.stringify(FOLDS))}catch(e){}}
 document.addEventListener("click",e=>{const sm=e.target.closest("details.fold>summary");if(!sm)return;const d=sm.parentElement,b=d.querySelector(":scope>.fbody");e.preventDefault();
-  const opening=!d.open;foldSet(d.dataset.fold,opening);
+  /* d._want is where the fold is heading; a second tap mid-animation reverses it from its current height */
+  const opening=!(d._want??d.open);d._want=opening;foldSet(d.dataset.fold,opening);
   const still=matchMedia("(prefers-reduced-motion: reduce)").matches||!b||!b.animate;
-  if(opening){d.open=true;if(still)return;const h=b.scrollHeight;b.animate([{height:"0px",opacity:0},{height:h+"px",opacity:1}],{duration:200,easing:"ease-out"})}
-  else{if(still){d.open=false;return}const h=b.scrollHeight;const a=b.animate([{height:h+"px",opacity:1},{height:"0px",opacity:0}],{duration:150,easing:"ease-in"});a.onfinish=()=>{d.open=false}}});
+  const from=d.open&&b?b.getBoundingClientRect().height:0;if(d._anim){d._anim.onfinish=null;d._anim.cancel();d._anim=null}
+  const done=()=>{d._anim=null;d._want=undefined};
+  if(opening){d.open=true;if(still)return done();const h=b.scrollHeight;const a=d._anim=b.animate([{height:from+"px",opacity:from?1:0},{height:h+"px",opacity:1}],{duration:200*(1-from/Math.max(h,1)),easing:"ease-out"});a.onfinish=done}
+  else{if(still){d.open=false;return done()}const a=d._anim=b.animate([{height:from+"px",opacity:1},{height:"0px",opacity:0}],{duration:150,easing:"ease-in"});a.onfinish=()=>{d.open=false;done()}}});
+/* also save state when a fold opens without a tap (find-in-page, openFold) */
+document.addEventListener("toggle",e=>{const d=e.target;if(d.matches?.("details.fold")&&d._want===undefined&&d.dataset.fold)foldSet(d.dataset.fold,d.open)},true);
 document.addEventListener("click",e=>{const a=e.target.closest("[data-gofold]");if(a){foldSet(a.dataset.gofold,true)}});
 function openFold(k){foldSet(k,true);const d=document.querySelector(`details.fold[data-fold="${k}"]`);if(d)d.open=true}
 let wkObs=null;
