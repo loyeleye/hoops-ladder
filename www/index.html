@@ -104,8 +104,13 @@ html{scroll-padding-top:calc(var(--plate-h,60px) + 12px)}
 .sktabs .ind{position:absolute;left:0;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--sk,var(--accent));pointer-events:none;transition:transform .24s cubic-bezier(.2,.8,.2,1),width .24s cubic-bezier(.2,.8,.2,1),background-color .24s}
 
 /* Level plate: level badge, rank and one thin bar for overall progress; the chevron opens a row of skill rings (progress, not XP numbers). */
-.plate .wrap:first-child .lvl{grid-row:auto;width:40px;height:40px;border:2px solid var(--accent);background:rgb(242 245 250/.06)}
-.plate .wrap:first-child .lvl b{font-size:18px}
+/* Overall level as a big jersey number with a thin divider, so it reads differently from the skill rings. On level-up it rolls like a scoreboard. */
+.plate .wrap:first-child .lvl{grid-row:auto;width:auto;height:44px;border-radius:0;padding-right:14px;border-right:1px solid rgb(242 245 250/.18);overflow:hidden;align-content:center}
+.plate .wrap:first-child .lvl b{font-size:38px;color:var(--accent);display:block;line-height:44px}
+.plate .lvl .roll{display:grid}.plate .lvl .roll b{grid-area:1/1}
+.plate .lvl .roll b:first-child{animation:lvOut .5s .25s cubic-bezier(.5,0,.2,1) both}.plate .lvl .roll b:last-child{animation:lvIn .5s .25s cubic-bezier(.5,0,.2,1) both}
+@keyframes lvOut{to{transform:translateY(-100%);opacity:0}}@keyframes lvIn{from{transform:translateY(100%);opacity:0}}
+@media (prefers-reduced-motion: reduce){.plate .lvl .roll b{animation:none!important}.plate .lvl .roll b:first-child{display:none}}
 .plate .plhead{min-width:0}.plate .plhead h1{font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .plate .plxp{display:block;height:4px;border-radius:3px;background:rgb(242 245 250/.14);overflow:hidden;margin-top:5px}.plate .plxp i{display:block;height:100%;background:var(--accent);border-radius:3px}
 .plate .skrings{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:110px;padding-top:10px;transition:max-height .2s ease-out,opacity .2s ease-out,padding .2s ease-out}
@@ -2856,15 +2861,15 @@ function skRing(frac,col){const C=2*Math.PI*24;return `<svg viewBox="0 0 54 54" 
 function renderPlate(){
   const o=lvl(S.xp.s+S.xp.h+(S.xp.f||0)+(S.xp.c||0),2), s=lvl(S.xp.s), h=lvl(S.xp.h), f=lvl(S.xp.f||0), c=lvl(S.xp.c||0);
   const sk=[["Shooting",s,"var(--accent)"],["Handling",h,"var(--read)"],["Finishing",f,"var(--good)"],["Conditioning",c,"var(--warn)"]];
-  $("#plate").innerHTML=`<div class="wrap"><div class="lvl" title="Player level"><b>${o.L}</b></div>
+  $("#plate").innerHTML=`<div class="wrap"><div class="lvl" title="Player level ${o.L}">${plateL&&o.L>plateL?`<span class="roll"><b>${o.L-1}</b><b>${o.L}</b></span>`:`<b>${o.L}</b>`}</div>
   <div class="plhead"><h1>${esc(rankOf("o",o.L))}</h1><span class="plxp" role="progressbar" aria-label="Progress to level ${o.L+1}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(100*o.into/o.need)}"><i style="width:${100*o.into/o.need}%"></i></span></div>
   <button class="pltog" type="button" aria-expanded="${plateOpen}" aria-controls="plateskills" aria-label="Skill levels"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <div class="skrings" id="plateskills">${sk.map(([n,v,col])=>`<div class="skr" aria-label="${n} level ${v.L}">${skRing(v.into/v.need,col)}<b>${v.L}</b><span>${n}</span></div>`).join("")}</div>
   ${syncNote?`<div class="syncnote" style="grid-column:1/-1">${esc(syncNote)}</div>`:""}</div>${state.tab==="drills"?skillTabs():""}`;
-  $("#plate").classList.toggle("compact",!plateOpen);placeInd(false)}
+  $("#plate").classList.toggle("compact",!plateOpen);plateL=o.L;placeInd(false)}
 /* Drills tab: the skill switch lives in the sticky plate so it stays reachable while scrolling a long ladder.
    Switching updates the tabs in place (keeps focus, lets the underline slide), re-renders only the list, and remembers each ladder's scroll spot. */
-const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"],["b","Conditioning"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)",b:"var(--warn)"},tabScroll={};let plateOpen=false;
+const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"],["b","Conditioning"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)",b:"var(--warn)"},tabScroll={};let plateOpen=false,plateL=0;
 function skillTabs(){const k=state.drillTab;
   return `<div class="wrap sktabs" role="tablist" aria-label="Skill">${SKT.map(([v,l])=>`<button role="tab" id="tab-${v}" aria-controls="drillpanel" data-dtab="${v}" aria-selected="${k===v}" tabindex="${k===v?0:-1}">${l}</button>`).join("")}<i class="ind" aria-hidden="true"></i></div>`}
 function placeInd(anim){const b=$("#tab-"+state.drillTab),ind=$(".sktabs .ind");if(!b||!ind)return;
