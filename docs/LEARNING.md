@@ -664,3 +664,36 @@ music there.
 
 **Ideas for later** (from the panel): a smaller, dimmer row while you work that grows during rests, and the
 real album art.
+
+## Step 20. Adding a coach's drills one at a time, with videos from YouTube
+
+**Add from your coach** on the Coach tab now has two ways in:
+
+| Mode | What you do |
+|---|---|
+| All at once | The same as before: type, paste or say every drill, one per line |
+| One at a time | Three short steps per drill: **1. Drill** (type or say its name, pick the skill), **2. Video** (find it on YouTube, paste a link, record a clip or attach one from the phone), **3. Goal** (Check off, Makes, Reps, In a row or Time, plus sets). **Save, add another** keeps the same list going |
+
+**Picking a YouTube video.** *Find it on YouTube* opens the YouTube app, already searching for the drill's name.
+Pick the video, tap **Share**, then **Hoops Ladder**: the app comes back with the video on that drill, labelled
+with its title. It works the same from Chrome or any app that shares a link. A link shared while a drill on the
+list is open for editing goes to that drill; with nothing open, it starts a new drill named after the video.
+
+**How it works.** The manifest adds a second `intent-filter` to `MainActivity` for `ACTION_SEND` with
+`text/plain`, which is what makes Hoops Ladder show up in Share menus. The activity is `singleTask`, so a share
+while the app is open comes in through `onNewIntent()`. Capacitor's `BridgeActivity` also passes the intent that
+started the app there, so one place handles both. `HoopsSharePlugin` (`android/.../share/`) sends the link and
+its subject (YouTube puts the video's title there) to the page as a `shared` event, or keeps it for `take()` if
+the page isn't listening yet. When Android rebuilds the app after closing it in the background it hands back the
+old intent, so `onCreate()` drops a share it has already seen. In `native-web/native.js`, section 9 passes each
+share to the page's `coShared()`.
+
+**Nothing gets lost on the way.** The drill you're adding is saved on the phone (`localStorage`,
+`hoopsLadder.coWiz`) on every change, so a trip to YouTube, or Android closing the app while you're there, picks up
+where you left off. Clips recorded for it are tagged with the drill's id before it's saved, so they show up under
+it afterwards. Back steps back through the three steps before it leaves the tab.
+
+**Goals.** They use the same steppers and limits as custom goals on built-in drills (`GL_LIM`: makes and reps move
+by 5, in a row by 1 from 2, time by 15 s). Each saved goal becomes the starting goal for the next drill. Any
+drill on the list can change its goal from **Edit**, including ones added all at once, and the goal shows on the
+list (*20 makes × 3 sets*).

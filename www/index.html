@@ -362,6 +362,19 @@ section{display:flex;flex-direction:column;gap:10px}
 .cofield{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 textarea.cofield{min-height:128px;resize:vertical;line-height:1.4}
 .cofield::placeholder{color:var(--muted);opacity:.8}
+.comode{align-self:flex-start;margin:0 0 10px}
+.wsteps{display:flex;gap:6px;list-style:none;margin:0;padding:0;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.wsteps li{flex:1;border-top:3px solid var(--line);padding-top:6px}
+.wsteps li.done{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.wsteps li.on{border-color:var(--accent);color:var(--ink)}
+.wzhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.wzhead b{font-family:var(--display);font-size:20px;text-transform:uppercase}
+.wznav{display:flex;gap:8px;flex-wrap:wrap}.wznav .btn{flex:1}
+a.btn{display:block;text-align:center;text-decoration:none}
+.chip.lnk{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.hgseg{flex-wrap:wrap;align-self:flex-start;border-radius:16px}
+.hgrow{justify-content:space-between}
+.hw .meta .hggoal{font-weight:700;color:var(--ink)}
 .btn.mic[aria-pressed="true"]{background:var(--bad);color:#fff;border-color:var(--bad)}
 .warnbtn{background:var(--bad)!important;color:#fff!important;border-color:var(--bad)!important}
 .cohome b{font-weight:700}
@@ -3256,7 +3269,12 @@ function arcCard(){const a=FC.arc;let body;
 /* ---------- coach: take-home drills from a coach + my training videos ----------
    Take-home lists live in S.coach with the rest of the progress. Videos never leave the phone: they're kept in this
    device's IndexedDB ("hoopsLadder.videos"), never in S, so progress sync can't carry them anywhere. */
-const CO={draft:"",name:"",open:null,dict:null,vids:[],vidsLoaded:false,vidErr:"",usage:null,thumbs:{},rec:null,view:null,capFor:null,live:null,facing:"environment"};
+const CO={draft:"",name:"",open:null,dict:null,vids:[],vidsLoaded:false,vidErr:"",usage:null,thumbs:{},rec:null,view:null,capFor:null,live:null,facing:"environment",mode:"list",wiz:null};
+/* the one-at-a-time drill being added lives on this device until it's saved, so leaving for YouTube (or the phone
+   closing the app while you're there) doesn't lose it */
+const WZ_LS="hoopsLadder.coWiz";
+try{const w=JSON.parse(localStorage.getItem(WZ_LS)||"null");if(w&&(w.mode==="step"||w.mode==="list")){CO.mode=w.mode;CO.wiz=w.wiz&&w.wiz.id?w.wiz:null}}catch(e){}
+function wzKeep(){try{localStorage.setItem(WZ_LS,JSON.stringify({mode:CO.mode,wiz:CO.wiz}))}catch(e){}}
 const HW_XP=10,REC_MAX=300;
 const coLists=()=>(S.coach&&Array.isArray(S.coach.lists))?S.coach.lists:(S.coach={lists:[]}).lists;
 const coFind=id=>{for(const l of coLists()){const it=l.items.find(x=>x.id===id);if(it)return{l,it}}return null};
@@ -3281,6 +3299,81 @@ function parseDrills(text){const out=[];
     if(!t&&out.length){out[out.length-1].links.push(...links);continue}
     out.push({text:t||"Coach video",links})}
   return out}
+/* goals for take-home drills. Amounts use the custom-goal limits (GL_LIM: step, min, max) so they move the same way */
+const HG={none:{b:"Check off"},makes:{b:"Makes",k:"n",d:20,u:"makes"},reps:{b:"Reps",k:"n",d:20,u:"reps"},row:{b:"In a row",k:"k",d:5,u:"in a row"},time:{b:"Time",k:"sec",d:60}};
+const hgNew=()=>Object.assign({kind:"none",n:20,sets:1},S.coach.def||{});
+function hgText(g){const c=g&&HG[g.kind];if(!c||!c.k)return"";return (g.kind==="time"?fmt(g.n):`${g.n} ${c.u}`)+(g.sets>1?` × ${g.sets} sets`:"")}
+function hgStep(g,op,x){if(op==="k"){if(HG[x]&&g.kind!==x){g.kind=x;if(HG[x].d)g.n=HG[x].d}}
+  else if(op==="n"&&HG[g.kind]?.k){const L=GL_LIM[HG[g.kind].k];g.n=Math.min(L[2],Math.max(L[1],(+g.n||0)+(+x)*L[0]))}
+  else if(op==="s")g.sets=Math.min(10,Math.max(1,(+g.sets||1)+(+x)))}
+const hgStp=(a,b,v,lab)=>`<div class="seg" role="group" aria-label="${lab}"><button data-hw="${a}" aria-label="Less">−</button><button class="num" disabled>${v}</button><button data-hw="${b}" aria-label="More">+</button></div>`;
+/* hw(op,arg) gives the data-hw value for each button */
+function hgCtl(g,hw){const c=HG[g.kind]||HG.none;
+  return `<div class="label">Goal</div><div class="seg hgseg" role="group" aria-label="Goal">${Object.keys(HG).map(k=>`<button data-hw="${hw("k",k)}" aria-pressed="${g.kind===k}">${HG[k].b}</button>`).join("")}</div>
+   ${c.k?`<div class="row hgrow"><span class="small muted">${c.b}</span>${hgStp(hw("n",-1),hw("n",1),c.k==="sec"?fmt(g.n):g.n,c.b)}</div>
+   <div class="row hgrow"><span class="small muted">Sets</span>${hgStp(hw("s",-1),hw("s",1),g.sets||1,"Sets")}</div>`:""}`}
+
+/* ---------- one drill at a time: name, then a YouTube video or your own clip, then its goal ---------- */
+function wzNew(lid,count){return{id:uid("i"),step:0,text:"",skill:"h",skillSet:false,links:[],lid:lid||null,count:count||0,g:hgNew()}}
+function wzUp(){wzKeep();render()}
+const coNameNow=()=>{const nm=$("#coName");return (nm?nm.value:CO.name||"").trim()};
+function wzYt(W){const q=W.text.trim();return "https://www.youtube.com/results?search_query="+encodeURIComponent(q?(/basketball/i.test(q)?q:q+" basketball"):"basketball drill")}
+function wzGo(n){const W=CO.wiz;if(!W)return;n=Math.max(0,Math.min(2,n));
+  if(n>0&&!W.text.trim()){W.step=0;wzUp();toast("Name the drill first","Type or say what your coach called it.");return}
+  dictStop();if(!W.skillSet)W.skill=guessSkill(W.text);W.step=n;wzUp()}
+function wzAddLink(){const W=CO.wiz,inp=$("#wzLink");if(!W||!inp)return;const us=(inp.value.match(URL_RE)||[]).map(u=>u.replace(/[).,;]+$/,""));
+  if(!us.length){toast("That isn't a link","Paste the full link, starting with https://");return}W.links.push(...us.map(u=>({url:u})));wzUp()}
+function wzSave(more){const W=CO.wiz;if(!W)return;if(!W.text.trim()){W.step=0;wzUp();toast("Name the drill first","Type or say what your coach called it.");return}
+  dictStop();const name=coNameNow();let l=W.lid&&coLists().find(x=>x.id===W.lid);
+  if(!l){l={id:uid("l"),t:Date.now(),coach:name,items:[]};coLists().unshift(l)}else if(name)l.coach=name;
+  const it={id:W.id,text:W.text.trim(),links:W.links.slice(),skill:W.skill,done:false};
+  if(HG[W.g.kind]?.k)it.goal={kind:W.g.kind,n:W.g.n,sets:W.g.sets||1};
+  l.items.push(it);CO.name=name;S.coach.lastCoach=name;S.coach.def={kind:W.g.kind,n:W.g.n,sets:W.g.sets||1};persist();
+  const n=l.items.length;CO.wiz=more?wzNew(l.id,n):wzNew();wzUp();
+  toast("Drill saved",`“${it.text}”${it.goal?", "+hgText(it.goal):""}. ${more?`${n} on this list. Add the next one.`:`${n} drill${n>1?"s":""} on this list.`}`);
+  if(more){const el=$("#wzName");if(el)el.focus()}else window.scrollTo({top:0,behavior:"smooth"})}
+function wzHtml(){const W=CO.wiz||(CO.wiz=wzNew()),nat=!!window.Capacitor?.isNativePlatform?.(),clips=CO.vids.filter(v=>v.item===W.id);
+  const steps=["Drill","Video","Goal"].map((s,i)=>`<li class="${i===W.step?"on":i<W.step?"done":""}">${i+1}. ${s}</li>`).join("");
+  const head=`<ol class="wsteps" aria-label="Steps">${steps}</ol><div class="wzhead"><b>Drill ${W.count+1}</b>${W.count?`<span class="small muted">${W.count} saved to this list</span>`:""}</div>`;
+  if(W.step===0)return `${head}
+    <label class="label" for="wzName">What's the drill?</label><input class="cofield" id="wzName" placeholder="For example: Mikan drill, 3 sets of 20" value="${esc(W.text)}" autocomplete="off">
+    ${dictOK()?`<div class="row"><button class="btn sec small mic" id="coMic" data-hw="mic:wzName" aria-pressed="${!!CO.dict}">${CO.dict?"Stop listening":"Say it"}</button><span class="muted small" id="coMicMsg" role="status">${CO.dict?"Listening. Say the drill's name.":""}</span></div>`:""}
+    <div class="label">Counts toward</div><div class="seg" role="group" aria-label="Skill">${["s","h","f"].map(k=>`<button data-hw="wz:sk:${k}" aria-pressed="${W.skill===k}">${SK[k]}</button>`).join("")}</div>
+    <div class="wznav"><button class="btn pri small" data-hw="wz:go:1">Next: video</button></div>
+    ${W.text||W.links.length||clips.length?`<button class="linkbtn" data-hw="wz:clear" style="align-self:flex-start">Start this drill over</button>`:""}`;
+  if(W.step===1)return `${head}
+    <p class="small" style="margin:0">Tag a video for <b>${esc(W.text)}</b>: one from YouTube, or a clip of your own.</p>
+    <a class="btn pri small" href="${esc(wzYt(W))}" target="_blank" rel="noopener" data-ext data-hw="wz:yt">Find it on YouTube</a>
+    <p class="muted small" style="margin:0">${nat?"Pick the video, tap <b>Share</b>, then <b>Hoops Ladder</b>. It comes straight back to this drill.":"Copy the video's link (Share › Copy link), come back here and paste it below."}</p>
+    <div class="row"><input class="cofield" id="wzLink" inputmode="url" placeholder="Or paste a link" style="flex:1;min-width:0"><button class="btn sec small" data-hw="wz:link">Add</button></div>
+    ${W.links.length?`<div class="row small">${W.links.map((l,i)=>`<button class="chip lnk" data-hw="wz:unlink:${i}" aria-label="Remove ${esc(l.title||linkLabel(l.url))}">▶ ${esc(l.title||linkLabel(l.url))} ✕</button>`).join("")}</div>`:""}
+    <div class="row">${recCtl(W.id,"sec small")}<label class="btn sec small filebtn" for="coPick" data-hw="pick:${W.id}">Attach a clip</label></div>
+    ${clips.length?`<div class="vgrid">${clips.map(vCard).join("")}</div>`:""}
+    <div class="wznav"><button class="btn sec small" data-hw="wz:go:0">Back</button><button class="btn pri small" data-hw="wz:go:2">${W.links.length||clips.length?"Next: goal":"Skip: goal"}</button></div>`;
+  return `${head}
+    <p class="small" style="margin:0">Set the goal for <b>${esc(W.text)}</b>. The next drill you add starts from these settings.</p>
+    ${hgCtl(W.g,(op,x)=>`wz:g:${op}:${x}`)}
+    <div class="label">Counts toward</div><div class="seg" role="group" aria-label="Skill">${["s","h","f"].map(k=>`<button data-hw="wz:sk:${k}" aria-pressed="${W.skill===k}">${SK[k]}</button>`).join("")}</div>
+    <div class="wznav"><button class="btn sec small" data-hw="wz:go:1">Back</button><button class="btn pri small" data-hw="wz:save:more">Save, add another</button></div>
+    <button class="btn sec small" data-hw="wz:save:done">Save and finish</button>`}
+/* A link shared into the app (YouTube's Share › Hoops Ladder) goes to the drill you're adding or editing.
+   With neither open, it starts a new drill with that video, named after it. */
+function ytTitle(subject,text){let t=String(subject||"").trim();
+  if(!t)t=String(text||"").replace(URL_RE,"").trim();
+  t=t.replace(/^watch\s+["“](.*)["”]\s+on\s+youtube$/i,"$1").replace(/\s*[-–|]\s*youtube$/i,"").replace(/^["“](.*)["”]$/,"$1").trim();
+  return t.slice(0,120)}
+function coShared(text,subject){const us=(String(text||"").match(URL_RE)||[]).map(u=>u.replace(/[).,;]+$/,""));
+  if(!us.length){toast("Nothing to add","Share a video's link, for example from YouTube.");return}
+  const title=ytTitle(subject,text),add=us.map((u,i)=>Object.assign({url:u},i===0&&title?{title}:{}));
+  const f=CO.mode!=="step"&&CO.open&&coFind(CO.open);let msg;
+  if(f){f.it.links=(f.it.links||[]).concat(add);persist();msg=`Added to “${f.it.text}”.`}
+  else{if(CO.mode!=="step"||!CO.wiz)CO.wiz=CO.wiz||wzNew();CO.mode="step";const W=CO.wiz;W.links.push(...add);
+    if(!W.text.trim()&&title){W.text=title;if(!W.skillSet)W.skill=guessSkill(title)}if(W.text.trim()){if(W.step<1)W.step=1}else W.step=0;
+    msg=W.text.trim()?`Added to “${W.text.trim()}”.`:"Now name the drill."}
+  wzKeep();if(state.tab!=="coach")location.hash="#coach";else render();
+  toast("Video added",msg)}
+window.hoopsShared=coShared;
+
 function coAdd(){const ta=$("#coDraft"),nm=$("#coName");const text=ta?ta.value:CO.draft;const name=(nm?nm.value:CO.name).trim();
   const ds=parseDrills(text);if(!ds.length){toast("Nothing to add","Type or say the drills first, one per line.");return}
   dictStop();
@@ -3307,22 +3400,24 @@ function coEditText(id,v){const f=coFind(id);v=v.trim();if(!f||!v||v===f.it.text
 /* ---------- dictation: the app's own speech plugin when it has one, else the browser's, else the keyboard's mic ---------- */
 const NSR=()=>window.Capacitor?.Plugins?.SpeechRecognition;
 const dictOK=()=>!!(NSR()||((window.SpeechRecognition||window.webkitSpeechRecognition)&&micOK));
-function dictJoin(base,add){add=add.trim();if(!add)return base;return base&&!/\n\s*$/.test(base)?base.replace(/\s+$/,"")+"\n"+add:base+add}
-function dictShow(t){const ta=$("#coDraft");if(!ta||!CO.dict)return;ta.value=dictJoin(CO.dict.base,t);CO.draft=ta.value;ta.scrollTop=ta.scrollHeight}
-function dictBtn(){const b=$("#coMic");if(b){b.setAttribute("aria-pressed",!!CO.dict);b.textContent=CO.dict?"Stop listening":"Say them"}const s=$("#coMicMsg");if(s)s.textContent=CO.dict?"Listening. Pause between drills, or say “next drill”.":""}
-async function dictStart(){const ta=$("#coDraft");if(!ta)return;const base=ta.value;
+function dictJoin(base,add,sep){add=add.trim();if(!add)return base;sep=sep||"\n";return base&&!/\s$/.test(base)?base.replace(/\s+$/,"")+sep+add:base+add}
+const dictEl=()=>$("#"+((CO.dict&&CO.dict.el)||"coDraft"));
+function dictShow(t){const ta=dictEl();if(!ta||!CO.dict)return;const one=CO.dict.el==="wzName";ta.value=dictJoin(CO.dict.base,t,one?" ":"\n");
+  if(one){if(CO.wiz)CO.wiz.text=ta.value;wzKeep()}else{CO.draft=ta.value;ta.scrollTop=ta.scrollHeight}}
+function dictBtn(){const one=$("#wzName")&&!$("#coDraft"),b=$("#coMic");if(b){b.setAttribute("aria-pressed",!!CO.dict);b.textContent=CO.dict?"Stop listening":one?"Say it":"Say them"}const s=$("#coMicMsg");if(s)s.textContent=CO.dict?(one?"Listening. Say the drill's name.":"Listening. Pause between drills, or say “next drill”."):""}
+async function dictStart(elId){elId=elId||"coDraft";const ta=$("#"+elId);if(!ta)return;const base=ta.value;
   const P=NSR();
   if(P){try{const perm=await P.requestPermissions();if(perm&&perm.speechRecognition&&perm.speechRecognition!=="granted"){toast("Mic not allowed","Allow the microphone for Hoops Ladder in your phone's settings, or use your keyboard's mic.");return}
-      CO.dict={native:true,base};dictBtn();await P.removeAllListeners?.();
+      CO.dict={native:true,base,el:elId};dictBtn();await P.removeAllListeners?.();
       P.addListener("partialResults",d=>{const m=d&&d.matches&&d.matches[0];if(m)dictShow(m)});
-      P.addListener("listeningState",d=>{if(d&&d.status==="stopped"&&CO.dict&&CO.dict.native){const ta2=$("#coDraft");CO.dict.base=ta2?ta2.value:CO.dict.base;if(CO.dict.stop){CO.dict=null;dictBtn()}else P.start({language:"en-US",partialResults:true,popup:false}).catch(()=>{CO.dict=null;dictBtn()})}});
+      P.addListener("listeningState",d=>{if(d&&d.status==="stopped"&&CO.dict&&CO.dict.native){const ta2=dictEl();CO.dict.base=ta2?ta2.value:CO.dict.base;if(CO.dict.stop){CO.dict=null;dictBtn()}else P.start({language:"en-US",partialResults:true,popup:false}).catch(()=>{CO.dict=null;dictBtn()})}});
       await P.start({language:"en-US",partialResults:true,popup:false})}
     catch(e){CO.dict=null;dictBtn();toast("Couldn't start the mic","Use the mic on your keyboard instead.")}return}
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;
-  try{const r=new SR();r.continuous=true;r.interimResults=true;r.lang="en-US";CO.dict={r,base};
+  try{const r=new SR();r.continuous=true;r.interimResults=true;r.lang="en-US";CO.dict={r,base,el:elId};
     r.onresult=e=>{let t="";for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;dictShow(t)};
     r.onerror=e=>{if(/not-allowed|service-not-allowed|audio-capture/.test(e.error)){micOK=false;CO.dict=null;dictBtn();render();toast("The mic is blocked here","Tap the mic on your phone's keyboard to say the drills instead.")}};
-    r.onend=()=>{if(!CO.dict||CO.dict.r!==r)return;const ta2=$("#coDraft");CO.dict.base=ta2?ta2.value:CO.dict.base;if(CO.dict.stop){CO.dict=null;dictBtn();return}setTimeout(()=>{if(CO.dict&&CO.dict.r===r)try{r.start()}catch(e){CO.dict=null;dictBtn()}},200)};
+    r.onend=()=>{if(!CO.dict||CO.dict.r!==r)return;const ta2=dictEl();CO.dict.base=ta2?ta2.value:CO.dict.base;if(CO.dict.stop){CO.dict=null;dictBtn();return}setTimeout(()=>{if(CO.dict&&CO.dict.r===r)try{r.start()}catch(e){CO.dict=null;dictBtn()}},200)};
     r.start();dictBtn()}catch(e){CO.dict=null;dictBtn()}}
 function dictStop(){const d=CO.dict;if(!d)return;d.stop=true;try{if(d.r)d.r.stop();else NSR()?.stop()}catch(e){}if(!d.r){CO.dict=null;dictBtn()}}
 
@@ -3348,7 +3443,7 @@ async function saveVid(blob,o={}){toast("Saving…","Keeping the clip on this ph
     const meta={id,t:o.t||Date.now(),dur:Math.round(dur),size:blob.size,type:blob.type||"video/mp4",item:o.item||null,name:o.name||""};
     await vtx("readwrite",(m,bl)=>{m.put(meta);bl.put(blob,id);if(th)bl.put(th,id+":t")});
     try{if(navigator.storage?.persist&&!(await navigator.storage.persisted?.()))await navigator.storage.persist()}catch(e){}
-    await loadVids();const f=meta.item&&coFind(meta.item);toast("Saved on this phone",f?`Clip added to “${f.it.text}”.`:"It's in My videos. It never leaves this phone.")}
+    await loadVids();const f=meta.item&&coFind(meta.item),w=meta.item&&CO.wiz&&CO.wiz.id===meta.item;toast("Saved on this phone",f?`Clip added to “${f.it.text}”.`:w?`Clip attached to “${CO.wiz.text||"this drill"}”.`:"It's in My videos. It never leaves this phone.")}
   catch(e){toast("Couldn't save the clip",e&&e.name==="QuotaExceededError"?"Your phone is out of space for videos. Delete a few clips and try again.":"This browser won't let the app keep videos.")}}
 async function delVid(id){try{await vtx("readwrite",(m,bl)=>{m.delete(id);bl.delete(id);bl.delete(id+":t")})}catch(e){}if(CO.thumbs[id])URL.revokeObjectURL(CO.thumbs[id]);delete CO.thumbs[id];closeVid();await loadVids()}
 const fmtDur=s=>s?`${Math.floor(s/60)}:${String(Math.round(s)%60).padStart(2,"0")}`:"";
@@ -3364,8 +3459,8 @@ function recCtl(item,cls){return camLive()?`<button class="btn ${cls}" data-hw="
 /* recorder */
 function pickMime(){for(const t of["video/mp4;codecs=avc1","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"])try{if(MediaRecorder.isTypeSupported(t))return t}catch(e){}return""}
 async function openRec(item){closeVid();dictStop();const el=document.createElement("div");el.className="covid corec";el.setAttribute("role","dialog");el.setAttribute("aria-label","Record a training video");
-  const f=item&&coFind(item);
-  el.innerHTML=`<div class="bar"><button class="btn sec small" data-rc="close">Close</button><span class="small">${f?esc(f.it.text):"New clip"}</span><button class="btn sec small" data-rc="flip">Flip</button></div>
+  const f=item&&coFind(item),wl=item&&CO.wiz&&CO.wiz.id===item&&CO.wiz.text;
+  el.innerHTML=`<div class="bar"><button class="btn sec small" data-rc="close">Close</button><span class="small">${f?esc(f.it.text):wl?esc(wl):"New clip"}</span><button class="btn sec small" data-rc="flip">Flip</button></div>
    <video id="coLive" autoplay muted playsinline></video>
    <div class="bar recbar"><span class="num rect" id="coRecT">0:00</span><button class="recbtn" data-rc="go" aria-label="Start recording"><i></i></button><span class="small recnote">Saved on this phone only</span></div>`;
   document.body.appendChild(el);document.body.style.overflow="hidden";CO.rec={el,item,chunks:[],mr:null,stream:null,t0:0,timer:0};await recStream()}
@@ -3447,17 +3542,18 @@ document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(CO.view)cl
 
 /* ---------- the Coach tab ---------- */
 const CHECK_SVG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
-function hwLinks(it){return (it.links||[]).map(l=>safeUrl(l.url)?`<a href="${esc(l.url)}" target="_blank" rel="noopener">▶ ${esc(linkLabel(l.url))}</a>`:"").join("")}
+function hwLinks(it){return (it.links||[]).map(l=>safeUrl(l.url)?`<a href="${esc(l.url)}" target="_blank" rel="noopener">▶ ${esc(l.title||linkLabel(l.url))}</a>`:"").join("")}
 function hwRow(it){const open=CO.open===it.id,clips=CO.vids.filter(v=>v.item===it.id);
   return `<div class="hw${it.done?" done":""}">
    <button class="hwchk" data-hw="tog:${it.id}" aria-pressed="${!!it.done}" aria-label="${it.done?"Mark not done":"Mark done"}: ${esc(it.text)}">${CHECK_SVG}</button>
-   <div><div class="hwtext">${esc(it.text)}</div><div class="meta"><span class="tag ${it.skill}">${SKS[it.skill]}</span>${hwLinks(it)}${clips.length?`<span>${clips.length} clip${clips.length>1?"s":""}</span>`:""}</div></div>
+   <div><div class="hwtext">${esc(it.text)}</div><div class="meta"><span class="tag ${it.skill}">${SKS[it.skill]}</span>${it.goal?`<span class="hggoal">${esc(hgText(it.goal))}</span>`:""}${hwLinks(it)}${clips.length?`<span>${clips.length} clip${clips.length>1?"s":""}</span>`:""}</div></div>
    <button class="hwmore" data-hw="open:${it.id}" aria-expanded="${open}">${open?"Close":"Edit"}</button>
    ${open?`<div class="hwpanel">
      <label class="label" for="coEdit">Drill</label><input class="cofield" id="coEdit" data-item="${it.id}" value="${esc(it.text)}">
      <div class="row small"><span class="label">Counts toward</span><div class="seg" role="group" aria-label="Skill">${["s","h","f"].map(k=>`<button data-hw="sk:${it.id}:${k}" aria-pressed="${it.skill===k}">${SK[k]}</button>`).join("")}</div></div>
+     ${hgCtl(it.goal||{kind:"none",n:20,sets:1},(op,x)=>`ig:${it.id}:${op}:${x}`)}
      <div class="row"><input class="cofield" id="coLink" inputmode="url" placeholder="Paste a YouTube link" style="flex:1;min-width:0"><button class="btn sec small" data-hw="link:${it.id}">Add link</button></div>
-     ${(it.links||[]).length?`<div class="row small">${(it.links||[]).map((l,i)=>`<button class="chip" data-hw="unlink:${it.id}:${i}" aria-label="Remove link ${esc(linkLabel(l.url))}">${esc(linkLabel(l.url))} ✕</button>`).join("")}</div>`:""}
+     ${(it.links||[]).length?`<div class="row small">${(it.links||[]).map((l,i)=>`<button class="chip lnk" data-hw="unlink:${it.id}:${i}" aria-label="Remove link ${esc(l.title||linkLabel(l.url))}">${esc(l.title||linkLabel(l.url))} ✕</button>`).join("")}</div>`:""}
      ${clips.length?`<div class="vgrid">${clips.map(vCard).join("")}</div>`:""}
      <div class="row">${recCtl(it.id,"pri small")}<button class="btn sec small" data-hw="del:${it.id}">Remove drill</button></div></div>`:""}
   </div>`}
@@ -3466,23 +3562,24 @@ function vCard(v){const th=CO.thumbs[v.id],f=v.item&&coFind(v.item);
    <span><b>${f?esc(f.it.text):"Training clip"}</b>${new Date(v.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})} · ${fmtMB(v.size)}</span></button>`}
 function viewCoach(){if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
   const ls=coLists(),all=ls.flatMap(l=>l.items),left=all.filter(x=>!x.done).length,coaches=[...new Set(ls.map(l=>l.coach).filter(Boolean))];
-  const name=CO.name||S.coach.lastCoach||"",free=CO.vids.filter(v=>!v.item||!coFind(v.item));
+  const name=CO.name||S.coach.lastCoach||"",free=CO.vids.filter(v=>!v.item||(!coFind(v.item)&&!(CO.wiz&&v.item===CO.wiz.id)));
   return `<section><div class="sechead"><h2>Take-home drills</h2>${all.length?`<span class="muted small"><b class="num" style="font-size:18px;color:var(--ink)">${all.length-left}</b> of ${all.length} done</span>`:""}</div>
    ${ls.length?ls.map(l=>{const n=l.items.filter(x=>x.done).length;return `<div class="hwgrp"><span>${l.coach?"From "+esc(l.coach)+" · ":""}${new Date(l.t).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span>${n===l.items.length?`<button class="linkbtn" data-hw="dellist:${l.id}">Clear list</button>`:`<span>${n}/${l.items.length}</span>`}</div>
      <div class="hwlist">${l.items.map(hwRow).join("")}</div>`}).join("")
    :`<div class="empty">When your coach gives you drills to do on your own, add them below. Type them, paste their text or links, or say them. Each one you check off earns ${HW_XP} XP.</div>`}</section>
   <section><div class="sechead"><h2>Add from your coach</h2></div>
+   <div class="seg comode" role="group" aria-label="How to add"><button data-hw="mode:list" aria-pressed="${CO.mode!=="step"}">All at once</button><button data-hw="mode:step" aria-pressed="${CO.mode==="step"}">One at a time</button></div>
    <div class="card coadd">
     <label class="label" for="coName">Coach</label><input class="cofield" id="coName" list="coNames" placeholder="Coach's name (optional)" value="${esc(name)}" autocomplete="off">
     <datalist id="coNames">${coaches.map(c=>`<option value="${esc(c)}">`).join("")}</datalist>
-    <label class="label" for="coDraft">Drills</label>
+    ${CO.mode==="step"?wzHtml():`<label class="label" for="coDraft">Drills</label>
     <textarea class="cofield" id="coDraft" placeholder="One drill per line, for example:&#10;Mikan drill, 3 sets of 20&#10;Form shooting, 50 makes&#10;https://youtu.be/…">${esc(CO.draft)}</textarea>
     <div class="row">${dictOK()?`<button class="btn sec small mic" id="coMic" data-hw="mic" aria-pressed="${!!CO.dict}">${CO.dict?"Stop listening":"Say them"}</button>`:""}<button class="btn pri small" data-hw="add" style="flex:1">Add to my list</button></div>
     <p class="muted small" id="coMicMsg" role="status" style="margin:0">${CO.dict?"Listening. Pause between drills, or say “next drill”.":""}</p>
-    <p class="muted small" style="margin:0">${dictOK()?"Say them, or":"To say them, tap"} the mic on your phone's keyboard${dictOK()?" works too":""}. A link on its own line goes with the drill above it.</p>
+    <p class="muted small" style="margin:0">${dictOK()?"Say them, or":"To say them, tap"} the mic on your phone's keyboard${dictOK()?" works too":""}. A link on its own line goes with the drill above it. To add a video or clip and a goal to each drill, use One at a time.</p>`}
    </div></section>
   <section><div class="sechead"><h2>My videos</h2>${CO.vids.length?`<span class="muted small">${CO.vids.length} clip${CO.vids.length>1?"s":""}${CO.usage?` · ${fmtMB(CO.vids.reduce((a,v)=>a+v.size,0))}`:""}</span>`:""}</div>
-   <div class="row">${recCtl("","pri small")}<label class="btn sec small filebtn" for="coPick">Add a clip</label></div>
+   <div class="row">${recCtl("","pri small")}<label class="btn sec small filebtn" for="coPick" data-hw="pick:">Add a clip</label></div>
    <input type="file" id="coCap" accept="video/*" capture="environment" hidden><input type="file" id="coPick" accept="video/*" hidden>
    ${CO.vidErr?`<div class="empty">${esc(CO.vidErr)}</div>`:free.length?`<div class="vgrid">${free.map(vCard).join("")}</div>`:CO.vids.length?"":`<div class="empty">Film your reps to watch them back, slow them down, or show your coach next session. Clips you film for a drill on your list show up under that drill.</div>`}
    <p class="muted small" style="margin:0">Videos are kept only on this phone and are never uploaded. Deleting the app deletes them, so use Save to phone for any you want to keep.</p></section>`}
@@ -3491,8 +3588,20 @@ function coachTodayCard(){const ls=coLists(),open=ls.flatMap(l=>l.items.filter(x
   return `<section><div class="card small cohome"><div class="label">Take-home from ${ls.find(l=>l.items.some(x=>!x.done))?.coach?esc(ls.find(l=>l.items.some(x=>!x.done)).coach):"your coach"}</div>
    <b>${open.length} drill${open.length>1?"s":""} to do:</b> ${open.slice(0,3).map(x=>esc(x.text)).join(" · ")}${open.length>3?" …":""}
    <a class="linkbtn" href="#coach" style="display:block">Open take-home list →</a></div></section>`}
-document.addEventListener("click",e=>{const t=e.target.closest("[data-hw]");if(!t)return;const [a,id,x]=t.dataset.hw.split(":");
-  if(a==="add")coAdd();else if(a==="mic"){CO.dict?dictStop():dictStart()}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-hw]");if(!t)return;const p=t.dataset.hw.split(":"),[a,id,x]=p;
+  if(a==="wz"){const W=CO.wiz;if(!W)return;
+    if(id==="go")wzGo(+x);else if(id==="sk"){W.skill=x;W.skillSet=true;wzUp()}
+    else if(id==="g"){hgStep(W.g,x,p[3]);wzUp()}
+    else if(id==="link")wzAddLink();else if(id==="unlink"){W.links.splice(+x,1);wzUp()}
+    else if(id==="save")wzSave(x==="more");
+    else if(id==="clear"){dictStop();CO.wiz=wzNew(W.lid,W.count);wzUp()}
+    else if(id==="yt")wzKeep();
+    return}
+  if(a==="ig"){const f=coFind(id);if(!f)return;const g=f.it.goal||{kind:"none",n:20,sets:1};hgStep(g,x,p[3]);
+    if(HG[g.kind].k)f.it.goal=g;else delete f.it.goal;persist();render();return}
+  if(a==="mode"){dictStop();CO.mode=id==="step"?"step":"list";if(CO.mode==="step"&&!CO.wiz)CO.wiz=wzNew();wzUp();return}
+  if(a==="pick"){CO.capFor=id||null;return}
+  if(a==="add")coAdd();else if(a==="mic"){CO.dict?dictStop():dictStart(id||"coDraft")}
   else if(a==="tog")coToggle(id);else if(a==="open"){CO.open=CO.open===id?null:id;render()}
   else if(a==="sk")coSetSkill(id,x);else if(a==="link")coAddLink(id);
   else if(a==="unlink"){const f=coFind(id);if(f){f.it.links.splice(+x,1);persist();render()}}
@@ -3500,10 +3609,11 @@ document.addEventListener("click",e=>{const t=e.target.closest("[data-hw]");if(!
   else if(a==="dellist")coDelList(id);
   else if(a==="rec")openRec(id||null);else if(a==="cap")CO.capFor=id||null;
   else if(a==="vid")openVid(id)});
-document.addEventListener("input",e=>{if(e.target.id==="coDraft")CO.draft=e.target.value;else if(e.target.id==="coName")CO.name=e.target.value});
+document.addEventListener("input",e=>{if(e.target.id==="coDraft")CO.draft=e.target.value;else if(e.target.id==="coName")CO.name=e.target.value;
+  else if(e.target.id==="wzName"&&CO.wiz){const W=CO.wiz;W.text=e.target.value;if(!W.skillSet){W.skill=guessSkill(W.text);document.querySelectorAll('[data-hw^="wz:sk:"]').forEach(b=>b.setAttribute("aria-pressed",b.dataset.hw==="wz:sk:"+W.skill))}wzKeep()}});
 document.addEventListener("change",e=>{const el=e.target;
   if(el.id==="coEdit"){coEditText(el.dataset.item,el.value);return}
-  if((el.id==="coCap"||el.id==="coPick")&&el.files&&el.files[0]){const file=el.files[0],item=el.id==="coCap"?CO.capFor:null;CO.capFor=null;el.value="";
+  if((el.id==="coCap"||el.id==="coPick")&&el.files&&el.files[0]){const file=el.files[0],item=CO.capFor||null;CO.capFor=null;el.value="";
     saveVid(file,{item,name:file.name,t:el.id==="coPick"&&file.lastModified?file.lastModified:Date.now()})}});
 
 /* ---------- boot + sync ---------- */
@@ -3570,7 +3680,8 @@ route();
      close button does:
      demo clip → training video / recorder → "Show the move" → drill timer (End, which goes to the rating screen) →
      rep logger (Exit) → "Discard this drill?" (Keep going) → drill sheet (close, which asks first if anything's
-     logged) → the tab you were on before → leave the app from Today. */
+     logged) → the step before, when adding a coach's drills one at a time → the tab you were on before → leave the
+     app from Today. */
   {
     const tabs = []; // tabs visited before the current one, oldest first
     let cur = state.tab, popping = false;
@@ -3599,6 +3710,8 @@ route();
         if (R.confirm) { R.confirm = false; drawDock(); } else closeRunner();
         return true;
       }
+      // Adding drills one at a time on the Coach tab: back goes to the step before.
+      if (state.tab === "coach" && CO.mode === "step" && CO.wiz && CO.wiz.step > 0) { wzGo(CO.wiz.step - 1); return true; }
       const prev = tabs.length ? tabs.pop() : state.tab !== "today" ? "today" : null;
       if (prev && prev !== state.tab) { popping = true; location.hash = "#" + prev; return true; }
       return false;
@@ -4427,6 +4540,21 @@ route();
     const origDrawPlayer = drawPlayer, origDrawBig = drawBig;
     drawPlayer = function () { origDrawPlayer.apply(this, arguments); if (typeof pEl !== "undefined" && pEl) place(pEl); };
     drawBig = function () { origDrawBig.apply(this, arguments); if (typeof bigEl !== "undefined" && bigEl) place(bigEl); };
+  }
+
+  /* ---------- 9. Share › Hoops Ladder: a YouTube video comes back to the drill you're adding ----------
+     On the Coach tab, "Find it on YouTube" opens the YouTube app. The player picks a video and shares it to Hoops
+     Ladder; the native HoopsShare plugin (android/.../share/) hands the link and the video's title to the page's
+     coShared(), which adds it to the drill being added or edited. A share that started the app waits in take().
+     It sits before section 8 because that one stops early on a phone without the HoopsRemote plugin.
+     See docs/LEARNING.md, step 20. */
+  {
+    const Share = Plug.HoopsShare;
+    if (Share) {
+      const got = s => { if (s && s.text) { try { coShared(s.text, s.subject || ""); } catch (e) {} } };
+      Share.addListener("shared", got);
+      Share.take().then(r => got(r && r.share)).catch(() => {});
+    }
   }
 
   /* ---------- 8. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------

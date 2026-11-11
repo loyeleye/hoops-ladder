@@ -42,7 +42,8 @@
      close button does:
      demo clip → training video / recorder → "Show the move" → drill timer (End, which goes to the rating screen) →
      rep logger (Exit) → "Discard this drill?" (Keep going) → drill sheet (close, which asks first if anything's
-     logged) → the tab you were on before → leave the app from Today. */
+     logged) → the step before, when adding a coach's drills one at a time → the tab you were on before → leave the
+     app from Today. */
   {
     const tabs = []; // tabs visited before the current one, oldest first
     let cur = state.tab, popping = false;
@@ -71,6 +72,8 @@
         if (R.confirm) { R.confirm = false; drawDock(); } else closeRunner();
         return true;
       }
+      // Adding drills one at a time on the Coach tab: back goes to the step before.
+      if (state.tab === "coach" && CO.mode === "step" && CO.wiz && CO.wiz.step > 0) { wzGo(CO.wiz.step - 1); return true; }
       const prev = tabs.length ? tabs.pop() : state.tab !== "today" ? "today" : null;
       if (prev && prev !== state.tab) { popping = true; location.hash = "#" + prev; return true; }
       return false;
@@ -899,6 +902,21 @@
     const origDrawPlayer = drawPlayer, origDrawBig = drawBig;
     drawPlayer = function () { origDrawPlayer.apply(this, arguments); if (typeof pEl !== "undefined" && pEl) place(pEl); };
     drawBig = function () { origDrawBig.apply(this, arguments); if (typeof bigEl !== "undefined" && bigEl) place(bigEl); };
+  }
+
+  /* ---------- 9. Share › Hoops Ladder: a YouTube video comes back to the drill you're adding ----------
+     On the Coach tab, "Find it on YouTube" opens the YouTube app. The player picks a video and shares it to Hoops
+     Ladder; the native HoopsShare plugin (android/.../share/) hands the link and the video's title to the page's
+     coShared(), which adds it to the drill being added or edited. A share that started the app waits in take().
+     It sits before section 8 because that one stops early on a phone without the HoopsRemote plugin.
+     See docs/LEARNING.md, step 20. */
+  {
+    const Share = Plug.HoopsShare;
+    if (Share) {
+      const got = s => { if (s && s.text) { try { coShared(s.text, s.subject || ""); } catch (e) {} } };
+      Share.addListener("shared", got);
+      Share.take().then(r => got(r && r.share)).catch(() => {});
+    }
   }
 
   /* ---------- 8. Hands-free logging: volume buttons, earbuds and lock-screen buttons ----------

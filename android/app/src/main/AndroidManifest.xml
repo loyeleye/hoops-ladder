@@ -22,6 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Share › Hoops Ladder from YouTube (or any app that shares a link as text): the link goes to the drill
+                 you're adding on the Coach tab. See docs/LEARNING.md, step 20. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
         </activity>
 
         <!-- Keeps rep logging running with the screen locked, and owns the media session that receives the
