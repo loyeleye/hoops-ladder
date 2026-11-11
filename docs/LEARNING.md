@@ -348,7 +348,7 @@ Under **Policy and programs → App content**, Play asks a set of questions abou
 
 **The problem.** Training alone, you can't keep walking back to the phone to tap. The web app already logs
 quick-rep drills by the set, with a one-button map: **one press = miss, two presses (or a hold) = set done,
-three presses = undo** (shot by shot it's one press = make, two = miss). A web page can't use the phone's
+three presses = undo** (shot by shot it's one press = miss, two = make: one press always means something went wrong). A web page can't use the phone's
 volume buttons or keep working with the screen locked, so this step adds a **custom native plugin**.
 
 **The pieces** (all in `android/app/src/main/java/com/ladioyeleye/hoopsladder/remote/`):

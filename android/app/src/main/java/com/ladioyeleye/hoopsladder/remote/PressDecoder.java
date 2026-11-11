@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 /**
  * Turns raw button presses into the app's three logging signals, the same one-button map the web app uses:
  * one press = "a", two quick presses or a long hold = "b", three quick presses = "u" (undo).
- * In sets mode a = miss and b = set done; in shot-by-shot mode a = make and b = miss.
+ * In sets mode a = miss and b = set done; in shot-by-shot mode a = miss and b = make (one rule: one press means something went wrong).
  *
  * Decoding happens here, in Java, rather than in the page, because the page's timers slow down
  * when the screen is locked. The page only ever receives the finished signal.
