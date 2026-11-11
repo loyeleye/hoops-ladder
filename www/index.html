@@ -721,6 +721,13 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .ses-wrow{display:flex;gap:10px;align-items:center;border:1px solid #2A3858;border-radius:14px;background:#131C30;padding:9px 10px}.ses-wm{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.ses-wm .ses-in{margin:0;padding:8px 10px}
 .ses-sw{flex:0 0 auto;width:48px;height:30px;border-radius:15px;border:0;background:#2A3858;position:relative;padding:0}.ses-sw span{position:absolute;left:4px;top:4px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
 .ses-sw[aria-pressed="true"]{background:#F07A35}.ses-sw[aria-pressed="true"] span{left:22px}
+.ses-tx{font-size:13.5px;line-height:1.45;color:#E9EEF7;background:#0B111D;border:1px solid #22304D;border-top:0;border-radius:0 0 12px 12px;margin:-8px 0 0;padding:8px 10px 8px 12px}
+.ses-tx.w{color:#9AA6BF;font-style:italic}.ses-tx.f{color:#9AA6BF}.ses-txr{background:none;border:0;padding:4px 0;min-height:32px;color:#F7A06A;font-weight:700;font-size:13.5px}
+.ses-spd+.ses-tx{margin:0;border-top:1px solid #22304D;border-radius:12px}
+.ses-sug{font-size:12.5px;color:#9AA6BF;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}.ses-sugb{background:none;border:0;border-bottom:1px dotted #9AA6BF;padding:2px 0;min-height:32px;color:#E9EEF7;font-size:12.5px;text-align:left}
+.ses-beta{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:4px;background:#2A3858;color:#E9EEF7;vertical-align:2px;margin-left:4px}
+.ses-vm{position:relative}.ses-vm>span:nth-child(2){flex:1}.ses-vm .ses-sw{pointer-events:none}
+.ses-sm[data-svm][aria-pressed="true"]{background:#F07A35;color:#1A0C03}
 .sescard{background:var(--plate,#12203A);color:#F2F5FA;border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 3px 0 0 var(--accent)}
 .sescard .label{color:#B9C3D6}.sescard .sest{font-family:var(--display);font-size:26px;text-transform:uppercase;line-height:1}.sescard>span{font-size:14px;color:#C7CFDE}
 .sescard .linkbtn{color:#F7A06A;text-align:left}
@@ -5383,13 +5390,13 @@ async function sesRecSave(R){sesStopCam();if(SES)SES.rec=null;const s=sesFind(SE
   const blob=new Blob(R.chunks,{type:R.chunks[0].type||"video/mp4"}),t=s.topics.find(x=>x.id===R.tid);
   try{const {id,dur}=await sesStore(blob,s,{name:t?sesTName(s,t):""}),end=dur||R.secs,ps=[];
     R.marks.forEach((m,i)=>{const b=i+1<R.marks.length?R.marks[i+1].t:end;if(b-m.t<.5)return;ps.push(Object.assign({id:uid("p"),k:m.k,v:id,a:+m.t.toFixed(2),b:+b.toFixed(2),t:Date.now()},m.k==="m"?{n:m.n}:{}))});
-    if(t)t.pieces.push(...ps);sesTouch(s);sesThumbs(s,ps,SESU[id]);
+    if(t)t.pieces.push(...ps);sesTouch(s);sesThumbs(s,ps,SESU[id]);sesTxQ(s,...ps);
     const last=ps[ps.length-1];if(last&&last.k==="m"&&R.stopTo!=="board"){SES.p=last.id;SES.v="replay"}else SES.v="board"}
   catch(e){SES.v="board";SES.msg=e&&e.name==="QuotaExceededError"?"Your phone is out of space for videos. Delete a few clips and try again.":"Couldn't keep that clip."}
   sesDraw()}
 /* a clip picked from the phone (or shared in): one piece, coach or you */
 async function sesAddFile(blob,k,name){const s=sesFind(SES?.sid)||sesCur();if(!s)return;let t=sesTop(s);if(!t||(k==="c"&&sesTries(t).length))t=sesNewTopic(s);
-  try{const {id,dur}=await sesStore(blob,s,{name});const p=Object.assign({id:uid("p"),k,v:id,a:0,b:dur||0,t:Date.now()},k==="m"?{n:sesTries(t).length+1}:{});t.pieces.push(p);sesTouch(s);
+  try{const {id,dur}=await sesStore(blob,s,{name});const p=Object.assign({id:uid("p"),k,v:id,a:0,b:dur||0,t:Date.now()},k==="m"?{n:sesTries(t).length+1}:{});t.pieces.push(p);sesTouch(s);sesTxQ(s,p);
     if(SES){SES.msg=`Added ${name?`“${name}” `:""}to ${sesTName(s,t)}.`;sesDraw()}sesThumbs(s,[p],SESU[id])}catch(e){if(SES){SES.msg="Couldn't keep that clip.";sesDraw()}}}
 
 /* ---------- voice notes ---------- */
@@ -5404,7 +5411,7 @@ async function sesTalk(on){const s=sesFind(SES.sid);if(!s||s.end)return;if(!sesT
 function sesStopTalk(keep){const T=SES&&SES.talk;if(!T)return;T.keep=!!keep;clearInterval(T.tick);if(T.mr&&T.mr.state!=="inactive"){try{T.mr.stop()}catch(e){}}else if(T.stream){T.stream.getTracks().forEach(x=>x.stop())}SES.talk=null}
 async function sesTalkSave(T){if(T.stream)T.stream.getTracks().forEach(x=>x.stop());const s=sesFind(SES?.sid);if(!T.keep||!T.chunks.length||!s)return;
   const blob=new Blob(T.chunks,{type:T.chunks[0].type||"audio/webm"}),dur=(performance.now()-T.t0)/1000,on=T.on&&sesPiece(s,T.on),t=on?on.t:sesTop(s);
-  try{const {id}=await sesStore(blob,s,{audio:true,dur,name:"Voice note"});t.pieces.push({id:uid("p"),k:"t",v:id,dur:Math.round(dur),on:T.on||null,t:Date.now()});sesTouch(s);if(SES){SES.msg="Voice note saved.";sesDraw()}}
+  try{const {id}=await sesStore(blob,s,{audio:true,dur,name:"Voice note"});t.pieces.push({id:uid("p"),k:"t",v:id,dur:Math.round(dur),on:T.on||null,t:Date.now()});sesTouch(s);sesTxQ(s,t.pieces[t.pieces.length-1]);if(SES){SES.msg="Voice note saved.";sesDraw()}}
   catch(e){if(SES){SES.msg="Couldn't keep the voice note.";sesDraw()}}}
 let sesAudio=null;
 async function sesPlayTalk(p){try{if(sesAudio){sesAudio.pause();if(sesAudio._p===p.id){sesAudio=null;sesDraw();return}}const u=await sesBlob(p.v);if(!u)return;sesAudio=new Audio(u);sesAudio._p=p.id;sesAudio.onended=()=>{sesAudio=null;sesDraw()};sesAudio.play();sesDraw()}catch(e){}}
@@ -5747,6 +5754,113 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-ses]");if(
   else if(a==="topic"){const [sid,tid]=[id,b.dataset.ses.split(":")[2]],s=sesFind(sid);if(!s)return toast("Clips not found","That session was deleted.");const t=s.topics.find(x=>x.id===tid),p=t&&(sesVidP(t).find(x=>x.k==="c")||sesVidP(t)[0]);sesOpen({view:sid});if(p){SES.p=p.id;SES.v="replay";sesDraw()}}});
 /* a session restored after the app restarts gets its share target back */
 setTimeout(()=>{const s=sesCur();if(s)try{window.hoopsSesShare?.(true,s.coach)}catch(e){}sesPill()},1500);
+/* ---------- transcripts and spoken marks ----------
+   Voice notes and the coach's clips are turned into text after they're saved, never live. sesPcm() decodes the
+   recording to 16 kHz mono PCM and window.hoopsTx (native.js, section 3b) hands it to the phone's on-device
+   recognizer (Android 13+). The text goes on the piece as p.tx; p.txs says why there's none ("fail", "lang", or
+   "none" when no words were heard). In a browser or on an older phone there's no hoopsTx, notes stay audio, and
+   nothing extra shows. The transcript shows under its note or clip, and gives name suggestions at wrap-up.
+   Spoken "my turn", "again" and "done" (beta, off by default, S.coach.sesVoice) listen live while a propped
+   recording runs: window.hoopsSesVoice in the app, the browser's SpeechRecognition elsewhere. Taps always work.
+   This part draws by adding to what sesDraw just drew (sesXPaint, marked data-sx), so the screens stay as they are.
+   See docs/LEARNING.md, step 27. */
+const SES_TXMAX=180;   // seconds of a piece sent to the recognizer
+const SESTX=new Set(),SESASK=new Set(); // pieces being transcribed right now; retries tapped by hand
+let sesTxChain=Promise.resolve(),sesTxAvail=null;
+const sesTxOK=()=>window.hoopsTx?(sesTxAvail=sesTxAvail||Promise.resolve().then(()=>window.hoopsTx.ok()).then(x=>!!x,()=>false)):Promise.resolve(false);
+/* the piece's sound as base64 16-bit PCM, 16 kHz mono; "" when it's too short to hold words, null when it can't be read */
+async function sesPcm(vid,a,b){const AC=window.OfflineAudioContext||window.webkitOfflineAudioContext;if(!AC)return null;
+  const blob=await vtx("readonly",(m,bl)=>rq(bl.get(vid)));if(!blob)return null;
+  const buf=await blob.arrayBuffer(),ctx=new AC(1,16000,16000);
+  const au=await new Promise((res,rej)=>{const p=ctx.decodeAudioData(buf,res,rej);if(p&&p.catch)p.catch(rej)}).catch(()=>null);if(!au)return null;
+  const r=au.sampleRate,i0=Math.max(0,Math.floor((a||0)*r)),i1=Math.min(au.length,b?Math.ceil(b*r):au.length,i0+SES_TXMAX*r);if(i1-i0<r*.4)return"";
+  const ch=[];for(let c=0;c<au.numberOfChannels;c++)ch.push(au.getChannelData(c));
+  const out=new Int16Array(i1-i0);for(let i=i0;i<i1;i++){let v=0;for(const d of ch)v+=d[i];v/=ch.length;out[i-i0]=Math.max(-1,Math.min(1,v))*32767}
+  const u8=new Uint8Array(out.buffer);let s="";for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s)}
+const sesTxTidy=x=>{x=String(x||"").replace(/\s+/g," ").trim().slice(0,2000);return x?x[0].toUpperCase()+x.slice(1):""};
+/* queue pieces (voice notes and coach clips) for a transcript; one at a time, after any recording in progress */
+async function sesTxQ(s,...ps){if(!s||!(await sesTxOK()))return;
+  for(const p of ps){if(!p||!p.v||(p.k!=="t"&&p.k!=="c")||SESTX.has(p.id))continue;SESTX.add(p.id);const ask=SESASK.delete(p.id);
+    sesTxChain=sesTxChain.then(()=>sesTxRun(s.id,p.id,ask)).catch(()=>{}).then(()=>{SESTX.delete(p.id);sesXPaint()})}
+  sesXPaint()}
+async function sesTxRun(sid,pid,ask){
+  // the camera or mic is busy while filming or talking: wait for it (up to 10 minutes)
+  for(let i=0;i<600&&SES&&(SES.rec||SES.talk);i++)await new Promise(r=>setTimeout(r,1000));
+  const find=()=>{const s=sesFind(sid);return s&&sesPiece(s,pid)};let f=find();if(!f)return;
+  let pcm=null;try{pcm=await sesPcm(f.p.v,f.p.k==="t"?0:f.p.a,f.p.k==="t"?0:f.p.b)}catch(e){}
+  let tx="",why=null;
+  if(pcm===null)why="fail";else if(!pcm)why="none";
+  else{try{const r=await window.hoopsTx.run(pcm,{ask:!!ask});tx=sesTxTidy(r&&r.text);if(!tx)why="none"}
+    catch(e){const c=String(e&&(e.code||e.message)||e);why=/nolang/.test(c)?"lang":/unavailable/.test(c)?"":"fail"}}
+  f=find();if(!f)return;const p=f.p;   // look it up again: it may have been deleted, or the progress reloaded
+  if(tx){p.tx=tx;delete p.txs}else if(why)p.txs=why;persist()}
+function sesTxHtml(p){if(p.tx)return `<div class="ses-tx" data-sx>“${esc(p.tx)}”</div>`;
+  if(SESTX.has(p.id))return `<div class="ses-tx w" data-sx>Turning it into text…</div>`;
+  const why={fail:"Couldn't turn this into text.",lang:"The phone is still getting its English speech pack.",none:p.k==="t"?"No words heard.":""}[p.txs];
+  return why?`<div class="ses-tx f" data-sx>${why} <button class="ses-txr" data-stx="${p.id}">Try again</button></div>`:""}
+
+/* name suggestions at wrap-up: the drill, the link's title, then the coach's own words */
+const SES_TERMS=["follow-through","follow through","guide hand","shooting hand","set point","elbow","wrist","fingertips","release","arc","balance","base","footwork","feet","hips","pivot","jab step","triple threat","crossover","between the legs","behind the back","hesitation","in and out","spin move","euro step","layup","floater","reverse layup","finish","free throw","jump shot","pull-up","step-back","catch and shoot","bank shot","hook shot","drop step","post move","close out","box out","rebound","defensive stance","slide","pick and roll","screen","chest pass","bounce pass","handle","dribble","dip","eyes","rim"];
+const SES_STOP=new Set("a an the and or but so to of on in at for with from by is are was be been it its it's this that these those here there now then just like okay ok alright all right um uh yeah yes no you you're your yours i i'm me my we we're us our they them he she what when where how why do does did don't doesn't can can't will gonna going want wanna let's lets see look watch get got go come take make one two three more really very good great nice little bit thing things way want need try again little first want".split(" "));
+function sesTxName(text){const t=" "+String(text||"").toLowerCase().replace(/[^a-z' -]/g," ").replace(/\s+/g," ")+" ";if(t.trim().length<3)return"";
+  const hits=SES_TERMS.map(w=>[w,t.indexOf(" "+w+" ")]).filter(x=>x[1]>=0).sort((x,y)=>x[1]-y[1]).map(x=>x[0].replace("follow through","follow-through"));
+  const cap=w=>w[0].toUpperCase()+w.slice(1);
+  if(hits.length)return [...new Set(hits)].slice(0,2).map(cap).join(" & ");
+  const first=String(text).split(/[.!?]/)[0].toLowerCase().replace(/[^a-z' -]/g," ").split(/\s+/).filter(w=>w.length>2&&!SES_STOP.has(w)).slice(0,3);
+  return first.length?cap(first.join(" ")).slice(0,40):""}
+function sesSug(s,t){const out=[],add=x=>{x=String(x||"").trim().slice(0,60);if(x&&x!==t.name&&!out.includes(x))out.push(x)};
+  if(t.from&&D[t.from])add(D[t.from].name);add((t.pieces.find(p=>p.k==="l"&&p.title)||{}).title);
+  const tx=t.pieces.filter(p=>p.k==="c"&&p.tx).concat(t.pieces.filter(p=>p.k==="t"&&p.tx)).map(p=>p.tx).join(". ");add(sesTxName(tx));
+  return out.slice(0,2)}
+
+/* ---------- spoken marks (beta) ---------- */
+const SESVM={on:false,r:null,bad:null,eng:null,iv:0,last:0,fired:false};
+const sesNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+const sesVmOK=()=>!!(window.hoopsSesVoice||(!sesNative()&&(window.SpeechRecognition||window.webkitSpeechRecognition)));
+function sesVmWant(){const s=SES&&SES.sid&&sesFind(SES.sid),R=SES&&SES.rec;
+  return !!(S.coach.sesVoice&&s&&s.mode==="prop"&&!s.end&&SES.v==="rec"&&R&&R.mr&&R.mr.state==="recording"&&SESVM.bad!==R&&sesVmOK())}
+function sesVmCmd(x){const t=" "+String(x||"").toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ")+" ";
+  if(/ (my turn|my go|my try|me now) /.test(t))return"turn";if(/ (again|one more|another one) /.test(t))return"again";if(/ (done|i m done|finished) /.test(t))return"done";return null}
+function sesVmHeard(text,alts,fin){const R=SES&&SES.rec;if(!SESVM.on||!R||!R.mr||SES.v!=="rec")return;
+  if(SESVM.fired||performance.now()-SESVM.last<1500){if(fin)SESVM.fired=false;return}
+  const me=(R.marks[R.marks.length-1]||{}).k==="m";
+  for(const x of [text].concat(alts||[])){const k=sesVmCmd(x);if(!k)continue;
+    if(k==="turn"&&!me)sesMark("m");else if(k==="again"&&me)sesMark("m");else if(k==="done"&&me)sesRecStop(true);else continue;
+    SESVM.last=performance.now();SESVM.fired=!fin;return}
+  if(fin)SESVM.fired=false}
+function sesVmStart(){const R=SES.rec;if(SESVM.on&&SESVM.r===R)return;sesVmStop();SESVM.on=true;SESVM.r=R;SESVM.fired=false;
+  const fail=()=>{if(SESVM.r!==R)return;SESVM.bad=R;sesVmStop();if(SES&&SES.v==="rec"){const h=SES.el.querySelector(".ses-hint");if(h)h.textContent="Voice isn't working here. Tap instead."}};
+  if(window.hoopsSesVoice){try{Promise.resolve(window.hoopsSesVoice.start(sesVmHeard)).catch(fail)}catch(e){fail()}}
+  else{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;try{const r=new SR();r.continuous=true;r.interimResults=true;r.maxAlternatives=3;r.lang="en-US";SESVM.eng=r;
+      r.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i],al=[];for(let j=1;j<x.length;j++)al.push(x[j].transcript);sesVmHeard(x[0].transcript,al,x.isFinal)}};
+      r.onerror=e=>{if(/not-allowed|service-not-allowed|audio-capture/.test(e.error))fail()};
+      r.onend=()=>{if(SESVM.eng===r)setTimeout(()=>{if(SESVM.eng===r)try{r.start()}catch(e){}},250)};r.start()}catch(e){fail()}}
+  SESVM.iv=setInterval(()=>{if(!sesVmWant())sesVmStop()},1000)}
+function sesVmStop(){if(!SESVM.on)return;SESVM.on=false;SESVM.r=null;clearInterval(SESVM.iv);
+  if(SESVM.eng){const r=SESVM.eng;SESVM.eng=null;try{r.abort()}catch(e){}}else try{window.hoopsSesVoice&&window.hoopsSesVoice.stop()}catch(e){}}
+
+/* adds this part's bits to the screen sesDraw just drew; safe to run again at any time */
+function sesXPaint(){if(!SES||!SES.el)return;const el=SES.el,v=SES.v,s=SES.sid&&sesFind(SES.sid);el.querySelectorAll("[data-sx]").forEach(x=>x.remove());
+  sesVmWant()?sesVmStart():sesVmStop();
+  const vmOn=!!S.coach.sesVoice;
+  if(v==="setup"){const h=el.querySelector('[data-x="mode:hand"]');if(h&&SES.set&&SES.set.mode==="prop"&&sesVmOK())h.insertAdjacentHTML("afterend",
+    `<button class="ses-opt ses-vm" data-svm data-sx aria-pressed="${vmOn}"><span class="ses-ic">🎙</span><span><b>Say “my turn” <i class="ses-beta">Beta</i></b><span>Also “again” and “done” while it records. Tapping still works. Some phones can't listen while filming.</span></span><span class="ses-sw" aria-hidden="true" aria-pressed="${vmOn}"><span></span></span></button>`);return}
+  if(!s)return;
+  if(v==="board"||v==="replay"){for(const t of s.topics)for(const p of t.pieces){if(p.k!=="t"&&p.k!=="c")continue;const h=sesTxHtml(p);if(!h)continue;
+      el.querySelectorAll(`[data-x="talkplay:${p.id}"],.ses-pcs [data-x="play:${p.id}"]`).forEach(r=>r.insertAdjacentHTML("afterend",h))}
+    if(v==="replay"){const f=sesPiece(s,SES.p),sp=el.querySelector(".ses-spd");if(f&&f.p.k==="c"&&sp){const h=sesTxHtml(f.p);if(h)sp.insertAdjacentHTML("afterend",h)}}
+    // pieces saved before transcripts existed, or while the app was closed, get theirs now
+    if(SES.txScan!==s.id){SES.txScan=s.id;const todo=[];for(const t of s.topics)for(const p of t.pieces)if((p.k==="t"||p.k==="c")&&p.tx==null&&!p.txs)todo.push(p);if(todo.length)sesTxQ(s,...todo)}}
+  if(v==="wrap")for(const t of s.topics){const inp=!t.name&&el.querySelector(`[data-in="tname:${t.id}"]`),sg=inp&&sesSug(s,t);if(!sg||!sg.length)continue;
+    inp.parentNode.insertAdjacentHTML("beforeend",`<span class="ses-sug" data-sx>Suggested: ${sg.map(x=>`<button class="ses-sugb" data-ssug="${t.id}" data-n="${esc(x)}">${esc(x)}</button>`).join(" ")}</span>`)}
+  if(v==="rec"&&s.mode==="prop"&&SES.rec&&SES.rec.mr&&sesVmOK()){const R=SES.rec,me=(R.marks[R.marks.length-1]||{}).k==="m",row=el.querySelector(".ses-camfoot .ses-row"),hint=el.querySelector(".ses-camfoot .ses-hint");
+    if(row)row.insertAdjacentHTML("beforeend",`<button class="ses-sm" data-svm data-sx aria-pressed="${vmOn}">🎙 Voice ${vmOn?"on":"off"} · beta</button>`);
+    if(hint&&SESVM.on)hint.textContent=me?"Say “again” for one more, “done” to stop and watch":"Tap or say “my turn” when you take over"}}
+{const o=sesDraw;sesDraw=function(){o.apply(this,arguments);sesXPaint()}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-stx],[data-ssug],[data-svm]");if(!b||!SES)return;e.preventDefault();const s=SES.sid&&sesFind(SES.sid);
+  if(b.dataset.stx!=null){const f=s&&sesPiece(s,b.dataset.stx);if(f){delete f.p.txs;delete f.p.tx;SESASK.add(f.p.id);persist();sesTxQ(s,f.p)}return}
+  if(b.dataset.ssug!=null){const t=s&&s.topics.find(x=>x.id===b.dataset.ssug);if(t){t.name=b.dataset.n;persist();const inp=SES.el.querySelector(`[data-in="tname:${t.id}"]`);if(inp)inp.value=t.name;sesXPaint()}return}
+  S.coach.sesVoice=!S.coach.sesVoice;persist();sesXPaint()});
 document.addEventListener("click",e=>{const t=e.target.closest("[data-hw]");if(!t)return;const p=t.dataset.hw.split(":"),[a,id,x]=p;
   if(a==="addopen"){CO.addOpen=true;render();document.getElementById("coName")?.focus();return}
   if(a==="wz"){const W=CO.wiz;if(!W)return;
@@ -6154,6 +6268,44 @@ route();
       if (P && S.settings.pvoice && who !== "play") vStart("play").then(() => drawPlayer()).catch(() => { S.settings.pvoice = false; persist() });
     };
     closePlayer = function () { if (who === "play") vStop(); origClosePlayer.apply(this, arguments) };
+
+    // Coach session (beta, off by default): "my turn", "again" and "done" while a propped recording runs. The page
+    // calls hoopsSesVoice.start(cb) / stop() (sesVmStart in www/index.html) and decides what each phrase does.
+    // The drill player's own voice pauses meanwhile and comes back afterward. The WebView is recording at the same
+    // time, and some phones give the recognizer silence while it does: then nothing is heard and taps still work.
+    let sesCb = null, sesResume = null;
+    window.hoopsSesVoice = {
+      start(cb) {
+        if (!sesResume) sesResume = hooks.voicePause();
+        vStop();
+        sesCb = cb; who = "ses"; fired = false;
+        return Voice.start({ words: ["my turn", "again", "one more", "done"] }).then(() => true, e => {
+          if (who === "ses") who = null;
+          sesCb = null;
+          throw e;
+        });
+      },
+      stop() {
+        sesCb = null;
+        if (who === "ses") vStop();
+        const r = sesResume; sesResume = null;
+        if (r) r();
+      },
+    };
+    Voice.addListener("heard", e => { if (e && who === "ses" && sesCb) try { sesCb(e.text || "", e.alts || [], !!e.final) } catch (x) {} });
+  }
+
+  /* ---------- 3b. Coach session transcripts ----------
+     Voice notes and the coach's clips become text after they're saved. The page decodes the recording to 16 kHz
+     mono PCM and calls hoopsTx.run(); the native HoopsTranscribe plugin (android/.../voice/) feeds it to the
+     phone's on-device recognizer (Android 13+), so the audio never leaves the phone. Without the plugin, or on an
+     older phone, ok() is false and notes stay audio only. See docs/LEARNING.md, step 27. */
+  const Tx = Plug.HoopsTranscribe;
+  if (Tx) {
+    window.hoopsTx = {
+      ok: () => Tx.available().then(r => !!(r && r.ok), () => false),
+      run: (pcm, o) => Tx.transcribe({ pcm, rate: 16000, lang: "en-US", ask: !!(o && o.ask) }),
+    };
   }
 
   /* ---------- 4. Live form check from the camera ----------
