@@ -950,7 +950,7 @@ is kept per coach in `S.coach.ok`.
 happened: `c` the coach on camera, `m` your tries (numbered), `t` voice notes, and `l` links. A topic can also hold
 `hw`, the id of the take-home drill made from it. *Film coach* starts a new topic when the current one already has a
 try. *Film me*, *Talk* and *Link* add to the current topic. Tapping a topic's name makes it current. The camera opens
-only when you film, so there's no live preview on the board.
+only when you film (or for Rewind, below), so there's no live preview on the board.
 
 **Recording.** The camera is `getUserMedia` + `MediaRecorder` at 2.5 Mbps with sound, like the Coach recorder in
 step 7. A recording stops at 5 minutes (about 19 MB).
@@ -987,6 +987,28 @@ everything and leaves *Finish setting up …* on the Coach tab. A session left a
 leaves them out. Nothing is uploaded. *Delete session* on a past session removes its clips and notes. Take-home
 drills made from it stay.
 
-**Not built yet** (from the storyboard): Rewind (keeping the last 30 seconds while propped), trimming setup and
-the end of a clip with the pose model, finding the handoff between two people in one clip, importing past clips,
-drawing on a frame, the in-session quick test, voice-note transcripts, and spoken *my turn* / *again*.
+**Rewind: save the last 30 s** (storyboard frame 12). A setup switch, off by default and only for propped sessions
+(`s.rw`). While the board shows, the camera runs with no preview and a small *Rewind on* line says so. Two
+MediaRecorders share the stream, started 30 s apart, and each starts over after 60 s, so the older one always holds
+30 to 60 s. A file from one recorder's own start plays anywhere, which a later timeslice chunk on its own doesn't.
+*Save last 30 s* stops that recorder and keeps its last 30 s as a try (`rw: 1`, shown as *Rewind · Try n*), then
+opens the replay. Nothing is written until Save. The camera closes whenever the board isn't showing: filming
+(which opens its own camera), Talk, a replay, End, closing session mode, or the app going to the background. A
+phone that won't run two recorders at once keeps one, restarted every 60 s. Code: `sesRw*`.
+
+**Draw on a frame** (frame 22). *✎ Draw* on a replay pauses it and grabs the frame on a canvas. *Line* is freehand,
+*Circle* and *Arrow* follow the drag, with *Undo* and *Clear*. *Save as picture* keeps the frame and the drawing as
+one JPEG in the video store and adds a Picture piece (`k: "d"`, `on` the try, `at` the second). It lists on the board
+and under its try's replay. Tapping it shows the picture, with *Talk over it* for a voice note. Code: `sesInk*`.
+
+**A link in compare** (frame 18). Compare's chips now include the topic's links, and a topic with a link offers
+Compare even without a coach clip. Picking a link stacks the YouTube video above your try (it's landscape). It's a
+`youtube-nocookie.com/embed` iframe with the marked part as `start`/`end`, so it loads in the app through the same
+`MainActivity` frame rule as step 14. When the IFrame API loads, it attaches to the iframe, loops `a` to `b` on a
+200 ms timer, and the speed and play/pause buttons drive both sides. Offline, the iframe area stays blank and the
+try still plays. *Full player* opens the step 14 player. Line up isn't offered, because the YouTube player can't be
+synced to a frame. Code: `sesCmpLink`, `sesYt*`.
+
+**Not built yet** (from the storyboard): trimming setup and the end of a clip with the pose model, finding the
+handoff between two people in one clip, importing past clips, the in-session quick test, voice-note transcripts,
+and spoken *my turn* / *again*.
