@@ -14,29 +14,42 @@ Hoops Ladder
 ## Short description (80 max)
 
 ```
-Basketball drills that level up with you. Shooting, handling and finishing.
+Basketball workouts built around what needs work. Shooting, handling, finishing.
 ```
 
 ## Full description (4,000 max)
 
 ```
-Hoops Ladder turns solo basketball practice into a ladder you climb. Pick how long you have, get a workout built for your level, and earn XP for every drill. Hit your goals and harder drills unlock, so you always know what to work on next.
+Hoops Ladder turns solo basketball practice into a ladder you climb. Pick how long you have, get a workout built around what needs work, and earn XP for every drill. Every drill is open from day one, so you can practice anything you want.
 
 WORKOUTS FOR THE TIME YOU HAVE
 • Choose 20, 30 or 45 minutes and get today's session
+• Each workout fills its slots with drills you added, drills for what needs work, drills on your schedule, your favorites and one new drill
+• What needs work comes from your numbers: your coldest 3-point spot, your weakest finish, your miss pattern and ball-handling drops
 • Tell it if you have a partner or a heavy ball, and the plan adjusts
+• A quick body check (feeling good, legs heavy or game tonight) lightens the plan
 • One cue a day to focus on, so you're not thinking about ten things at once
+
+YOUR PLAN, YOUR WAY
+• Add any drill to your next workout
+• Swap a drill and see why it's there
+• Put drills on your own schedule: every workout, weekly or custom
+• The app learns your favorites from what you do
+• Build your own workouts and use one instead for a day
+• Rate drills Easy, Right or Hard at the end, and your goals move to match
 
 55 DRILLS ACROSS THREE SKILLS
 • Shooting: form work, a tracked five-spot 3-point test, free throws, and game-speed decision reps
 • Handling: stationary and on-the-move ball-handling, two-ball work and called-move reaction drills
 • Finishing: layup footwork, both hands, off the glass and through contact
 • Every drill has animated steps and a demo, so you can learn it alone at the gym
+• Difficulty dots mark each drill as Starter, Builder or Advanced
+• Advanced drills are suggested once you've hit your Builder goals a few times
 
 LEVEL UP
 • Separate levels for Shooting, Handling and Finishing, plus an overall player level
 • Ranks from Rookie to Gym legend
-• Skill checks: hit your goal twice and the next rung of drills opens
+• Levels and XP are medals for your work. They never lock a drill.
 
 TRACK WHAT MATTERS
 • A 3-point map that shows your percentage from each spot over 30 days or all time
