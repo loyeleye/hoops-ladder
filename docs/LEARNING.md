@@ -1107,3 +1107,41 @@ its note. *Any coach* goes into the next session, whoever it's with. The setup s
 These tries point at the shot burst's own video, so deleting the session never deletes a video whose meta has
 `burst`, and the burst's cleanup skips any video `sesUsesVid(v)` says is still used. Sent shots get `shot.sent` and
 saved ones `shot.keep`, which keep their video past the 14-day cleanup. Code: `snd*`, `sendShots`, `sendPieces`.
+
+## Step 29. Shot bursts: keep each shot's own video
+
+At a Shoot360 the machine feeds a ball every few seconds. You want each shot back on its own, with its numbers, to
+look at later or send to a coach (step 28), without filling the phone with minutes of waiting and rebounding.
+
+**Live form check › Keep video** (on by default, `S.settings.lfKeep`). Before anything counts, a *Place the phone*
+card sits over the live picture: *Behind you* (on the line to the rim, 10 to 15 ft back, waist height, at the back
+of a Shoot360 lane, clear of the machine's passes and the net) or *From the side*. It sets the same Camera switch as
+the Form tab. *Ready* starts counting shots. The shot finder is unchanged (step 16).
+
+**Only the shots reach storage.** Two `MediaRecorder`s share the camera stream with no sound, at 1 Mbps, started
+5 s apart, and each starts over every 10 s. So any stretch of 5 s or less lies wholly inside one of their 10 s
+pieces. A shot's window is 2 s before the wrist goes above the head to 0.6 s after the follow-through. When a piece
+finishes, it is written to `hoopsLadder.videos` (tagged `burst`) only if a shot's window lies inside it. Otherwise it
+is thrown away from memory. Several shots can share one piece, and each shot keeps its own `a`/`b` in it. A phone
+that won't run two recorders keeps one with 20 s pieces, and a shot that falls across a seam keeps its numbers only.
+A line on the camera shows `Video · 2.6 MB kept`. After 40 shots with video, or if storage fills, the rest keep their
+numbers only. In headless Chromium with Ladi's clips as a fake camera, 9 of 9 shots kept their video, at about
+0.35 MB a shot. *Cues* now cycles Voice, Buzz (one buzz for a clean shot, two for a fix, for a loud gym) and Off.
+
+**A long clip from the gallery.** On the Form tab, a clip over 12 s goes to the burst reader instead of the one-shot
+check. It reads up to 3 minutes at 10 frames a second with the pose model, finds every shot with the same rules as
+the live check (`buFind`), and runs `compute()` on each. Then each shot is re-recorded on its own through a canvas at
+normal speed (`buCut`), so only the shots are kept. 8 of Ladi's clips joined into one 36 s video gave 7 shots, about
+0.2 MB each.
+
+**The viewer.** Shot 1 to N as chips, coloured by each shot's worst check, ★ on starred ones. The shot loops at ½×
+with its skeleton (the 10 fps pose frames saved at `blobs[shotId+":pf"]`) and its checks as pills. Dip, Set point and
+Release jump to those frames. *Compare* puts a second shot beside it (your starred shot, else the next one you tap),
+lined up at the release. Hold a chip to select several. *Send to coach…* (step 28) plugs into the bottom bar through
+`BURST_ACTIONS`. Each burst also saves one form history entry: the median of each number, like the live check.
+
+**Cleanup.** A shot's numbers live in `S.bursts` and stay. Its video is deleted 14 days after filming unless it has
+★, *Keep*, or was sent or saved for a coach (`shot.sent`, `shot.keep`), and never while a coach session still uses it
+(`sesUsesVid`). The Form tab's *Shot bursts* fold shows how much the videos use and *Free up space* lists bursts by
+size with *Delete videos* (numbers stay). Burst videos no shot points at, from the app closing mid-burst, go after an
+hour. Code: `bu*`, `burstOpen`, `buSweep`, and `burstFind`, `burstShotUrl`, `burstShotFrames` on `window` for the page.

@@ -442,6 +442,12 @@
 .livefc .lf-shot span{font-size:12.5px;border-radius:999px;padding:4px 10px;background:#1C2844}
 .livefc .lf-shot span.fix{background:#C13C2A}.livefc .lf-shot span.watch{background:#6b4a05}.livefc .lf-shot span.good{background:#1E8657}
 .livefc .btn.sec{background:#1C2844;border-color:#2A3858;color:#F2F5FA}
+.livefc .lf-kb{position:absolute;left:12px;top:12px;font-size:12.5px;font-weight:600;background:rgba(5,8,15,.72);border-radius:999px;padding:3px 10px;z-index:2}.livefc .lf-kb:empty{display:none}
+.livefc .lf-place{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(5,8,15,.88);border-radius:14px;padding:12px 14px;font-size:14px;z-index:3}
+.livefc .lf-place b{font-family:var(--display);font-size:18px;text-transform:uppercase}
+.livefc .lf-place ul{margin:8px 0 10px;padding-left:18px}.livefc .lf-place li{margin:4px 0}
+.livefc .lf-seg{display:flex;gap:6px;margin-top:8px}.livefc .lf-seg button{flex:1;border-radius:999px;border:1px solid #2A3858;background:#1C2844;color:#F2F5FA;padding:7px 8px;font:inherit;font-weight:600}
+.livefc .lf-seg button[aria-pressed="true"]{background:#F2F5FA;color:#05080F}
 .livefc .btn.sec[aria-pressed="true"]{background:#F2F5FA;color:#05080F}`;
     document.head.appendChild(st);
 
@@ -472,7 +478,23 @@
     function drawTop() {
       if (!L) return;
       L.el.querySelector(".lf-n").textContent = L.shots.length ? `· ${L.shots.length}` : "";
-      const b = L.el.querySelector("[data-lf=talk]"); b.setAttribute("aria-pressed", L.talk);
+      // Cues: spoken, a buzz (one for a clean shot, two for a fix: for a loud gym), or off
+      const b = L.el.querySelector("[data-lf=talk]"); b.setAttribute("aria-pressed", L.talk !== "off"); b.textContent = "Cues: " + { say: "Voice", buzz: "Buzz", off: "Off" }[L.talk];
+    }
+    // Before the first shot: where to put the phone, over the live picture so you can line it up. Ready starts counting.
+    function drawPlace() {
+      const box = L && L.el.querySelector(".lf-place");
+      if (!box) return;
+      if (L.ready) { box.hidden = true; box.innerHTML = ""; return; }
+      const B = behind();
+      box.hidden = false;
+      box.innerHTML = `<b>Place the phone</b>
+        <div class="lf-seg"><button data-lf="view" data-v="behind" aria-pressed="${B}">Behind you</button><button data-lf="view" data-v="side" aria-pressed="${!B}">From the side</button></div>
+        <ul>${B
+          ? "<li>Behind you, on the straight line from you to the rim. That shows left and right: your elbow, the ball's line, your guide hand.</li><li>About 10 to 15 ft back, at waist height. At a Shoot360, prop it at the back of your lane, out of the way of the machine's passes and the net.</li>"
+          : "<li>Level with where you shoot, off to your shooting-hand side, so your shooting arm faces the phone. That shows balance, timing, set point and arc.</li><li>About 10 to 15 ft away, at waist height, out of the way of the ball and the rebound.</li>"}
+        <li>Your whole body in the picture, feet included, with room above your hands at the release. Check the skeleton sits on you, then tap Ready.</li></ul>
+        <button class="btn pri" data-lf="ready" style="width:100%">Ready</button>`;
     }
     function showShot(res) {
       const box = L.el.querySelector(".lf-shot");
@@ -486,22 +508,26 @@
       el.setAttribute("role", "dialog");
       el.setAttribute("aria-label", "Live form check");
       el.innerHTML = `<div class="lf-top"><div class="lf-title">Live <span class="lf-n" style="opacity:.7"></span></div>
-        <button class="btn sec small" data-lf="talk" aria-pressed="true">Cues</button><button class="btn sec small" data-lf="flip">Flip</button><button class="btn sec small" data-lf="close">Done</button></div>
-        <div class="lf-stage"><video playsinline muted autoplay></video><canvas></canvas><div class="lf-msg" role="status">Starting the camera…</div><div class="lf-cue" aria-live="polite"></div></div>
+        <button class="btn sec small" data-lf="keep" aria-pressed="${buKeepOn()}">Keep video</button><button class="btn sec small" data-lf="talk">Cues</button><button class="btn sec small" data-lf="flip">Flip</button><button class="btn sec small" data-lf="close">Done</button></div>
+        <div class="lf-stage"><video playsinline muted autoplay></video><canvas></canvas><div class="lf-msg" role="status">Starting the camera…</div><div class="lf-cue" aria-live="polite"></div><div class="lf-kb"></div><div class="lf-place"></div></div>
         <div class="lf-shot"><span>${filmTip()} Shoot when you're ready.</span></div>`;
       document.body.appendChild(el);
-      L = { el, video: el.querySelector("video"), cv: el.querySelector("canvas"), stream: null, face: "environment", talk: true,
-            buf: [], shots: [], up: 0, cool: 0, armed: true, lastT: 0, noBody: 0, raf: 0, pl: null, busy: false };
+      L = { el, video: el.querySelector("video"), cv: el.querySelector("canvas"), stream: null, face: "environment", talk: S.settings.lfCue || "say",
+            ready: false, buf: [], shots: [], up: 0, cool: 0, armed: true, lastT: 0, noBody: 0, raf: 0, pl: null, busy: false };
       L.video.setAttribute("playsinline", "");
       el.addEventListener("click", e => {
         const b = e.target.closest("[data-lf]");
         if (!b || !L) return;
         if (b.dataset.lf === "close") closeLive();
-        else if (b.dataset.lf === "talk") { L.talk = !L.talk; drawTop(); }
+        else if (b.dataset.lf === "talk") { L.talk = { say: "buzz", buzz: "off", off: "say" }[L.talk] || "say"; S.settings.lfCue = L.talk; persist(); drawTop(); }
+        else if (b.dataset.lf === "keep") buLiveKeep(L);
+        else if (b.dataset.lf === "ready") { L.ready = true; drawPlace(); }
+        else if (b.dataset.lf === "view") { S.settings.fcView = b.dataset.v; persist(); L.buf = []; L.up = 0; if (K && !K.burst.shots.length) K.burst.view = fcView(); drawPlace(); }
         else if (b.dataset.lf === "flip") { L.face = L.face === "environment" ? "user" : "environment"; startCam(); }
       });
       lockOn();
       drawTop();
+      drawPlace();
       try { L.pl = await loadLivePose(); } catch (e) { msg("The pose model couldn't load on this phone."); return; }
       if (!L) return;
       startCam();
@@ -509,6 +535,7 @@
 
     async function startCam() {
       if (!L) return;
+      buLivePause(); // the shot recorders stop before the old camera does
       if (L.stream) L.stream.getTracks().forEach(t => t.stop());
       cancelAnimationFrame(L.raf);
       msg("Starting the camera…");
@@ -525,6 +552,7 @@
       L.buf = []; L.up = 0;
       msg("");
       L.raf = requestAnimationFrame(loop);
+      buLiveCam(L); // Keep video: record only the shots (section 4b)
     }
 
     function size() {
@@ -548,7 +576,7 @@
       L.buf.push({ t, lm });
       while (L.buf.length && L.buf[0].t < t - 5) L.buf.shift();
       draw(lm, cw, ch);
-      track(lm, t);
+      if (L.ready) track(lm, t); // shots count once the phone is placed (Ready)
     }
 
     function draw(lm, cw, ch) {
@@ -621,6 +649,7 @@
       // A hand raised without a dip and a long arm (a wave, a catch, fixing a sleeve) isn't a shot.
       if (res.view === "behind" ? res.vals.dip < 1.5 : res.vals.knee > 165 || res.vals.ext < 120) return;
       L.shots.push(res);
+      { const [cw, ch] = size(); buLiveShot(res, frames, t0, upAt, endAt, cw, ch); }
       drawTop();
       showShot(res);
       const worst = ORDER.map(k => res.M.find(m => m.k === k && m.st === "fix")).find(Boolean);
@@ -628,12 +657,14 @@
       const cel = L.el.querySelector(".lf-cue");
       cel.textContent = cue;
       cel.style.color = worst ? "#FF8A75" : "#7BE0A8";
-      if (L.talk) say(cue);
+      if (L.talk === "say") say(cue);
+      else if (L.talk === "buzz") try { navigator.vibrate?.(worst ? [60, 80, 60] : 40); } catch (e) {}
     }
 
     function closeLive() {
       if (!L) return;
       const shots = L.shots;
+      buLiveEnd().then(id => { if (id) burstOpen(id); }); // stops the shot recorders before the camera closes
       cancelAnimationFrame(L.raf);
       if (L.stream) L.stream.getTracks().forEach(t => t.stop());
       L.el.remove();
@@ -652,6 +683,584 @@
       render();
     }
   }
+
+  /* ---------- 4b. Shot bursts: each shot's own video, from a run of shots ----------
+     At a Shoot360 (or any rapid run of shots) the live form check finds each shot. With Keep video on, it also keeps
+     that shot's few seconds of video, and nothing else: two MediaRecorders on the camera stream take turns, each
+     restarting every 10 s, so any shot of 5 s or less falls wholly inside one of them. A 10 s piece is written to
+     the video store only if a shot lies in it, so walking, waiting for the machine and rebounding never reach
+     storage. No sound, 1 Mbps. A long clip picked on the Form tab is read the same way: every shot is found, and
+     each one is re-recorded on its own (a canvas copy played at normal speed) so only the shots are kept.
+     The viewer shows Shot 1..N with each shot's numbers and skeleton, star, keep and compare lined up at the release.
+     Video for shots with no star, Keep or send is deleted 14 days after filming; the numbers stay.
+     Data: S.bursts (numbers only, see burstFind) and video records tagged `burst` in hoopsLadder.videos. Pose frames
+     for a shot are at blobs[shotId+":pf"]. See docs/LEARNING.md, step 28. */
+  const BURST_ACTIONS = []; // {id, label, run(burst, shots)}: extra buttons on the viewer's bottom bar
+  const BU = { KEEP_DAYS: 14, MAX: 40, SEG: 10, ONE_SEG: 20, BPS: 1000000, PRE: 2, POST: .6, CLIP_MIN: 12, CLIP_MAX: 180, FPS: 10 };
+  const buList = () => (Array.isArray(S.bursts) ? S.bursts : (S.bursts = []));
+  function burstFind(id) { const burst = buList().find(b => b.id === id); return burst ? { burst } : null; }
+  const BUU = {}; // blob URLs by video id
+  async function burstShotUrl(shot) {
+    if (!shot || !shot.v) return "";
+    if (BUU[shot.v]) return BUU[shot.v];
+    try { const b = await vtx("readonly", (m, bl) => rq(bl.get(shot.v))); if (b) return (BUU[shot.v] = URL.createObjectURL(b)); } catch (e) {}
+    return "";
+  }
+  async function burstShotFrames(shot) {
+    if (!shot) return null;
+    try { return (await vtx("readonly", (m, bl) => rq(bl.get(shot.id + ":pf")))) || null; } catch (e) { return null; }
+  }
+  // native.js runs inside its own function, so the page (Send to coach) reaches these through window
+  Object.assign(window, { burstFind, burstShotUrl, burstShotFrames, BURST_ACTIONS });
+  if (typeof sendShots === "function") BURST_ACTIONS.push({ id: "send", label: "Send to coach…", run: (b, shots) => sendShots(b, shots) });
+  const buSesUses = v => { try { return typeof sesUsesVid === "function" && !!sesUsesVid(v); } catch (e) { return false; } };
+
+  async function buStore(bid, blob, secs) {
+    const id = uid("v");
+    const meta = { id, t: Date.now(), dur: Math.round(secs || 0), size: blob.size, type: blob.type || "video/mp4", burst: bid, ses: null, name: "", item: null, drill: null };
+    await vtx("readwrite", (m, bl) => { m.put(meta); bl.put(blob, id); });
+    try { if (navigator.storage?.persist && !(await navigator.storage.persisted?.())) await navigator.storage.persist(); } catch (e) {}
+    BUU[id] = URL.createObjectURL(blob);
+    return id;
+  }
+  const buPf = (shotId, pf) => vtx("readwrite", (m, bl) => { bl.put(pf, shotId + ":pf"); }).catch(() => {});
+  // drop video ids no shot (and no coach session) still points at, and the pose frames of the given shots
+  async function buDrop(vids, shotIds) {
+    const used = new Set();
+    for (const b of buList()) for (const s of b.shots) if (s.v) used.add(s.v);
+    const gone = [...new Set(vids)].filter(v => v && !used.has(v) && !buSesUses(v));
+    try { await vtx("readwrite", (m, bl) => { for (const v of gone) { m.delete(v); bl.delete(v); } for (const s of shotIds || []) bl.delete(s + ":pf"); }); } catch (e) {}
+    for (const v of gone) if (BUU[v]) { URL.revokeObjectURL(BUU[v]); delete BUU[v]; }
+    return gone.length;
+  }
+  const rnd = (x, k) => Math.round(x * k) / k;
+  const pack = lm => (lm ? lm.map(p => [rnd(p.x, 10), rnd(p.y, 10), rnd(p.v, 100)]) : null);
+  const unpack = f => (f ? f.map(p => ({ x: p[0], y: p[1], v: p[2] })) : null);
+  // one shot's record, from compute()'s result. `T` turns a frame index into video seconds.
+  function buShot(n, res) {
+    return { id: uid("sh"), n, v: null, a: 0, b: 0, r: 0, at: null, vals: res.vals, st: Object.fromEntries(res.M.map(m => [m.k, m.st])),
+             m: res.M.map(m => ({ k: m.k, l: m.label.replace(/ \(.*\)/, ""), v: m.val, st: m.st })), star: false, keep: false };
+  }
+  const worstOf = shot => (shot.m.some(m => m.st === "fix") ? "fix" : shot.m.some(m => m.st === "watch") ? "watch" : "good");
+  function buSaveForm(results) { // one form history entry for a burst, like the live form check: medians and the commonest status
+    if (!results.length) return;
+    const vals = {}, M = [];
+    for (const k of Object.keys(results[0].vals)) { const xs = results.map(r => r.vals[k]).filter(x => x != null); vals[k] = xs.length ? med(xs) : null; }
+    for (const m of results[0].M) {
+      const n = {};
+      for (const r of results) { const x = r.M.find(y => y.k === m.k); if (x) n[x.st] = (n[x.st] || 0) + 1; }
+      M.push({ k: m.k, st: Object.keys(n).sort((a, b) => n[b] - n[a])[0] });
+    }
+    saveForm({ vals, M, view: results[0].view });
+  }
+
+  /* -- two staggered recorders on one stream; onSeg({blob, t0, t1}) for each finished piece (performance seconds) -- */
+  function buRing(stream, onSeg) {
+    const W = { recs: [], one: false, tick: 0, ok: true };
+    const now = () => performance.now() / 1000;
+    function rec() {
+      const type = pickMime();
+      let mr;
+      try { mr = new MediaRecorder(stream, Object.assign({ videoBitsPerSecond: BU.BPS }, type ? { mimeType: type } : {})); }
+      catch (e) { try { mr = new MediaRecorder(stream); } catch (e2) { return null; } }
+      const r = { mr, chunks: [], t0: now() };
+      mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); };
+      mr.onstart = () => { r.t0 = now(); };
+      try { mr.start(1000); } catch (e) { return null; }
+      W.recs.push(r);
+      return r;
+    }
+    function finish(r) {
+      W.recs.splice(W.recs.indexOf(r), 1);
+      const t1 = now();
+      return new Promise(res => {
+        r.mr.onstop = () => { const c = r.chunks; r.chunks = []; res(c.length ? { blob: new Blob(c, { type: c[0].type || r.mr.mimeType || "video/mp4" }), t0: r.t0, t1, last: W.ending } : null); };
+        try { if (r.mr.state === "inactive") r.mr.onstop(); else r.mr.stop(); } catch (e) { res(null); }
+      }).then(seg => (seg ? onSeg(seg) : null));
+    }
+    if (typeof MediaRecorder === "undefined" || !rec()) { W.ok = false; return W; }
+    W.tick = setInterval(() => {
+      const life = W.one ? BU.ONE_SEG : BU.SEG;
+      for (const r of W.recs.slice()) if (now() - r.t0 >= life) { finish(r); rec(); }
+      if (W.recs.length === 1 && !W.one && now() - W.recs[0].t0 >= BU.SEG / 2 && !rec()) W.one = true; // one recorder at a time: 20 s pieces
+      if (!W.recs.length) rec();
+    }, 250);
+    W.end = () => { clearInterval(W.tick); W.ending = true; return Promise.all(W.recs.slice().map(finish)); };
+    return W;
+  }
+
+  /* -- live form check side (called from section 4) -- */
+  let K = null; // the live burst: {burst, ring, pend, results, chain, bytes, el}
+  const buKeepOn = () => S.settings.lfKeep !== false;
+  function buLiveLine() {
+    if (!K || !K.el) return;
+    const el = K.el.querySelector(".lf-kb");
+    if (!el) return;
+    const n = K.burst.shots.length;
+    el.textContent = !buKeepOn() ? "" : K.noRec ? "No video on this phone, numbers only" : K.full ? "Storage full, numbers only" : K.bytes ? `Video · ${fmtMB(K.bytes)} kept` : "Video · keeping shots only";
+  }
+  // (re)start the recorders on the live check's stream; buLivePause() first when the stream is about to change
+  function buLiveCam(L) {
+    if (!K) K = { burst: { id: uid("b"), t: Date.now(), view: fcView(), hand: S.settings.hand || "R", src: "live", shots: [] }, pend: [], results: [], chain: Promise.resolve(), bytes: 0, ends: [] };
+    K.el = L.el;
+    buLivePause();
+    if (buKeepOn() && L.stream && !K.full) {
+      const k = K, W = buRing(L.stream, seg => { k.chain = k.chain.then(() => buSeg(k, seg)); });
+      if (W.ok) K.ring = W; else K.noRec = true;
+    }
+    buLiveLine();
+  }
+  function buLivePause() { if (K && K.ring) { const W = K.ring; K.ring = null; K.ends.push(W.end()); } }
+  function buLiveKeep(L) {
+    S.settings.lfKeep = !buKeepOn();
+    persist();
+    const b = L.el.querySelector("[data-lf=keep]");
+    if (b) b.setAttribute("aria-pressed", buKeepOn());
+    if (buKeepOn()) buLiveCam(L); else { buLivePause(); buLiveLine(); }
+  }
+  // a shot found by the live check: frames are compute()'s 10 fps frames from t0 (performance seconds)
+  function buLiveShot(res, frames, t0, upAt, endAt, cw, ch) {
+    if (!K) return;
+    K.results.push(res);
+    const B = K.burst, shot = buShot(B.shots.length + 1, res);
+    if (!buList().includes(B)) { buList().push(B); S.bursts = buList().slice(-30); }
+    B.shots.push(shot);
+    persist();
+    // dense 10 fps frames from t0 (compute's frames can skip a missing one)
+    const f = [];
+    for (const fr of frames) f[Math.round(fr.t * BU.FPS)] = pack(fr.lm);
+    for (let i = 0; i < f.length; i++) if (f[i] === undefined) f[i] = null;
+    const at = { p: t0 + frames[res.p].t, sp: t0 + frames[res.sp].t, r: t0 + frames[res.r].t };
+    if (K.ring && B.shots.filter(s => s.v || K.pend.some(p => p.shot === s)).length < BU.MAX)
+      K.pend.push({ shot, w0: upAt - BU.PRE, w1: endAt + BU.POST, at, pf: { fps: BU.FPS, t0, cw, ch, f } });
+    else buPf(shot.id, { fps: BU.FPS, t0: 0, cw, ch, f });
+    buLiveLine();
+  }
+  async function buSeg(K, seg) {
+    // the last piece (Done) also takes a shot whose follow-through it cut short, as long as the release is in it
+    const mine = K.pend.filter(p => p.w0 >= seg.t0 - .05 && (p.w1 <= seg.t1 + .05 || (seg.last && p.at.r < seg.t1 - .1)));
+    if (mine.length) {
+      try {
+        const id = await buStore(K.burst.id, seg.blob, seg.t1 - seg.t0);
+        K.bytes += seg.blob.size;
+        for (const p of mine) {
+          const s = p.shot, o = seg.t0;
+          Object.assign(s, { v: id, a: rnd(Math.max(0, p.w0 - o), 100), b: rnd(Math.min(p.w1, seg.t1) - o, 100), r: rnd(p.at.r - o, 100),
+                             at: { p: rnd(p.at.p - o, 100), sp: rnd(p.at.sp - o, 100), r: rnd(p.at.r - o, 100) } });
+          await buPf(s.id, Object.assign({}, p.pf, { t0: rnd(p.pf.t0 - o, 1000) }));
+        }
+        persist();
+      } catch (e) { if (e && e.name === "QuotaExceededError") { K.full = true; toast("Phone storage is full", "Shot videos stopped. The numbers keep going."); } }
+      K.pend = K.pend.filter(p => !mine.includes(p));
+    }
+    // (a shot no piece covers keeps waiting; Done gives it its numbers only)
+    if (K.full && K.ring) { const W = K.ring; K.ring = null; K.ends.push(W.end()); }
+    buLiveLine();
+  }
+  // Done on the live check: stop the recorders, keep what's covered, then open the burst. Resolves to its id or null.
+  async function buLiveEnd() {
+    if (!K) return null;
+    const k = K;
+    buLivePause(); // stops the recorders now, before the camera closes
+    await Promise.all(k.ends);
+    await k.chain;
+    for (const p of k.pend) await buPf(p.shot.id, Object.assign({}, p.pf, { t0: 0 }));
+    k.pend = [];
+    K = null;
+    persist();
+    if (k.burst.shots.length) { await loadVids(); return k.burst.id; }
+    return null;
+  }
+
+  /* -- a long clip from the gallery: find every shot, keep each one as its own short video -- */
+  // Same shot rules as the live check (section 4): the wrist above the head starts a shot, back below the shoulder
+  // (or 1.8 s) ends it, 0.8 s before the next, and the hand must come down for 0.3 s first.
+  function buFind(frames, view, hand) {
+    const B = view === "behind", side = SIDE[hand];
+    const out = [];
+    let up = 0, cool = 0, armed = true, downAt = 0;
+    for (const { t, lm } of frames) {
+      if (!lm) continue;
+      const body = B ? lm[11].v > .3 && lm[12].v > .3 && (lm[15].v > .3 || lm[16].v > .3) && (lm[27].v > .3 || lm[28].v > .3)
+                     : lm[0].v > .3 && lm[side.wr].v > .3 && (lm[side.an].v > .3 || lm[side.an === 28 ? 27 : 28].v > .3);
+      if (!body) continue;
+      const wr = B ? ((lm[16].v > .3 ? lm[16].y : 1e9) <= (lm[15].v > .3 ? lm[15].y : 1e9) ? 16 : 15) : side.wr;
+      const shY = B ? (lm[11].y + lm[12].y) / 2 : lm[side.sh].y, headY = B ? shY - .6 * Math.abs(lm[11].x - lm[12].x) : lm[0].y;
+      if (!armed) { if (lm[wr].y > shY) { downAt = downAt || t; if (t - downAt > .3) armed = true; } else downAt = 0; }
+      if (t < cool || !armed) continue;
+      const above = lm[wr].y < headY, down = lm[wr].y > shY;
+      if (above && !up) up = t;
+      if (up && ((down && t - up > .25) || t - up > 1.8)) { out.push({ up, end: t }); up = 0; armed = false; downAt = 0; cool = t + .8; }
+    }
+    return out;
+  }
+  const buOnce = (el, ev, ms) => new Promise(res => { const f = () => { clearTimeout(tm); el.removeEventListener(ev, f); res(true); }; const tm = setTimeout(() => { el.removeEventListener(ev, f); res(false); }, ms); el.addEventListener(ev, f); });
+  async function buSeekTo(v, t) { if (Math.abs(v.currentTime - t) < 1e-3) return; const p = buOnce(v, "seeked", 2000); v.currentTime = t; await p; }
+  // re-record v from w0 to w1 at normal speed through a canvas, with no sound
+  async function buCut(v, w0, w1) {
+    const c = document.createElement("canvas"), sc = Math.min(1, 720 / Math.min(v.videoWidth, v.videoHeight));
+    c.width = Math.round(v.videoWidth * sc / 2) * 2; c.height = Math.round(v.videoHeight * sc / 2) * 2;
+    const g = c.getContext("2d");
+    if (!c.captureStream || typeof MediaRecorder === "undefined") return null;
+    await buSeekTo(v, w0);
+    g.drawImage(v, 0, 0, c.width, c.height);
+    const stream = c.captureStream(30), type = pickMime();
+    let mr;
+    try { mr = new MediaRecorder(stream, Object.assign({ videoBitsPerSecond: BU.BPS }, type ? { mimeType: type } : {})); } catch (e) { try { mr = new MediaRecorder(stream); } catch (e2) { return null; } }
+    const chunks = [];
+    mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    const stopped = new Promise(res => { mr.onstop = res; });
+    mr.start(500);
+    v.playbackRate = 1;
+    try { await v.play(); } catch (e) { mr.stop(); stream.getTracks().forEach(x => x.stop()); return null; }
+    await new Promise(res => {
+      const lim = setTimeout(res, (w1 - w0) * 1000 + 3000);
+      const step = () => { g.drawImage(v, 0, 0, c.width, c.height); if (v.currentTime >= w1 || v.ended) { clearTimeout(lim); res(); } else requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    });
+    v.pause();
+    mr.stop();
+    await stopped;
+    stream.getTracks().forEach(x => x.stop());
+    return chunks.length ? new Blob(chunks, { type: chunks[0].type || mr.mimeType || "video/mp4" }) : null;
+  }
+  let BC = null; // the clip being read
+  async function buFromClip(file, dur) {
+    if (BC) return;
+    const el = document.createElement("div");
+    el.className = "livefc buv";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-label", "Finding your shots");
+    el.innerHTML = `<div class="lf-top"><div class="lf-title">Shot burst</div><button class="btn sec small" data-bc="cancel">Cancel</button></div>
+      <div class="bu-wait"><b>Finding your shots</b><p class="bu-prog" role="status">Loading the pose model…</p><p class="bu-sub">Keep the app open. Only the shots are kept, each as its own short video.</p></div>`;
+    document.body.appendChild(el);
+    BC = { el, stop: false };
+    el.addEventListener("click", e => { if (e.target.closest("[data-bc=cancel]") && BC) BC.stop = true; });
+    const prog = t => { const p = el.querySelector(".bu-prog"); if (p) p.textContent = t; };
+    lockOn();
+    const url = URL.createObjectURL(file), v = document.createElement("video");
+    v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = url;
+    const done = id => { lockOff(); URL.revokeObjectURL(url); v.removeAttribute("src"); v.load(); el.remove(); BC = null; render(); if (id) burstOpen(id); };
+    let pl = null;
+    try { pl = await loadPose(); } catch (e) {}
+    if (!pl) { toast("Couldn't load the pose model", "Shot bursts need it to find your shots."); return done(null); }
+    await buOnce(v, "loadeddata", 8000);
+    if (!v.videoWidth) { toast("Couldn't open that video", "Try a clip filmed with your camera app."); return done(null); }
+    const sc = 480 / Math.max(v.videoWidth, v.videoHeight), cw = Math.round(v.videoWidth * sc), ch = Math.round(v.videoHeight * sc);
+    const work = document.createElement("canvas"); work.width = cw; work.height = ch;
+    const wg = work.getContext("2d");
+    const end = Math.min(dur, BU.CLIP_MAX), n = Math.floor(end * BU.FPS), frames = [];
+    for (let i = 0; i < n; i++) {
+      if (BC.stop) return done(null);
+      const t = i / BU.FPS;
+      await buSeekTo(v, Math.min(t + .001, dur - .01));
+      wg.drawImage(v, 0, 0, cw, ch);
+      let lm = null;
+      try { const r = pl.detect(work); lm = r.landmarks && r.landmarks[0]; } catch (e) {}
+      frames.push({ t, lm: lm ? lm.map(p => ({ x: p.x * cw, y: p.y * ch, v: p.visibility ?? 1 })) : null });
+      if (i % 10 === 0) prog(`Reading ${fmtDur(t) || "0:00"} of ${fmtDur(end)}${dur > end ? ` (the first ${fmtDur(end)} only)` : ""}`);
+    }
+    const view = fcView(), hand = S.settings.hand || "R", B = { id: uid("b"), t: Date.now(), view, hand, src: "clip", shots: [] }, results = [], keep = [];
+    for (const s of buFind(frames, view, hand)) {
+      const t0 = s.up - 2.5, fr = frames.filter(f => f.t >= t0 - 1e-6 && f.t <= s.end + 1e-6).map(f => ({ t: f.t - t0, lm: f.lm }));
+      let res = null;
+      try { res = compute(fr, BU.FPS); } catch (e) {}
+      if (!res || !res.ok) continue;
+      if (res.view === "behind" ? res.vals.dip < 1.5 : res.vals.knee > 165 || res.vals.ext < 120) continue;
+      const shot = buShot(B.shots.length + 1, res);
+      B.shots.push(shot); results.push(res);
+      keep.push({ shot, w0: Math.max(0, s.up - BU.PRE), w1: Math.min(dur, s.end + BU.POST), t0, fr, at: { p: t0 + fr[res.p].t, sp: t0 + fr[res.sp].t, r: t0 + fr[res.r].t } });
+    }
+    if (!B.shots.length) { toast("No shots found", view === "behind" ? "Film from behind you with your whole body, feet included, in frame." : "Film from the side with your whole body, feet included, in frame."); return done(null); }
+    buList().push(B); S.bursts = buList().slice(-30);
+    persist();
+    let cut = 0;
+    for (const k of keep) {
+      if (BC.stop) break;
+      prog(`Keeping shot ${k.shot.n} of ${B.shots.length}`);
+      const f = [];
+      for (const x of k.fr) f[Math.round(x.t * BU.FPS)] = pack(x.lm);
+      for (let i = 0; i < f.length; i++) if (f[i] === undefined) f[i] = null;
+      let blob = null;
+      if (cut < BU.MAX) try { blob = await buCut(v, k.w0, k.w1); } catch (e) {}
+      if (blob) {
+        try {
+          const o = k.w0, s = k.shot;
+          s.v = await buStore(B.id, blob, k.w1 - k.w0);
+          Object.assign(s, { a: 0, b: rnd(k.w1 - o, 100), r: rnd(k.at.r - o, 100), at: { p: rnd(k.at.p - o, 100), sp: rnd(k.at.sp - o, 100), r: rnd(k.at.r - o, 100) } });
+          cut++;
+        } catch (e) { if (e && e.name === "QuotaExceededError") { toast("Phone storage is full", "The rest of the shots keep their numbers only."); cut = BU.MAX; } }
+      }
+      await buPf(k.shot.id, { fps: BU.FPS, t0: rnd(k.t0 - k.w0, 1000), cw, ch, f });
+    }
+    persist();
+    buSaveForm(results);
+    await loadVids();
+    done(B.id);
+  }
+  const origAnalyze = analyze;
+  analyze = async function (file) {
+    let d = 0;
+    try { d = await vidDur(file); } catch (e) {}
+    if (d > BU.CLIP_MIN) return buFromClip(file, d);
+    return origAnalyze.apply(this, arguments);
+  };
+
+  /* -- the burst viewer -- */
+  const bst = document.createElement("style");
+  bst.textContent = `
+.buv .bu-wait{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px}
+.buv .bu-wait b{font-family:var(--display);font-size:24px;text-transform:uppercase}.buv .bu-wait p{margin:8px 0 0}.buv .bu-sub{opacity:.7;font-size:14px}
+.buv .bu-panes{position:relative;flex:1;min-height:0;display:flex;gap:6px;padding:0 8px}
+.buv .bu-pane{position:relative;flex:1;min-width:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000;border-radius:10px}
+.buv .bu-pane video,.buv .bu-pane canvas{position:absolute}
+.buv .bu-tag{position:absolute;left:8px;top:8px;font-size:12.5px;font-weight:700;background:rgba(5,8,15,.75);border-radius:999px;padding:3px 9px;z-index:2}
+.buv .bu-none{opacity:.75;font-size:14px;padding:16px;text-align:center}
+.buv .bu-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 12px 0}
+.buv .bu-strip{display:flex;gap:6px;overflow-x:auto;padding:10px 12px 4px;scrollbar-width:none}
+.buv .bu-chip{flex:none;min-width:44px;height:44px;border-radius:12px;border:2px solid transparent;background:#1C2844;color:#F2F5FA;font-weight:700;font-size:15px;position:relative}
+.buv .bu-chip.fix{background:#7a2318}.buv .bu-chip.watch{background:#5a3f06}.buv .bu-chip.good{background:#145c3c}
+.buv .bu-chip.nov{opacity:.45}.buv .bu-chip[aria-current="true"]{border-color:#F2F5FA}.buv .bu-chip.sel{outline:3px solid #F07A35;outline-offset:1px}
+.buv .bu-chip .st{position:absolute;right:2px;top:0;font-size:11px;color:#FFD34D}
+.buv .bu-m{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:6px 12px 0}
+.buv .bu-m span{font-size:12.5px;border-radius:999px;padding:4px 10px;background:#1C2844}
+.buv .bu-m span.fix{background:#C13C2A}.buv .bu-m span.watch{background:#6b4a05}.buv .bu-m span.good{background:#1E8657}
+.buv .bu-note{font-size:12.5px;opacity:.72;text-align:center;padding:6px 16px 0;margin:0}
+.buv .bu-bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 12px 14px}
+.bu-list{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.bu-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line,#ddd);border-radius:12px;padding:10px 12px;background:var(--card,#fff);color:inherit;font:inherit}
+.bu-item b{flex:1}.bu-item .muted{font-size:13px}`;
+  document.head.appendChild(bst);
+
+  let BV = null; // the open viewer: {bid, i, sel:Set, cmp, rate, el, raf}
+  const buDay = t => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  function burstOpen(id, i) {
+    const f = burstFind(id);
+    if (!f) return;
+    if (BV) burstClose();
+    const el = document.createElement("div");
+    el.className = "livefc buv";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-label", "Shot burst");
+    document.body.appendChild(el);
+    BV = { bid: id, i: i || 0, sel: new Set(), cmp: null, pick: false, rate: .5, el, raf: 0, pf: {}, urls: {} };
+    el.addEventListener("click", buClick);
+    el.addEventListener("pointerdown", buPress);
+    buDraw();
+  }
+  function burstClose() {
+    if (!BV) return;
+    cancelAnimationFrame(BV.raf);
+    BV.el.querySelectorAll("video").forEach(v => { v.pause(); v.removeAttribute("src"); v.load(); });
+    BV.el.remove();
+    BV = null;
+    if (state.tab === "form") render();
+  }
+  const buCur = () => { const f = BV && burstFind(BV.bid); return f ? f.burst : null; };
+  function buDraw() {
+    const B = buCur();
+    if (!B) return burstClose();
+    const S0 = B.shots, cur = S0[BV.i] || S0[0], other = BV.cmp != null ? S0[BV.cmp] : null;
+    const exp = B.t + BU.KEEP_DAYS * 864e5, kept = s => s.star || s.keep || s.sent;
+    const unkept = S0.filter(s => s.v && !kept(s)).length;
+    const shots = BV.sel.size ? S0.filter(s => BV.sel.has(s.id)) : [cur];
+    BV.el.innerHTML = `<div class="lf-top"><div class="lf-title">Shot ${cur.n} <span style="opacity:.7">of ${S0.length} · ${esc(buDay(B.t))}</span></div>
+      <button class="btn sec small" data-bv="close">Done</button></div>
+      <div class="bu-panes">${pane(cur, other ? `Shot ${cur.n}` : "")}${other ? pane(other, `Shot ${other.n}`) : ""}</div>
+      <div class="bu-m">${cur.m.map(m => `<span class="${m.st}">${esc(m.l)} · ${esc(m.v)}</span>`).join("")}</div>
+      <div class="bu-row">${[[1, "1×"], [.5, "½×"], [.25, "¼×"]].map(([r, l]) => `<button class="btn sec small" data-bv="rate:${r}" aria-pressed="${BV.rate === r}">${l}</button>`).join("")}
+        ${cur.at ? `<button class="btn sec small" data-bv="jump:p">Dip</button><button class="btn sec small" data-bv="jump:sp">Set point</button><button class="btn sec small" data-bv="jump:r">Release</button>` : ""}<button class="btn sec small" data-bv="play">Pause</button></div>
+      <div class="bu-strip" role="listbox" aria-label="Shots">${S0.map((s, j) => `<button class="bu-chip ${worstOf(s)}${s.v ? "" : " nov"}${BV.sel.has(s.id) ? " sel" : ""}" data-bv="shot:${j}" aria-current="${j === BV.i}" aria-label="Shot ${s.n}${s.star ? ", starred" : ""}${s.v ? "" : ", no video"}">${s.n}${s.star ? '<span class="st">★</span>' : ""}</button>`).join("")}</div>
+      ${BV.pick ? `<p class="bu-note"><b>Tap the shot to compare with.</b> They play lined up at the release.</p>`
+        : BV.sel.size ? `<p class="bu-note">${BV.sel.size} selected · <button class="linkbtn" data-bv="selclear" style="color:inherit">Clear</button></p>`
+        : `<p class="bu-note">${unkept && Date.now() < exp ? `Video for shots with no ★ or Keep is deleted on ${esc(buDay(exp))}. ` : ""}Hold a shot to select several.</p>`}
+      <div class="bu-bar"><button class="btn sec small" data-bv="star" aria-pressed="${!!cur.star}">${cur.star ? "★ Starred" : "☆ Star"}</button>
+        ${cur.v ? `<button class="btn sec small" data-bv="keep" aria-pressed="${!!cur.keep}">${cur.keep ? "Kept" : "Keep"}</button>` : ""}
+        ${S0.length > 1 ? `<button class="btn sec small" data-bv="cmp" aria-pressed="${other != null || BV.pick}">${other ? "Single" : "Compare"}</button>` : ""}
+        ${cur.v ? `<button class="btn sec small" data-bv="del">${BV.delAsk ? "Tap again to delete" : "Delete video"}</button>` : ""}
+        ${BURST_ACTIONS.map(a => `<button class="btn sec small" data-bv="act:${esc(a.id)}">${esc(a.label)}</button>`).join("")}</div>`;
+    BV.shots = shots;
+    buLoad(cur, other);
+  }
+  function pane(s, tag) {
+    return `<div class="bu-pane" data-shot="${s.id}">${tag ? `<span class="bu-tag">${esc(tag)}</span>` : ""}${s.v ? `<video playsinline muted loop=""></video><canvas></canvas>` : `<div class="bu-none">No video for shot ${s.n}. ${s.gone ? "It was deleted after 14 days." : "Only its numbers were kept."}</div>`}</div>`;
+  }
+  async function buLoad(cur, other) {
+    const my = BV;
+    cancelAnimationFrame(my.raf);
+    const P = [];
+    for (const s of [cur, other].filter(Boolean)) {
+      const box = my.el.querySelector(`.bu-pane[data-shot="${s.id}"]`), v = box && box.querySelector("video");
+      if (!v) continue;
+      const url = await burstShotUrl(s);
+      if (BV !== my) return;
+      if (!url) { box.innerHTML = `<div class="bu-none">Couldn't open shot ${s.n}'s video.</div>`; continue; }
+      if (!(s.id in my.pf)) my.pf[s.id] = await burstShotFrames(s);
+      if (BV !== my) return;
+      v.src = url;
+      v.playbackRate = my.rate;
+      P.push({ s, v, cv: box.querySelector("canvas"), box, pf: my.pf[s.id] });
+    }
+    my.P = P;
+    for (const p of P) { if (p.v.readyState < 1) await buOnce(p.v, "loadedmetadata", 4000); try { p.v.currentTime = p.s.a; } catch (e) {} }
+    if (BV !== my) return;
+    for (const p of P) { p.v.playbackRate = my.rate; p.v.play().catch(() => {}); }
+    my.playing = true;
+    const tick = () => {
+      if (BV !== my) return;
+      my.raf = requestAnimationFrame(tick);
+      const m = P[0];
+      if (!m) return;
+      if (m.v.currentTime >= m.s.b - .02 || m.v.currentTime < m.s.a - .3) { m.v.currentTime = m.s.a; }
+      if (P[1]) { // the other shot follows, lined up at the release
+        const want = Math.max(P[1].s.a, Math.min(P[1].s.b, P[1].s.r + (m.v.currentTime - m.s.r)));
+        if (Math.abs(P[1].v.currentTime - want) > .08) P[1].v.currentTime = want;
+        if (P[1].v.paused !== m.v.paused) { if (m.v.paused) P[1].v.pause(); else P[1].v.play().catch(() => {}); }
+      }
+      for (const p of P) buSkel(p, B0(p));
+    };
+    const B0 = p => p.v.currentTime;
+    tick();
+  }
+  function buSkel(p, t) {
+    const { v, cv, box, pf } = p;
+    if (!v.videoWidth) return;
+    const k = Math.min(box.clientWidth / v.videoWidth, box.clientHeight / v.videoHeight), w = Math.round(v.videoWidth * k), h = Math.round(v.videoHeight * k);
+    if (v.style.width !== w + "px") { v.style.width = cv.style.width = w + "px"; v.style.height = cv.style.height = h + "px"; }
+    if (!pf || !pf.f) return;
+    if (cv.width !== pf.cw) { cv.width = pf.cw; cv.height = pf.ch; }
+    const c = cv.getContext("2d");
+    c.clearRect(0, 0, cv.width, cv.height);
+    const i = Math.round((t - pf.t0) * pf.fps), lm = i >= 0 && i < pf.f.length ? unpack(pf.f[i]) : null;
+    if (!lm) return;
+    const B = buCur(), s = B && B.view !== "behind" ? SIDE[B.hand || "R"] : null, hot = new Set(s ? [s.sh, s.el, s.wr] : []);
+    c.lineCap = "round";
+    for (const [a, b] of BONES) {
+      const A = lm[a], Z = lm[b];
+      if (!A || !Z || A.v < .3 || Z.v < .3) continue;
+      const on = hot.has(a) && hot.has(b);
+      c.strokeStyle = on ? "#F07A35" : "rgba(255,255,255,.85)"; c.lineWidth = on ? 4 : 2.5;
+      c.beginPath(); c.moveTo(A.x, A.y); c.lineTo(Z.x, Z.y); c.stroke();
+    }
+  }
+  function buPress(e) {
+    const b = e.target.closest("[data-bv^='shot:']");
+    if (!b || !BV) return;
+    clearTimeout(BV.hold);
+    BV.held = false;
+    const up = () => { clearTimeout(BV && BV.hold); b.removeEventListener("pointerup", up); b.removeEventListener("pointerleave", up); };
+    b.addEventListener("pointerup", up); b.addEventListener("pointerleave", up);
+    BV.hold = setTimeout(() => {
+      if (!BV) return;
+      BV.held = true;
+      const s = buCur().shots[+b.dataset.bv.slice(5)];
+      if (BV.sel.has(s.id)) BV.sel.delete(s.id); else BV.sel.add(s.id);
+      try { navigator.vibrate?.(15); } catch (er) {}
+      buDraw();
+    }, 500);
+  }
+  async function buClick(e) {
+    const b = e.target.closest("[data-bv]");
+    if (!b || !BV) return;
+    const [k, x] = b.dataset.bv.split(/:(.*)/), B = buCur(), cur = B.shots[BV.i];
+    if (k !== "del") BV.delAsk = false;
+    if (k === "close") return burstClose();
+    if (k === "shot") {
+      if (BV.held) { BV.held = false; return; }
+      const j = +x;
+      if (BV.sel.size) { const s = B.shots[j]; if (BV.sel.has(s.id)) BV.sel.delete(s.id); else BV.sel.add(s.id); return buDraw(); }
+      if (BV.pick) { BV.pick = false; if (j !== BV.i) BV.cmp = j; return buDraw(); }
+      BV.i = j;
+      if (BV.cmp === j) BV.cmp = null;
+      return buDraw();
+    }
+    if (k === "rate") { BV.rate = +x; (BV.P || []).forEach(p => (p.v.playbackRate = BV.rate)); BV.el.querySelectorAll("[data-bv^='rate:']").forEach(y => y.setAttribute("aria-pressed", y.dataset.bv === b.dataset.bv)); return; }
+    if (k === "play") { const m = BV.P && BV.P[0]; if (!m) return; if (m.v.paused) m.v.play().catch(() => {}); else m.v.pause(); b.textContent = m.v.paused ? "Play" : "Pause"; return; }
+    if (k === "jump") { const m = BV.P && BV.P[0]; if (!m || !cur.at) return; m.v.pause(); m.v.currentTime = cur.at[x]; const pb = BV.el.querySelector("[data-bv=play]"); if (pb) pb.textContent = "Play"; return; }
+    if (k === "selclear") { BV.sel.clear(); return buDraw(); }
+    if (k === "star") { cur.star = !cur.star; persist(); return buDraw(); }
+    if (k === "keep") { cur.keep = !cur.keep; persist(); return buDraw(); }
+    if (k === "cmp") {
+      if (BV.cmp != null || BV.pick) { BV.cmp = null; BV.pick = false; return buDraw(); }
+      const star = B.shots.findIndex((s, j) => s.star && s.v && j !== BV.i);
+      if (star >= 0) BV.cmp = star; else BV.pick = true;
+      return buDraw();
+    }
+    if (k === "del") {
+      if (!BV.delAsk) { BV.delAsk = true; b.textContent = "Tap again to delete"; return; }
+      BV.delAsk = false;
+      const v = cur.v;
+      cur.v = null; cur.star = false; cur.keep = false;
+      persist();
+      await buDrop([v], []);
+      await loadVids();
+      return buDraw();
+    }
+    if (k === "act") { const a = BURST_ACTIONS.find(y => y.id === x); if (a) try { await a.run(B, BV.sel.size ? B.shots.filter(s => BV.sel.has(s.id)) : [cur]); } catch (er) {} return BV && buDraw(); }
+  }
+
+  /* -- cleanup: unkept shot video goes 14 days after filming; burst videos no shot points at go too -- */
+  async function buSweep() {
+    const now = Date.now(), vids = [], ids = [];
+    for (const B of buList()) {
+      if (now - B.t < BU.KEEP_DAYS * 864e5) continue;
+      for (const s of B.shots) if (s.v && !s.star && !s.keep && !s.sent && !buSesUses(s.v)) { vids.push(s.v); ids.push(s.id); s.v = null; s.gone = 1; }
+    }
+    let n = 0;
+    if (vids.length) { persist(); n += await buDrop(vids, ids); }
+    try { // orphans: a burst video older than an hour that no shot points at (the app closed mid-burst)
+      const metas = await vtx("readonly", m => rq(m.getAll()));
+      const orph = metas.filter(m => m.burst && now - m.t > 36e5).map(m => m.id);
+      if (orph.length) n += await buDrop(orph, []);
+    } catch (e) {}
+    if (n && CO.vidsLoaded) loadVids();
+  }
+  setTimeout(buSweep, 5000);
+
+  /* -- Form tab: the Shot bursts fold, with storage and Free up space -- */
+  let BF = { free: false, ask: null };
+  const buSizes = () => { const m = {}; for (const v of CO.vids) if (v.burst) m[v.id] = v.size || 0; return m; };
+  function buBytes(B, sz) { const seen = new Set(); let n = 0; for (const s of B.shots) if (s.v && !seen.has(s.v)) { seen.add(s.v); n += sz[s.v] || 0; } return n; }
+  function buSection() {
+    const L = buList().slice().reverse(), sz = buSizes(), tot = Object.values(sz).reduce((a, b) => a + b, 0);
+    const row = B => {
+      const n = B.shots.length, st = B.shots.filter(s => s.star).length, mb = buBytes(B, sz);
+      return BF.free
+        ? `<div class="bu-item"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}</b><span class="muted">${mb ? fmtMB(mb) : "no video"}</span>${mb ? `<button class="btn sec small" data-buf="del:${B.id}">${BF.ask === B.id ? "Tap again" : "Delete videos"}</button>` : ""}</div>`
+        : `<button class="bu-item" data-buf="open:${B.id}"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}${st ? ` · ★${st}` : ""}</b><span class="muted">${B.src === "clip" ? "From a clip" : B.view === "behind" ? "From behind" : "From the side"}${mb ? " · " + fmtMB(mb) : ""}</span></button>`;
+    };
+    const list = BF.free ? L.slice().sort((a, b) => buBytes(b, sz) - buBytes(a, sz)) : L.slice(0, 10);
+    const body = `<p class="small" style="margin:0">Turn on <b>Keep video</b> in Live form check and each shot keeps its own few seconds of video, with its numbers. Only the shots are saved, never the time in between. A clip longer than ${BU.CLIP_MIN} s picked above is split into its shots the same way.</p>
+      <p class="small muted" style="margin:6px 0 0">At a Shoot360, prop the phone behind you in the lane and pick Camera: From behind.</p>
+      ${list.length ? `<div class="bu-list">${list.map(row).join("")}</div>` : ""}
+      ${tot ? `<p class="small muted" style="margin:0">Shot videos use ${fmtMB(tot)}${CO.usage ? ` of the ${fmtMB(CO.usage)} the app uses on this phone` : ""}. Video for shots with no ★ or Keep is deleted 14 days after filming. The numbers stay.</p>
+      <button class="btn sec small" data-buf="free" style="margin-top:6px">${BF.free ? "Done" : "Free up space"}</button>` : ""}`;
+    return `<section>${fold("bursts", "Shot bursts", L.length ? `${L.length} burst${L.length > 1 ? "s" : ""}${tot ? " · " + fmtMB(tot) : ""}` : "None yet", body, false)}</section>`;
+  }
+  {
+    const prevViewForm = viewForm;
+    viewForm = function () { return prevViewForm.apply(this, arguments).replace('<section id="cliplib">', buSection() + '<section id="cliplib">'); };
+  }
+  document.addEventListener("click", async e => {
+    const b = e.target.closest && e.target.closest("[data-buf]");
+    if (!b) return;
+    e.preventDefault();
+    const [k, id] = b.dataset.buf.split(":");
+    if (k === "open") return burstOpen(id);
+    if (k === "free") { BF.free = !BF.free; BF.ask = null; return render(); }
+    if (k === "del") {
+      if (BF.ask !== id) { BF.ask = id; return render(); }
+      BF.ask = null;
+      const f = burstFind(id);
+      if (!f) return;
+      const vids = [], ids = [];
+      for (const s of f.burst.shots) if (s.v && !buSesUses(s.v)) { vids.push(s.v); ids.push(s.id); s.v = null; s.star = false; s.keep = false; }
+      persist();
+      const n = await buDrop(vids, []);
+      await loadVids();
+      toast("Videos deleted", n ? "The shots' numbers are still there." : "Nothing to delete.");
+    }
+  });
 
   /* ---------- 5. Match the beat to the player's real dribble ----------
      On a part with a beat, "Match my dribble" listens with the mic for 8 seconds while the player dribbles at their
