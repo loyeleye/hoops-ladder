@@ -979,6 +979,8 @@ server, and the temporary file is deleted straight away.
 - One at a time, and only once filming or talking stops. A failure shows *Try again* (`txs: "fail"`, or `"lang"`
   while the phone fetches its English speech pack). Older phones and the browser keep audio only and show nothing.
 - Up to 3 minutes of each piece is transcribed.
+The phone's recognizer stops at the first pause, so `sesPcmSplit()` cuts the audio at pauses of 0.35 s or more
+(parts of 1.5 to 20 s) and each part is transcribed on its own, then joined as sentences.
 
 **Spoken marks (beta).** In setup, *Say "my turn"* (off by default, `S.coach.sesVoice`) listens during a propped
 recording: "my turn" marks your try, "again" or "one more" marks another, and "done" stops and opens the replay.
@@ -1067,6 +1069,9 @@ starts with the first shot), or N in a row. *Done · save score* adds a Score pi
 `made`, `att`, `secs`, `best`) shown on the board and at wrap-up, with *Last time with Mo* from earlier tests on the
 same topic. When the topic came from a drill that logs makes, a switch (on by default) also logs it to that drill's
 history as `{m, a, xp: 0, q: 1}`, so it counts toward the drill's goal.
+
+**Discard.** Wrap-up has *Discard this session* (tap twice): it deletes the session's clips and notes and gives no XP,
+for a session you don't want to keep.
 
 **Not built yet** (from the storyboard): auto-stop when the phone tips toward the floor, and splitting one imported
 clip that has both the coach and you in it.
