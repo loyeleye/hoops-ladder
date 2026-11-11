@@ -987,6 +987,31 @@ everything and leaves *Finish setting up …* on the Coach tab. A session left a
 leaves them out. Nothing is uploaded. *Delete session* on a past session removes its clips and notes. Take-home
 drills made from it stay.
 
-**Not built yet** (from the storyboard): Rewind (keeping the last 30 seconds while propped), trimming setup and
-the end of a clip with the pose model, finding the handoff between two people in one clip, importing past clips,
-drawing on a frame, the in-session quick test, voice-note transcripts, and spoken *my turn* / *again*.
+**Trimming and the handoff (pose).** After a recording is kept, the same bundled MediaPipe `PoseLandmarker` as the
+form check (Apache-2.0, already in `www/`: `vision_bundle.mjs`, `wasm/`, `pose_landmarker_lite.task`, so it works
+offline) reads 4 frames a second in the background, looking for up to two people. It never runs while the camera
+records. It finds the first and last frames with someone in them (a palm over the lens, the floor at the end). In a
+propped recording with no *My turn* mark it also looks for the handoff, in this order: a second or more with nobody
+in frame, the main person changing size or place (6 s either side), two people becoming one, or a still gap of
+2.5 s or more. It only suggests. The topic card shows *Suggested: coach 0:00–0:41, try 0:44–1:10* with *Apply*,
+*Adjust* (half-second nudges, with that part looping above) and *Not now*. *Apply* changes the pieces' `a`/`b`, or
+adds the try piece, and keeps *Undo*. The suggestion is kept in `topic.trim`. The frames stay in memory only. If the
+model can't load or finds nobody, nothing shows. `sesPoseSplit()` is the heuristic and can be tested on its own.
+
+**Film this rep against the coach.** A take-home drill made in a session (`item.ses`) whose topic kept a coach clip
+or a link gets a *Film this rep* button on its row. It opens the usual compare screen with the coach's clip on the
+left instead of the app's animation. It follows *Play both* and the speed, and lines up by time from its start when
+you scrub or step. Chips switch the left side to the link, your session try (*Before*) or back to the animation. The
+same goes for an app drill's sheet when the topic came from that drill (a session started from the workout player).
+A clip you keep there is attached to the take-home drill.
+
+**Quick test.** *+ Quick test* on the current topic opens a counter with the workout logger's + and − (+ a make,
+− takes back the last shot, *+ Miss* a miss), the same beeps and buzz. Goals: N makes, makes in a time (the clock
+starts with the first shot), or N in a row. *Done · save score* adds a Score piece (`k: "q"`, with `gk`, `goal`,
+`made`, `att`, `secs`, `best`) shown on the board and at wrap-up, with *Last time with Mo* from earlier tests on the
+same topic. When the topic came from a drill that logs makes, a switch (on by default) also logs it to that drill's
+history as `{m, a, xp: 0, q: 1}`, so it counts toward the drill's goal.
+
+**Not built yet** (from the storyboard): Rewind (keeping the last 30 seconds while propped), auto-stop when the
+phone tips toward the floor, importing past clips, drawing on a frame, voice-note transcripts, and spoken *my turn* /
+*again*.
