@@ -784,3 +784,29 @@ beeps and says "Switch sides". Halfway through *both directions* or *one way, th
 player, XP and history work as before. `rtPick(k)` returns your pick (or the default), `FIXED` covers every routine
 so the recommender never swaps them out, and `slotOf()` puts them in the *Body warm-up* and *Cool-down* slots.
 Adding a routine (like a club's own warm-up) is one more entry in `DRILLS` with `rt` set.
+
+## Step 23. Animations and demo links for every warm-up and cool-down
+
+**What changed.** Every routine on the Body tab now opens to *The parts*: one row per move with an animated
+figure, a one-line how-to, and (for the less familiar moves) ▶ links that jump to a short YouTube demo at the
+right moment. The same animation shows in the player under *Show the move* while that part's timer runs.
+
+**One move, many routines.** The animations live in a shared moves library inside the vector engine (`BV`):
+`jog`, `highknee`, `carioca`, `wgs` (world's greatest stretch), `hipcar`, `frank` (leg raise to the ball),
+`jumpskip`, `plank`, `wallsit`, `pushup`, `burpee`, `balltwist`, `fig4`, `child` and about 30 more. Each entry is
+an animation plus its note. A routine lists one move per part in a new field, `mv`:
+
+```js
+{id:"b_club", ..., phases:[["Lap at half speed",60], ...], mv:["jog","lap","sprint","skip","hipcar", ...]}
+```
+
+so adding a routine reuses the moves without drawing anything new. `mv` must have one key per phase.
+
+**Demo links.** `MCLIP` maps a move to its demo clips (`[videoId, start, end, label]`), and any routine with `mv`
+gets its clip links from it. Moves that are obvious from the animation (walking, jogging, squats) have none. The
+clips were picked by their titles and channels, so swap any that turn out to be poor.
+
+**Lying and kneeling poses.** The figure used to stand its lowest foot on the floor, which sank planks, bridges
+and stretches into the ground. `solve()` now finds the lowest point of the whole body (feet, knees, hips, head,
+elbows, hands) and puts that on the floor, and an animation can draw a ball that follows the hands
+(`ball:(t,pose)=>({x,y})`).
