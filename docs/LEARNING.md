@@ -763,6 +763,7 @@ Stretch. Now there's a choice of each, and any of them can be run on its own, li
 | Body Warm-Up | warm-up | 4 min | Most days (the default) |
 | Full Dynamic Warm-Up | warm-up | 8 min | Long sessions, cold gyms, stiff days: high knees, butt kicks, carioca, world's greatest stretch |
 | Easy Start Warm-Up | warm-up | 7 min | Stiff knees, ankles or hips, or coming back from time off: starts on the spot, no hops or fast runs |
+| Club Warm-Up | warm-up | 7 min | The Never Too Late adult club's warm-up: three laps building to full speed, skips, hip CARs, lunges, leg raises to the ball, carioca, butt kicks, jump skips |
 | Pre-Game Warm-Up | warm-up | 9 min | With a ball before a game: dynamic moves, handles, form shots, layups, mid-range, two sprints |
 | Cool-Down Stretch | cool-down | 3 min | Most days (the default) |
 | Full Cool-Down | cool-down | 8 min | After a hard session or a game: legs, hips, lower back and shoulders |
