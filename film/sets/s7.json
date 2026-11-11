@@ -1,0 +1,214 @@
+{
+ "id": "s7",
+ "name": "IQ test: quick decisions",
+ "blurb": "Find the defender guarding two, and move the ball to whoever he leaves.",
+ "src": {
+  "FR-IQ1": {
+   "v": "j16FCb3BbDs",
+   "t": "Basketball IQ Test #1 - Making Quick Decisions",
+   "who": "The Film Room · former Big 12 player"
+  }
+ },
+ "m": [
+  {
+   "id": "s7-01",
+   "src": "FR-IQ1",
+   "start": 39,
+   "pause": 53,
+   "end": 89,
+   "lv": "I",
+   "checked": false,
+   "title": "Downhill drive",
+   "q": "On this downhill drive, where does the ball go?",
+   "choices": [
+    {
+     "t": "The big near the rim",
+     "ok": true
+    },
+    {
+     "t": "The corner"
+    },
+    {
+     "t": "The opposite wing"
+    }
+   ],
+   "ans": "A ball fake moves the corner defender, the second defender steps up, and because he never gets inside position on the big, the dump-off is open.",
+   "quote": "As he enters the paint, that's going to force this secondary defender to step up and help. And once that happens, we have to get our eyes to this defender right here. If he takes away the big, then we throw it out to the wing. But because he never got inside position, that's what opened up this dump off for an easy bucket.",
+   "cast": [
+    "YOU · the point guard, driving",
+    "TEAMMATE · corner",
+    "TEAMMATE · big",
+    "TEAMMATE · opposite wing",
+    "HELPER"
+   ]
+  },
+  {
+   "id": "s7-02",
+   "src": "FR-IQ1",
+   "start": 98,
+   "pause": 116,
+   "end": 145,
+   "lv": "I",
+   "checked": false,
+   "title": "Middle of the floor off the screen",
+   "q": "You drive to the middle off the ball screen. Who gets it?",
+   "choices": [
+    {
+     "t": "The teammate sliding in behind",
+     "ok": true
+    },
+    {
+     "t": "The big rolling to the rim"
+    }
+   ],
+   "ans": "The tag defender has two players. He helps on the rolling big, so throw it back to the man behind him for a rhythm three.",
+   "quote": "The key to this decision is this person right here who's known as the tag defender because he is now responsible for guarding both of these players. And because he came in to help on the big or tagged the big, that is your indication to throw the ball back to the shake man, which is what he did and it led to the rhythm three.",
+   "cast": [
+    "YOU · the point guard",
+    "TEAMMATE · big, rolling",
+    "TEAMMATE · behind the play",
+    "TAG DEFENDER"
+   ]
+  },
+  {
+   "id": "s7-03",
+   "src": "FR-IQ1",
+   "start": 157,
+   "pause": 168,
+   "end": 204,
+   "lv": "I",
+   "checked": false,
+   "title": "Catch on the short roll",
+   "q": "Number 14 catches it on the short roll. Where does it go?",
+   "choices": [
+    {
+     "t": "To the side where one defender is guarding two",
+     "ok": true
+    },
+    {
+     "t": "Back out to the ball handler"
+    },
+    {
+     "t": "He shoots it"
+    }
+   ],
+   "ans": "Catching the short roll pulls the tag defender over, so one defender is left with two players on that side. Find the open one.",
+   "quote": "When 14 catches the short roll, he forces this tag defender to rotate over and help. And he now has two people guarding him. So that means there's one defender guarding two and we need to find the open man on this side.",
+   "cast": [
+    "YOU · #14, short roll",
+    "TAG DEFENDER",
+    "TEAMMATE · wing",
+    "TEAMMATE · corner"
+   ]
+  },
+  {
+   "id": "s7-04",
+   "src": "FR-IQ1",
+   "start": 176,
+   "pause": 183,
+   "end": 223,
+   "lv": "B",
+   "checked": false,
+   "title": "Then the wing catches",
+   "q": "Now the wing has it. Shoot, or swing it one more to the corner?",
+   "choices": [
+    {
+     "t": "Swing it to the corner",
+     "ok": true
+    },
+    {
+     "t": "Shoot it"
+    }
+   ],
+   "ans": "The one defender left with two commits to the ball, so the corner is open. Expect an open shot or a bad closeout there.",
+   "quote": "Because he's stuck guarding two people, as soon as he commits to the ball, that means he's leaving the corner man open and we need to go one more to that corner and expect that he's going to get an open shot or a bad closeout.",
+   "cast": [
+    "YOU · wing, with the ball",
+    "DEFENDER · guarding two",
+    "TEAMMATE · corner"
+   ]
+  },
+  {
+   "id": "s7-05",
+   "src": "FR-IQ1",
+   "start": 232,
+   "pause": 246,
+   "end": 280,
+   "lv": "B",
+   "checked": false,
+   "title": "Kick-out to the corner",
+   "q": "The ball gets kicked to you in the corner. Shoot, or one more to the wing?",
+   "choices": [
+    {
+     "t": "One more to the wing",
+     "ok": true
+    },
+    {
+     "t": "Shoot it"
+    }
+   ],
+   "ans": "The same two-on-one: the defender commits to the corner, so one-time it up to the wing.",
+   "quote": "On this catch in the corner, you get that same two-on-one situation and because this man is committing to the corner, he makes the right decision to one-time it up to the wing.",
+   "cast": [
+    "YOU · corner",
+    "DEFENDER · closing out",
+    "TEAMMATE · wing"
+   ]
+  },
+  {
+   "id": "s7-06",
+   "src": "FR-IQ1",
+   "start": 251,
+   "pause": 261,
+   "end": 310,
+   "lv": "I",
+   "checked": false,
+   "title": "Then the wing catches",
+   "q": "Number 11 catches it on the wing. Shoot, or swing it one more to the top?",
+   "choices": [
+    {
+     "t": "Shoot it",
+     "ok": true
+    },
+    {
+     "t": "Swing it to the top"
+    }
+   ],
+   "ans": "Shoot. The closeout comes from the side, so it doesn't block his view of the rim, and a defender coming from the side can jump the next pass.",
+   "quote": "The closeout is now coming from the side of the shooter, which means number one, he's not impairing his vision of the basket. So, he has a clean look at the rim right now. And the second thing that makes this decision different is something that's called a slice out. And that's where someone who's closing out from the side actually jumps into the passing lane and instead of closing out, tries to steal that one more pass.",
+   "cast": [
+    "YOU · #11, wing",
+    "DEFENDER · closing out",
+    "TEAMMATE · top of the key"
+   ]
+  },
+  {
+   "id": "s7-07",
+   "src": "FR-IQ1",
+   "start": 319,
+   "pause": 331,
+   "end": 359,
+   "lv": "I",
+   "checked": false,
+   "title": "Catch off another screen",
+   "q": "Number 14 catches it. Hit the cutter or kick it out for a three?",
+   "choices": [
+    {
+     "t": "Hit the cutter",
+     "ok": true
+    },
+    {
+     "t": "Kick it out for the three"
+    }
+   ],
+   "ans": "Take the easy two over an easy three. The tag defender helped and #8 isn't in position to take the cutter away.",
+   "quote": "In a situation where we don't need a three, we always want to take an easy two over an easy three. And because he forced the tag defender to help, the man we need to read is number eight right here. So, if he's not in the position to crack all the way down and take this pass away, the priority should always be trying to take the two.",
+   "cast": [
+    "YOU · #14",
+    "TEAMMATE · cutting",
+    "TEAMMATE · wing",
+    "DEFENDER · #8"
+   ]
+  }
+ ]
+}
