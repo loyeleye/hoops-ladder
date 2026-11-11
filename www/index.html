@@ -6929,7 +6929,7 @@ route();
     };
     const ORDER = ["drift", "bSway", "seq", "tilt", "bElbow", "bLine", "bGuide", "tempo", "ext", "hold", "knee", "bStance"];
     const behind = () => fcView() === "behind";
-    const filmTip = () => behind() ? "Film from behind you, on the line to the rim, whole body in frame." : "Film from the side, shooting arm toward the phone, whole body in frame.";
+    const filmTip = () => behind() ? (S.settings.fcFront ? "Film from straight in front of you, whole body in frame." : "Film from behind you, on the line to the rim, whole body in frame.") : "Film from the side, shooting arm toward the phone, whole body in frame.";
     // From behind, the shooting arm is the one with the higher wrist (the pose model can swap left and right on a back view).
     const armOf = lm => { if (!behind()) return SIDE[S.settings.hand || "R"]; const a = lm[15].v > .3 ? lm[15].y : 1e9, b = lm[16].v > .3 ? lm[16].y : 1e9; return b <= a ? { sh: 12, el: 14, wr: 16 } : { sh: 11, el: 13, wr: 15 }; };
     let L = null; // the open live session
@@ -6993,11 +6993,15 @@ route();
       const box = L && L.el.querySelector(".lf-place");
       if (!box) return;
       if (L.ready) { box.hidden = true; box.innerHTML = ""; return; }
-      const B = behind();
+      // In front (under a Shoot360 machine) uses the behind checks: they're measured from your own shoulders, so a
+      // straight-on view from the front reads the same, mirrored. An angled view doesn't, so the tips say straight on.
+      const B = behind(), F = B && !!S.settings.fcFront;
       box.hidden = false;
       box.innerHTML = `<b>Place the phone</b>
-        <div class="lf-seg"><button data-lf="view" data-v="behind" aria-pressed="${B}">Behind you</button><button data-lf="view" data-v="side" aria-pressed="${!B}">From the side</button></div>
-        <ul>${B
+        <div class="lf-seg"><button data-lf="view" data-v="behind" aria-pressed="${B && !F}">Behind</button><button data-lf="view" data-v="front" aria-pressed="${F}">In front</button><button data-lf="view" data-v="side" aria-pressed="${!B}">Side</button></div>
+        <ul>${F
+          ? "<li>Straight in front of you, facing you, on the line from the rim to where you shoot. At a Shoot360, under the machine with you at the 3-point line. Not off to an angle: that throws off the elbow and ball-line numbers.</li><li>That shows left and right, like from behind: your elbow, the ball's line, your guide hand. Keep it below or beside the machine's chute so passes don't hit it.</li>"
+          : B
           ? "<li>Behind you, on the straight line from you to the rim. That shows left and right: your elbow, the ball's line, your guide hand.</li><li>About 10 to 15 ft back, at waist height. At a Shoot360, prop it at the back of your lane, out of the way of the machine's passes and the net.</li>"
           : "<li>Level with where you shoot, off to your shooting-hand side, so your shooting arm faces the phone. That shows balance, timing, set point and arc.</li><li>About 10 to 15 ft away, at waist height, out of the way of the ball and the rebound.</li>"}
         <li>Your whole body in the picture, feet included, with room above your hands at the release. Check the skeleton sits on you, then tap Ready.</li></ul>
@@ -7029,7 +7033,9 @@ route();
         else if (b.dataset.lf === "talk") { L.talk = { say: "buzz", buzz: "off", off: "say" }[L.talk] || "say"; S.settings.lfCue = L.talk; persist(); drawTop(); }
         else if (b.dataset.lf === "keep") buLiveKeep(L);
         else if (b.dataset.lf === "ready") { L.ready = true; drawPlace(); }
-        else if (b.dataset.lf === "view") { S.settings.fcView = b.dataset.v; persist(); L.buf = []; L.up = 0; if (K && !K.burst.shots.length) K.burst.view = fcView(); drawPlace(); }
+        else if (b.dataset.lf === "view") { const v = b.dataset.v; S.settings.fcView = v === "front" ? "behind" : v; S.settings.fcFront = v === "front"; persist(); L.buf = []; L.up = 0;
+          if (K && !K.burst.shots.length) { K.burst.view = fcView(); K.burst.front = !!S.settings.fcFront && fcView() === "behind"; }
+          if (!L.shots.length) L.el.querySelector(".lf-shot").innerHTML = `<span>${filmTip()} Shoot when you're ready.</span>`; drawPlace(); }
         else if (b.dataset.lf === "flip") { L.face = L.face === "environment" ? "user" : "environment"; startCam(); }
       });
       lockOn();
@@ -7114,7 +7120,7 @@ route();
                      : lm && lm[0].v > .3 && lm[side.wr].v > .3 && (lm[side.an].v > .3 || lm[side.an === 28 ? 27 : 28].v > .3);
       if (!body) {
         L.noBody = L.noBody || t;
-        if (t - L.noBody > 1.5) msg("Step back until your whole body, feet included, is in frame. " + (B ? "Film from behind, on the line to the rim." : "Film from the side."));
+        if (t - L.noBody > 1.5) msg("Step back until your whole body, feet included, is in frame. " + (B ? (S.settings.fcFront ? "Film from straight in front." : "Film from behind, on the line to the rim.") : "Film from the side."));
         return;
       }
       // From behind the nose is hidden, so "above the head" is measured from the shoulders (the head is about 0.6 shoulder widths above them).
@@ -7308,7 +7314,7 @@ route();
   }
   // (re)start the recorders on the live check's stream; buLivePause() first when the stream is about to change
   function buLiveCam(L) {
-    if (!K) K = { burst: { id: uid("b"), t: Date.now(), view: fcView(), hand: S.settings.hand || "R", src: "live", shots: [] }, pend: [], results: [], chain: Promise.resolve(), bytes: 0, ends: [] };
+    if (!K) K = { burst: { id: uid("b"), t: Date.now(), view: fcView(), hand: S.settings.hand || "R", src: "live", front: !!S.settings.fcFront && fcView() === "behind", shots: [] }, pend: [], results: [], chain: Promise.resolve(), bytes: 0, ends: [] };
     K.el = L.el;
     buLivePause();
     if (buKeepOn() && L.stream && !K.full) {
@@ -7734,11 +7740,11 @@ route();
       const n = B.shots.length, st = B.shots.filter(s => s.star).length, mb = buBytes(B, sz);
       return BF.free
         ? `<div class="bu-item"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}</b><span class="muted">${mb ? fmtMB(mb) : "no video"}</span>${mb ? `<button class="btn sec small" data-buf="del:${B.id}">${BF.ask === B.id ? "Tap again" : "Delete videos"}</button>` : ""}</div>`
-        : `<button class="bu-item" data-buf="open:${B.id}"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}${st ? ` · ★${st}` : ""}</b><span class="muted">${B.src === "clip" ? "From a clip" : B.view === "behind" ? "From behind" : "From the side"}${mb ? " · " + fmtMB(mb) : ""}</span></button>`;
+        : `<button class="bu-item" data-buf="open:${B.id}"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}${st ? ` · ★${st}` : ""}</b><span class="muted">${B.src === "clip" ? "From a clip" : B.view === "behind" ? (B.front ? "From the front" : "From behind") : "From the side"}${mb ? " · " + fmtMB(mb) : ""}</span></button>`;
     };
     const list = BF.free ? L.slice().sort((a, b) => buBytes(b, sz) - buBytes(a, sz)) : L.slice(0, 10);
     const body = `<p class="small" style="margin:0">Turn on <b>Keep video</b> in Live form check and each shot keeps its own few seconds of video, with its numbers. Only the shots are saved, never the time in between. A clip longer than ${BU.CLIP_MIN} s picked above is split into its shots the same way.</p>
-      <p class="small muted" style="margin:6px 0 0">At a Shoot360, prop the phone behind you in the lane and pick Camera: From behind.</p>
+      <p class="small muted" style="margin:6px 0 0">At a Shoot360, prop the phone behind you in the lane, or straight in front of you under the machine. Live form check asks which before you start.</p>
       ${list.length ? `<div class="bu-list">${list.map(row).join("")}</div>` : ""}
       ${tot ? `<p class="small muted" style="margin:0">Shot videos use ${fmtMB(tot)}${CO.usage ? ` of the ${fmtMB(CO.usage)} the app uses on this phone` : ""}. Video for shots with no ★ or Keep is deleted 14 days after filming. The numbers stay.</p>
       <button class="btn sec small" data-buf="free" style="margin-top:6px">${BF.free ? "Done" : "Free up space"}</button>` : ""}`;
