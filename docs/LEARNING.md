@@ -697,3 +697,58 @@ it afterwards. Back steps back through the three steps before it leaves the tab.
 by 5, in a row by 1 from 2, time by 15 s). Each saved goal becomes the starting goal for the next drill. Any
 drill on the list can change its goal from **Edit**, including ones added all at once, and the goal shows on the
 list (*20 makes × 3 sets*).
+
+## Step 21. Left/right, depth and arc
+
+Shoot360 splits every shot into three parts: **left/right** (alignment), **depth** (short or long) and **arc**. The
+app already let you tag a miss Short, Long, Left or Right. This step gives each part its own drill, coaching and
+camera check.
+
+**Three drills** (Drills → Shooting). Each one works on one part and says where to put the phone for it (`cam` on
+the drill: `behind` for left/right, `side` for depth and arc):
+
+- **Rim Line Shots** (left/right): 10 shots each from 5 ft, the free throw line and the top of the key, all on the
+  line straight out from the rim, with the phone behind you.
+- **Depth Calls**: the phone calls an aim point before each shot (just over the front rim, the middle, the back of
+  the rim). Same form, new target.
+- **Arc Calls**: the phone calls low, normal or high arc.
+
+Calls drills now save makes and short/long misses by call (`it.cb`), shown in the drill summary and in **Arc and
+depth** on the Progress tab, with a ★ on the call that goes in most often.
+
+**Swish.** In Buttons and Shot-by-shot logging you can mark a make as a swish (the Swish button, "That was a swish"
+after a make on the shot-by-shot screen, or say "swish"). Progress shows what share of makes were swishes, since a
+swish means depth and arc were both right. Sets mode can't tell makes apart, so it doesn't count there.
+
+**Left or right, by hand.** Miss advice used to treat left and right as one "side" miss. It now uses your shooting
+hand (the Form tab's Right-handed / Left-handed switch): misses to the guide-hand side (left for a right-hander)
+point to elbow flare or the ball crossing your face, and Rim Line Shots; misses to the shooting-hand side point to a
+pushing guide hand, and Guide Hand Slides.
+
+**Fix after three.** When three tagged misses in a row share a direction, the logger says and shows one fix ("Three
+short. Legs under the ball, up and over the rim."). It waits for three more tagged misses before saying another.
+
+**Form check from behind.** The Form tab has a **Camera** switch: From the side (balance, timing, set point, arc) or
+From behind (left/right). The behind check (`computeBehind`) measures:
+
+| Check | How | Good |
+|---|---|---|
+| Elbow under the ball | forearm angle from vertical at the set point; + = elbow flared out | within 10° |
+| Ball line at release | wrist sideways from the shooting shoulder, in shoulder widths; + = outside the shoulder | −60% to +15% |
+| Guide hand at release | guide wrist moving toward the ball from set point to just after release | under 12% |
+| Side-to-side balance | hips moving sideways from the dip to the release, in % of height | within 3% |
+| Stance width | feet apart at the dip, in shoulder widths | 0.7 to 1.6 |
+
+From behind the face is hidden and the pose model can mix up left and right, so the shooting arm is simply the one
+whose wrist gets highest, and "toward the shooting hand" is measured from the guide shoulder to the shooting
+shoulder in the picture. That makes it work for either hand and with the phone's selfie camera. Live form check uses
+the same switch: from behind, a shot starts when a wrist goes above the head (estimated from the shoulders), and a
+dip of under 1.5% of your height means it wasn't a shot.
+
+**Arc distance.** Measure arc used to assume every shot was a 22 ft three. Pick where you shot from (8, 14, 17 or
+22 ft) and the entry angle is worked out for that distance: tan(entry) = tan(launch) − 2h/d, with the release
+h = 2 ft below the rim.
+
+**Next.** Ball tracking will plug into these drills one part at a time: Rim Line Shots reads left/right from the
+phone behind you, Depth Calls reads where the ball lands past the front of the rim, and Arc Calls reads the entry
+angle, each from the camera position that drill already asks for.
