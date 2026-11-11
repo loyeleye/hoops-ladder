@@ -753,7 +753,74 @@ h = 2 ft below the rim.
 phone behind you, Depth Calls reads where the ball lands past the front of the rim, and Arc Calls reads the entry
 angle, each from the camera position that drill already asks for.
 
-## Step 22. Film a rep and compare it with the demo
+## Step 22. Warm-up and cool-down routines
+
+Every recommended workout already started with the 4-minute Body Warm-Up and ended with the 3-minute Cool-Down
+Stretch. Now there's a choice of each, and any of them can be run on its own, like before a game.
+
+| Routine | Kind | Length | For |
+|---|---|---|---|
+| Body Warm-Up | warm-up | 4 min | Most days (the default) |
+| Full Dynamic Warm-Up | warm-up | 8 min | Long sessions, cold gyms, stiff days: high knees, butt kicks, carioca, world's greatest stretch |
+| Easy Start Warm-Up | warm-up | 7 min | Stiff knees, ankles or hips, or coming back from time off: starts on the spot, no hops or fast runs |
+| Club Warm-Up | warm-up | 7 min | The Never Too Late adult club's warm-up: three laps building to full speed, skips, hip CARs, lunges, leg raises to the ball, carioca, butt kicks, jump skips |
+| Club Warm-Up + Floor Work | warm-up | 10 min | The same club warm-up on days with the other coach, then plank, wall sit, push-ups, burpees and ball twists |
+| Pre-Game Warm-Up | warm-up | 9 min | With a ball before a game: dynamic moves, handles, form shots, layups, mid-range, two sprints |
+| Cool-Down Stretch | cool-down | 3 min | Most days (the default) |
+| Full Cool-Down | cool-down | 8 min | After a hard session or a game: legs, hips, lower back and shoulders |
+
+**Picking yours.** On the Today tab the warm-up and cool-down rows now have the ⇄ button. It opens *Pick your
+warm-up* (or cool-down); the one you pick goes into every recommended workout until you change it
+(`S.settings.rt = {warm, cool}`). Longer routines take their minutes out of the workout like any other drill.
+
+**Drills → Body.** A fourth tab lists every routine, marks the one your workouts use, and opens any of them to run
+on its own. The workout builder lists them in their own *Warm-up and cool-down* group, and with *Keep Cold 3s and
+the warm-up first* on, any warm-up stays first and any cool-down stays last.
+
+**Switch sides.** Halfway through a part that says *each leg*, *each side*, *each foot* or *each arm*, the timer
+beeps and says "Switch sides". Halfway through *both directions* or *one way, then the other* it says "Other way".
+
+**How it's built.** A routine is an ordinary timer drill with `body: true` and `rt: "warm"` or `rt: "cool"`, so the
+player, XP and history work as before. `rtPick(k)` returns your pick (or the default), `FIXED` covers every routine
+so the recommender never swaps them out, and `slotOf()` puts them in the *Body warm-up* and *Cool-down* slots.
+Adding a routine (like a club's own warm-up) is one more entry in `DRILLS` with `rt` set.
+
+## Step 23. Workouts that work like playlists
+
+Saved workouts already lived behind **Plan · Change** on the Today tab. This step brings them out front and makes
+them play through like a playlist.
+
+| Where | What you get |
+|---|---|
+| Today, under *Today's workout* | A row of workout cards you can swipe: **Recommended**, each of your workouts, then **All workouts**. The one that's on says *▶ Playing*. One tap switches, even halfway through a session |
+| All workouts | Your workouts with **Edit** and **Duplicate**, the stay-on switch, and **Starter workouts** to add or play |
+| Any drill, under its steps | **Save to a workout**: tick the workouts it belongs in, or start a new one with it |
+| Today, while you train | A progress bar (*3 of 7 done · about 12 of 37 min*), and **⋯** on each drill of your own workout: skip it today, take it out, or edit the workout |
+| After you log a drill | The toast says what's up next with a **Start** button, so you go straight to the next drill (or the next run of timed drills) |
+
+**Switching keeps your work.** Done is still "logged today", so a drill you've done shows ✓ in any workout that has
+it. Drills you did that aren't in the new workout are listed under it as *Also done today*.
+
+**Stay on until I switch.** Off (the default), a workout you pick is for today and tomorrow goes back to
+Recommended, like before. On, it stays on day after day. `planRoll()` runs before each render and moves a
+stay-on pick to the new day, clearing that day's skips and add-ins.
+
+**Starter workouts** (`STARTERS`): Quick 30, Full gym day (about 80 min, with the full warm-up and the longer
+stretch, and it says to keep the next day light),
+Shooting day, Finishing day, Handles with no hoop, and a Game-day tune-up with no jumping. Adding one copies it into
+My workouts so it can be changed; the copy remembers which starter it came from, so the starter leaves the list.
+
+**Order rules still hold.** `wOrder()` is the builder's rule in one place: Cold 3s and the warm-up first, the
+cool-down last, and finishing or jump work brings in your picked warm-up (step 22). Starters that use the plain
+Body Warm-Up and Cool-Down Stretch get your picked routines instead when you add them. Saving a drill to a workout from the drill uses it too.
+
+**Not here on purpose.** No streaks and no "workouts in a row": long days come with a note to go light the next
+day, and the 250-shot warning in the builder stays.
+
+**Data.** `S.rec.plan` gains `skip` (drill ids skipped today) and `stay`; `S.rec.stay` is the switch;
+workouts may carry `from` (the starter id). Older saves load as they are.
+
+## Step 24. Film a rep and compare it with the demo
 
 Every drill with a demo animation now has a **Film a rep** card in its sheet. **Compare** opens a full-screen view
 with the demo on the left and your clip on the right.
