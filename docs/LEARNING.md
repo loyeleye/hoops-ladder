@@ -1114,9 +1114,11 @@ At a Shoot360 the machine feeds a ball every few seconds. You want each shot bac
 look at later or send to a coach (step 28), without filling the phone with minutes of waiting and rebounding.
 
 **Live form check › Keep video** (on by default, `S.settings.lfKeep`). Before anything counts, a *Place the phone*
-card sits over the live picture: *Behind you* (on the line to the rim, 10 to 15 ft back, waist height, at the back
-of a Shoot360 lane, clear of the machine's passes and the net) or *From the side*. It sets the same Camera switch as
-the Form tab. *Ready* starts counting shots. The shot finder is unchanged (step 16).
+card sits over the live picture: *Behind* (on the line to the rim, 10 to 15 ft back, waist height, at the back
+of a Shoot360 lane, clear of the machine's passes and the net), *In front* (straight on, facing you, from under the
+basket) or *Side*. It sets the same Camera switch as the Form tab. *In front* uses the
+behind checks (`S.settings.fcFront`, `burst.front`): they're measured from your own shoulders and the higher wrist,
+so a straight-on front view reads the same, mirrored. An angled view foreshortens the arm, so the tips say straight on. *Ready* starts counting shots. The shot finder is unchanged (step 16).
 
 **Only the shots reach storage.** Two `MediaRecorder`s share the camera stream with no sound, at 1 Mbps, started
 5 s apart, and each starts over every 10 s. So any stretch of 5 s or less lies wholly inside one of their 10 s
