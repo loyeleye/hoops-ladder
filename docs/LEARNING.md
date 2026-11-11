@@ -965,8 +965,27 @@ same moment, tap *Lock*, and from then on the left follows the right with the sa
 YouTube player (step 14), looping the part you marked.
 
 **Voice notes.** *Talk* records audio only (`MediaRecorder`, Opus where the phone has it). *Feedback* on a replay
-attaches the note to that try. Notes are kept as audio. Turning them into text afterward needs Android's
-speech engine to read a file (Android 13 and later), which is planned.
+attaches the note to that try. Notes are kept as audio.
+
+**Transcripts.** After a voice note or a coach clip is saved, the app turns it into text on the phone, never live.
+The page decodes the recording to 16 kHz mono PCM (`OfflineAudioContext.decodeAudioData`, `sesPcm`) and sends it
+to the `HoopsTranscribe` plugin (`android/.../voice/HoopsTranscribePlugin.java`). That writes it to a temporary
+file and gives the file to Android's on-device recognizer (`createOnDeviceSpeechRecognizer` with
+`EXTRA_AUDIO_SOURCE`, Android 13+) in a segmented session, so pauses don't cut it short. Nothing is sent to a
+server, and the temporary file is deleted straight away.
+- The text is kept on the piece as `tx`. It shows under the note or clip on the board and in the replay, and gives
+  a *Suggested* name at wrap-up (a basketball term from the coach's words, like "Follow-through", or the first
+  words). The drill's name and a link's title are suggested too.
+- One at a time, and only once filming or talking stops. A failure shows *Try again* (`txs: "fail"`, or `"lang"`
+  while the phone fetches its English speech pack). Older phones and the browser keep audio only and show nothing.
+- Up to 3 minutes of each piece is transcribed.
+
+**Spoken marks (beta).** In setup, *Say "my turn"* (off by default, `S.coach.sesVoice`) listens during a propped
+recording: "my turn" marks your try, "again" or "one more" marks another, and "done" stops and opens the replay.
+The recording screen has a *Voice on/off · beta* button to switch it mid-session. In the app it borrows the live
+`HoopsVoice` listener from step 15 (`hoopsSesVoice` in native.js); in a browser it uses the page's speech
+recognition. The camera's own recording holds the mic at the same time, and some phones give the recognizer
+silence while it does: then nothing is heard, and taps keep working.
 
 **Links and shared videos.** While a session runs, the app pushes an Android sharing shortcut, *Session · Mo*, that
 shows in the share sheet. Ending the session removes it. A link shared through it goes to the session's *Add a link*
@@ -989,4 +1008,4 @@ drills made from it stay.
 
 **Not built yet** (from the storyboard): Rewind (keeping the last 30 seconds while propped), trimming setup and
 the end of a clip with the pose model, finding the handoff between two people in one clip, importing past clips,
-drawing on a frame, the in-session quick test, voice-note transcripts, and spoken *my turn* / *again*.
+drawing on a frame, and the in-session quick test.
