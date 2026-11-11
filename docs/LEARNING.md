@@ -752,3 +752,42 @@ h = 2 ft below the rim.
 **Next.** Ball tracking will plug into these drills one part at a time: Rim Line Shots reads left/right from the
 phone behind you, Depth Calls reads where the ball lands past the front of the rim, and Arc Calls reads the entry
 angle, each from the camera position that drill already asks for.
+
+## Step 22. Film a rep and compare it with the demo
+
+Every drill with a demo animation now has a **Film a rep** card in its sheet. **Compare** opens a full-screen view
+with the demo on the left and your clip on the right.
+
+**Getting the clip.** *Record a rep* opens the camera inside the app (`getUserMedia` + `MediaRecorder`, the same
+web APIs as the Coach recorder in step 7, no sound). It counts down 5 or 10 seconds with a beep each second so you
+can put the phone down and get to your spot, then records 6 or 10 seconds and stops by itself. Both choices are
+saved in settings (`cmpDelay`, `cmpLen`). *Pick a clip* takes a video you already filmed. Where the page can't open
+the camera (a Claude-hosted page), that button is the only one and the phone's own picker offers the camera.
+
+**Watching them together.** *Play both* starts your clip and the demo from the top at the same time. ½× and ¼×
+slow both down: the video through `playbackRate`, the demo by advancing its animation clock more slowly (the demo
+animations are drawn from a time value, so any speed works; the older GIF demos play at their own speed). ◀ ▶ step
+your clip a tenth of a second at a time, *Mirror me* flips it for selfie-camera clips, and the step chips switch
+which part of the demo loops. Your clip is painted into a canvas every frame so the skeleton can be drawn on top
+in exactly the right place.
+
+**Notes from the pose model.** The clip is read the same way as a form check: 10 frames a second, each scaled to
+480 px, through the `PoseLandmarker` in `IMAGE` mode. Then the notes depend on the drill's skill:
+
+| Skill | Checks | How |
+|---|---|---|
+| Shooting | The form check's own numbers, from the drill's camera angle (`CHECK_VIEW`, else the drill's `cam`) | `computeSide` or `computeBehind`. The drill's own checks (`CHECKS`) come first, then the worst of the rest, three at most |
+| Handling | Low stance, Eyes up, Stay level | Bent knees: knee angle 155° or less, or the thigh showing 90% or less of the shin's height (bent knees shorten the thigh from the front and the side). Eyes down: the nose drops more than 45% of the way from the ears to the shoulders. Level: how far the hips move from their median height, as a share of your height |
+| Finishing | Knee drive, Reach at the top, Soft landing | The top of the jump is where the hips are highest (it needs a rise of 4% of your height). Knee drive: the higher knee there, as an angle from hanging straight down. Reach: the higher hand above the head with the arm 150° or straighter. Landing: knees bend in the 0.6 s after the hips come back down |
+
+Each note has **See it in your clip**, which pauses and jumps your clip to the frame the number came from (the
+dip, set point or release for shots, the most upright frame for stance, the top of the jump for knee drive).
+Warm-up drills get the side-by-side but no notes yet.
+
+**Checked on real clips.** Ladi's 13 side-on shooting clips gave shooting notes on 11, the same two misses as the Form tab (too far away, feet out of frame).
+They were also run through the handling and finishing checks to make sure nothing breaks on real footage, but
+there are no handling or finishing clips yet, so those thresholds are a first guess to tune.
+
+**Privacy.** The clip lives in memory and is gone when you close the screen. *Keep clip* saves it with your
+training videos (step 7), named after the drill, so it shows in My videos on the Coach tab. Android's back button
+closes the compare screen first.

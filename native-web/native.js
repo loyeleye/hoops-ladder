@@ -61,6 +61,7 @@
       if (clip) { if (!press(clip, '[data-yt="close"]')) clip.remove(); return true; }
       if (CO.view) { closeVid(); return true; }
       if (CO.rec) { closeRec(); return true; }
+      if (CMP) { closeCmp(); return true; }
       if (seeEl) { if (!press(seeEl, '[data-s="resume"]')) closeSee(); return true; }
       if (pEl && P) {
         // The rating screen has its own Save and Discard, so back stays put rather than throwing the workout away.
