@@ -1,0 +1,438 @@
+{
+ "id": "s3",
+ "name": "Pick and roll: first reads",
+ "blurb": "Coming off a ball screen, read the help defenders and give yourself a second before you decide.",
+ "src": {
+  "JP-PNR": {
+   "v": "LdSe_auBuhg",
+   "t": "Pick & Roll Reads Pros See That You Don't",
+   "who": "Jason Preston · NBA"
+  }
+ },
+ "m": [
+  {
+   "id": "s3-01",
+   "src": "JP-PNR",
+   "start": 0,
+   "pause": 19,
+   "end": 29,
+   "lv": "I",
+   "checked": false,
+   "title": "The big jumps out",
+   "q": "You're coming off the ball screen. Where does the ball go?",
+   "choices": [
+    {
+     "t": "Wherever the helper leaves: fake one way, pass the other",
+     "ok": true
+    },
+    {
+     "t": "Straight to the roller"
+    },
+    {
+     "t": "Keep it and shoot the pull-up"
+    }
+   ],
+   "ans": "Read the two help defenders. The helper doesn't stay, so he jumps, looks one way and passes the other.",
+   "quote": "First, I'm reading this guy. If he stays and picks up this guy, then I'll hit one of these two players. He doesn't stay. I jump to make the illusion like I'm going to make a pass. I look this way and the ball goes that way.",
+   "cast": [
+    "YOU · Preston, with the ball",
+    "SCREENER'S DEFENDER · the big",
+    "HELPER",
+    "HELPER · the second one"
+   ]
+  },
+  {
+   "id": "s3-02",
+   "src": "JP-PNR",
+   "start": 29,
+   "pause": 40,
+   "end": 49,
+   "lv": "I",
+   "checked": false,
+   "title": "Same coverage, second look",
+   "q": "Same coverage as the last clip. Where does the ball go?",
+   "choices": [
+    {
+     "t": "To the big rolling",
+     "ok": true
+    },
+    {
+     "t": "Skip it to the far corner"
+    },
+    {
+     "t": "Reset it to the top"
+    }
+   ],
+   "ans": "The helper isn't looking and starts to fan out, so the roller is open.",
+   "quote": "I'm looking at the big rolling and I'm just waiting to see if this guy stays or this guy goes out. I jump and this gives me time to realize to see that he's not even looking. He's starting to fan out.",
+   "cast": [
+    "YOU · Preston",
+    "ROLLER",
+    "HELPER"
+   ]
+  },
+  {
+   "id": "s3-03",
+   "src": "JP-PNR",
+   "start": 49,
+   "pause": 52,
+   "end": 64,
+   "lv": "B",
+   "checked": false,
+   "title": "Before the screen arrives",
+   "q": "Your screener is on the way. What do you do?",
+   "choices": [
+    {
+     "t": "Skip it across now, no need for the screen",
+     "ok": true
+    },
+    {
+     "t": "Wait for the screen and come off it"
+    },
+    {
+     "t": "Drive before the screen gets there"
+    }
+   ],
+   "ans": "The helper is already sunk deep in the paint, so throw the skip pass without using the screen.",
+   "quote": "If you notice that this guy is already so far in, you don't even have to use the ball screen sometimes. You can just throw the skip pass.",
+   "cast": [
+    "YOU · Preston",
+    "HELPER",
+    "TEAMMATE · far side",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s3-04",
+   "src": "JP-PNR",
+   "start": 64,
+   "pause": 70,
+   "end": 90,
+   "lv": "B",
+   "checked": false,
+   "title": "Dragging the screen out",
+   "q": "You're dragging the screen out. Where does the ball go?",
+   "choices": [
+    {
+     "t": "To the big rolling to the rim",
+     "ok": true
+    },
+    {
+     "t": "Kick it to the near wing"
+    },
+    {
+     "t": "Keep it and pull up"
+    }
+   ],
+   "ans": "Nobody is looking at the roller and the defenders are distracted, so hit the big.",
+   "quote": "There's no one here and there's no one looking at my big rolling to the rim. So, now I know that I can drag it out just a second more that there's action going on here. These guys are distracted and my big will have a wide open lane to the rim.",
+   "cast": [
+    "YOU · Preston",
+    "ROLLER",
+    "DEFENDER · far side",
+    "DEFENDER · far side"
+   ]
+  },
+  {
+   "id": "s3-05",
+   "src": "JP-PNR",
+   "start": 90,
+   "pause": 95,
+   "end": 102,
+   "lv": "I",
+   "checked": false,
+   "title": "Off a great screen",
+   "q": "Off the screen. Pass, shoot or drive?",
+   "choices": [
+    {
+     "t": "Pocket pass to the roller",
+     "ok": true
+    },
+    {
+     "t": "Pull-up jumper"
+    },
+    {
+     "t": "Drive and finish yourself"
+    }
+   ],
+   "ans": "The roller's defender doesn't commit and the big has the inside position, so the pocket pass is there.",
+   "quote": "He doesn't commit here. I know that he has the inside advantage on this guy, so he can't get to that pocket pass.",
+   "cast": [
+    "YOU · Preston",
+    "ROLLER",
+    "ROLLER'S DEFENDER"
+   ]
+  },
+  {
+   "id": "s3-06",
+   "src": "JP-PNR",
+   "start": 103,
+   "pause": 119,
+   "end": 127,
+   "lv": "B",
+   "checked": false,
+   "title": "Two on the ball",
+   "q": "Two defenders are on you. What now?",
+   "choices": [
+    {
+     "t": "Keep it and run right off the big",
+     "ok": true
+    },
+    {
+     "t": "Force the pass to the roller"
+    },
+    {
+     "t": "Pick up the ball and pivot"
+    }
+   ],
+   "ans": "The pass could get stolen, but the big turns his back, so he keeps it and goes.",
+   "quote": "Obviously, I can't make a pass to him now cuz he can possibly steal it. So, now I'm looking at this big who turns his back. And now once I see this, I know that I can run right off of him.",
+   "cast": [
+    "YOU · Preston",
+    "THE BIG",
+    "YOUR DEFENDER",
+    "ROLLER"
+   ]
+  },
+  {
+   "id": "s3-07",
+   "src": "JP-PNR",
+   "start": 127,
+   "pause": 142,
+   "end": 157,
+   "lv": "I",
+   "checked": false,
+   "title": "Coming off the screen",
+   "q": "You're coming off the screen. What's open?",
+   "choices": [
+    {
+     "t": "Get downhill yourself",
+     "ok": true
+    },
+    {
+     "t": "Pass back to the screener"
+    },
+    {
+     "t": "Reset and call another screen"
+    }
+   ],
+   "ans": "The big hesitates and won't commit, which gives him a step on his guard to get downhill.",
+   "quote": "I see that the big doesn't really want to commit to me, so this hesitation allows me to have a step on the guard and I can get downhill. But all of that I already knew before going into the play. Like I said, I have a shooting big, so he doesn't really want to help on me.",
+   "cast": [
+    "YOU · Preston",
+    "SCREENER'S DEFENDER",
+    "YOUR DEFENDER",
+    "LOW MAN"
+   ]
+  },
+  {
+   "id": "s3-08",
+   "src": "JP-PNR",
+   "start": 164,
+   "pause": 168,
+   "end": 188,
+   "lv": "B",
+   "checked": false,
+   "title": "A step ahead",
+   "q": "You're a step ahead of your man off the screen. What now?",
+   "choices": [
+    {
+     "t": "Slow down, keep him behind you and look",
+     "ok": true
+    },
+    {
+     "t": "Sprint to the rim before he recovers"
+    },
+    {
+     "t": "Pull up right away"
+    }
+   ],
+   "ans": "Don't run into traffic. Slow down, keep him on your back and see the floor.",
+   "quote": "I don't have to just run aimlessly into into traffic. I can take my time, slow down, get him behind me, which now gives me an opportunity to see everything else that's going on on the court.",
+   "cast": [
+    "YOU · Preston",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s3-09",
+   "src": "JP-PNR",
+   "start": 205,
+   "pause": 215,
+   "end": 225,
+   "lv": "I",
+   "checked": false,
+   "title": "The big sits back",
+   "q": "The big is sitting back in the paint. Attack him now?",
+   "choices": [
+    {
+     "t": "No, wait a second for him to move",
+     "ok": true
+    },
+    {
+     "t": "Yes, attack him right away"
+    },
+    {
+     "t": "Pull up from where you are"
+    }
+   ],
+   "ans": "Flying at him gives a contested shot. He waits, the big steps up, then retreats, and that lets him get downhill.",
+   "quote": "I could just fly down here and take a contested shot against this big, right? But instead I see him step up, so I kind of just wait for a second. And then I see that he starts to retreat and it allows me to get downhill.",
+   "cast": [
+    "YOU · Preston",
+    "THE BIG"
+   ]
+  },
+  {
+   "id": "s3-10",
+   "src": "JP-PNR",
+   "start": 248,
+   "pause": 265,
+   "end": 275,
+   "lv": "I",
+   "checked": false,
+   "title": "Man on your back",
+   "q": "You've got your man on your back. Where's the best shot?",
+   "choices": [
+    {
+     "t": "Your big inside",
+     "ok": true
+    },
+    {
+     "t": "The corner"
+    },
+    {
+     "t": "Your own pull-up"
+    }
+   ],
+   "ans": "The corner swing was there, but the big has a seal, which is an easier shot.",
+   "quote": "I could potentially swing this over here to the corner, but I also see that my big has a seal for me and I can get to an easier shot.",
+   "cast": [
+    "YOU · Preston",
+    "YOUR DEFENDER",
+    "BIG",
+    "BIG'S DEFENDER",
+    "TEAMMATE · corner"
+   ]
+  },
+  {
+   "id": "s3-11",
+   "src": "JP-PNR",
+   "start": 282,
+   "pause": 316,
+   "end": 329,
+   "lv": "I",
+   "checked": false,
+   "title": "Three on four",
+   "q": "You're past the screen. Where does the ball go?",
+   "choices": [
+    {
+     "t": "The corner",
+     "ok": true
+    },
+    {
+     "t": "Lob to the roller"
+    },
+    {
+     "t": "Your own layup"
+    }
+   ],
+   "ans": "He was going to lob it, but because he's playing slow he sees the helper come, which leaves the corner open.",
+   "quote": "I noticed first that my big got behind that big, so I was going to lob it, but now since I'm playing so slow, I can see that he helps. And it's wide open corner pass.",
+   "cast": [
+    "YOU · Preston",
+    "ROLLER",
+    "HELPER",
+    "TEAMMATE · corner"
+   ]
+  },
+  {
+   "id": "s3-12",
+   "src": "JP-PNR",
+   "start": 359,
+   "pause": 370,
+   "end": 383,
+   "lv": "I",
+   "checked": false,
+   "title": "In the air",
+   "q": "You're in the air. Who gets it?",
+   "choices": [
+    {
+     "t": "The shooter",
+     "ok": true
+    },
+    {
+     "t": "The roller"
+    },
+    {
+     "t": "Nobody, come down with it"
+    }
+   ],
+   "ans": "Jumping lets him see whether the helper tags. The helper pulls into the paint, so the shooter is open.",
+   "quote": "Me jumping in the air allows me to determine what this guy does. If he's helping or if he's tagging. I see he's pulled in. He's in the paint. And that means I can make a pass to my shooter.",
+   "cast": [
+    "YOU · Preston",
+    "ROLLER",
+    "HELPER",
+    "SHOOTER"
+   ]
+  },
+  {
+   "id": "s3-13",
+   "src": "JP-PNR",
+   "start": 431,
+   "pause": 435,
+   "end": 464,
+   "lv": "B",
+   "checked": false,
+   "title": "Bigs lined up",
+   "q": "Your big looks covered. Throw it?",
+   "choices": [
+    {
+     "t": "Yes, throw it ahead of him",
+     "ok": true
+    },
+    {
+     "t": "No, he's covered"
+    },
+    {
+     "t": "Wait until he's past his man"
+    }
+   ],
+   "ans": "The defender is backpedaling and your big is running forward, so a ball thrown ahead can't be reached.",
+   "quote": "Even though that these bigs are aligned, this big is backpedaling and this big is moving forward. So, right now it might not look like he's open, but he literally, if I throw this ball here, will never unless he's Giannis, will never have the chance to physically be able to get to a ball that goes there.",
+   "cast": [
+    "YOU · Preston",
+    "ROLLER",
+    "THE BIG"
+   ]
+  },
+  {
+   "id": "s3-14",
+   "src": "JP-PNR",
+   "start": 464,
+   "pause": 471,
+   "end": 486,
+   "lv": "B",
+   "checked": false,
+   "title": "Bigs lined up, second look",
+   "q": "Same idea, different look. Throw it?",
+   "choices": [
+    {
+     "t": "Yes",
+     "ok": true
+    },
+    {
+     "t": "No"
+    }
+   ],
+   "ans": "His man is backpedaling while he's running, so the defender has to turn and run and can't get there.",
+   "quote": "I notice that this guy's backpedaling and this guy's running. Even though he's in front of him, if I were to throw the ball down here, there's no way that he can get cuz he has to turn and run before this guy and who is already running. Make the game easier, not harder.",
+   "cast": [
+    "YOU · Preston",
+    "TEAMMATE · running",
+    "HIS DEFENDER"
+   ]
+  }
+ ]
+}

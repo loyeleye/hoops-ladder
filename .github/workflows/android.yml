@@ -38,6 +38,8 @@ jobs:
 
       # Copies www/ into the Android project and registers plugins.
       - run: npm ci
+      # Fails if a film study set is malformed or wasn't built into www/index.html (docs/LEARNING.md, step 26).
+      - run: node tools/build_film.mjs --check
       - run: npx cap sync android
 
       # The Gradle wrapper downloads Gradle itself on first use, and that download sometimes times out.

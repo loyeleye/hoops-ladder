@@ -1,0 +1,300 @@
+{
+ "id": "s4",
+ "name": "Pick and roll: NBA coverages",
+ "blurb": "Read the coverage, then the low man, and let the defense tell you where the ball goes.",
+ "src": {
+  "JG-PNR": {
+   "v": "hNwxyd2qBNo",
+   "t": "How I See The Game as an NBA Player",
+   "who": "Josh Giddey · NBA"
+  }
+ },
+ "m": [
+  {
+   "id": "s4-01",
+   "src": "JG-PNR",
+   "start": 76,
+   "pause": 106,
+   "end": 133,
+   "lv": "I",
+   "checked": false,
+   "title": "Racing to the rim",
+   "q": "You're past the screen and going to the rim. How do you finish?",
+   "choices": [
+    {
+     "t": "Reverse layup on the other side of the rim",
+     "ok": true
+    },
+    {
+     "t": "Right-hand layup on this side"
+    },
+    {
+     "t": "Pull up for a floater"
+    }
+   ],
+   "ans": "Two defenders are timing a block on his right hand, so he goes up and under for a reverse.",
+   "quote": "As I go into my gather, you can see these guys are both trying to time a block, right? And the low man is kind of fanning out because he thinks Ingram's got it under control. So, as I go up for the layup, you can see I go for I take it to the other side on a reverse layup because Ingram and Scotty are both trying to block at the right-hand side.",
+   "cast": [
+    "YOU · Giddey",
+    "DEFENDER · Ingram, chasing",
+    "DEFENDER · Scotty, corner",
+    "LOW MAN"
+   ]
+  },
+  {
+   "id": "s4-02",
+   "src": "JG-PNR",
+   "start": 143,
+   "pause": 196,
+   "end": 239,
+   "lv": "I",
+   "checked": false,
+   "title": "Off the switch",
+   "q": "You're coming downhill off the screen. Where does the ball go?",
+   "choices": [
+    {
+     "t": "Skip it to the corner",
+     "ok": true
+    },
+    {
+     "t": "Wrap-around pass to the screener"
+    },
+    {
+     "t": "Finish it yourself"
+    }
+   ],
+   "ans": "LeBron's hands take away the wrap-around pass and Reaves still pulls in, so the corner is open with a long closeout.",
+   "quote": "LeBron does a good job on the ball showing hands. He's kind of deterring that pass. And as LeBron starts to deter it, Reaves still pulls in, and that's when I go to my next read, which is Lonnie in the corner because there's no help. And as I pick the ball, you can see Reaves he gets two feet inside of the charge circle. So, it's a long closeout for him to get back out to the corner shooter.",
+   "cast": [
+    "YOU · Giddey",
+    "SCREENER · Sticks",
+    "DEFENDER · LeBron",
+    "DEFENDER · Reaves",
+    "TEAMMATE · corner"
+   ]
+  },
+  {
+   "id": "s4-03",
+   "src": "JG-PNR",
+   "start": 291,
+   "pause": 313,
+   "end": 338,
+   "lv": "I",
+   "checked": false,
+   "title": "Crowded paint",
+   "q": "Eight players are in one corner of the floor. You want the ball to your screener. How?",
+   "choices": [
+    {
+     "t": "Go up like it's a layup, then drop it off",
+     "ok": true
+    },
+    {
+     "t": "Bounce pass through the crowd now"
+    },
+    {
+     "t": "Back it out and reset"
+    }
+   ],
+   "ans": "He shows the layup with his left hand, three defenders contest, and the drop-off is easy.",
+   "quote": "So, my thought process here is show the layup. Is go up with my left hand, act like I'm shooting a layup. And you'll see as I go up with the left hand three guys contest, right? You got Podziemski, Santos, and Richards all down there contesting and it becomes an easy drop off to Sticks.",
+   "cast": [
+    "YOU · Giddey",
+    "SCREENER · Sticks",
+    "DEFENDER",
+    "DEFENDER",
+    "DEFENDER"
+   ]
+  },
+  {
+   "id": "s4-04",
+   "src": "JG-PNR",
+   "start": 382,
+   "pause": 410,
+   "end": 435,
+   "lv": "I",
+   "checked": false,
+   "title": "Middle ball screen",
+   "q": "You have three teammates to choose from. Who gets it?",
+   "choices": [
+    {
+     "t": "The shooter on the far side",
+     "ok": true
+    },
+    {
+     "t": "Lob to the roller"
+    },
+    {
+     "t": "The big trailing behind"
+    }
+   ],
+   "ans": "The big steps up, the low man takes away the lob, so the weak-side shooter is the easy choice.",
+   "quote": "So, my reads here are one is a lob to Rich. The second one, you got to pull behind Diakite who'll be pulling up the floor. The third one is Marciulionis. So, I act like I'm going to shoot a floater here, right? But I see Raymond steps up which kind of activates the low man here. He takes away the lob pass. So, now if you had to pick who was open here, Marciulionis is probably the easy choice.",
+   "cast": [
+    "YOU · Giddey",
+    "ROLLER · Rich",
+    "TEAMMATE · Diakite",
+    "TEAMMATE · Marciulionis",
+    "THE BIG",
+    "LOW MAN"
+   ]
+  },
+  {
+   "id": "s4-05",
+   "src": "JG-PNR",
+   "start": 467,
+   "pause": 488,
+   "end": 528,
+   "from": 438,
+   "lv": "I",
+   "checked": false,
+   "title": "Kept on the sideline",
+   "q": "They're keeping you on the sideline. Where's the ball going?",
+   "choices": [
+    {
+     "t": "Lob to the roller",
+     "ok": true
+    },
+    {
+     "t": "Kick it to the corner"
+    },
+    {
+     "t": "Pull up yourself"
+    }
+   ],
+   "ans": "The low man inches out to the corner and the big commits to the ball, so the lob to the roller is easy.",
+   "quote": "But, I'm watching him, right? And he thinks that as this play progresses bit by bit, you can see him start to inch out to the corner. So, he thinks Turner's got it under control. And as I see that, Green fans out, Kuzma fans out. This is a really easy lob throw to Rich.",
+   "cast": [
+    "YOU · Giddey",
+    "ROLLER · Rich",
+    "THE BIG · Turner",
+    "LOW MAN · Kuzma",
+    "DEFENDER · Green"
+   ]
+  },
+  {
+   "id": "s4-06",
+   "src": "JG-PNR",
+   "start": 528,
+   "pause": 545,
+   "end": 584,
+   "lv": "I",
+   "checked": false,
+   "title": "Guard-guard screen",
+   "q": "A guard comes to screen for you. What's your job?",
+   "choices": [
+    {
+     "t": "Be patient and read what the screener does",
+     "ok": true
+    },
+    {
+     "t": "Go right away before the defense sets"
+    },
+    {
+     "t": "Pass to the screener on the catch"
+    }
+   ],
+   "ans": "Wait for the screener to decide, then read it. They don't switch, so he gets downhill. His own fix: take one more dribble before picking it up.",
+   "quote": "So, my job is to be patient and let Lenny make a decision whether he's going to screen, whether he's going to touch and roll, and kind of read him from there. So, I read what he does, and it allows me to get downhill. So, I probably picked the ball up way too early.",
+   "cast": [
+    "YOU · Giddey",
+    "SCREENER · Lenny",
+    "DEFENDER · Veit",
+    "DEFENDER · Scoot"
+   ]
+  },
+  {
+   "id": "s4-07",
+   "src": "JG-PNR",
+   "start": 615,
+   "pause": 630,
+   "end": 682,
+   "lv": "I",
+   "checked": false,
+   "title": "Two come at you",
+   "q": "Two defenders come at you off the screen. Where does the ball go?",
+   "choices": [
+    {
+     "t": "Back to the screener popping out",
+     "ok": true
+    },
+    {
+     "t": "Split the two defenders"
+    },
+    {
+     "t": "Retreat dribble and reset"
+    }
+   ],
+   "ans": "They trap him, so the popping big is open, and a teammate cutting out of the way leaves nobody to help.",
+   "quote": "They put two on the ball. So, Six, who's a great shooter for us, he's our big that's going to pop here. I'm throwing this ball back to him and Isaac cuts out. So, as Isaac cuts, there's no one there. So, I throw it back to Six and it allows Six to get a wide open catch-and-shoot three.",
+   "cast": [
+    "YOU · Giddey",
+    "SCREENER · Six",
+    "TEAMMATE · Isaac",
+    "DEFENDER · Brunson",
+    "DEFENDER · the trap"
+   ]
+  },
+  {
+   "id": "s4-08",
+   "src": "JG-PNR",
+   "start": 685,
+   "pause": 736,
+   "end": 750,
+   "lv": "I",
+   "checked": false,
+   "title": "Big diving down the middle",
+   "q": "Your big is diving down the middle. Pass, shoot or drive?",
+   "choices": [
+    {
+     "t": "Pass to him for the short floater",
+     "ok": true
+    },
+    {
+     "t": "Drive it yourself"
+    },
+    {
+     "t": "Kick to the corner"
+    }
+   ],
+   "ans": "The big commits to the ball and the low man isn't high enough to stop it, so the pass to the diving big is wide open.",
+   "quote": "Ayton commits to the ball, if you watch this. LaRavia is in a good low spot, but he's not high enough up the floor to deter a pass to Vuch, which as I throw this ball, it's a wide-open little floater for him.",
+   "cast": [
+    "YOU · Giddey",
+    "ROLLER · Vučević",
+    "THE BIG · Ayton",
+    "LOW MAN · LaRavia"
+   ]
+  },
+  {
+   "id": "s4-09",
+   "src": "JG-PNR",
+   "start": 763,
+   "pause": 789,
+   "end": 810,
+   "lv": "B",
+   "checked": false,
+   "title": "Side pick and roll",
+   "q": "Your man is behind you after the screen. What now?",
+   "choices": [
+    {
+     "t": "Get downhill and race him to the rim",
+     "ok": true
+    },
+    {
+     "t": "Wait for him to catch up and reset"
+    },
+    {
+     "t": "Pass to the screener right away"
+    }
+   ],
+   "ans": "His man had to chase over the screen and the big isn't switching, so he gets ahead and attacks.",
+   "quote": "And Randle's not switching, Wells is chasing. So, they're kind of in a tough spot now, cuz it allows me to get ahead of steam downhill. It's just tough when you're playing behind the guy that's getting downhill.",
+   "cast": [
+    "YOU · Giddey",
+    "YOUR DEFENDER · Wells",
+    "SCREENER'S DEFENDER · Randle",
+    "SCREENER · Vučević"
+   ]
+  }
+ ]
+}

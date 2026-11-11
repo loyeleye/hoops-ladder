@@ -1,0 +1,448 @@
+{
+ "id": "s1",
+ "name": "Catch and read",
+ "blurb": "The first read after a catch: look up, see who's open, and move the ball before the defense recovers.",
+ "src": {
+  "JP-PG": {
+   "v": "bkkOyFneH_4",
+   "t": "Learn Point Guard Reads from an NBA Player (Live Mic'd Up)",
+   "who": "Jason Preston · NBA"
+  },
+  "JP-YF": {
+   "v": "8jCebQmLA-s",
+   "t": "How NBA Players See The Game (I Break Down YOUR Film)",
+   "who": "Jason Preston · NBA"
+  }
+ },
+ "m": [
+  {
+   "id": "s1-01",
+   "src": "JP-PG",
+   "start": 44,
+   "pause": 49,
+   "end": 56,
+   "lv": "B",
+   "checked": true,
+   "title": "Outlet up the floor",
+   "q": "You have the ball. Pass to your teammate now or hold it?",
+   "choices": [
+    {
+     "t": "Pass it now",
+     "ok": true
+    },
+    {
+     "t": "Hold it and keep dribbling"
+    }
+   ],
+   "ans": "Pass. #42 has his back to you, so he can't see the pass coming.",
+   "quote": "If a defender's back is facing you, throw the ball. They are wide open… number 42 isn't looking at me.",
+   "cast": [
+    "YOU · Preston, with the ball",
+    "DEFENDER · #42",
+    "TEAMMATE · up the floor"
+   ],
+   "court": {
+    "edges": [],
+    "players": [
+     {
+      "k": "off",
+      "x": 45,
+      "y": 300,
+      "face": [
+       90,
+       190
+      ]
+     },
+     {
+      "k": "def",
+      "x": 112,
+      "y": 248,
+      "face": [
+       150,
+       150
+      ]
+     },
+     {
+      "k": "off",
+      "x": 400,
+      "y": 238,
+      "face": [
+       330,
+       110
+      ]
+     },
+     {
+      "k": "def",
+      "x": 398,
+      "y": 168,
+      "face": [
+       330,
+       110
+      ]
+     },
+     {
+      "k": "def",
+      "x": 445,
+      "y": 228,
+      "face": [
+       420,
+       130
+      ]
+     },
+     {
+      "k": "off",
+      "x": 335,
+      "y": 200,
+      "face": [
+       262,
+       292
+      ],
+      "key": true,
+      "label": "TEAMMATE",
+      "mv": [
+       298,
+       118
+      ]
+     },
+     {
+      "k": "def",
+      "x": 288,
+      "y": 226,
+      "face": [
+       340,
+       180
+      ],
+      "key": true,
+      "label": "DEFENDER #42",
+      "mv": [
+       312,
+       170
+      ],
+      "side": "left"
+     },
+     {
+      "k": "off",
+      "x": 212,
+      "y": 330,
+      "you": true,
+      "key": true,
+      "label": "YOU",
+      "ball": true,
+      "mv": [
+       220,
+       282
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "s1-02",
+   "src": "JP-PG",
+   "start": 62,
+   "pause": 65,
+   "end": 72,
+   "lv": "B",
+   "checked": false,
+   "title": "Outlet up the floor, second look",
+   "q": "Same idea, different look. Pass or hold?",
+   "choices": [
+    {
+     "t": "Pass it now",
+     "ok": true
+    },
+    {
+     "t": "Hold it"
+    }
+   ],
+   "ans": "Pass. The defender in the white shirt turns his back, so he can't see the pass to his man.",
+   "quote": "White shirt turns his back. He can't see that I'm throwing the ball at his man.",
+   "cast": [
+    "YOU · Preston, with the ball",
+    "DEFENDER · white shirt",
+    "TEAMMATE · up the floor"
+   ]
+  },
+  {
+   "id": "s1-03",
+   "src": "JP-PG",
+   "start": 74,
+   "pause": 77,
+   "end": 89,
+   "lv": "B",
+   "checked": false,
+   "title": "Teammate with a defender on him",
+   "q": "Your teammate has a defender right next to him. Is he open?",
+   "choices": [
+    {
+     "t": "Yes, throw it to him",
+     "ok": true
+    },
+    {
+     "t": "No, look somewhere else"
+    }
+   ],
+   "ans": "Yes. The defender is right next to him but can't make a play on the ball, so he's open.",
+   "quote": "Even though it doesn't look like he's open, he's open cuz the defender can't make a play on the ball.",
+   "cast": [
+    "YOU · Preston, with the ball",
+    "TEAMMATE",
+    "DEFENDER · on your teammate"
+   ]
+  },
+  {
+   "id": "s1-04",
+   "src": "JP-PG",
+   "start": 106,
+   "pause": 126,
+   "end": 134,
+   "lv": "B",
+   "checked": false,
+   "title": "The outlet catch",
+   "q": "You just caught the outlet. What's your first move?",
+   "choices": [
+    {
+     "t": "Put it on the floor and push"
+    },
+    {
+     "t": "Look up the floor before you dribble",
+     "ok": true
+    }
+   ],
+   "ans": "Look up before you dribble. #24 isn't looking at you, so you can advance it to his man.",
+   "quote": "You should never catch it, dribble. The first thing you should do is catch and look… Number 24 is not looking at me. I can advance to him.",
+   "cast": [
+    "YOU · Preston, just caught the outlet",
+    "DEFENDER · #24",
+    "TEAMMATE · up the floor"
+   ]
+  },
+  {
+   "id": "s1-05",
+   "src": "JP-PG",
+   "start": 200,
+   "pause": 204,
+   "end": 234,
+   "lv": "I",
+   "checked": true,
+   "title": "Big rolling to the rim",
+   "q": "Your big is rolling. Throw it to him?",
+   "choices": [
+    {
+     "t": "Yes, hit the roller"
+    },
+    {
+     "t": "No, pass it somewhere else",
+     "ok": true
+    }
+   ],
+   "ans": "No. The low man is coming to help and your big can't see him. Preston jumps and passes opposite, away from where the defender's weight just moved.",
+   "quote": "",
+   "cast": [
+    "YOU · Preston",
+    "ROLLER · your big",
+    "LOW MAN · the help defender"
+   ]
+  },
+  {
+   "id": "s1-06",
+   "src": "JP-PG",
+   "start": 278,
+   "pause": 295,
+   "end": 326,
+   "lv": "I",
+   "checked": false,
+   "title": "Coming off the ball screen",
+   "q": "Coming off the screen, read the defense. Where does the ball go?",
+   "choices": [
+    {
+     "t": "Lob it to the roller"
+    },
+    {
+     "t": "Skip it to the corner",
+     "ok": true
+    },
+    {
+     "t": "Keep it and pull up"
+    }
+   ],
+   "ans": "Skip it to the corner. His defender throws his hands up and the low man creeps in, so he looks at the roller and skips it to the corner.",
+   "quote": "",
+   "cast": [
+    "YOU · Preston",
+    "YOUR DEFENDER",
+    "BIG · in drop",
+    "LOW MAN"
+   ]
+  },
+  {
+   "id": "s1-07",
+   "src": "JP-PG",
+   "start": 390,
+   "pause": 395,
+   "end": 405,
+   "lv": "I",
+   "checked": false,
+   "title": "Screener's defender at the ball screen",
+   "q": "You come off the screen. What's the play?",
+   "choices": [
+    {
+     "t": "Turn the corner and drive"
+    },
+    {
+     "t": "Hit the shooter next to you",
+     "ok": true
+    },
+    {
+     "t": "Hit the roller"
+    }
+   ],
+   "ans": "Hit the shooter right next to you. The screener's defender hedges for a second, so that's the easy play.",
+   "quote": "I see that he hedges for a second. I got a shooter right next to me… It's an easy play.",
+   "cast": [
+    "YOU · Preston",
+    "SCREENER'S DEFENDER",
+    "TEAMMATE · next to you"
+   ]
+  },
+  {
+   "id": "s1-08",
+   "src": "JP-PG",
+   "start": 446,
+   "pause": 450,
+   "end": 461,
+   "lv": "B",
+   "checked": false,
+   "title": "Catch with a little space",
+   "q": "You catch it with a little space. Shoot right away?",
+   "choices": [
+    {
+     "t": "Yes, shoot it on the catch"
+    },
+    {
+     "t": "No, take a second and read it",
+     "ok": true
+    }
+   ],
+   "ans": "Take a second first. Preston told his teammate he had a dribble into a layup, or the corner.",
+   "quote": "You caught it and shot it. Just give yourself more time. You had dribble lay. You had corner.",
+   "cast": [
+    "YOU · the teammate who catches it",
+    "CLOSEOUT DEFENDER",
+    "TEAMMATE · in the corner"
+   ]
+  },
+  {
+   "id": "s1-09",
+   "src": "JP-YF",
+   "start": 0,
+   "pause": 6,
+   "end": 19,
+   "lv": "B",
+   "checked": false,
+   "title": "Big running the floor",
+   "q": "Your big is running the floor ahead of you. Throw it now or wait?",
+   "choices": [
+    {
+     "t": "Throw it now"
+    },
+    {
+     "t": "Wait a beat",
+     "ok": true
+    }
+   ],
+   "ans": "Wait a beat, until he's close enough to finish without dribbling.",
+   "quote": "I don't want to put my big in a position to give him the ball here… wait for him to go a little bit closer to the rim.",
+   "cast": [
+    "YOU · with the ball",
+    "BIG · running the floor"
+   ]
+  },
+  {
+   "id": "s1-10",
+   "src": "JP-YF",
+   "start": 160,
+   "pause": 166,
+   "end": 174,
+   "lv": "B",
+   "checked": true,
+   "title": "Catch on the wing",
+   "q": "You catch on the wing. What's the play?",
+   "choices": [
+    {
+     "t": "Drive at your man"
+    },
+    {
+     "t": "Swing it to the corner",
+     "ok": true
+    },
+    {
+     "t": "Hold it and call for a screen"
+    }
+   ],
+   "ans": "Look first. He reads the helper and swings it to the corner right away.",
+   "quote": "Catches it. First thing he does is look… Makes the read of this guy. Immediately swings to the corner.",
+   "cast": [
+    "YOU · on the wing, the ball on its way",
+    "HELPER",
+    "TEAMMATE · in the corner"
+   ]
+  },
+  {
+   "id": "s1-11",
+   "src": "JP-YF",
+   "start": 335,
+   "pause": 340,
+   "end": 356,
+   "lv": "B",
+   "checked": false,
+   "title": "Driving into the paint",
+   "q": "You've driven into the paint. Go up or pass?",
+   "choices": [
+    {
+     "t": "Go up and finish"
+    },
+    {
+     "t": "Pass it",
+     "ok": true
+    }
+   ],
+   "ans": "Pass. He drew four defenders, so a teammate has an open layup or an open three.",
+   "quote": "So glad he passed this ball… he drew four… he made the right read. Open layup or open three any day of the week.",
+   "cast": [
+    "YOU · the driver",
+    "HELP DEFENDERS"
+   ]
+  },
+  {
+   "id": "s1-12",
+   "src": "JP-YF",
+   "start": 382,
+   "pause": 387,
+   "end": 412,
+   "lv": "B",
+   "checked": false,
+   "title": "Before the catch",
+   "q": "The ball is on its way to you. What's your first move?",
+   "choices": [
+    {
+     "t": "Catch and take a dribble"
+    },
+    {
+     "t": "Pass it on the catch",
+     "ok": true
+    },
+    {
+     "t": "Catch and hold it"
+    }
+   ],
+   "ans": "Pass on the catch. A dribble gives his defender time to recover. Know your next move before the ball gets to you.",
+   "quote": "You taking this dribble could allow him to recover… Even before receiving the ball, we should kind of already know what we're about to be doing.",
+   "cast": [
+    "YOU · about to catch",
+    "TEAMMATE",
+    "DEFENDER · on your teammate"
+   ]
+  }
+ ]
+}

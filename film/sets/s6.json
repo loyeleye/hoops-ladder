@@ -1,0 +1,177 @@
+{
+ "id": "s6",
+ "name": "The baseline drive",
+ "blurb": "When help comes on a baseline drive, look front of the rim, then the opposite corner, then the opposite wing.",
+ "src": {
+  "FR-BASE": {
+   "v": "VccaMTYLZcU",
+   "t": "The 3 Key Reads When Driving Baseline",
+   "who": "The Film Room · former Big 12 player"
+  }
+ },
+ "m": [
+  {
+   "id": "s6-01",
+   "src": "FR-BASE",
+   "start": 91,
+   "pause": 104,
+   "end": 108,
+   "lv": "B",
+   "checked": false,
+   "title": "Help comes on the baseline drive",
+   "q": "You've driven baseline and help comes over. Where does it go?",
+   "choices": [
+    {
+     "t": "The opposite corner",
+     "ok": true
+    },
+    {
+     "t": "Front of the rim"
+    },
+    {
+     "t": "Opposite wing"
+    },
+    {
+     "t": "Finish it yourself"
+    }
+   ],
+   "ans": "Front of the rim is the first look, but when help takes it away the next read is always the opposite corner, the hammer pass.",
+   "quote": "The tee-up should always be your first read but if the help defender comes over and the tee-up is taken away your next read should always be the hammer pass",
+   "cast": [
+    "YOU · driving baseline",
+    "HELPER",
+    "TEAMMATE · front of rim",
+    "TEAMMATE · opposite corner",
+    "TEAMMATE · opposite wing"
+   ]
+  },
+  {
+   "id": "s6-02",
+   "src": "FR-BASE",
+   "start": 124,
+   "pause": 128,
+   "end": 139,
+   "lv": "I",
+   "checked": false,
+   "title": "Two helpers come",
+   "q": "You've driven baseline. Where does it go?",
+   "choices": [
+    {
+     "t": "Opposite wing",
+     "ok": true
+    },
+    {
+     "t": "Opposite corner"
+    },
+    {
+     "t": "Front of the rim"
+    }
+   ],
+   "ans": "Two defenders help, but the corner man hasn't reached his spot yet, so the slot man is open for the three.",
+   "quote": "Now on this drive two people actually go to help but the hammer man just cut through and wasn't to his spot yet and so the slot man ended up being the one who is open for a catch and shoot three",
+   "cast": [
+    "YOU · driving baseline",
+    "HELPER",
+    "HELPER",
+    "TEAMMATE · heading to the opposite corner",
+    "TEAMMATE · opposite wing"
+   ]
+  },
+  {
+   "id": "s6-03",
+   "src": "FR-BASE",
+   "start": 163,
+   "pause": 167,
+   "end": 176,
+   "from": 159,
+   "lv": "I",
+   "checked": false,
+   "title": "Bunch of help",
+   "q": "A bunch of defenders come to help. You pass to the opposite wing. What should he do with it?",
+   "choices": [
+    {
+     "t": "Pass it straight on to the corner",
+     "ok": true
+    },
+    {
+     "t": "Shoot it"
+    },
+    {
+     "t": "Drive his closeout"
+    }
+   ],
+   "ans": "The slot man one-times it to the corner for a three. It doesn't always have to go corner first.",
+   "quote": "There's the hammer and the slot he decides to throw it to the slot man and he one-times it to the corner for a three",
+   "cast": [
+    "YOU · driving baseline",
+    "TEAMMATE · opposite wing",
+    "TEAMMATE · opposite corner",
+    "HELPER"
+   ]
+  },
+  {
+   "id": "s6-04",
+   "src": "FR-BASE",
+   "start": 176,
+   "pause": 194,
+   "end": 203,
+   "lv": "I",
+   "checked": false,
+   "title": "The second drive",
+   "q": "The ball got kicked out, driven, and kicked back to you. You drive again. Where does it go?",
+   "choices": [
+    {
+     "t": "Front of the rim",
+     "ok": true
+    },
+    {
+     "t": "Opposite corner"
+    },
+    {
+     "t": "Opposite wing"
+    }
+   ],
+   "ans": "Two defenders are left to guard three on the backside, and the tee-up man at the front of the rim is open.",
+   "quote": "You have two guys to guard three people on the backside tee-up, hammer, slot and as you can see the tee-up man is the one who's open",
+   "cast": [
+    "YOU · driving baseline",
+    "TEAMMATE · front of rim",
+    "TEAMMATE · opposite corner",
+    "TEAMMATE · opposite wing",
+    "DEFENDER",
+    "DEFENDER"
+   ]
+  },
+  {
+   "id": "s6-05",
+   "src": "FR-BASE",
+   "start": 216,
+   "pause": 222,
+   "end": 228,
+   "lv": "B",
+   "checked": false,
+   "title": "Help takes the rim",
+   "q": "You've driven baseline and help comes. Where does it go?",
+   "choices": [
+    {
+     "t": "Opposite corner",
+     "ok": true
+    },
+    {
+     "t": "Front of the rim"
+    },
+    {
+     "t": "Finish it yourself"
+    }
+   ],
+   "ans": "The Duke defender takes away the front of the rim, so the corner is open.",
+   "quote": "You have a tee-up man and you have a hammer because that defender from Duke comes over and takes away the tee-up he knew the hammer was open",
+   "cast": [
+    "YOU · Wilson, driving",
+    "HELPER",
+    "TEAMMATE · front of rim",
+    "TEAMMATE · opposite corner"
+   ]
+  }
+ ]
+}

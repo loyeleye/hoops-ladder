@@ -4,6 +4,7 @@
   "description": "Hoops Ladder basketball training app for Android (Capacitor)",
   "scripts": {
     "import-prototype": "node tools/import_prototype.mjs",
+    "build-film": "node tools/build_film.mjs",
     "sync": "cap sync android",
     "open": "cap open android"
   },
