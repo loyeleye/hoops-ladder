@@ -64,7 +64,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .syncnote{font-size:12px;opacity:.75}
 /* Drills tab: Shooting / Handling / Finishing tabs at the bottom of the sticky plate. The plate keeps its own (brighter) skill colours so the blue and green read on navy in both themes. */
 .plate{--read:#8FA8FF;--good:#46C489}
-.plate .sktabs{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding-block:0;position:relative;border-top:1px solid rgb(242 245 250/.14)}
+.plate .sktabs{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding-block:0;position:relative;border-top:1px solid rgb(242 245 250/.14)}
 .sktabs button{border:0;background:none;color:var(--bg);opacity:.6;font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;min-height:46px;padding:0 4px;transition:opacity .2s}
 .sktabs button[aria-selected="true"]{opacity:1}.sktabs button:active{opacity:.85}
 .sktabs .ind{position:absolute;left:0;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--sk,var(--accent));pointer-events:none;transition:transform .24s cubic-bezier(.2,.8,.2,1),width .24s cubic-bezier(.2,.8,.2,1),background-color .24s}
@@ -664,15 +664,45 @@ const DRILLS=[
   cue:"Decide on the catch, not before.",src:[{label:"Decision-rep idea from r/BasketballTips",url:""}]},
 
  // ---------- HANDLING: mechanics ----------
- {id:"b_body",skill:"h",body:true,name:"Body Warm-Up",role:"body",unlock:1,mins:4,log:"timer",
+ {id:"b_body",skill:"h",body:true,rt:"warm",short:"Quick and general. Good most days.",name:"Body Warm-Up",role:"body",unlock:1,mins:4,log:"timer",
   phases:[["Easy jog or skips, baseline to baseline",40],["Ankle hops in place, small and quick",20],["Walking lunges with a reach",40],["Leg swings, front to back, then side to side",40],["Slow calf raises",20],["Defensive slides, both directions",30],["Build-up runs at about half, then three-quarter speed",40]],
   what:"Four minutes to get your ankles, calves, hamstrings and hips ready before you jump, sprint or finish at the rim. It comes right after Cold 3s, which you shoot with no warm-up at all.",
   steps:["Start easy. You should feel warm and a little loose by the end, not tired.","Keep the hops small and quick, landing softly on the balls of your feet.","On lunges, step long and keep your front knee over your foot.","Build-up runs: start easy and only go faster when your legs feel ready. Skip the last round if anything feels tight."],
   cue:"Warm, not tired.",src:[{label:"Standard dynamic warm-up"}]},
- {id:"b_cool",skill:"h",body:true,name:"Cool-Down Stretch",role:"cool",unlock:1,mins:3,log:"timer",
+ {id:"b_cool",skill:"h",body:true,rt:"cool",short:"Short stretch for what you just used.",name:"Cool-Down Stretch",role:"cool",unlock:1,mins:3,log:"timer",
   phases:[["Walk it off, breathe out slowly",30],["Hamstring stretch, each leg",40],["Hip flexor stretch, each side",40],["Calf stretch against the wall",30],["Quad stretch, each leg",30]],
   what:"Three easy minutes to bring your heart rate down and stretch what you just used: hamstrings, hips, calves and quads. It comes after Tired 3s, the last thing you shoot.",
   steps:["Walk until your breathing settles.","Hold each stretch still. No bouncing.","Breathe out as you ease a little deeper.","Stretch both sides. The app tells you when to switch."],
+  cue:"Breathe out into the stretch.",src:[{label:"Standard static cool-down"}]},
+ {id:"b_full",skill:"h",body:true,rt:"warm",short:"Longer and more thorough, for long sessions or cold gyms.",name:"Full Dynamic Warm-Up",role:"body",unlock:1,mins:8,log:"timer",
+  phases:[["Easy jog, baseline to baseline",60],["High knees, down and back",30],["Butt kicks, down and back",30],["Carioca, facing one way, then the other",40],["Skips with an arm swing",30],["Backpedal, then turn and jog",30],["Walking lunges with a twist toward the front leg",40],["World's greatest stretch, each side",60],["Leg swings, front to back, then side to side",40],["Defensive slides, both directions",30],["Ankle hops in place, small and quick",20],["Build-up runs at about half, then three-quarter speed",40]],
+  what:"Eight minutes that warm up everything a game asks for: running, backpedalling, cutting sideways and jumping. Use it for a long session, a cold gym, or a day you feel stiff.",
+  steps:["Start slow and let each move get a little bigger than the last.","Carioca: hips turn, shoulders stay square, back foot crosses in front then behind.","World's greatest stretch: long lunge, same-side elbow down to the inside of the front foot, then rotate and reach that arm to the ceiling. Switch sides at the call.","Build-up runs only go faster if your legs feel ready. Skip the last round if anything feels tight."],
+  cue:"Each move a little bigger.",src:[{label:"Standard dynamic warm-up"}]},
+ {id:"b_easy",skill:"h",body:true,rt:"warm",short:"Gentle start for stiff knees, ankles or hips.",name:"Easy Start Warm-Up",role:"body",unlock:1,mins:7,log:"timer",
+  phases:[["Ankle circles, each foot",40],["Hip circles, both directions",30],["Glute bridges, slow",40],["Slow bodyweight squats",40],["Walking knee hugs",40],["Walking quad pulls",40],["Walk on your toes, then on your heels",30],["Slow calf raises",20],["Easy jog, baseline to baseline",60],["Build-up runs at about half speed",40]],
+  what:"Seven minutes that start on the spot and build to a jog, for days your knees, ankles or hips feel stiff, or when you're coming back from time off. No hops and no fast runs.",
+  steps:["Every move is slow and controlled. It should feel easy.","Glute bridges: lie on your back, feet flat, squeeze your glutes to lift your hips, hold a second at the top.","Squats: sit back as far as feels fine, knees over your toes. Half depth is OK.","Only jog once your ankles and knees feel loose."],
+  cue:"Slow first. Loose before fast.",src:[{label:"Standard joint-friendly warm-up"}]},
+ {id:"b_game",skill:"h",body:true,rt:"warm",short:"With a ball, before a game, league night or pickup.",name:"Pre-Game Warm-Up",role:"body",unlock:1,mins:10,log:"timer",
+  phases:[["Jog with the ball, dribbling, baseline to baseline",60],["High knees and butt kicks, down and back",40],["Carioca, facing one way, then the other",40],["Leg swings, front to back, then side to side",30],["Stationary handles: pounds, crosses, between the legs",60],["Form shots close to the rim, one hand",60],["Layups, right hand from the right, left hand from the left",60],["Catch-and-shoot from mid-range, move between shots",90],["Defensive slides, both directions",30],["Two sprints, baseline to half court",30]],
+  what:"Ten minutes with a ball to get your body and your shot ready before a game. It ends at game speed so the first trip down the floor isn't your first sprint.",
+  steps:["Start loose and get faster every minute.","Form shots and layups: make them, don't rush them. You want to see the ball go in.","Mid-range: game spots and game speed, a hard step into each shot.","Finish with the sprints a few minutes before tip-off, not half an hour early."],
+  cue:"Loose, then game speed.",src:[{label:"Standard pre-game warm-up"}]},
+ {id:"b_club",skill:"h",body:true,rt:"warm",short:"Never Too Late club's warm-up: laps, then moves across the court. Bring a ball.",name:"Club Warm-Up",role:"body",unlock:1,mins:7,log:"timer",
+  phases:[["Lap around the court at half speed",60],["Lap around the court at three-quarter speed",45],["Lap around the court at full speed",40],["Skips, the full length of the court",30],["Walking hip CARs, across the court",60],["Walking lunges, across the court",45],["Walking leg raises, ball touches your toe",45],["Carioca, facing one way, then the other",40],["Walking butt kicks, across the court",40],["Jump skips for height, across the court",30]],
+  what:"The warm-up from the Never Too Late adult club: three laps around the outside of the court that build to full speed, then a line of moves across the court. You need a ball for the leg raises.",
+  steps:["Laps: run around the outside of the whole court. First at a jog, then three-quarter speed, then full speed.","Hip CARs (controlled articular rotations): lift a knee, open it out to the side, and circle it back down, slow and as big as you can control. Step and switch legs.","Leg raises with the ball: walk forward, swing one straight leg up until it's level with the floor, and bring the ball down to touch your toe. Lower it and repeat with the other leg.","Jump skips: skip across the court driving each knee up and jumping as high as you can."],
+  cue:"Build the laps. Big, slow hips.",src:[{label:"Never Too Late adult basketball club"}]},
+ {id:"b_club2",skill:"h",body:true,rt:"warm",short:"The club warm-up plus floor work: plank, wall sit, push-ups, burpees, ball twists.",name:"Club Warm-Up + Floor Work",role:"body",unlock:1,mins:10,log:"timer",
+  phases:[["Lap around the court at half speed",60],["Lap around the court at three-quarter speed",45],["Lap around the court at full speed",40],["Skips, the full length of the court",30],["Walking hip CARs, across the court",60],["Walking lunges, across the court",45],["Walking leg raises, ball touches your toe",45],["Carioca, facing one way, then the other",40],["Walking butt kicks, across the court",40],["Jump skips for height, across the court",30],["Plank",30],["Wall sit",30],["Push-ups",30],["Burpees",30],["Ball twists, elbow to each hip",30]],
+  what:"The Never Too Late club warm-up on days with the other coach: the same laps and moves across the court, then five floor exercises for your core, legs and upper body.",
+  steps:["Laps: run around the outside of the whole court. First at a jog, then three-quarter speed, then full speed.","Hip CARs: lift a knee, open it out to the side, and circle it back down, slow and as big as you can control.","Plank: forearms under your shoulders, body in one straight line, squeeze your glutes. Wall sit: back flat on the wall, knees over your ankles. Push-ups: drop to your knees once your form goes.","Ball twists: hold the ball at your chest and rotate side to side, touching your elbow to each hip."],
+  cue:"Build the laps. Hold your form on the floor.",src:[{label:"Never Too Late adult basketball club"}]},
+ {id:"b_cool2",skill:"h",body:true,rt:"cool",short:"Longer stretch for after a hard session or a game.",name:"Full Cool-Down",role:"cool",unlock:1,mins:8,log:"timer",
+  phases:[["Walk it off, breathe out slowly",60],["Standing hamstring stretch, each leg",60],["Quad stretch, each leg",40],["Calf stretch against the wall, each leg",40],["Hip flexor stretch, each side",60],["Figure-four glute stretch, each side",60],["Butterfly stretch",40],["Child's pose",40],["Lying twist, each side",40],["Cross-body shoulder stretch, each arm",30]],
+  what:"Eight minutes from head to toe after a long session or a game: legs, hips, lower back and shoulders. Your muscles are warm, so this is the best time to work on how far you can stretch.",
+  steps:["Walk until your breathing settles.","Hold each stretch still. No bouncing. It should pull, not hurt.","Breathe out as you ease a little deeper.","The app calls when to switch sides."],
   cue:"Breathe out into the stretch.",src:[{label:"Standard static cool-down"}]},
  {id:"h_lab",skill:"h",name:"In The Lab Daily Warm-Up",role:"warm",unlock:1,mins:6,log:"timer",heavy:true,
   phases:[["Pounds, right hand",30],["Pounds, left hand",30],["Pounds, both hands",30],["Pound + crossover, hard and low",30],["Between the legs, step into it",30],["In-and-out → between, + one dribble",40],["Split-stance walk forward & back",50],["Jump-stop over-cross (small, quiet stop)",30],["Quick in-and-outs, sell with head",30],["Crossover snatch-back",30]],
@@ -2091,7 +2121,10 @@ const LVL_NAME=["","Starter","Builder","Advanced"];
 const lvlOf=d=>d.unlock<=2?1:d.unlock<=5?2:3;
 const pipsHTML=d=>{const L=lvlOf(d);return `<span class="dpips" role="img" aria-label="${LVL_NAME[L]}" title="${LVL_NAME[L]}">${[1,2,3].map(i=>`<i class="${i<=L?"on":""}"></i>`).join("")}</span>`};
 const NW_DEF={20:1,30:2,45:2},NW_ALL=99,NW_MAX=6;
-const FIXED=new Set(["s_cold","b_body","s_tired","b_cool"]);
+/* warm-up and cool-down routines: you pick one of each (Today's plan ⇄, or Drills → Body) and every recommended workout uses it */
+const RTS=k=>DRILLS.filter(d=>d.rt===k),RT_DEF={warm:"b_body",cool:"b_cool"},RT_NAME={warm:"warm-up",cool:"cool-down"};
+function rtPick(k){const d=D[(S.settings.rt||{})[k]];return d&&d.rt===k?d:D[RT_DEF[k]]}
+const FIXED=new Set(["s_cold","s_tired",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
 /* drills that load the legs: left out on a "Legs heavy" or "Game tonight" day */
 const JUMPY=new Set(["f_power","f_bump","f_contact","f_spots","f_chair","s_tired","h_zig","h_stop"]);
 const FREQ_LABEL={auto:"Auto",every:"Every workout",weekly:"Weekly",custom:"Custom",never:"Never suggest"};
@@ -2121,7 +2154,7 @@ function needsWork(){const out=[],add=(id,t,why)=>{if(D[id]&&!out.some(x=>x.d.id
   let hd=null;const cut=cutOf(30);for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){const d=D[it.id];if(d&&d.skill==="h"&&!d.body&&it.lost>=3&&(!hd||it.lost>=hd.lost))hd={id:it.id,lost:it.lost}}}
   if(hd)add(hd.id,`Needs work: ${hd.lost} drops last time`,`You lost the ball ${hd.lost} times the last time you ran it. Clean reps here carry over to games.`);
   return out.filter(x=>!((S.rec.paused||{})[x.d.id]>today()))}
-function slotOf(d){if(d.id==="s_cold")return"Cold shots";if(d.id==="b_body")return"Body warm-up";if(d.id==="b_cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
+function slotOf(d){if(d.id==="s_cold")return"Cold shots";if(d.rt==="warm")return"Body warm-up";if(d.rt==="cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
   if(d.role==="warm")return"Warm-up";if(d.id==="h_live")return"Live";
   if(d.skill==="h")return d.read?"Handle · decisions":"Handle · mechanics";
   if(d.skill==="f")return"Finishing";
@@ -2144,9 +2177,9 @@ function plan0(){
   const add=(d,why,prio)=>{if(!d||used.has(d.id))return;const to=sw[d.id];let sx=false;if(to&&D[to]&&!used.has(to)&&!FIXED.has(d.id)){used.add(d.id);d=D[to];sx=true;why=why&&why.k==="need"?why:{k:"swap",t:"Swapped in"}}
     if(used.has(d.id))return;cand.push({slot:slotOf(d),d,why,prio,sx});used.add(d.id)};
   const light=body?{k:"light",t:"Lighter today"}:null;
-  add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(D.b_body,{k:"fixed",t:"Always before handling"},"must");
+  add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(rtPick("warm"),{k:"fixed",t:"Always before handling"},"must");
   const tired=mins!==20&&!body;if(tired)add(D.s_tired,{k:"fixed",t:"Always near the end"},"must");
-  add(D.b_cool,null,"must");
+  add(rtPick("cool"),null,"must");
   for(const id of S.rec.added)if(D[id]&&!D[id].body&&(!D[id].partner||S.settings.partner))add(D[id],{k:"you",t:"You added it"},"added");
   let nNW=0;const nwN=nwCount(mins);for(const x of needsWork()){if(nNW>=nwN)break;if(!ok(x.d)||used.has(x.d.id))continue;add(x.d,{k:"need",t:x.t},"need");nNW++}
   for(const id in S.rec.freq){if(fq(id).k==="every"&&ok(D[id]))add(D[id],{k:"every",t:"Every workout"},"every")}
@@ -2207,7 +2240,7 @@ function renderPlate(){
   $("#plate").classList.toggle("compact",state.tab==="drills"&&plateSmall);placeInd(false)}
 /* Drills tab: the skill switch lives in the sticky plate so it stays reachable while scrolling a long ladder.
    Switching updates the tabs in place (keeps focus, lets the underline slide), re-renders only the list, and remembers each ladder's scroll spot. */
-const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)"},tabScroll={};let plateSmall=false;
+const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"],["b","Body"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)",b:"var(--warn)"},tabScroll={};let plateSmall=false;
 function skillTabs(){const k=state.drillTab;
   return `<div class="wrap sktabs" role="tablist" aria-label="Skill">${SKT.map(([v,l])=>`<button role="tab" id="tab-${v}" aria-controls="drillpanel" data-dtab="${v}" aria-selected="${k===v}" tabindex="${k===v?0:-1}">${l}</button>`).join("")}<i class="ind" aria-hidden="true"></i></div>`}
 function placeInd(anim){const b=$("#tab-"+state.drillTab),ind=$(".sktabs .ind");if(!b||!ind)return;
@@ -2218,11 +2251,11 @@ function setDrillTab(k,focus){const old=state.drillTab;if(k===old){if(focus)$("#
   tabScroll[old]=window.scrollY;state.drillTab=k;
   document.querySelectorAll(".sktabs [role=tab]").forEach(b=>{const on=b.dataset.dtab===k;b.setAttribute("aria-selected",on);b.tabIndex=on?0:-1});
   placeInd(true);$("#view").innerHTML=viewDrills();
-  const sec=$("#drillpanel");if(sec)sec.classList.add("shf".indexOf(k)>"shf".indexOf(old)?"enter-r":"enter-l");
+  const sec=$("#drillpanel");if(sec)sec.classList.add("shfb".indexOf(k)>"shfb".indexOf(old)?"enter-r":"enter-l");
   window.scrollTo(0,tabScroll[k]||0);if(focus)$("#tab-"+k)?.focus()}
 document.addEventListener("keydown",e=>{const t=e.target.closest?.(".sktabs [role=tab]");if(!t)return;
-  const ks=SKT.map(x=>x[0]),i=ks.indexOf(state.drillTab),j={ArrowRight:i+1,ArrowLeft:i-1,Home:0,End:2}[e.key];
-  if(j==null)return;e.preventDefault();setDrillTab(ks[(j+3)%3],true)});
+  const ks=SKT.map(x=>x[0]),i=ks.indexOf(state.drillTab),j={ArrowRight:i+1,ArrowLeft:i-1,Home:0,End:ks.length-1}[e.key];
+  if(j==null)return;e.preventDefault();setDrillTab(ks[(j+ks.length)%ks.length],true)});
 window.addEventListener("scroll",()=>{if(state.tab!=="drills")return;const y=window.scrollY,small=plateSmall?y>16:y>120;
   if(small!==plateSmall){plateSmall=small;$("#plate").classList.toggle("compact",small)}},{passive:true});
 window.addEventListener("resize",()=>placeInd(false));
@@ -2286,7 +2319,7 @@ function viewToday(){
      if(timed(up[0])){const secs=up.reduce((a,x)=>a+totalOf(x.d),0)+10*(up.length-1);return `<button class="btn pri upnext" data-play="${up.map(x=>x.d.id).join(",")}">Up next: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}<small>Timed · plays back to back · ${Math.round(secs/60)} min</small></button>`}
      return `<button class="btn pri upnext" data-open="${up[0].d.id}">Up next: ${esc(up[0].d.name)}<small>Opens the drill and its logger</small></button>`})()}
    <div class="plantotal"><span>${p.length} drills${nNeed?` · ${nNeed} for what needs work`:""}</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min on the court</b></div>
-   <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}<div class="planline">${drillRow(x.d,i+1,{next:upIds.has(x.d.id),why:x.why})}${!cw&&!FIXED.has(x.d.id)?`<button class="optb" data-rec="opt:${x.d.id}" aria-label="${esc(x.d.name)}: why it's here, swap or how often">${SWAPICON}</button>`:`<span class="optb ph" aria-hidden="true"></span>`}</div>`).join("")}</div>
+   <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}<div class="planline">${drillRow(x.d,i+1,{next:upIds.has(x.d.id),why:x.why})}${!cw&&x.d.rt?`<button class="optb" data-rec="rt:${x.d.rt}" aria-label="${esc(x.d.name)}: pick your ${RT_NAME[x.d.rt]}">${SWAPICON}</button>`:!cw&&!FIXED.has(x.d.id)?`<button class="optb" data-rec="opt:${x.d.id}" aria-label="${esc(x.d.name)}: why it's here, swap or how often">${SWAPICON}</button>`:`<span class="optb ph" aria-hidden="true"></span>`}</div>`).join("")}</div>
    ${cw?"":overflowCard(p)}
    <p class="muted small" style="margin:0">${cw?`${esc(cw.name)} runs in the order you saved it, today only. Tomorrow goes back to the recommended plan. `:`Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The plan fills those slots with drills you added, what needs work, your schedule, favorites and one new drill, as many as fit the minutes you picked. Each drill says why it's here. Tap ⇄ to swap it or set how often it comes back. `}The Up next button always starts the next drill (outlined), and timed drills in a row play back to back. You can also tap any drill to do it out of order.</p></section>
   ${coachTodayCard()}`}
@@ -2295,12 +2328,18 @@ function cueCard(){const c=todayCue();
   return `<div class="card small cuecard"><div class="label">Today's one cue</div><b class="cuebig">${esc(CUES[c.i].t)}</b><div class="muted">${esc(CUES[c.i].w)} ${esc(c.why)}</div>
    <div class="chips" role="group" aria-label="Pick today's cue">${CUES.map((x,i)=>`<button class="chip" data-cue="${i}" aria-pressed="${i===c.i}">${esc(x.t)}</button>`).join("")}</div></div>`}
 function viewDrills(){
-  const k=state.drillTab;
+  const k=state.drillTab;if(k==="b")return viewBody();
   const list=DRILLS.filter(d=>d.skill===k&&!d.body).sort((a,b)=>a.unlock-b.unlock||(a.read?1:0)-(b.read?1:0));
   return `<section id="drillpanel" role="tabpanel" aria-labelledby="tab-${k}"><div class="sechead"><h2>${k==="s"?"Shooting":k==="h"?"Handling":"Finishing"} ladder</h2></div>
    <p class="muted small" style="margin:0">${k==="f"?"Low-lift finishes: soft touch off the glass, two-foot stops, floaters, same-foot finishes and reverses that use the rim. No backboard slaps or big jumps. Then decision reps where the phone picks the finish.":k==="s"?"Form work from SeeMikeDunn, a tracked 3-point test, then decision reps that make the catch unpredictable.":"Mechanics from In The Lab, Phil Handy and ILB coaches, then decision reps where your phone calls the move so you react instead of recite."} Every drill is open. The dots show difficulty: one for Starter, two for Builder, three for Advanced. Open any drill to add it to your next workout or set how often it comes back.</p>
    <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div></section>${k==="f"?finCard(0):""}`}
 
+/* Drills → Body: every warm-up and cool-down, which one your workouts use, and a way to run any of them on its own */
+function viewBody(){const grp=k=>{const cur=rtPick(k).id;return `<div class="sechead"><h2>${k==="warm"?"Warm-ups":"Cool-downs"}</h2><button class="linkbtn" data-rec="rt:${k}" style="padding:0">Change yours ›</button></div>
+   <div class="list">${RTS(k).map((d,i)=>`<div class="planline">${drillRow(d,i+1,{why:d.id===cur?{k:"fixed",t:`Your ${RT_NAME[k]}: in every workout`}:{k:"mix",t:d.short||""}})}</div>`).join("")}</div>`};
+  return `<section id="drillpanel" role="tabpanel" aria-labelledby="tab-b"><div class="sechead"><h2>Warm-up and cool-down</h2></div>
+   <p class="muted small" style="margin:0">Your recommended workout starts with your warm-up and ends with your cool-down. Pick which ones, or open any routine to run it on its own, like before a game or after club night. Each one is a timer that calls the next move, and tells you when to switch sides.</p>
+   ${grp("warm")}${grp("cool")}</section>`}
 function spark(series){
   const W=320,H=120,pl=30,pr=10,pt=10,pb=22,n=series.length;
   const x=i=>pl+(n<2?0:(W-pl-pr)*i/(n-1)), y=v=>pt+(H-pt-pb)*(1-v/70);
@@ -2454,6 +2493,11 @@ function openOpt(id){const p=plan(),x=p.find(y=>y.d.id===id);if(!x)return;const 
    ${need?`<button class="rs-row" data-rec="pause:${id}"><span>I'm already working on this elsewhere</span><b>Pause 2 weeks</b></button><button class="rs-row" data-rec="nw"><span>Needs-work drills per workout</span><b>${nwLabel(nwCount(p.mins))} ›</b></button>`:FIXED.has(id)?"":`<button class="rs-row" data-rec="never:${id}"><span>Stop suggesting this drill</span><b>Never suggest</b></button>`}
    ${S.rec.added.includes(id)?`<button class="rs-row" data-rec="add:${id}"><span>Take it out of my next workout</span><b>Remove</b></button>`:""}
    <button class="btn pri" data-rec="go:${id}">Open the drill</button>`,"Why this drill")}
+/* pick your warm-up or cool-down: every recommended workout uses it until you change it */
+function rtHTML(k){const cur=rtPick(k).id;
+  return bsTop(k==="warm"?"Before you train":"After you train",k==="warm"?"Pick your warm-up":"Pick your cool-down")+`<p class="rs-p">Every recommended workout uses the one you pick until you change it. You can also run any of them on its own from Drills → Body, like before a game.</p>
+   <div class="opts" role="radiogroup" aria-label="${k==="warm"?"Warm-ups":"Cool-downs"}">${RTS(k).map(d=>`<div class="opt${d.id===cur?" on":""}"><button class="optmain" role="radio" aria-checked="${d.id===cur}" data-rec="rtset:${k}:${d.id}"><b>${esc(d.name)} · ${Math.round(totalOf(d)/60)} min</b><span>${esc(d.short||"")}</span></button><button class="linkbtn" data-rec="go:${d.id}">See the moves ›</button></div>`).join("")}</div>
+   <button class="btn pri" data-rec="close">Done</button>`}
 function freqHTML(id){const f=fq(id),d=D[id],m=realMins(d),mins=S.settings.mins,share=Math.round(100*m/mins);
   const everyMins=Object.keys(S.rec.freq).filter(k=>D[k]&&fq(k).k==="every").reduce((a,k)=>a+realMins(D[k]),0);
   const o=(k,t,s,extra="")=>`<div class="opt${f.k===k?" on":""}"><button class="optmain" role="radio" aria-checked="${f.k===k}" data-rec="fset:${id}:${k}"><b>${t}</b><span>${s}</span></button>${f.k===k?extra:""}</div>`;
@@ -2483,12 +2527,13 @@ function planHTML(){const cw=customToday(),ws=S.rec.workouts,mins=S.settings.min
 
 /* My workouts: build, reorder, save */
 let B=null;
-const PINS=["s_cold","b_body"];
+/* with "keep" on, Cold 3s and any warm-up stay first and any cool-down stays last */
+const pinFirst=items=>[...items.filter(id=>id==="s_cold"),...items.filter(id=>D[id]&&D[id].rt==="warm")],pinLast=items=>items.filter(id=>D[id]&&D[id].rt==="cool");
 function openBuilder(wid,seed){const w=wid&&S.rec.workouts.find(x=>x.id===wid);
   B=w?{id:w.id,name:w.name,items:[...w.items],keep:w.keep!==false,view:"list",q:"",del:false}:{id:null,name:"",items:seed?[...new Set(seed)]:[],keep:true,view:"list",q:"",del:false};bsOpen(builderHTML(),"Build a workout")}
-function bItems(){if(!B.keep)return B.items;const first=PINS.filter(id=>B.items.includes(id)),last=B.items.includes("b_cool")?["b_cool"]:[];return [...first,...B.items.filter(id=>!first.includes(id)&&!last.includes(id)),...last]}
+function bItems(){if(!B.keep)return B.items;const first=pinFirst(B.items),last=pinLast(B.items);return [...first,...B.items.filter(id=>!first.includes(id)&&!last.includes(id)),...last]}
 const shotsOf=d=>d.log==="spots"?d.per*5:d.log==="makes"?(d.att||Math.ceil((d.goal||20)/Math.max(.3,(d.t0||50)/100))):0;
-const needsWarm=ids=>ids.some(id=>JUMPY.has(id)||(D[id]&&D[id].skill==="f"))&&!ids.includes("b_body");
+const needsWarm=ids=>ids.some(id=>JUMPY.has(id)||(D[id]&&D[id].skill==="f"))&&!ids.some(id=>D[id]&&D[id].rt==="warm");
 function builderHTML(){
   if(B.view==="pick"){const q=B.q.trim().toLowerCase(),L=DRILLS.filter(d=>!q||d.name.toLowerCase().includes(q));
     return bsTop("Add drills",B.name||"New workout")+`<input class="rs-in" id="bq" type="search" placeholder="Search drills" aria-label="Search drills" value="${esc(B.q)}" autocomplete="off">
@@ -2496,14 +2541,14 @@ function builderHTML(){
   const ids=bItems(),mins=Math.round(ids.reduce((a,id)=>a+realMins(D[id]),0)),shots=ids.reduce((a,id)=>a+shotsOf(D[id]),0);
   return bsTop(B.id?"Edit workout":"New workout",B.name||"New workout")+`<label class="label" for="bname">Name</label><input class="rs-in" id="bname" value="${esc(B.name)}" placeholder="Sunday Shooting" maxlength="40" autocomplete="off">
    <div class="plantotal"><span>${ids.length} drill${ids.length===1?"":"s"}${shots?` · about ${shots} shots`:""}</span><b>About ${mins} min</b></div>
-   ${ids.length?`<div class="rs-list">${ids.map((id,i)=>{const d=D[id],pin=B.keep&&(PINS.includes(id)||id==="b_cool");return `<div class="brow"><span class="bn">${i+1}</span><span class="bname"><b>${esc(d.name)}</b><small>${d.body?"Body":SKS[d.skill]} · ${realMins(d)} min${pin?` · stays ${id==="b_cool"?"last":"first"}`:""}</small></span>${pin?"":`<button data-rec="bmv:${id}:-1" aria-label="Move ${esc(d.name)} up">↑</button><button data-rec="bmv:${id}:1" aria-label="Move ${esc(d.name)} down">↓</button>`}<button data-rec="brm:${id}" aria-label="Remove ${esc(d.name)}">×</button></div>`}).join("")}</div>`:`<div class="empty">No drills yet. Add some from the library.</div>`}
+   ${ids.length?`<div class="rs-list">${ids.map((id,i)=>{const d=D[id],pin=B.keep&&(id==="s_cold"||!!(d&&d.rt));return `<div class="brow"><span class="bn">${i+1}</span><span class="bname"><b>${esc(d.name)}</b><small>${d.body?"Body":SKS[d.skill]} · ${realMins(d)} min${pin?` · stays ${d.rt==="cool"?"last":"first"}`:""}</small></span>${pin?"":`<button data-rec="bmv:${id}:-1" aria-label="Move ${esc(d.name)} up">↑</button><button data-rec="bmv:${id}:1" aria-label="Move ${esc(d.name)} down">↓</button>`}<button data-rec="brm:${id}" aria-label="Remove ${esc(d.name)}">×</button></div>`}).join("")}</div>`:`<div class="empty">No drills yet. Add some from the library.</div>`}
    ${shots>250?`<p class="rs-warn"><b>About ${shots} shots.</b> That's a big day for your shooting shoulder. Fine once a week.</p>`:""}
    ${needsWarm(ids)?`<p class="rs-warn">This workout has finishing or jump work, so the body warm-up goes in first when you save.</p>`:""}
    <button class="btn sec" data-rec="bview:pick">+ Add drills</button>
    <label class="toggle"><input type="checkbox" id="bkeep" ${B.keep?"checked":""}> Keep Cold 3s and the warm-up first, the stretch last</label>
    ${B.del?`<div class="confirm"><b>Delete ${esc(B.name||"this workout")}?</b><div class="psee-btns"><button class="btn sec small" data-rec="bdel:no">Keep it</button><button class="btn miss small" data-rec="bdel:yes">Delete</button></div></div>`:""}
    <div class="psee-btns">${B.id?`<button class="btn sec small" data-rec="bdel:ask">Delete</button>`:`<button class="btn sec small" data-rec="plan">Cancel</button>`}<button class="btn pri small" data-rec="bsave" ${ids.length?"":"disabled"}>Save</button></div>`}
-function bPickList(L){return ["s","h","f"].map(k=>{const rows=L.filter(d=>d.skill===k&&(k!=="h"||!d.body||true));if(!rows.length)return"";return `<div class="label" style="margin-top:6px">${SK[k]}</div><div class="rs-list">${rows.map(d=>{const on=B.items.includes(d.id);return `<button class="rs-alt${on?" on":""}" data-rec="bpick:${d.id}" aria-pressed="${on}"><span><b>${esc(d.name)}</b><small>${d.body?"Body":pipsHTML(d)} ${realMins(d)} min</small></span><span class="go">${on?"✓":"+"}</span></button>`}).join("")}</div>`}).join("")}
+function bPickList(L){return ["b","s","h","f"].map(k=>{const rows=L.filter(d=>k==="b"?d.body:d.skill===k&&!d.body);if(!rows.length)return"";return `<div class="label" style="margin-top:6px">${k==="b"?"Warm-up and cool-down":SK[k]}</div><div class="rs-list">${rows.map(d=>{const on=B.items.includes(d.id);return `<button class="rs-alt${on?" on":""}" data-rec="bpick:${d.id}" aria-pressed="${on}"><span><b>${esc(d.name)}</b><small>${d.body?"Body":pipsHTML(d)} ${realMins(d)} min</small></span><span class="go">${on?"✓":"+"}</span></button>`}).join("")}</div>`}).join("")}
 document.addEventListener("input",e=>{if(!B)return;if(e.target.id==="bname")B.name=e.target.value;if(e.target.id==="bq"){B.q=e.target.value;const q=B.q.trim().toLowerCase(),el=$("#bpick");if(el)el.innerHTML=bPickList(DRILLS.filter(d=>!q||d.name.toLowerCase().includes(q)))}});
 document.addEventListener("change",e=>{if(B&&e.target.id==="bkeep"){B.keep=e.target.checked;bsSet(builderHTML())}});
 
@@ -2554,6 +2599,8 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "neww":return openBuilder(null,b==="plan"?plan().map(x=>x.d.id):null);
   case "editw":return openBuilder(b);
   case "opt":return openOpt(b);
+  case "rt":return bsOpen(rtHTML(b),b==="warm"?"Pick your warm-up":"Pick your cool-down");
+  case "rtset":{if(!D[c]||D[c].rt!==b)return;S.settings.rt={...(S.settings.rt||{}),[b]:c};persist();render();bsSet(rtHTML(b));return toast("Saved",`${D[c].name} is your ${RT_NAME[b]} from now on.`)}
   case "go":bsClose(true);return openRunner(b);
   case "swap":{const prev=clone(S.rec.swaps),pp=S.rec.pref[b],p=plan(),x=p.find(y=>y.d.id===b),need=!!(x&&x.why&&x.why.k==="need");
     const m={...swapMap()},orig=Object.keys(m).find(z=>m[z]===b)||b;m[orig]=c;S.rec.swaps={d:today(),map:m};if(!need)S.rec.pref[b]=(S.rec.pref[b]||0)-.5;persist();bsClose();
@@ -2582,10 +2629,10 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "reset":if(b==="yes"){S.rec.pref={};S.rec.gadj={};S.rec.log=[];S.rec.swaps=null;persist();state.resetAsk=false;toast("Reset","The app starts learning your drills again from here.")}else state.resetAsk=b!=="no";return render();
   case "bview":B.view=b;bsSet(builderHTML());if(b==="pick"){const q=$("#bq");if(q)q.focus()}return;
   case "bpick":{const j=B.items.indexOf(b);if(j>=0)B.items.splice(j,1);else B.items.push(b);const el=$("#bpick"),q=B.q.trim().toLowerCase();if(el)el.innerHTML=bPickList(DRILLS.filter(d=>!q||d.name.toLowerCase().includes(q)));const done=bsEl&&bsEl.querySelector('[data-rec="bview:list"]');if(done)done.textContent=`Done adding · ${B.items.length} drill${B.items.length===1?"":"s"}`;return}
-  case "bmv":{B.items=bItems();const j=B.items.indexOf(b),to=j+ +c;const lo=B.keep?PINS.filter(x=>B.items.includes(x)).length:0,hi=B.items.length-1-(B.keep&&B.items.includes("b_cool")?1:0);if(to<lo||to>hi)return;[B.items[j],B.items[to]]=[B.items[to],B.items[j]];return bsSet(builderHTML())}
+  case "bmv":{B.items=bItems();const j=B.items.indexOf(b),to=j+ +c;const lo=B.keep?pinFirst(B.items).length:0,hi=B.items.length-1-(B.keep?pinLast(B.items).length:0);if(to<lo||to>hi)return;[B.items[j],B.items[to]]=[B.items[to],B.items[j]];return bsSet(builderHTML())}
   case "brm":{const j=B.items.indexOf(b),prev=[...B.items];B.items.splice(j,1);bsSet(builderHTML());return toastU("Removed",D[b].name,()=>{if(!B||!bsEl)return;B.items=prev;bsSet(builderHTML())})}
   case "bdel":if(b==="yes"){S.rec.workouts=S.rec.workouts.filter(w=>w.id!==B.id);if(S.rec.plan&&S.rec.plan.w===B.id)S.rec.plan=null;persist();B=null;render();return bsOpen(planHTML(),"Today's plan")}B.del=b==="ask";return bsSet(builderHTML());
-  case "bsave":{let ids=bItems();if(!ids.length)return;if(needsWarm(ids)){ids=["b_body",...ids];if(B.keep){B.items=ids;ids=bItems()}}
+  case "bsave":{let ids=bItems();if(!ids.length)return;if(needsWarm(ids)){ids=[rtPick("warm").id,...ids];if(B.keep){B.items=ids;ids=bItems()}}
     const w={id:B.id||("w"+Date.now().toString(36)),name:(B.name||"").trim()||"My workout",items:ids,keep:B.keep};const j=S.rec.workouts.findIndex(x=>x.id===w.id);if(j>=0)S.rec.workouts[j]=w;else S.rec.workouts.push(w);persist();B=null;render();toast("Saved",`${w.name} is in My workouts.`);return bsOpen(planHTML(),"Today's plan")}
   }}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&bsEl){e.stopImmediatePropagation();bsClose()}},true);
@@ -2968,6 +3015,7 @@ function startTick(){clearInterval(tick);let last=performance.now();
     if(R.d.log==="react"){R.nextAt-=dt;if(R.nextAt<=0){R.call=pickCall();R.calls++;R.nextAt=gapNext();beep(R.call.toLowerCase().startsWith("l")?740:988,160);say(R.call);flash()}
       if(R.left<=0){R.left=0;R.running=false;clearInterval(tick);tick=null;beep(520,400);R.finished=true;lockOff()}}
     else if(R.left<=0){nextPhase(true)}
+    else if(R.d.log==="timer"&&R.d.phases)halfway(R.d.phases[R.phase],R.left,dt);
     const c=$(".clock"),t=$(".tally .num");if(c)c.textContent=fmt(R.left);else if(t&&R.d.log==="react")t.textContent=fmt(R.left);
     if(R.finished)drawDock()},200)}
 function gapNext(){const [a,b]=R.d.gap;return a+Math.random()*(b-a)}
@@ -3085,11 +3133,14 @@ function togglePlay(){const cur=P.stage==="work"&&phasesOf(P.items[P.i])[P.pi];
   if(!P.running&&cur&&(cur[3]||(P.items[P.i].tempoCalls&&!isRestPart()))&&cdSecs()>0){P.running=true;P.cd=cdSecs();P.beat=0;beep(660,120);try{speechSynthesis.cancel()}catch(e){}say(String(P.cd));return drawPlayer()}
   if(P.running&&P.cd>0){P.cd=0;P.running=false;beep(440,120);try{speechSynthesis.cancel()}catch(e){}say("Paused");return drawPlayer()}
   P.running=!P.running;P.lost=false;P.beat=0;beep(P.running?660:440,120);if(!P.running){try{speechSynthesis.cancel()}catch(e){}say("Paused")}drawPlayer()}
+/* halfway through a two-sided part ("each leg", "both directions") the timer calls the switch */
+function halfCall(name){const n=String(name).toLowerCase();return /\beach (leg|side|foot|arm)\b/.test(n)?"Switch sides":/both directions|one way, then the other/.test(n)?"Other way":null}
+function halfway(ph,left,dt){if(!ph||ph[3])return;const h=ph[1]/2,c=halfCall(ph[0]);if(c&&left<=h&&left+dt>h){beep(988,160);say(c)}}
 function stepPlayer(dt){
   if(P.cd>0){const b=Math.ceil(P.cd);P.cd-=dt;const a=Math.ceil(P.cd);if(P.cd<=0){P.cd=0;P.lost=false;P.beat=0;beep(988,200);say("Go");return drawPlayer()}if(a!==b){beep(660,90);say(String(a))}return updPlayer()}
   const b=Math.ceil(P.left);P.left-=dt;const a=Math.ceil(P.left);if(a!==b&&a>=1&&a<=3)beep(a===1?880:660,90);
   const d=P.items[P.i];
-  if(P.stage==="work"){P.el[P.i]+=dt;
+  if(P.stage==="work"){P.el[P.i]+=dt;if(d.log==="timer")halfway(phasesOf(d)[P.pi],P.left,dt);
     if(d.log!=="react"&&!/^rest\b/i.test(phasesOf(d)[P.pi][0])){P.tipAt=(P.tipAt==null?7:P.tipAt)-dt;if(P.tipAt<=0){P.tip=pickTip(phasesOf(d)[P.pi][0],d);P.tipAt=12+Math.random()*6;if(!d.silent)say(P.tip);P.tipFlash=Date.now()}}
     const cur=phasesOf(d)[P.pi];if(cur&&cur[3]){P.beat=(P.beat||0)+dt;const iv=60/cur[3];while(P.beat>=iv&&P.rep<cur[2]){P.beat-=iv;P.rep++;beep(P.rep%10===0?1320:1100,35);if(P.rep%50===0&&P.rep<cur[2])say(String(P.rep))}}
     if(d.log==="react"&&d.tempoCalls){if(!isRestPart())tempoCallStep(d,dt)}
