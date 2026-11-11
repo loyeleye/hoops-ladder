@@ -724,6 +724,14 @@ a.btn{display:block;text-align:center;text-decoration:none}
 .sescard{background:var(--plate,#12203A);color:#F2F5FA;border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 3px 0 0 var(--accent)}
 .sescard .label{color:#B9C3D6}.sescard .sest{font-family:var(--display);font-size:26px;text-transform:uppercase;line-height:1}.sescard>span{font-size:14px;color:#C7CFDE}
 .sescard .linkbtn{color:#F7A06A;text-align:left}
+.sesto{display:flex;flex-direction:column;gap:4px;color:#C7CFDE}.sesto select{background:#1C2844;color:#F2F5FA;border:1px solid #2A3858;border-radius:10px;padding:8px 10px;font:inherit;font-size:15px;min-height:44px}
+.ses-mk{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#FFD166;margin-left:4px}.ses-mk.l{color:#7FD1A8}
+.ses-star{position:absolute;right:8px;top:8px;min-height:40px;padding:0 12px;border-radius:10px;border:0;background:rgba(5,8,15,.72);color:#FFD166;font-weight:800;font-size:14px}
+.ses-pc small{display:block;font-size:11.5px;color:#7F8BA3;overflow:hidden;text-overflow:ellipsis}.ses-pc.off{opacity:.45}
+.ses-seg{flex:0 0 auto;display:flex;background:#1C2844;border-radius:10px;padding:2px;gap:2px}.ses-seg button{min-height:40px;min-width:52px;border:0;border-radius:8px;background:none;color:#C7CFDE;font-weight:700;font-size:13px;padding:0 8px}
+.ses-seg button[aria-pressed="true"]:first-child{background:#3557C9;color:#fff}.ses-seg button[aria-pressed="true"]:last-child{background:#F07A35;color:#1A0C03}
+.ses-x{flex:0 0 auto;width:40px;height:40px;border-radius:10px;border:0;background:none;color:#9AA6BF;font-size:22px}
+.ses-sel{margin:0;padding:9px 10px;font-size:15px}
 .sespill{position:fixed;left:12px;right:12px;bottom:calc(var(--tabh,64px) + 10px);z-index:7;background:#0B111D;color:#F2F5FA;border:1.5px solid #F07A35;border-radius:14px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;box-shadow:0 8px 22px -8px rgba(0,0,0,.6);font:inherit}
 .sespill>span{display:flex;flex-direction:column;min-width:0}.sespill b{font-family:var(--display);font-size:17px;text-transform:uppercase}.sespill span span{font-size:12.5px;color:#9AA6BF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sespill u{text-decoration:none;color:#F7A06A;font-weight:700;white-space:nowrap}
@@ -5338,7 +5346,7 @@ function sesOpen(o={}){const s=sesCur();if(SES){SES.el.hidden=false}else{const e
   else{SES.sid=null;SES.v="setup";SES.set={coach:S.coach.lastCoach||"",mode:S.coach.sesMode||"prop",from:o.from||null,ok:false}}
   sesDraw();sesPill()}
 function sesHide(){if(!SES)return;sesStopCam();sesStopTalk();SES.el.remove();SES=null;if(!document.querySelector(".covid")&&(!$("#sheet")||$("#sheet").hidden))document.body.style.overflow="";sesPill();if(state.tab==="coach")render()}
-window.sesBack=function(){if(!SES)return false;const v=SES.v;
+window.sesBack=function(){if(!SES)return false;const v=SES.v;if(/^sx/.test(v)||v==="setup"&&sesQ.length)return sesXBack();
   if(v==="rec"){sesRecStop(false);return true}if(v==="talk"){sesStopTalk();SES.v=SES.back||"board";sesDraw();return true}
   if(v==="replay"||v==="cmp"||v==="link"||v==="hw"){SES.v=v==="cmp"?"replay":v==="hw"&&SES.hw&&SES.hw.from==="wrap"?"wrap":"board";sesDraw();return true}
   sesHide();return true};
@@ -5346,7 +5354,7 @@ function sesStart(){const st=SES.set,name=(st.coach||"").trim();
   const s={id:uid("s"),t:Date.now(),last:Date.now(),coach:name,mode:st.mode,topics:[],cur:-1,from:st.from||null};
   S.coach.lastCoach=name||S.coach.lastCoach;S.coach.sesMode=st.mode;(S.coach.ok=S.coach.ok||{})[name||"_"]=true;
   if(st.from)sesNewTopic(s,st.from.name).from=st.from.drill;
-  sesAll().push(s);persist();SES.sid=s.id;SES.v="board";try{window.hoopsSesShare?.(true,name)}catch(e){}sesDraw();sesPill()}
+  sesAll().push(s);persist();SES.sid=s.id;SES.v="board";try{window.hoopsSesShare?.(true,name)}catch(e){}sesDraw();sesPill();sesPendGo()}
 function sesEnd(){const s=sesFind(SES.sid);if(!s)return;if(!s.end)s.end=Date.now();persist();try{window.hoopsSesShare?.(false)}catch(e){}
   if(!s.topics.some(t=>t.pieces.length)){sesAll().splice(sesAll().indexOf(s),1);persist();sesHide();toast("Session ended","Nothing was filmed, so there's nothing to keep.");return}
   SES.v="wrap";sesDraw()}
@@ -5408,10 +5416,143 @@ const unmmss=v=>{const m=String(v||"").trim().match(/^(?:(\d+):)?(\d{1,2})$/);re
 function sesLinkHref(p){try{const x=new URL(p.url);if(p.a&&/youtu/.test(x.hostname)){x.searchParams.set("t",p.a+"s")}return x.toString()}catch(e){return p.url}}
 window.sesShared=function(o){o=o||{};const s=sesCur();
   if(o.failed){toast("Couldn't add the video","The share didn't come through. Try sharing it again.");return true}
-  if(o.blob){if(!s){saveVid(o.blob,{name:o.name||"Shared video"});return true}if(!SES)sesOpen();SES.v="board";sesAddFile(o.blob,"c",o.name||"Shared video");return true}
+  if(o.blob)return sesShareIn(o);
   const us=(String(o.text||"").match(URL_RE)||[]).map(u=>u.replace(/[).,;]+$/,""));
   if(!s||!us.length){if(s&&o.target==="session"&&!us.length){toast("Nothing to add","Share a link or a video into the session.");return true}return false}
   if(!SES)sesOpen();SES.link={url:us[0],title:(typeof ytTitle==="function"?ytTitle(o.subject,o.text):"")||o.subject||"",a:ytStart(us[0]),b:0};SES.v="link";sesDraw();return true};
+/* ---------- shared videos, best and latest, importing past clips (step 27) ----------
+   A video shared in during a session asks Coach or Me (Me is the topic's next try). With no session running, the
+   first share asks where shared videos go and remembers it in S.settings.shareTo ("vids" or "ses"), changed later
+   on the Coach tab's session card. The views here are named sx… so sesDraw and sesBack hand them over in one line. */
+const SES_GAP=180; // importing: more than 3 minutes between clips starts a new topic
+let sesQ=[]; // shared videos waiting for an answer: {blob,name,u}
+const sesQFree=it=>{if(it&&it.u){URL.revokeObjectURL(it.u);it.u=""}};
+function sesQToVids(){const q=sesQ.splice(0);for(const it of q){sesQFree(it);saveVid(it.blob,{name:it.name})}}
+function sesXEl(){if(!SES||SES.el._sx)return;SES.el._sx=true;SES.el.addEventListener("click",sesXClick);SES.el.addEventListener("change",sesXInput);SES.el.addEventListener("input",sesXInput)}
+function sesShareIn(o){sesQ.push({blob:o.blob,name:o.name||"Shared video"});
+  if(sesCur()){sesAsk();return true}
+  const to=S.settings.shareTo;if(to==="vids"){sesQToVids();return true}
+  sesOpen();sesXEl();if(to!=="ses"){SES.v="sxwhere";sesDraw()}return true}
+/* Coach or Me, one shared video at a time; waits while the camera or mic is busy */
+function sesAsk(){const s=sesCur();if(!s||!sesQ.length)return;clearTimeout(sesAsk.t);
+  if(SES&&/^(rec|saving|talk)$/.test(SES.v)){sesAsk.t=setTimeout(sesAsk,1500);return}
+  if(!SES||SES.sid!==s.id)sesOpen();sesXEl();SES.v="sxkind";sesDraw()}
+const sesPendGo=()=>{if(sesQ.length)sesAsk()};
+/* best (your star, one per topic) and latest (the highest-numbered try, once there are two) */
+const sesLatest=t=>sesTries(t).reduce((b,p)=>!b||p.n>b.n?p:b,null);
+function sesMk(t,p,txt){if(!t||p.k!=="m")return"";const l=sesTries(t).length>1&&sesLatest(t)===p;
+  if(txt)return (p.star?" ★":"")+(l?" · latest":"");
+  return (p.star?` <b class="ses-mk">★ Best</b>`:"")+(l?` <b class="ses-mk l">Latest</b>`:"")}
+const sesStarBtn=(s,p,others)=>p.k==="m"&&(others.length||s.end)?`<button class="ses-star" data-x="star:${p.id}" aria-pressed="${!!p.star}">${p.star?"★ Best try":"☆ Best try"}</button>`:"";
+
+function sesXDraw(el,s){const v=SES.v,I=SES.imp;
+  if(v==="sxwhere"){el.innerHTML=`${sesHead("Shared video",sesQ.length>1?`${sesQ.length} videos`:"Where should it go?")}<div class="ses-body">
+     <p class="ses-sub">No coach session is running. Where should videos you share into Hoops Ladder go? The app remembers, and you can change it on the Coach tab.</p>
+     <button class="ses-opt" data-x="sxto:vids"><span class="ses-ic">🎞</span><span><b>My videos</b><span>Kept on the Form tab with your other clips.</span></span></button>
+     <button class="ses-opt" data-x="sxto:ses"><span class="ses-ic">🏀</span><span><b>Start a coach session</b><span>Opens a new session, then asks if it's the coach or you.</span></span></button></div>`;return}
+  if(v==="sxkind"){const it=sesQ[0];if(!it||!s){SES.v="board";return sesDraw()}if(!it.u)it.u=URL.createObjectURL(it.blob);
+    const t=sesTop(s),n=t?sesTries(t).length+1:1,tn=t?esc(sesTName(s,t)):"";
+    el.innerHTML=`${sesHead("Shared video",sesQ.length>1?`1 of ${sesQ.length} · ${it.name}`:it.name)}
+     <div class="ses-vid"><video playsinline muted loop autoplay src="${it.u}"></video></div>
+     <div class="ses-body"><div class="ses-lab">Who's in it?</div><p class="ses-sub">${!t?"Coach or Me starts the first topic.":`Coach ${sesTries(t).length?"starts a new topic":`goes in ${tn}`}. Me becomes try ${n} in ${tn}.`}</p></div>
+     <div class="ses-dock"><div class="r2"><button class="ses-btn c" data-x="sxk:c">Coach<small>Demo or explain</small></button><button class="ses-btn m" data-x="sxk:m">Me<small>Try ${n}</small></button></div>
+      <button class="ses-btn g wide" data-x="sxk:v">Put it in My videos instead</button></div>`;return}
+  if(v==="sximp"&&I){const on=I.cs.filter(c=>!c.off),cOf=id=>I.cs.find(c=>c.id===id),past=sesAll().filter(x=>x.end).slice().reverse().slice(0,20);
+    const day=t=>new Date(t).toLocaleDateString(undefined,{month:"short",day:"numeric",year:new Date(t).getFullYear()===new Date().getFullYear()?undefined:"numeric"}),hm=t=>new Date(t).toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+    const nk=Object.keys(I.nd).length,opts=g=>[...Object.entries(I.nd).map(([k,t])=>[`new:${k}`,`New session · ${day(t)}${nk>1?` (${k})`:""}`]),[`own:${g.id}`,"A new session of its own"],...past.map(x=>[`old:${x.id}`,`${day(x.t)}${x.coach?" · "+x.coach:""} (past session)`]),["skip","Leave this topic out"]]
+      .map(([k,l])=>`<option value="${esc(k)}" ${g.to===k?"selected":""}>${esc(l)}</option>`).join("");
+    const gs=I.gs.filter(g=>g.cs.some(id=>!cOf(id).off));
+    el.innerHTML=`${sesHead("Import past clips",I.cs.length?`${on.length} clip${on.length===1?"":"s"} · ${gs.length} topic${gs.length===1?"":"s"}`:"Build sessions from videos on this phone")}<div class="ses-body">${sesNote()}
+     ${I.busy?`<div class="ses-msg" role="status">Reading ${I.busy} clip${I.busy===1?"":"s"}…</div>`:""}
+     ${!I.cs.length&&!I.busy?`<div class="ses-empty"><b>Pick from your videos</b><span>Pick several clips. Clips filmed within 3 minutes of each other become one topic, in the order they were filmed. Then set each one to Coach or Me and choose its session.</span></div>`:""}
+     ${gs.length?`<label class="ses-lab" for="sesImpCoach">Coach, for new sessions</label><input class="ses-in" id="sesImpCoach" data-sxin="coach" value="${esc(I.coach)}" placeholder="Coach's name (optional)" autocomplete="off">`:""}
+     ${gs.map((g,i)=>{const cs=g.cs.map(cOf).filter(c=>!c.off);return `<div class="ses-topic"><div class="ses-th-h"><b class="ses-tn">Topic ${i+1}</b><span class="ses-sub">${day(cs[0].t0)} · ${hm(cs[0].t0)}</span></div>
+      <select class="ses-in ses-sel" data-sxin="to:${g.id}" aria-label="Session for topic ${i+1}">${opts(g)}</select>
+      <div class="ses-pcs">${cs.map(c=>`<div class="ses-pc${g.to==="skip"?" off":""}"><span class="ses-th" data-sxth="${c.id}">${c.th?`<img src="${c.th}" alt="">`:""}</span><span class="tx">${hm(c.t0)} · ${fmtDur(c.dur)||"0:01"}${c.src==="file"?" · file date":""}<small>${esc(c.name)}</small></span>
+        <span class="ses-seg"><button data-x="sximpk:${c.id}:c" aria-pressed="${c.k==="c"}">Coach</button><button data-x="sximpk:${c.id}:m" aria-pressed="${c.k==="m"}">Me</button></span><button class="ses-x" data-x="sximpdel:${c.id}" aria-label="Leave out ${esc(c.name)}">×</button></div>`).join("")}</div></div>`}).join("")}
+     ${on.some(c=>c.src==="file")?`<p class="ses-sub">“File date” means the clip didn't say when it was filmed, so its time comes from the file and may be off.</p>`:""}
+     <input type="file" id="sesImpPick" accept="video/*" multiple hidden></div>
+     <div class="ses-dock">${I.cs.length?`<button class="ses-btn g wide" data-x="sximppick" ${I.saving?"disabled":""}>+ Pick more</button>`:""}<div class="r2"><button class="ses-btn g" data-x="back">Cancel</button>${I.cs.length?`<button class="ses-btn m" data-x="sximpgo" ${I.busy||I.saving||!on.length?"disabled":""}>${I.saving?"Importing…":`Import ${on.length}`}</button>`:`<button class="ses-btn go" data-x="sximppick" ${I.busy?"disabled":""}>Pick videos</button>`}</div></div>`;return}
+  SES.v="board";if(s)return sesDraw();sesHide()}
+function sesXBack(){const v=SES.v;
+  if(v==="sxkind"){const n=sesQ.length;sesQToVids();SES.v="board";sesDraw();return true}
+  if(v==="sximp"){sesImpFree(SES.imp);SES.imp=null;if(SES.sid&&sesFind(SES.sid)){SES.v="board";sesDraw()}else sesHide();return true}
+  sesQToVids();sesHide();return true}
+function sesXClick(e){const b=e.target.closest("[data-x]");if(!b||!SES||!/^sx/.test(b.dataset.x))return;const [a,id,k]=b.dataset.x.split(":");
+  if(a==="sxto"){S.settings.shareTo=id;persist();if(id==="vids"){sesQToVids();sesHide();return}SES.v="setup";return sesDraw()}
+  if(a==="sxk")return sesKind(id);
+  const I=SES.imp;if(!I)return;
+  if(a==="sximppick"){const inp=SES.el.querySelector("#sesImpPick");if(inp){inp.value="";inp.click()}return}
+  if(a==="sximpk"){const c=I.cs.find(x=>x.id===id);if(c)c.k=k;return sesDraw()}
+  if(a==="sximpdel"){const c=I.cs.find(x=>x.id===id);if(c)c.off=true;return sesDraw()}
+  if(a==="sximpgo")return sesImpGo()}
+function sesXInput(e){const t=e.target;if(!SES)return;
+  if(t.id==="sesImpPick"&&e.type==="change"){if(t.files&&t.files.length)sesImpAdd([...t.files]);return}
+  const k=t.dataset&&t.dataset.sxin,I=SES.imp;if(!k||!I)return;
+  if(k==="coach")I.coach=t.value;else if(k.startsWith("to:")&&e.type==="change"){const g=I.gs.find(x=>x.id===k.slice(3));if(g){g.to=t.value;sesDraw()}}}
+async function sesKind(k){const it=sesQ.shift();if(!it||!SES)return;SES.v="board";sesDraw();
+  if(k==="v")saveVid(it.blob,{name:it.name});else await sesAddFile(it.blob,k,it.name);sesQFree(it);
+  if(sesQ.length)sesAsk()}
+
+/* ---------- importing past clips (storyboard frame 21) ---------- */
+/* when a clip was filmed: the MP4's own creation time, else a date in the file name (VID_20240428_173912), else the
+   file's date, which is usually when filming stopped */
+async function sesMvhd(f){const rd=async(o,n)=>new DataView(await f.slice(o,o+n).arrayBuffer()),ty=(d,o)=>String.fromCharCode(d.getUint8(o),d.getUint8(o+1),d.getUint8(o+2),d.getUint8(o+3));
+  for(let o=0,i=0;i<64&&o+8<=f.size;i++){const h=await rd(o,16);let sz=h.getUint32(0),hl=8;const tp=ty(h,4);
+    if(sz===1){sz=h.getUint32(8)*4294967296+h.getUint32(12);hl=16}else if(sz===0)sz=f.size-o;if(sz<hl)return 0;
+    if(tp==="moov"){for(let c=o+hl,j=0;j<64&&c+8<=o+sz;j++){const d=await rd(c,24),cs=d.getUint32(0);
+        if(ty(d,4)==="mvhd"){const sec=d.getUint8(8)===1?d.getUint32(12)*4294967296+d.getUint32(16):d.getUint32(12),ms=(sec-2082844800)*1000;return ms>Date.UTC(2005,0,1)&&ms<Date.now()+864e5?ms:0}
+        if(cs<8)return 0;c+=cs}return 0}
+    o+=sz}return 0}
+async function sesClipStart(f,dur){const mv=await sesMvhd(f).catch(()=>0);if(mv)return{t:mv,src:"clip"};
+  const m=String(f.name||"").match(/(20\d\d)[-_.]?(\d\d)[-_.]?(\d\d)[ _T.-]?(\d\d)[-_.:]?(\d\d)[-_.:]?(\d\d)/);
+  if(m&&+m[2]>=1&&+m[2]<=12&&+m[3]<=31&&+m[4]<24&&+m[5]<60){const d=new Date(+m[1],m[2]-1,+m[3],+m[4],+m[5],+m[6]).getTime();if(d>0)return{t:d,src:"name"}}
+  return{t:(f.lastModified||Date.now())-dur*1000,src:"file"}}
+function sesImpOpen(){sesOpen();sesXEl();SES.imp={cs:[],gs:[],nd:{},busy:0,coach:S.coach.lastCoach||""};SES.v="sximp";sesDraw();
+  const inp=SES.el.querySelector("#sesImpPick");if(inp)try{inp.click()}catch(e){}}
+const sesImpFree=I=>{if(I)for(const c of I.cs){if(c.u)URL.revokeObjectURL(c.u);if(c.th)URL.revokeObjectURL(c.th)}};
+async function sesImpAdd(files){const I=SES&&SES.imp;if(!I)return;const fs=files.filter(f=>/^video\//.test(f.type)||/\.(mp4|mov|m4v|3gp|webm|mkv)$/i.test(f.name||""));
+  if(!fs.length){SES.msg="Those aren't videos. Pick clips from your phone's videos.";return sesDraw()}
+  I.busy+=fs.length;sesDraw();const added=[];
+  for(const f of fs){try{if(!I.cs.some(x=>x.f.name===f.name&&x.f.size===f.size&&!x.off)){const dur=await vidDur(f),st=await sesClipStart(f,dur);
+      const c={id:uid("c"),f,name:(f.name||"Clip").replace(/\.[^.]+$/,""),t0:st.t,t1:st.t+dur*1000,dur,src:st.src,k:null};I.cs.push(c);added.push(c)}}catch(e){}I.busy--}
+  sesImpGroup(I);if(SES&&SES.imp===I)sesDraw();
+  for(const c of added){c.u=URL.createObjectURL(c.f);const b=await sesStill(c.u,0);if(b&&SES&&SES.imp===I){c.th=URL.createObjectURL(b);const sp=SES.el.querySelector(`[data-sxth="${c.id}"]`);if(sp)sp.innerHTML=`<img src="${c.th}" alt="">`}}}
+/* topics by time gaps; a guess at Coach (the first clip of a topic with more than one) or Me; and a session for each
+   topic: a past session it falls in, else a new one shared with topics less than 2 hours apart on the same day */
+function sesImpGroup(I){const cs=I.cs.filter(c=>!c.off).sort((a,b)=>a.t0-b.t0),gs=[],cOf=id=>cs.find(c=>c.id===id);let g=null,end=-Infinity;
+  for(const c of cs){if(!g||c.t0-end>SES_GAP*1000){g={id:uid("g"),cs:[]};gs.push(g)}g.cs.push(c.id);end=Math.max(end,c.t1)}
+  const past=sesAll().filter(x=>x.end),nd={};let nk=0,last=null;
+  for(const g of gs){const a=cOf(g.cs[0]).t0,b=Math.max(...g.cs.map(id=>cOf(id).t1));
+    g.cs.forEach((id,i)=>{const c=cOf(id);if(!c.k)c.k=g.cs.length>1&&i===0?"c":"m"});
+    const old=past.find(x=>a>=x.t-1800e3&&a<=(x.end||x.last||x.t)+1800e3);if(old){g.to="old:"+old.id;continue}
+    if(!last||a-last.b>SES_IDLE||new Date(a).toDateString()!==new Date(last.b).toDateString()){nk++;nd[nk]=a;last={b}}else last.b=Math.max(last.b,b);
+    g.to="new:"+nk}
+  I.gs=gs;I.nd=nd}
+async function sesImpGo(){const I=SES&&SES.imp;if(!I||I.busy||I.saving)return;I.saving=true;sesDraw();
+  const cOf=id=>I.cs.find(c=>c.id===id),made={},mine=new Set(),hit=new Set(),coach=(I.coach||"").trim();let n=0,full=false;
+  for(const g of I.gs){const cs=g.cs.map(cOf).filter(c=>c&&!c.off);if(!cs.length||g.to==="skip"||full)continue;
+    const t1=Math.max(...cs.map(c=>c.t1));let s=g.to.startsWith("old:")?sesFind(g.to.slice(4)):null;
+    if(!s){const key=g.to.startsWith("new:")?g.to:"own:"+g.id;s=made[key];
+      if(!s){s=made[key]={id:uid("s"),t:cs[0].t0,last:t1,end:t1,coach,mode:"hand",topics:[],cur:-1,from:null,wrap:false,imp:true};sesAll().push(s);mine.add(s)}}
+    const t={id:uid("t"),name:"",pieces:[],t:cs[0].t0},ps=[];
+    for(const c of cs){try{const {id,dur}=await sesStore(c.f,s,{name:c.name,dur:c.dur});const p=Object.assign({id:uid("p"),k:c.k||"m",v:id,a:0,b:+(dur||c.dur||0).toFixed(2),t:c.t0},c.k==="c"?{}:{n:sesTries(t).length+1});t.pieces.push(p);ps.push([p,id]);n++}
+      catch(e){if(e&&e.name==="QuotaExceededError"){full=true;break}}}
+    if(!t.pieces.length)continue;
+    const cur=s.topics[s.cur];s.topics.push(t);s.topics.sort((x,y)=>(x.t||0)-(y.t||0));s.cur=mine.has(s)?s.topics.length-1:s.topics.indexOf(cur);
+    if(mine.has(s)){s.t=Math.min(s.t,t.t);s.end=s.last=Math.max(s.end,t1)}hit.add(s);
+    for(const [p,id] of ps)sesThumbs(s,[p],SESU[id])}
+  for(const s of mine)if(!s.topics.length)sesAll().splice(sesAll().indexOf(s),1);
+  if(coach)S.coach.lastCoach=coach;persist();sesImpFree(I);
+  const nm=[...mine].filter(s=>s.topics.length).length,k=hit.size;
+  if(SES){SES.imp=null;if(SES.sid&&sesFind(SES.sid)){SES.v="board";sesDraw()}else sesHide()}
+  if(!n)return toast("Nothing imported",full?"Your phone is out of space for videos.":"Couldn't keep those clips.");
+  toast(`Imported ${n} clip${n===1?"":"s"}`,`Into ${k} session${k===1?"":"s"}.${nm?` Name the topics from “Finish setting up” on the Coach tab.`:""}${full?" The phone ran out of space, so some were left out.":""}`)}
+/* on the Coach tab's session card: importing, and where videos shared with no session running go */
+function sesCardMore(){const to=S.settings.shareTo||"";return `<button class="linkbtn" data-sx="imp">Import past clips →</button>
+   <label class="small sesto">Videos shared in with no session running<select data-sx="shareto">${[["","Ask me"],["vids","Go to My videos"],["ses","Start a coach session"]].map(([k,l])=>`<option value="${k}" ${to===k?"selected":""}>${l}</option>`).join("")}</select></label>`}
+document.addEventListener("click",e=>{const b=e.target.closest('[data-sx="imp"]');if(b){e.preventDefault();sesImpOpen()}});
+document.addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.sx==="shareto"){if(t.value)S.settings.shareTo=t.value;else delete S.settings.shareTo;persist();toast("Saved",t.value==="vids"?"Shared videos go to My videos.":t.value==="ses"?"A shared video starts a coach session.":"The app will ask where a shared video goes.")}});
 
 /* ---------- homework: straight onto the take-home list ---------- */
 function sesHwOpen(tid,from){const s=sesFind(SES.sid),t=s&&s.topics.find(x=>x.id===tid);if(!t)return;
@@ -5437,14 +5578,14 @@ function sesThumbHtml(p,big){const th=CO.thumbs[p.id];return `<span class="ses-t
 function sesPieceRow(s,t,p){const kk={c:"Coach",m:"Me",t:"Talk",l:"Link"}[p.k];
   if(p.k==="l")return `<a class="ses-pc" href="${esc(sesLinkHref(p))}" ${p.b?`data-end="${p.b}"`:""} target="_blank" rel="noopener"><span class="ses-ic">🔗</span><i class="ses-k l">Link</i><span class="tx">${esc(p.title||linkLabel(p.url))}</span><span class="tm">${p.b?`${mmss(p.a)}–${mmss(p.b)}`:p.a?`from ${mmss(p.a)}`:""}</span></a>`;
   if(p.k==="t"){const on=p.on&&t.pieces.find(x=>x.id===p.on),pl=sesAudio&&sesAudio._p===p.id;return `<button class="ses-pc" data-x="talkplay:${p.id}"><span class="ses-ic">${pl?"❚❚":"▶"}</span><i class="ses-k t">Talk</i><span class="tx">${on?`About ${esc(sesLabel(on).toLowerCase())}`:"Voice note"}</span><span class="tm">${fmtDur(p.dur)||"0:01"}</span></button>`}
-  return `<button class="ses-pc" data-x="play:${p.id}">${sesThumbHtml(p)}<i class="ses-k ${p.k}">${kk}</i><span class="tx">${p.k==="m"?`Try ${p.n}${p.star?" ★":""}`:"Coach on camera"}</span><span class="tm">${fmtDur(p.b-p.a)||"0:01"}</span></button>`}
+  return `<button class="ses-pc" data-x="play:${p.id}">${sesThumbHtml(p)}<i class="ses-k ${p.k}">${kk}</i><span class="tx">${p.k==="m"?`Try ${p.n}${sesMk(t,p)}`:"Coach on camera"}</span><span class="tm">${fmtDur(p.b-p.a)||"0:01"}</span></button>`}
 function sesTopicCard(s,t,i){const cur=!s.end&&i===s.cur;
   return `<div class="ses-topic${cur?" cur":""}"><div class="ses-th-h"><button class="ses-tn" data-x="cur:${t.id}">${esc(sesTName(s,t))}${cur?" · now":""}</button>${t.hw?`<i class="ses-k h">Homework</i>`:t.from?`<span class="ses-sub">from workout</span>`:""}</div>
    ${t.pieces.length?`<div class="ses-pcs">${t.pieces.map(p=>sesPieceRow(s,t,p)).join("")}</div>`:`<div class="ses-sub">Nothing yet. Film coach, Film me, Talk or Link adds to this topic.</div>`}
    ${!s.end&&t.pieces.length&&!t.hw?`<button class="ses-lk" data-x="hw:${t.id}">+ Homework</button>`:""}</div>`}
 function sesHead(title,sub,right){return `<div class="ses-top"><button class="ses-back" data-x="back" aria-label="Back">‹</button><div class="ses-tt"><b>${esc(title)}</b>${sub?`<span>${esc(sub)}</span>`:""}</div>${right||""}</div>`}
 const sesNote=()=>{const m=SES.msg;SES.msg="";return m?`<div class="ses-msg" role="status">${esc(m)}</div>`:""};
-function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=SES.v;
+function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=SES.v;if(/^sx/.test(v))return sesXDraw(el,s);
   if(v==="setup"){const st=SES.set,key=(st.coach||"").trim()||"_",asked=(S.coach.ok||{})[key]||st.ok,cs=sesCoaches();
     el.innerHTML=`${sesHead("New coach session","Two questions, both remembered")}<div class="ses-body">
      <label class="ses-lab" for="sesCoach">Coach</label>
@@ -5481,7 +5622,7 @@ function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=
      <div class="ses-dock"><div class="r2"><button class="ses-btn g" data-x="talkcancel">Cancel</button><button class="ses-btn m" data-x="talksave">Save</button></div></div>`;return}
   if(v==="replay"){const f=sesPiece(s,SES.p);if(!f){SES.v="board";return sesDraw()}const {t,p}=f,others=sesVidP(t).filter(x=>x.id!==p.id),coach=others.find(x=>x.k==="c"),rt=SES.rate||.5;
     el.innerHTML=`${sesHead(`${sesTName(s,t)} · ${sesLabel(p).toLowerCase()}`,`${fmtDur(p.b-p.a)||"0:01"} · ${rt===1?"1×":rt===.5?"½×":"¼×"}`)}
-     <div class="ses-vid"><video playsinline muted loop></video><em class="${p.k}">${p.k==="c"?"Coach":`Me · try ${p.n}`}</em></div>
+     <div class="ses-vid"><video playsinline muted loop></video><em class="${p.k}">${p.k==="c"?"Coach":`Me · try ${p.n}`}</em>${sesStarBtn(s,p,others)}</div>
      <div class="ses-body">${sesNote()}<div class="ses-spd">${[[1,"1×"],[.5,"½×"],[.25,"¼×"]].map(([r,l])=>`<button data-x="rate:${r}" aria-pressed="${rt===r}">${l}</button>`).join("")}<button data-x="pp" aria-label="Play or pause">❚❚</button><button data-x="back3">⏮ 3 s</button><button data-x="snd" aria-pressed="${!!SES.snd}">${SES.snd?"🔊":"🔇"}</button></div>
      ${t.pieces.filter(x=>x.k==="t"&&x.on===p.id).map(x=>sesPieceRow(s,t,x)).join("")}</div>
      <div class="ses-dock">${s.end?"":`<div class="r2"><button class="ses-btn g" data-x="talkon:${p.id}">🎙 Feedback</button>${others.length?`<button class="ses-btn c" data-x="cmp">⇆ Compare${coach?" with coach":""}</button>`:`<button class="ses-btn g" data-x="star:${p.id}">${p.star?"★ Best try":"☆ Best try"}</button>`}</div>
@@ -5494,7 +5635,7 @@ function sesDraw(){if(!SES)return;const el=SES.el,s=SES.sid&&sesFind(SES.sid),v=
      <div class="ses-split"><div class="ses-vid"><video playsinline muted loop></video><em class="${L.k}">${esc(L.k==="c"?"Coach":"Try "+L.n)}</em></div><div class="ses-vid"><video playsinline muted loop></video><em class="${p.k}">${p.k==="c"?"Coach":`Me · try ${p.n}`}</em></div></div>
      ${C.lining?`<div class="ses-scrubs"><input type="range" min="0" max="1000" value="0" data-in="scrubL" aria-label="Move the left clip"><input type="range" min="0" max="1000" value="0" data-in="scrubR" aria-label="Move the right clip"></div>`:""}
      <div class="ses-body"><div class="ses-spd">${[[1,"1×"],[.5,"½×"],[.25,"¼×"]].map(([r,l])=>`<button data-x="rate:${r}" aria-pressed="${rt===r}">${l}</button>`).join("")}<button data-x="pp" aria-label="Play or pause">❚❚</button><button data-x="${C.lining?"lock":"lineup"}">${C.lining?"Lock":"⇆ Line up"}</button></div>
-      <div class="ses-chips">${others.map(x=>`<button class="ses-chip" data-x="left:${x.id}" aria-pressed="${x.id===L.id}">${esc(x.k==="c"?"Coach":"Try "+x.n)}</button>`).join("")}${links.map(x=>`<a class="ses-chip" href="${esc(sesLinkHref(x))}" ${x.b?`data-end="${x.b}"`:""} target="_blank" rel="noopener">🔗 ${esc((x.title||"Link").slice(0,18))}</a>`).join("")}</div></div>
+      <div class="ses-chips">${others.map(x=>`<button class="ses-chip" data-x="left:${x.id}" aria-pressed="${x.id===L.id}">${esc(x.k==="c"?"Coach":"Try "+x.n+sesMk(t,x,1))}</button>`).join("")}${links.map(x=>`<a class="ses-chip" href="${esc(sesLinkHref(x))}" ${x.b?`data-end="${x.b}"`:""} target="_blank" rel="noopener">🔗 ${esc((x.title||"Link").slice(0,18))}</a>`).join("")}</div></div>
      <div class="ses-dock"><div class="r2"><button class="ses-btn g" data-x="talkon:${p.id}" ${s.end?"hidden":""}>🎙 Feedback</button><button class="ses-btn g" data-x="star:${p.id}">${p.star?"★ Best try":"☆ Best try"}</button></div><button class="ses-btn g wide" data-x="replay">Back to the replay</button></div>`;
     const [vl,vr]=el.querySelectorAll(".ses-split video");sesVideo(vl,L,rt,C.sync?C.sync.l:null);sesVideo(vr,p,rt,C.sync?C.sync.r:null);
     if(C.sync){const follow=()=>{if(!SES||SES.v!=="cmp"||!vr.isConnected)return;const want=C.sync.l+(vr.currentTime-C.sync.r);if(want>=L.b||want<L.a){vr.currentTime=C.sync.r;vl.currentTime=C.sync.l}else if(Math.abs(vl.currentTime-want)>.12)vl.currentTime=want;requestAnimationFrame(follow)};requestAnimationFrame(follow)}
@@ -5567,7 +5708,7 @@ function sesClick(e){const b=e.target.closest("[data-x]");if(!b||!SES)return;if(
    case"pp":{const vs=vids(),paused=vs.some(v=>v.paused);for(const v of vs)paused?v.play().catch(()=>{}):v.pause();b.textContent=paused?"❚❚":"▶";return}
    case"back3":{const f=sesPiece(s,SES.p);for(const v of vids())v.currentTime=Math.max(f?f.p.a:0,v.currentTime-3);return}
    case"snd":SES.snd=!SES.snd;for(const v of vids())v.muted=!SES.snd;b.setAttribute("aria-pressed",SES.snd);b.textContent=SES.snd?"🔊":"🔇";return;
-   case"star":{const f=sesPiece(s,id);if(f){f.p.star=!f.p.star;persist()}return sesDraw()}
+   case"star":{const f=sesPiece(s,id);if(f){const on=!f.p.star;sesTries(f.t).forEach(x=>delete x.star);if(on)f.p.star=true;persist()}return sesDraw()}
    case"del":{const f=sesPiece(s,id);if(!f)return;if(!b.dataset.sure){b.dataset.sure="1";b.textContent="Tap again to delete";return}
      f.t.pieces.splice(f.t.pieces.indexOf(f.p),1);f.t.pieces=f.t.pieces.filter(x=>x.on!==f.p.id||x.k!=="t");if(f.p.v&&!s.topics.some(t=>t.pieces.some(x=>x.v===f.p.v)))sesDelVid(f.p.v);persist();SES.v="board";return sesDraw()}
    case"cmp":SES.v="cmp";return sesDraw();
@@ -5595,7 +5736,7 @@ function sesCard(){const s=sesCur(),todo=sesAll().filter(x=>x.end&&!x.wrap&&x.to
    <span>Film your coach and your tries, keep what they say, and add homework on the spot. Nothing to type until you're done.</span>
    ${s?`<button class="btn pri" data-ses="open">Back to session · ${sesClock(s)}</button>`:`<button class="btn pri" data-ses="open">Start coach session</button>`}
    ${todo.map(x=>`<button class="linkbtn" data-ses="wrap:${x.id}">Finish setting up ${when(x)}${x.coach?" with "+esc(x.coach):""} →</button>`).join("")}
-   ${past.length?`<span class="small">Past: ${past.map(x=>`<button class="linkbtn" data-ses="view:${x.id}">${when(x)}${x.coach?" · "+esc(x.coach):""}</button>`).join(" ")}</span>`:""}</div></section>`}
+   ${past.length?`<span class="small">Past: ${past.map(x=>`<button class="linkbtn" data-ses="view:${x.id}">${when(x)}${x.coach?" · "+esc(x.coach):""}</button>`).join(" ")}</span>`:""}${sesCardMore()}</div></section>`}
 function sesPill(){let el=document.getElementById("sespill");const s=sesCur(),show=!!(s&&!SES&&!pEl);
   if(!show){if(el)el.remove();return}
   if(!el){el=document.createElement("button");el.id="sespill";el.className="sespill";el.dataset.ses="open";document.body.appendChild(el)}
@@ -6587,8 +6728,8 @@ route();
      During a coach session the share sheet also shows "Session · <coach>" (a sharing shortcut the page turns on and
      off through hoopsSesShare). A share through it arrives with target "session" and goes to sesShared(), never
      to a take-home drill. Shared videos arrive as a file the plugin copied into the app's cache. They're read back
-     here as a Blob and always go to sesShared(), which puts them in the session or, with none running, keeps them in
-     My videos.
+     here as a Blob and always go to sesShared(), which asks Coach or Me and puts them in the session or, with none
+     running, sends them where the owner chose (asked the first time: My videos, or a new coach session).
      It sits before section 8 because that one stops early on a phone without the HoopsRemote plugin.
      See docs/LEARNING.md, steps 20 and 27. */
   {
