@@ -1,0 +1,566 @@
+{
+ "id": "s2",
+ "name": "Read the closeout",
+ "blurb": "On the catch, read the man closing out: shoot if he's late, drive if he's flying at you, pass if someone's open.",
+ "src": {
+  "FR-WIN": {
+   "v": "ocE57ESUA7E",
+   "t": "This SIMPLE Concept is a Game Changer",
+   "who": "The Film Room · former Big 12 player"
+  },
+  "FR-GAP": {
+   "v": "Qdq2yEoTEAw",
+   "t": "The Gap Theory (Driving Bad Closeouts)",
+   "who": "The Film Room · former Big 12 player"
+  },
+  "FR-2L": {
+   "v": "00yI9CC024o",
+   "t": "Are You Reading Defenders When You Drive?",
+   "who": "The Film Room · former Big 12 player"
+  },
+  "BSC-READ": {
+   "v": "4_miE-lVnHw",
+   "t": "1v1 Scoring Tips: How to Read Your Defender",
+   "who": "Basketball Scoring Coach · Coach Green"
+  },
+  "BSC-HERRO": {
+   "v": "SV4nofzWGSk",
+   "t": "How to Attack Closeouts and Create Easy Buckets!",
+   "who": "Basketball Scoring Coach · Coach Green"
+  }
+ },
+ "m": [
+  {
+   "id": "s2-01",
+   "src": "FR-WIN",
+   "start": 28,
+   "pause": 32,
+   "end": 39,
+   "lv": "B",
+   "checked": true,
+   "title": "Swing to the corner",
+   "q": "The ball swings to you. Shoot, drive or pass?",
+   "choices": [
+    {
+     "t": "Shoot"
+    },
+    {
+     "t": "Drive",
+     "ok": true
+    },
+    {
+     "t": "Pass"
+    }
+   ],
+   "ans": "Drive. It's a long closeout coming fast, so you can blow by him.",
+   "quote": "As the ball gets swung to the corner, you're going to see a bad closeout. And the offensive player wins that closeout by driving past him.",
+   "cast": [
+    "YOU · in the corner",
+    "CLOSEOUT DEFENDER"
+   ]
+  },
+  {
+   "id": "s2-02",
+   "src": "FR-WIN",
+   "start": 76,
+   "pause": 80,
+   "end": 88,
+   "lv": "B",
+   "checked": false,
+   "title": "Swing to the corner, second look",
+   "q": "The ball swings to you again. Shoot, drive or pass?",
+   "choices": [
+    {
+     "t": "Shoot",
+     "ok": true
+    },
+    {
+     "t": "Drive"
+    },
+    {
+     "t": "Pass"
+    }
+   ],
+   "ans": "Shoot on the catch. It's a long closeout and the defender is late getting there.",
+   "quote": "Having a long closeout also means it's going to take you longer to get back to your matchup and contest, which is why this player caught it and shot it right away as the defender was late getting there.",
+   "cast": [
+    "YOU · catching the swing",
+    "CLOSEOUT DEFENDER"
+   ]
+  },
+  {
+   "id": "s2-03",
+   "src": "BSC-READ",
+   "start": 53,
+   "pause": 68,
+   "end": 112,
+   "lv": "B",
+   "checked": true,
+   "title": "Catch off the kick-out",
+   "q": "You catch the kick-out. Shoot, drive or pass?",
+   "choices": [
+    {
+     "t": "Shoot",
+     "ok": true
+    },
+    {
+     "t": "Drive"
+    },
+    {
+     "t": "Pass"
+    }
+   ],
+   "ans": "Shoot. His hands are down and he isn't up in your face. The player jabs instead and ends up in no man's land.",
+   "quote": "Hands down, it's not too hard of a closeout where he's up in the offensive player's face, so at this point the read should be shot.",
+   "cast": [
+    "YOU · catching the kick-out",
+    "DEFENDER · closing out to you"
+   ]
+  },
+  {
+   "id": "s2-04",
+   "src": "BSC-READ",
+   "start": 355,
+   "pause": 359,
+   "end": 380,
+   "lv": "B",
+   "checked": false,
+   "title": "Catch on the wing, drill",
+   "q": "You catch it. Shoot, drive or jab?",
+   "choices": [
+    {
+     "t": "Shoot",
+     "ok": true
+    },
+    {
+     "t": "Drive"
+    },
+    {
+     "t": "Jab"
+    }
+   ],
+   "ans": "Shoot. The defender isn't up on you, so it's an easy catch and shoot. Jabbing wastes it.",
+   "quote": "He jabs and goes right into the defender. He did not take what the defense gave him. He's jabbing for no reason. The defender is not even up on him. That's an easy catch and shoot.",
+   "cast": [
+    "YOU · catching on the wing",
+    "DEFENDER"
+   ]
+  },
+  {
+   "id": "s2-05",
+   "src": "BSC-HERRO",
+   "start": 36,
+   "pause": 58,
+   "end": 71,
+   "lv": "B",
+   "checked": false,
+   "title": "Herro catches on the wing",
+   "q": "You're Herro and you just caught it on the wing. What now?",
+   "choices": [
+    {
+     "t": "Drive right away"
+    },
+    {
+     "t": "Shot fake, then go",
+     "ok": true
+    },
+    {
+     "t": "Pass it back out"
+    }
+   ],
+   "ans": "Shot fake to get him off the ground, then go. There isn't enough space to drive yet. The fake only works if they respect your shot.",
+   "quote": "He can't go right right now, it's not enough space. But I want you to watch how he's going to create the opportunity with a simple shot fake. Boom. Shot fake. Get him off the ground. Get the space.",
+   "cast": [
+    "YOU · Herro",
+    "DEFENDER"
+   ]
+  },
+  {
+   "id": "s2-06",
+   "src": "FR-GAP",
+   "start": 112,
+   "pause": 119,
+   "end": 133,
+   "lv": "I",
+   "checked": true,
+   "title": "Closeout on the wing",
+   "q": "He's closing out to you. Where do you go?",
+   "choices": [
+    {
+     "t": "Drive baseline"
+    },
+    {
+     "t": "Drive middle",
+     "ok": true
+    },
+    {
+     "t": "Shoot it"
+    }
+   ],
+   "ans": "Drive middle. He's closing out on your baseline side to take away the baseline drive, so the middle is open.",
+   "quote": "He is trying to take away a baseline drive by his closeout. This opens up the opportunity for the offensive player to drive to his left hand or to the middle.",
+   "cast": [
+    "YOU · on the wing",
+    "DEFENDER · closing out to you"
+   ],
+   "court": {
+    "edges": [
+     {
+      "t": "BASELINE",
+      "x": 440,
+      "y": 20
+     },
+     {
+      "t": "MIDDLE",
+      "x": 250,
+      "y": 388
+     }
+    ],
+    "players": [
+     {
+      "k": "off",
+      "x": 205,
+      "y": 118,
+      "face": [
+       380,
+       286
+      ]
+     },
+     {
+      "k": "def",
+      "x": 232,
+      "y": 132,
+      "face": [
+       205,
+       118
+      ]
+     },
+     {
+      "k": "def",
+      "x": 250,
+      "y": 200,
+      "face": [
+       350,
+       282
+      ]
+     },
+     {
+      "k": "def",
+      "x": 118,
+      "y": 300,
+      "face": [
+       80,
+       345
+      ]
+     },
+     {
+      "k": "off",
+      "x": 78,
+      "y": 348,
+      "face": [
+       380,
+       286
+      ]
+     },
+     {
+      "k": "off",
+      "x": 465,
+      "y": 60,
+      "face": [
+       380,
+       286
+      ]
+     },
+     {
+      "k": "def",
+      "x": 418,
+      "y": 92,
+      "face": [
+       465,
+       60
+      ]
+     },
+     {
+      "k": "def",
+      "x": 358,
+      "y": 248,
+      "face": [
+       378,
+       284
+      ],
+      "key": true,
+      "label": "DEFENDER",
+      "from": [
+       292,
+       178
+      ],
+      "side": "left"
+     },
+     {
+      "k": "off",
+      "x": 380,
+      "y": 286,
+      "you": true,
+      "key": true,
+      "label": "YOU",
+      "ball": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "s2-07",
+   "src": "FR-GAP",
+   "start": 130,
+   "pause": 135,
+   "end": 162,
+   "lv": "B",
+   "checked": false,
+   "title": "Corner catch",
+   "q": "You catch in the corner. Where do you attack, and what happens next?",
+   "choices": [
+    {
+     "t": "Drive baseline and finish"
+    },
+    {
+     "t": "Drive middle, then kick it when help steps in",
+     "ok": true
+    },
+    {
+     "t": "Shoot it over him"
+    }
+   ],
+   "ans": "Drive middle, then kick when help steps in. He's guarding the shot with that hand, so he can be beaten to the middle.",
+   "quote": "He's concerned about giving up a shot by that hand right there, which means he's susceptible to getting beat to the middle.",
+   "cast": [
+    "YOU · in the corner",
+    "DEFENDER · closing out to you"
+   ]
+  },
+  {
+   "id": "s2-08",
+   "src": "FR-GAP",
+   "start": 417,
+   "pause": 420,
+   "end": 425,
+   "from": 402,
+   "lv": "B",
+   "checked": false,
+   "title": "Which way to drive",
+   "q": "He's closing out to you. Which way do you drive?",
+   "choices": [
+    {
+     "t": "At his top (front) foot",
+     "ok": true
+    },
+    {
+     "t": "At his back foot"
+    },
+    {
+     "t": "Straight at his chest"
+    }
+   ],
+   "ans": "At his top foot. He has further to drop that foot to cut you off, and his momentum is taking him the other way.",
+   "quote": "The majority of the time you should attack the defender's top foot, and the reason why is because they're going to have a further distance to drop that foot to then try and cut you off, and their momentum is taking them the opposite direction.",
+   "cast": [
+    "YOU · catching it",
+    "DEFENDER · closing out to you"
+   ]
+  },
+  {
+   "id": "s2-09",
+   "src": "FR-WIN",
+   "start": 86,
+   "pause": 88,
+   "end": 96,
+   "lv": "B",
+   "checked": false,
+   "title": "Catch on the perimeter",
+   "q": "You catch it. Shoot, drive or pass?",
+   "choices": [
+    {
+     "t": "Shoot"
+    },
+    {
+     "t": "Drive"
+    },
+    {
+     "t": "Pass",
+     "ok": true
+    }
+   ],
+   "ans": "Pass it one more. Somebody else is wide open.",
+   "quote": "On the catch, if you ever notice that somebody else is wide open, the best decision is to pass it one more and let them make the decision.",
+   "cast": [
+    "YOU · catching it",
+    "TEAMMATE"
+   ]
+  },
+  {
+   "id": "s2-10",
+   "src": "FR-GAP",
+   "start": 207,
+   "pause": 220,
+   "end": 228,
+   "lv": "I",
+   "checked": false,
+   "title": "The hammer pass catch",
+   "q": "You catch the hammer pass in the corner. Shoot or drive?",
+   "choices": [
+    {
+     "t": "Shoot"
+    },
+    {
+     "t": "Drive",
+     "ok": true
+    }
+   ],
+   "ans": "Drive. He shoots it, but the presenter would rather he drove the bad closeout, which probably creates a better shot for somebody else.",
+   "quote": "I actually wish he would have driven that bad closeout, because he probably would have created a better shot for somebody else.",
+   "cast": [
+    "YOU · Dewan, in the corner",
+    "CLOSEOUT DEFENDER"
+   ]
+  },
+  {
+   "id": "s2-11",
+   "src": "FR-GAP",
+   "start": 313,
+   "pause": 324,
+   "end": 341,
+   "lv": "I",
+   "checked": false,
+   "title": "Coming off a pin down",
+   "q": "You come off a pin down and catch it. What's open?",
+   "choices": [
+    {
+     "t": "The shot"
+    },
+    {
+     "t": "The drive back to the middle",
+     "ok": true
+    },
+    {
+     "t": "The pass back to the screener"
+    }
+   ],
+   "ans": "The drive back to the middle. His defender tried to meet him on the other side and closed out out of control.",
+   "quote": "Instead of chasing him, he tries to go on the other side to meet him, and he ends up closing out extremely out of control… which makes it obvious that the drive back to the middle is open.",
+   "cast": [
+    "YOU · #14",
+    "DEFENDER",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s2-12",
+   "src": "FR-GAP",
+   "start": 429,
+   "pause": 438,
+   "end": 446,
+   "lv": "I",
+   "checked": false,
+   "title": "Second closeout from the same defender",
+   "q": "This defender got beat off the dribble on the last play. He's closing out to you now. Drive or shoot?",
+   "choices": [
+    {
+     "t": "Drive"
+    },
+    {
+     "t": "Shoot",
+     "ok": true
+    }
+   ],
+   "ans": "Shoot. He just got beat off the bounce, so he closes out short to stop the drive.",
+   "quote": "This defender just got beat off the bounce, so now as he closes out a second time he is closing out shorter because he doesn't want to get beat again. He was more concerned about the drive back to the middle, closes out short and gets hit with a three.",
+   "cast": [
+    "YOU · catching it",
+    "DEFENDER · got beat off the dribble last play"
+   ]
+  },
+  {
+   "id": "s2-13",
+   "src": "FR-2L",
+   "start": 138,
+   "pause": 141,
+   "end": 146,
+   "from": 129,
+   "lv": "B",
+   "checked": false,
+   "title": "Past your man",
+   "q": "You're past your man. Keep going or pass?",
+   "choices": [
+    {
+     "t": "Keep going to the rim"
+    },
+    {
+     "t": "Kick it out",
+     "ok": true
+    }
+   ],
+   "ans": "Kick it out to the helper's man. It's hard for a defender to stunt and get back to his man in time.",
+   "quote": "If that first level comes over and stunts, kick the ball to the perimeter. It's really difficult for a defender to stunt and recover to his man on time.",
+   "cast": [
+    "YOU · driving",
+    "HELPER",
+    "TEAMMATE · the helper's man"
+   ]
+  },
+  {
+   "id": "s2-14",
+   "src": "FR-2L",
+   "start": 192,
+   "pause": 200,
+   "end": 210,
+   "lv": "B",
+   "checked": false,
+   "title": "At the rim",
+   "q": "You're at the rim. Go up or pass?",
+   "choices": [
+    {
+     "t": "Go up"
+    },
+    {
+     "t": "Dump it off",
+     "ok": true
+    }
+   ],
+   "ans": "Dump it off to the big's man. The second-level big always wants to block the shot.",
+   "quote": "That second level big always wants to block a shot, so make sure when you get there, dump it off to his man.",
+   "cast": [
+    "YOU · at the rim",
+    "BIG",
+    "TEAMMATE · the big's man"
+   ]
+  },
+  {
+   "id": "s2-15",
+   "src": "FR-2L",
+   "start": 245,
+   "pause": 250,
+   "end": 263,
+   "lv": "B",
+   "checked": false,
+   "title": "Driving to the rim",
+   "q": "You're driving to the rim. Go up or pass?",
+   "choices": [
+    {
+     "t": "Go up"
+    },
+    {
+     "t": "Pass",
+     "ok": true
+    }
+   ],
+   "ans": "Pass. The first helper left the corner open and the big left the dump-off open. He goes up anyway and gets blocked.",
+   "quote": "The first level has fully come in and committed so it could go to the corner, and the second level is coming over to block the shot, and he still chooses to go up and try and score it when you can see how wide open the dump off is, and he gets his shot blocked.",
+   "cast": [
+    "YOU · driving",
+    "FIRST HELPER",
+    "BIG",
+    "TEAMMATE · in the corner",
+    "TEAMMATE · under the rim"
+   ]
+  }
+ ]
+}

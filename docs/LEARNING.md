@@ -884,3 +884,53 @@ there are no handling or finishing clips yet, so those thresholds are a first gu
 **Privacy.** The clip lives in memory and is gone when you close the screen. *Keep clip* saves it with your
 training videos (step 7), named after the drill, so it shows in My videos on the Coach tab. Android's back button
 closes the compare screen first.
+
+## Step 26. Film study: make the read on real film
+
+Film study is on the **Coach** tab. Each set is a run of moments from YouTube breakdowns by NBA, pro or college
+players, or a few vetted coaching channels (Thinking Basketball, Hoop Intellect, BBallBreakdown, The Film Room,
+Coach Frikki, Basketball Scoring Coach). The presenter's read is the right answer. When two sources read the same
+clip differently, the higher level wins and NBA players have the final say.
+
+**How a moment plays.** The video plays **muted with captions off** from the scene's start and pauses on the frame
+of the read. The narration and captions often say the answer right at that moment, which is why they're off. Then
+the moment's court diagram and the question ease in under the paused player. After you pick, *Hear … explain it*
+rewinds to the scene's start (or to `from`, when the explanation comes first) and plays with sound to `end`, so the
+presenter is never cut off mid-sentence.
+
+**YouTube's rules shape the screen.** Nothing may be drawn over the embedded player (the Required Minimum
+Functionality's "Overlays and frames"), and the app may not capture or keep frames (Developer Policies III.E.1).
+So the paused player stays on top, untouched, and the labels live in our own diagram underneath. The player is
+YouTube's IFrame API on the privacy-enhanced youtube-nocookie.com host, at least 200 px tall. Pausing, seeking and
+muting all go through the API. A muted embed turns YouTube's auto-captions on, so the app switches them off with
+`setOption("captions", "track", {})` when the player is ready, when the captions module loads (`onApiChange`) and
+every 0.4 s as a backstop. The replay leaves them off; the player's CC button turns them on. The pause is a
+50 ms timer on `getCurrentTime()`, so it lands within about a frame or two.
+
+**Levels.** *Basics* plays the moments tagged `B`, labels the players who matter and makes their vision cones glow
+(fading from invisible to about 45% and back). Everyone else is faded. *Intermediate* plays every moment, draws
+every cone the same and labels only you, because spotting who matters is part of the read. Titles and questions
+never name the cue or the answer, and the choices are shuffled every time.
+
+**The diagram.** A half court at 10 px a foot (a 500 × 400 `viewBox`, basket at the top). Each player is a dot with
+a cone toward where they're looking (`face`), drawn as a radial gradient. Moments without a built-in diagram show a
+*Who's who* list instead. After answering, **Place the players** opens an editor under the paused frame: tap to add
+teammates or defenders, drag to move, tap a player and drag the white dot to turn their cone, and mark key players.
+Saved diagrams go in `S.film.dia` (on the phone and in your account). **Flag this moment** saves a note when a pause,
+answer or diagram is off. *Copy your diagrams and flags* on the Coach tab puts both on the clipboard as JSON, ready
+to build into the sets.
+
+**Where the sets live.** One JSON file per set in `film/sets/` (`s1.json`, `s2.json`, …). Each moment has a video
+source, `start`, `pause`, `end` (and optional `from`) in seconds, a level, a neutral title and question, 2 to 4
+choices with one `ok`, the answer, the presenter's words, a `cast` list that starts with YOU, and an optional
+`court`. Moments are `checked` once a person has confirmed the pause against the video; a set with none checked
+shows a *Draft* tag. To add or change a set, edit its JSON and run:
+
+```bash
+node tools/build_film.mjs           # checks every set, then writes them into www/index.html
+node tools/build_film.mjs --check   # checks only, and fails if www/index.html is out of date
+```
+
+**What's kept.** Each finished run (set, level, how many you read right) in `S.film.runs`, your level choice, and any
+diagrams and flags. No XP: film study is study, not a workout, so it doesn't touch your levels or the session
+calendar.

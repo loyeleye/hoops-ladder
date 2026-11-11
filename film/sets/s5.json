@@ -1,0 +1,498 @@
+{
+ "id": "s5",
+ "name": "Moving without the ball",
+ "blurb": "Watch your own defender: cut when he stares at the ball or leaves to help.",
+ "src": {
+  "FR-OFF": {
+   "v": "wBqT8WqaBYY",
+   "t": "How to Become a Scoring Threat Off the Ball",
+   "who": "The Film Room · former Big 12 player"
+  },
+  "FR-DUKE": {
+   "v": "SPTnPEi_Idc",
+   "t": "Key to Unlocking Your Offense",
+   "who": "The Film Room · former Big 12 player"
+  }
+ },
+ "m": [
+  {
+   "id": "s5-01",
+   "src": "FR-OFF",
+   "start": 102,
+   "pause": 105,
+   "end": 117,
+   "lv": "B",
+   "checked": false,
+   "title": "Ball goes into the post",
+   "q": "You just caught it in the post. Who do you look at?",
+   "choices": [
+    {
+     "t": "The help defender",
+     "ok": true
+    },
+    {
+     "t": "Your own defender"
+    },
+    {
+     "t": "The rim"
+    }
+   ],
+   "ans": "Watch the help defender. He gets caught staring, which leaves the back-door cut open.",
+   "quote": "What the post player is looking at is this help defender right here who gets caught staring in no man's land and gives up this easy back door for a layup",
+   "cast": [
+    "YOU · post, with the ball",
+    "HELP DEFENDER",
+    "TEAMMATE · wing"
+   ]
+  },
+  {
+   "id": "s5-02",
+   "src": "FR-OFF",
+   "start": 196,
+   "pause": 201,
+   "end": 213,
+   "lv": "B",
+   "checked": false,
+   "title": "Corner, across from the screen",
+   "q": "You're in the corner across from a ball screen. Stand there or move?",
+   "choices": [
+    {
+     "t": "Cut to the rim",
+     "ok": true
+    },
+    {
+     "t": "Stay in the corner"
+    },
+    {
+     "t": "Lift up to the wing"
+    }
+   ],
+   "ans": "Both tag defenders are locked on the roller, and your man has no idea you're cutting.",
+   "quote": "Notice how when he comes off of this step up both of these tag defenders are locked in on this man rolling to the rim and the low tag has no idea that his man is cutting to the rim for an alley-oop",
+   "cast": [
+    "YOU · far corner",
+    "YOUR DEFENDER",
+    "ROLLER",
+    "BALL HANDLER"
+   ]
+  },
+  {
+   "id": "s5-03",
+   "src": "FR-OFF",
+   "start": 217,
+   "pause": 221,
+   "end": 231,
+   "lv": "B",
+   "checked": false,
+   "title": "Corner, second look",
+   "q": "Same spot, different play. Stand there or move?",
+   "choices": [
+    {
+     "t": "Cut to the rim",
+     "ok": true
+    },
+    {
+     "t": "Stay in the corner"
+    }
+   ],
+   "ans": "Both tag defenders are watching the ball and the roller, so the corner cut is open.",
+   "quote": "Watch on this step up ball screen that both of these tag defenders are completely locked into the ball and the roll man and they never see this corner cut. The ball handler ends up throwing it to the wing but the cut is still open",
+   "cast": [
+    "YOU · far corner",
+    "YOUR DEFENDER",
+    "DEFENDER",
+    "ROLLER"
+   ]
+  },
+  {
+   "id": "s5-04",
+   "src": "FR-OFF",
+   "start": 236,
+   "pause": 240,
+   "end": 247,
+   "lv": "B",
+   "checked": false,
+   "title": "Up on the wing",
+   "q": "You're on the wing while the screen happens above you. Stand there or move?",
+   "choices": [
+    {
+     "t": "Cut to the rim at an angle",
+     "ok": true
+    },
+    {
+     "t": "Stay for a catch and shoot"
+    },
+    {
+     "t": "Drift to the corner"
+    }
+   ],
+   "ans": "Your man is staring at the ball, so the 45 cut, an angled cut to the rim, is a wide-open layup.",
+   "quote": "This step up ball screen and this top tag man is staring at the ball and you're going to get this 45° angled cut that ends up being a wide open layup",
+   "cast": [
+    "YOU · wing",
+    "YOUR DEFENDER",
+    "BALL HANDLER",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s5-05",
+   "src": "FR-OFF",
+   "start": 247,
+   "pause": 260,
+   "end": 267,
+   "lv": "I",
+   "checked": false,
+   "title": "Nobody in the near corner",
+   "q": "The ball screen is on the other side and nobody's in the near corner. What do you do?",
+   "choices": [
+    {
+     "t": "Cut to the rim at an angle",
+     "ok": true
+    },
+    {
+     "t": "Stay on the wing for a three"
+    },
+    {
+     "t": "Run to the corner"
+    }
+   ],
+   "ans": "The low tag steps up, so one backside defender has two of you. As he sinks to the baseline, the 45 cut is open.",
+   "quote": "You can see the big man is rolling and the low tag is coming up to help so this backside plug defender is responsible for two people and as he sinks to the baseline that 45 cut's wide open",
+   "cast": [
+    "YOU · slot",
+    "ROLLER",
+    "DEFENDER · low tag",
+    "DEFENDER · backside"
+   ]
+  },
+  {
+   "id": "s5-06",
+   "src": "FR-OFF",
+   "start": 336,
+   "pause": 341,
+   "end": 352,
+   "lv": "B",
+   "checked": false,
+   "title": "Topside corner on a drive",
+   "q": "Your teammate is driving. You're in the corner. Stand there or move?",
+   "choices": [
+    {
+     "t": "Cut to the rim",
+     "ok": true
+    },
+    {
+     "t": "Stay in the corner"
+    },
+    {
+     "t": "Lift to the wing"
+    }
+   ],
+   "ans": "You're already below your man, and when he stares at the spin move the cut is wide open.",
+   "quote": "And on this drive if he were to cut baseline he'd be wide open but as soon as the ball handler spins and number seven stares at the basketball this 45 cut is wide open because he got behind his defender",
+   "cast": [
+    "YOU · corner",
+    "YOUR DEFENDER · #7",
+    "TEAMMATE · driving"
+   ]
+  },
+  {
+   "id": "s5-07",
+   "src": "FR-OFF",
+   "start": 352,
+   "pause": 357,
+   "end": 367,
+   "lv": "B",
+   "checked": false,
+   "title": "Running the wing",
+   "q": "You're running the wing on the break. Keep going to the corner?",
+   "choices": [
+    {
+     "t": "No, cut to the rim",
+     "ok": true
+    },
+    {
+     "t": "Yes, get to the corner"
+    }
+   ],
+   "ans": "Usually run to the corner, but his man is staring at the ball and he's below him, so he breaks it off and cuts.",
+   "quote": "Most wings are taught to run to the corner which I believe in but as soon as he recognizes that this defender is staring at the ball and he gets below him he just breaks it off cuts to the rim and again another easy layup",
+   "cast": [
+    "YOU · running the wing",
+    "YOUR DEFENDER",
+    "TEAMMATE · with the ball"
+   ]
+  },
+  {
+   "id": "s5-08",
+   "src": "FR-OFF",
+   "start": 440,
+   "pause": 449,
+   "end": 456,
+   "lv": "B",
+   "checked": false,
+   "title": "A screen in front of you",
+   "q": "A screen happens in front of you. What's your move?",
+   "choices": [
+    {
+     "t": "Follow your man to the rim when he leaves",
+     "ok": true
+    },
+    {
+     "t": "Stay put for a three"
+    },
+    {
+     "t": "Come set a screen"
+    }
+   ],
+   "ans": "When your defender rotates to help, follow him right to the rim.",
+   "quote": "As soon as the defender rotates to help on the pick and roll the offensive player literally follows him right to the rim for a layup",
+   "cast": [
+    "YOU · slot",
+    "YOUR DEFENDER",
+    "BALL HANDLER",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s5-09",
+   "src": "FR-OFF",
+   "start": 470,
+   "pause": 479,
+   "end": 496,
+   "lv": "B",
+   "checked": false,
+   "title": "Setting a screen away from the ball",
+   "q": "You're setting a screen away from the ball. What's open for you?",
+   "choices": [
+    {
+     "t": "Follow your man to the rim when he leaves",
+     "ok": true
+    },
+    {
+     "t": "Finish the screen and pop out"
+    },
+    {
+     "t": "Post up where you are"
+    }
+   ],
+   "ans": "His defender goes to help on the ball screen, so he follows right behind him for a dunk.",
+   "quote": "But as soon as his defender goes to help he literally follows right behind him and gets this wide open dunk and this works for post players really well because typically your matchup is a rim protector",
+   "cast": [
+    "YOU · big, setting the screen",
+    "YOUR DEFENDER",
+    "TEAMMATE · you're screening for"
+   ]
+  },
+  {
+   "id": "s5-10",
+   "src": "FR-OFF",
+   "start": 502,
+   "pause": 507,
+   "end": 517,
+   "from": 500,
+   "lv": "I",
+   "checked": false,
+   "title": "Your man leaves on the slip",
+   "q": "Your man leaves you to help on the slip. Cut or stay?",
+   "choices": [
+    {
+     "t": "Stay in the corner",
+     "ok": true
+    },
+    {
+     "t": "Cut to the rim"
+    }
+   ],
+   "ans": "Stay. A good shooter stays for the three, and if your man is late the big gets the dunk anyway.",
+   "quote": "Now if you're in the corner and you're a really good shooter maybe you stay to get a catch and shoot three or if you feel like your man is late on the tag and he's going to get an easy dunk you can stay put",
+   "cast": [
+    "YOU · corner",
+    "YOUR DEFENDER",
+    "SCREENER · slipping"
+   ]
+  },
+  {
+   "id": "s5-11",
+   "src": "FR-OFF",
+   "start": 539,
+   "pause": 543,
+   "end": 552,
+   "lv": "I",
+   "checked": false,
+   "title": "Down screen for a shooter",
+   "q": "A down screen is being set for your best shooter. What's open?",
+   "choices": [
+    {
+     "t": "The screener slipping to the rim",
+     "ok": true
+    },
+    {
+     "t": "The shooter curling off the screen"
+    },
+    {
+     "t": "A post-up for the screener"
+    }
+   ],
+   "ans": "The defender is scared of the shooter coming off for a three, so the screener slips to the basket.",
+   "quote": "This defender is worried about getting hit on this screen and giving up a three and because Marco knows that he uses it against the defender and slips to the basket and gets an easy layup",
+   "cast": [
+    "YOU · Marco",
+    "DEFENDER",
+    "SHOOTER"
+   ]
+  },
+  {
+   "id": "s5-12",
+   "src": "FR-DUKE",
+   "start": 215,
+   "pause": 219,
+   "end": 232,
+   "lv": "B",
+   "checked": false,
+   "title": "Pin down, second look at the defender",
+   "q": "A teammate sets a pin down for you. Use the screen?",
+   "choices": [
+    {
+     "t": "No, cut back door",
+     "ok": true
+    },
+    {
+     "t": "Yes, come off it to the wing"
+    },
+    {
+     "t": "Wait for a second screen"
+    }
+   ],
+   "ans": "His man is sitting on the top side to stop him coming off the screen, so he rejects it and back cuts.",
+   "quote": "You're going to see that the defender is standing on the top side because he doesn't want Isaiah to come off the down screen and get open. So instead of trying to fight through that, he just accepts what the defense is doing. He rejects it and that's how he gets this back cut.",
+   "cast": [
+    "YOU · coming off the pin down",
+    "YOUR DEFENDER",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s5-13",
+   "src": "FR-DUKE",
+   "start": 253,
+   "pause": 260,
+   "end": 276,
+   "lv": "B",
+   "checked": false,
+   "title": "Second defender on the post",
+   "q": "A second defender jumps the post. You're on the backside. What do you do?",
+   "choices": [
+    {
+     "t": "Cut to the basket",
+     "ok": true
+    },
+    {
+     "t": "Stay spaced for a pass out"
+    },
+    {
+     "t": "Go set a screen"
+    }
+   ],
+   "ans": "One defender is guarding two people on the backside, so somebody needs to cut.",
+   "quote": "Look at the numbers on the backside. He's matched up here. He's matched up here. And now this defender is responsible for guarding two people. And this is where Duke understands that when you have a two-on-one situation, somebody needs to cut to the basket.",
+   "cast": [
+    "YOU · backside",
+    "DEFENDER · backside",
+    "TEAMMATE · post, Boozer",
+    "DEFENDER · doubling"
+   ]
+  },
+  {
+   "id": "s5-14",
+   "src": "FR-DUKE",
+   "start": 293,
+   "pause": 300,
+   "end": 319,
+   "lv": "I",
+   "checked": false,
+   "title": "Same double team",
+   "q": "Same double team. Your teammate is cutting. You're in the corner. What do you do?",
+   "choices": [
+    {
+     "t": "Cut behind the defender who rotates",
+     "ok": true
+    },
+    {
+     "t": "Stay in the corner"
+    },
+    {
+     "t": "Lift to the wing"
+    }
+   ],
+   "ans": "Kansas rotates over to stop the first cut, which leaves Sar free to cut off the rotation. The pass got turned over, but it was the right play.",
+   "quote": "Kansas understands that as well. So, they full rotate over to take that away. And that's what opens up Sar in the corner with the opportunity to cut off of the rotation.",
+   "cast": [
+    "YOU · Sar, corner",
+    "TEAMMATE · cutting",
+    "DEFENDER · rotating",
+    "TEAMMATE · post"
+   ]
+  },
+  {
+   "id": "s5-15",
+   "src": "FR-DUKE",
+   "start": 420,
+   "pause": 433,
+   "end": 448,
+   "lv": "B",
+   "checked": false,
+   "title": "Corner man on the drive",
+   "q": "Your teammate gets to the middle of the paint. You're in the corner. What's open?",
+   "choices": [
+    {
+     "t": "A cut to the rim",
+     "ok": true
+    },
+    {
+     "t": "Stay for a kick-out three"
+    },
+    {
+     "t": "Lift to the wing"
+    }
+   ],
+   "ans": "His man is looking at the ball and denying the corner pass, so the cut is open. Nobody cut on this play.",
+   "quote": "As soon as this defender is caught looking at the ball and trying to deny the pass to the corner, that opens up this opportunity for the corner man to cut to the basket.",
+   "cast": [
+    "YOU · corner",
+    "YOUR DEFENDER",
+    "TEAMMATE · Foster, driving"
+   ]
+  },
+  {
+   "id": "s5-16",
+   "src": "FR-DUKE",
+   "start": 480,
+   "pause": 490,
+   "end": 507,
+   "lv": "B",
+   "checked": false,
+   "title": "Kick-out, then a drive",
+   "q": "The ball gets kicked out and your teammate drives. You're in the corner. What's open?",
+   "choices": [
+    {
+     "t": "A back cut behind your man",
+     "ok": true
+    },
+    {
+     "t": "Stay for a three"
+    },
+    {
+     "t": "Come up for a handoff"
+    }
+   ],
+   "ans": "It's the back cut behind his man, which he missed. Get below your man and watch his head.",
+   "quote": "This is an opportunity for Sar to back cut right behind his man in the same situation that we just looked at, but he didn't take advantage of it. So, a tip for your players who are off the ball is that they need to do what they can to try and get below their matchup and keep their eyes on their defender's head.",
+   "cast": [
+    "YOU · Sar, corner",
+    "YOUR DEFENDER",
+    "TEAMMATE · Boozer, driving"
+   ]
+  }
+ ]
+}

@@ -59,6 +59,8 @@
     window.hoopsBack = function () {
       const clip = document.querySelector(".ytsheet");
       if (clip) { if (!press(clip, '[data-yt="close"]')) clip.remove(); return true; }
+      const film = document.querySelector(".fsq");
+      if (film) { if (!press(film, '[data-fq="ecancel"]') && !press(film, '[data-fq="end"]') && !press(film, '[data-fq="close"]')) closeFS(); return true; }
       if (CO.view) { closeVid(); return true; }
       if (CO.rec) { closeRec(); return true; }
       if (CMP) { closeCmp(); return true; }
