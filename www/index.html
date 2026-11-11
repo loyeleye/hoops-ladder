@@ -2572,7 +2572,7 @@ function slotOf(d){if(d.cond)return"Conditioning";if(d.id==="s_cold")return"Cold
   return d.read?"Shot · decisions":"Shot · volume"}
 const ORDER=["Cold shots","Body warm-up","Warm-up","Live","Handle · mechanics","Handle · decisions","Finishing","Shot · form","3-point test","Shot · decisions","Shot · volume","Finisher","Tired shots","Conditioning","Cool-down"];
 const bodyToday=()=>{const b=S.rec.body;return b&&b.d===today()&&b.k!=="good"?b.k:null};
-const planMins=()=>bodyToday()==="game"?20:S.settings.mins;
+const planMins=()=>bodyToday()==="game"?(S.rec.body.only?D.b_game.mins:20):S.settings.mins;
 function nwCount(mins){const v=(S.rec.nw||{})[mins];return v==null?NW_DEF[mins]??2:v}
 function swapMap(){const s=S.rec.swaps;return s&&s.d===today()?s.map:{}}
 function customToday(){const p=S.rec.plan;if(!p||(p.d!==today()&&!p.stay))return null;return S.rec.workouts.find(w=>w.id===p.w)||null}
@@ -2590,7 +2590,9 @@ function plan0(){
   const add=(d,why,prio)=>{if(!d||used.has(d.id))return;const to=sw[d.id];let sx=false;if(to&&D[to]&&!used.has(to)&&!FIXED.has(d.id)){used.add(d.id);d=D[to];sx=true;why=why&&why.k==="need"?why:{k:"swap",t:"Swapped in"}}
     if(used.has(d.id))return;cand.push({slot:slotOf(d),d,why,prio,sx});used.add(d.id)};
   const light=body?{k:"light",t:"Lighter today"}:null;
-  add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(rtPick("warm"),{k:"fixed",t:"Always before handling"},"must");
+  /* game tonight: the Pre-Game Warm-Up (with a ball) replaces the everyday one; "warm-up only" is just that */
+  if(body==="game"&&S.rec.body.only){const o=[{slot:slotOf(D.b_game),d:D.b_game,why:{k:"fixed",t:"Before your game"},prio:"must"}];o.over=[];o.mins=D.b_game.mins;o.body=body;o.ml=ml;return o}
+  add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(body==="game"?D.b_game:rtPick("warm"),{k:"fixed",t:body==="game"?"Game tonight: warm up with a ball":"Always before handling"},"must");
   const tired=mins!==20&&!body;if(tired)add(D.s_tired,{k:"fixed",t:"Always near the end"},"must");
   add(rtPick("cool"),null,"must");
   for(const id of S.rec.added)if(D[id]&&!D[id].body&&(!D[id].partner||S.settings.partner))add(D[id],{k:"you",t:"You added it"},"added");
@@ -2735,7 +2737,7 @@ function viewToday(){
    <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}<div class="planline${x.skip?" skipped":""}">${drillRow(x.d,i+1,{next:upIds.has(x.d.id),why:x.why})}${cw?`<button class="optb" data-rec="wopt:${x.d.id}" aria-label="${esc(x.d.name)}: skip today or remove">${MOREICON}</button>`:x.d.rt?`<button class="optb" data-rec="rt:${x.d.rt}" aria-label="${esc(x.d.name)}: pick your ${RT_NAME[x.d.rt]}">${SWAPICON}</button>`:!FIXED.has(x.d.id)?`<button class="optb" data-rec="opt:${x.d.id}" aria-label="${esc(x.d.name)}: why it's here, swap or how often">${SWAPICON}</button>`:`<span class="optb ph" aria-hidden="true"></span>`}</div>`).join("")}</div>
    ${cw&&ts?(()=>{const other=[...new Set(ts.items.map(it=>it.id))].filter(id=>D[id]&&!p.some(x=>x.d.id===id));return other.length?`<p class="muted small" style="margin:0">Also done today: ${other.map(id=>esc(D[id].name)).join(", ")}.</p>`:""})():""}
    ${cw?"":overflowCard(p)}
-   <p class="muted small" style="margin:0">${cw?`${esc(cw.name)} runs in the order you saved it${S.rec.plan&&S.rec.plan.stay?" and stays on until you switch":", today only. Tomorrow goes back to the recommended plan"}. Switch to another workout any time: drills you've done today stay done. Tap ⋯ to skip a drill today. `:`Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The plan fills those slots with drills you added, what needs work, your schedule, favorites and one new drill, as many as fit the minutes you picked. Each drill says why it's here. Tap ⇄ to swap it or set how often it comes back. `}The Up next button always starts the next drill (outlined), and timed drills in a row play back to back. You can also tap any drill to do it out of order.</p></section>
+   <p class="muted small" style="margin:0">${cw?`${esc(cw.name)} runs in the order you saved it${S.rec.plan&&S.rec.plan.stay?" and stays on until you switch":", today only. Tomorrow goes back to the recommended plan"}. Switch to another workout any time: drills you've done today stay done. Tap ⋯ to skip a drill today. `:`Each drill says why it's here. Tap ⇄ to swap it or set how often it comes back. `}You can tap any drill to do it out of order. <button class="linkbtn" data-rec="how" style="padding:0">How today is built ›</button></p></section>
   ${coachTodayCard()}`}
 
 function cueCard(){const c=todayCue(),open=!!state.cueOpen;
@@ -2812,7 +2814,7 @@ function viewProgress(){
   <section><div class="sechead"><h2>Sessions</h2><span class="muted small">${shots} shots logged</span></div>
    ${progHeat()}
    ${recent.length?`<div class="card hist">${recent.map(se=>`<div><span>${new Date(se.d+"T12:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})}</span><span class="muted">${se.items.length} drill${se.items.length>1?"s":""}</span><b class="num">+${se.items.reduce((a,it)=>a+it.xp,0)} XP</b></div>`).join("")}</div>`:`<div class="empty">No sessions yet. Finish any drill on the Today tab and it's logged here with the XP you earned.</div>`}</section>
-  ${progPicks()}`}
+  <section><button class="planrow" data-rec="how"><span><span class="label">Favorites, schedules, reset learning</span><b>How today is built</b></span><span class="v">Open ›</span></button></section>`}
 
 /* Session calendar: the last 16 weeks, shaded by drills done that day. Hidden until asked for, with no streak or
    run-length count, so it reads as a log and never as a chain to keep alive. */
@@ -2994,8 +2996,9 @@ function planRow(p){const cw=p.custom,mins=cw?wMins(cw):p.mins;
   return `<button class="planrow" data-rec="plan"><span><span class="label">${cw?"Plan · yours, today only":p.body?"Plan · lightened":"Plan"}</span><b>${cw?esc(cw.name):"Recommended"} · ${mins} min</b></span><span class="v">Change ▾</span></button>`}
 /* Today's setup in one strip: the optional body check (before the first drill only), then the partner and heavy-ball switches */
 function setupStrip(body){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;
-  const note=k==="heavy"?"Same minutes, but no Tired 3s runs, no two-foot jump or contact drills, and lighter footwork.":k==="game"?"20 minutes of form and touch: no volume shooting, no jump or contact drills.":"";
-  return `<div class="setup">${body?`<div class="label">How's the body today? <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">Optional</span></div><div class="chips" role="group" aria-label="How's the body today">${[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]].map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${k===v?"✓ ":""}${t}</button>`).join("")}</div>${note?`<p class="small muted" style="margin:0">${note}</p>`:""}`:""}
+  const note=k==="heavy"?"Same minutes, but no Tired 3s runs, no two-foot jump or contact drills, and lighter footwork.":k==="game"?(S.rec.body.only?"Just the Pre-Game Warm-Up, about 10 minutes. Do it at the gym before tip-off.":"20 minutes of form and touch with the Pre-Game Warm-Up: no volume shooting, no jump or contact drills."):"";
+  const gm=k==="game"?`<div class="chips" role="group" aria-label="Game tonight">${[["tune","Tune-up · 20 min"],["warm","At the gym now: warm-up only"]].map(([v,t])=>{const on=(v==="warm")===!!S.rec.body.only;return `<button class="chip" data-rec="gmode:${v}" aria-pressed="${on}">${on?"✓ ":""}${t}</button>`}).join("")}</div>`:"";
+  return `<div class="setup">${body?`<div class="label">How's the body today? <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">Optional</span></div><div class="chips" role="group" aria-label="How's the body today">${[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]].map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${k===v?"✓ ":""}${t}</button>`).join("")}</div>${gm}${note?`<p class="small muted" style="margin:0">${note}</p>`:""}`:""}
    <div class="row"><label class="toggle"><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}> Partner today</label><label class="toggle"><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}> I have a heavy ball</label></div></div>`}
 function addedCard(ids){const names=ids.map(id=>D[id].name);
   return `<div class="addedcard"><b>You added ${esc(names.length>2?names.length+" drills":names.join(" and "))}.</b> Put ${names.length>1?"them":"it"} in today's workout, or keep ${names.length>1?"them":"it"} for your next recommended one?<div class="psee-btns"><button class="btn sec small" data-rec="addin">Add ${names.length>1?"them":"it"} in</button><button class="btn sec small" data-rec="keepnext">Keep for next</button></div></div>`}
@@ -3155,9 +3158,11 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "unhide":setFreq(b,"auto");return render();
   case "pause":S.rec.paused[b]=addDays(today(),14);persist();bsClose();return toastU("Paused",`${D[b].name} is off your plan for 2 weeks.`,()=>{delete S.rec.paused[b];persist();render()});
   case "nw":return bsOpen(nwHTML(),"Needs work");
+  case "how":return bsOpen(howHTML(),"How today is built");
   case "nwset":{const m=+b;let v=nwCount(m);v=+c>0?(v>=NW_MAX?NW_ALL:v+1):(v>=NW_ALL?NW_MAX:Math.max(0,v-1));S.rec.nw={...S.rec.nw,[m]:v};persist();render();return bsSet(nwHTML())}
   case "nwreset":S.rec.nw={...NW_DEF};persist();render();return bsSet(nwHTML());
   case "add":return toggleAdd(b);
+  case "gmode":{if(S.rec.body&&S.rec.body.k==="game"){S.rec.body.only=b==="warm";persist()}return render()}
   case "body":{const cur=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;S.rec.body=cur===b?null:{d:today(),k:b};persist();return render()}
   case "lvl":state.start={...(state.start||{level:"regular",focus:"bal"}),level:b};return render();
   case "focus":state.start={...(state.start||{level:"regular",focus:"bal"}),focus:b};return render();
@@ -3167,7 +3172,7 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "addin":S.rec.plan.extra=[...new Set([...(S.rec.plan.extra||[]),...S.rec.added])];persist();return render();
   case "keepnext":state.keepNext=today();return render();
   case "recap":return openRecap();
-  case "reset":if(b==="yes"){S.rec.pref={};S.rec.gadj={};S.rec.log=[];S.rec.swaps=null;persist();state.resetAsk=false;toast("Reset","The app starts learning your drills again from here.")}else state.resetAsk=b!=="no";return render();
+  case "reset":if(b==="yes"){S.rec.pref={};S.rec.gadj={};S.rec.log=[];S.rec.swaps=null;persist();state.resetAsk=false;toast("Reset","The app starts learning your drills again from here.")}else state.resetAsk=b!=="no";if(bsEl&&bsEl.getAttribute("aria-label")==="How today is built")bsSet(howHTML());return render();
   case "bview":B.view=b;bsSet(builderHTML());if(b==="pick"){const q=$("#bq");if(q)q.focus()}return;
   case "bpick":{const j=B.items.indexOf(b);if(j>=0)B.items.splice(j,1);else B.items.push(b);const el=$("#bpick"),q=B.q.trim().toLowerCase();if(el)el.innerHTML=bPickList(DRILLS.filter(d=>!q||d.name.toLowerCase().includes(q)));const done=bsEl&&bsEl.querySelector('[data-rec="bview:list"]');if(done)done.textContent=`Done adding · ${B.items.length} drill${B.items.length===1?"":"s"}`;return}
   case "bmv":{B.items=bItems();const j=B.items.indexOf(b),to=j+ +c;const lo=B.keep?pinFirst(B.items).length:0,hi=B.items.length-1-(B.keep?pinLast(B.items).length:0);if(to<lo||to>hi)return;[B.items[j],B.items[to]]=[B.items[to],B.items[j]];return bsSet(builderHTML())}
@@ -3193,9 +3198,9 @@ function progClimb(){const c30=cutOf(30),c60=cutOf(60);
    <div class="stats"><div class="stat"><b>${p3==null?"–":p3+"%"}</b><span>5-Spot 3s${p3!=null&&p3o!=null?` · ${p3>=p3o?"+":""}${p3-p3o} vs last month`:""}</span></div><div class="stat"><b>${gap==null?"–":gap}</b><span>Weak-hand gap, points</span></div><div class="stat"><b>${dpd==null?"–":dpd}</b><span>Drops per timed drill</span></div></div>
    ${goals.length||lowered.length?`<div class="card hist">${goals.slice(0,5).map(g=>`<div><span>${esc(g.d.name)}</span><span class="muted">${g.now>g.first?"raised":"lowered"}</span><b class="num">${g.first} → ${g.now}%</b></div>`).join("")}${lowered.filter(x=>!goals.some(g=>g.d.id===x.id)).map(x=>`<div><span>${esc(D[x.id].name)}</span><span class="muted">lowered after Hard (${fmtD(x.d)})</span><b class="num">${x.a}%</b></div>`).join("")}</div>`:`<div class="empty">Goals move with your numbers: hit them and they rise. Your raised goals show up here.</div>`}
    ${tt?`<div class="card"><div class="label">Time by skill, 4 weeks</div><div class="balbar">${["s","h","f"].map(k=>`<i class="${k}" style="width:${100*t[k]/tt}%"></i>`).join("")}</div><div class="small muted" style="margin-top:6px">Shooting ${Math.round(100*t.s/tt)}% · Handling ${Math.round(100*t.h/tt)}% · Finishing ${Math.round(100*t.f/tt)}%</div></div>`:""}</section>`}
-function progPicks(){const favs=DRILLS.filter(d=>!d.body&&isFav(d.id)).sort((a,b)=>favScore(b.id)-favScore(a.id)).slice(0,5),sched=Object.keys(S.rec.freq).filter(id=>D[id]&&!["auto","never"].includes(fq(id).k)),hidden=Object.keys(S.rec.freq).filter(id=>D[id]&&fq(id).k==="never"),
+function howHTML(){const favs=DRILLS.filter(d=>!d.body&&isFav(d.id)).sort((a,b)=>favScore(b.id)-favScore(a.id)).slice(0,5),sched=Object.keys(S.rec.freq).filter(id=>D[id]&&!["auto","never"].includes(fq(id).k)),hidden=Object.keys(S.rec.freq).filter(id=>D[id]&&fq(id).k==="never"),
    quiet=DRILLS.filter(d=>!d.body&&favScore(d.id)>=2&&daysAgo(lastDone(d.id))>=14&&daysAgo(lastDone(d.id))<Infinity).slice(0,3),paused=Object.keys(S.rec.paused||{}).filter(id=>D[id]&&S.rec.paused[id]>today());
-  return `<section><div class="sechead"><h2>How the app picks</h2></div><div class="card hist">
+  return `${bsTop("Today's plan","How today is built")}<p class="small" style="margin:0 0 10px">Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The Up next button always starts the next drill, and timed drills in a row play back to back.</p><div class="card hist">
    <div><span>Needs-work drills per workout</span><span></span><button class="linkbtn" data-rec="nw" style="padding:0">${[20,30,45].map(m=>nwLabel(nwCount(m))).join(" / ")} ›</button></div>
    ${favs.length?`<div><span>Favorites</span><span></span><span class="small">${favs.map(d=>esc(d.name)).join(", ")}</span></div>`:""}
    ${sched.map(id=>`<div><span>${esc(D[id].name)}</span><span></span><button class="linkbtn" data-rec="freq:${id}" style="padding:0">${fqText(id)} ›</button></div>`).join("")}
@@ -3203,7 +3208,7 @@ function progPicks(){const favs=DRILLS.filter(d=>!d.body&&isFav(d.id)).sort((a,b
    ${paused.map(id=>`<div><span>${esc(D[id].name)}</span><span class="muted">paused</span><span class="small">until ${new Date(S.rec.paused[id]+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span></div>`).join("")}
    ${hidden.map(id=>`<div><span>${esc(D[id].name)}</span><span class="muted">hidden</span><button class="linkbtn" data-rec="unhide:${id}" style="padding:0">Show again</button></div>`).join("")}</div>
    ${state.resetAsk?`<div class="confirm"><b>Reset what the app has learned?</b><span class="small">Favorites from your ratings and swaps, and goal changes from Easy and Hard, go back to zero. Your history, schedules and workouts stay.</span><div class="psee-btns"><button class="btn sec small" data-rec="reset:no">Keep it</button><button class="btn miss small" data-rec="reset:yes">Reset</button></div></div>`:`<button class="linkbtn" data-rec="reset">Reset learning</button>`}
-   <p class="muted small" style="margin:0">Every drill is open. Each workout fills its slots with drills you added, what needs work, your schedule, favorites and one new drill. The app only suggests Advanced drills after you hit your Builder goals in that skill 3 times. XP: every finished drill earns base XP, plus a point per make, a bonus for hitting your goal, and a bonus for clean reps. Levels are medals only. Each goal is your average over your last 3 sessions of that drill plus 3 points, moved a step by Easy or Hard on the recap.</p></section>`}
+   <p class="muted small" style="margin:0">Every drill is open. Each workout fills its slots with drills you added, what needs work, your schedule, favorites and one new drill. The app only suggests Advanced drills after you hit your Builder goals in that skill 3 times. XP: every finished drill earns base XP, plus a point per make, a bonus for hitting your goal, and a bonus for clean reps. Levels are medals only. Each goal is your average over your last 3 sessions of that drill plus 3 points, moved a step by Easy or Hard on the recap.</p>`}
 
 /* ---------- audio ---------- */
 let ac=null;
