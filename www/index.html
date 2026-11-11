@@ -2824,7 +2824,7 @@ function drillRow(d,i,opts={}){
   const w=opts.why, lib=opts.lib&&!d.body, f=lib?fq(d.id).k:"auto";
   return `<button class="drill ${done?"done":""} ${opts.next?"next":""}" data-open="${d.id}">
    <span class="ix">${done?"✓":i}</span>
-   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}${d.cond?condTags(d,opts.lib):`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}<span>${tgt}</span></span></span>
+   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}${lib&&d.cond?condTop2(d,f):d.cond?condTags(d,opts.lib):`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${lib&&d.cond?"":`${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}`}<span>${tgt}</span></span></span>
    <span class="go">${done?"Again":"Go"}</span></button>`}
 
 function weekDots(){
@@ -2879,10 +2879,19 @@ function viewLadder(){
   const list=DRILLS.filter(d=>d.skill===k&&!d.body).sort((a,b)=>a.unlock-b.unlock||(a.read?1:0)-(b.read?1:0));
   return `<section id="drillpanel" role="tabpanel" aria-labelledby="tab-${k}"><div class="sechead"><h2>${k==="s"?"Shooting":k==="h"?"Handling":"Finishing"} ladder</h2></div>
    <p class="muted small" style="margin:0">${k==="f"?"Low-lift finishes: soft touch off the glass, two-foot stops, floaters, same-foot finishes and reverses that use the rim. No backboard slaps or big jumps. Then decision reps where the phone picks the finish.":k==="s"?"Form work from SeeMikeDunn, a tracked 3-point test, then decision reps that make the catch unpredictable.":"Mechanics from In The Lab, Phil Handy and ILB coaches, then decision reps where your phone calls the move so you react instead of recite."} Every drill is open. The dots show difficulty: one for Starter, two for Builder, three for Advanced. Open any drill to add it to your next workout or set how often it comes back.</p>
-   <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div></section>${k==="f"?finCard(0):""}`}
+   <div class="list">${list.map((d,i)=>`${i===0||lvlOf(list[i-1])!==lvlOf(d)?`<h3 class="slot lvlhead">${LVL_NAME[lvlOf(d)]}</h3>`:""}${drillRow(d,i+1,{lib:true})}`).join("")}</div></section>${k==="f"?finCard(0):""}`}
 
 /* Drills → Conditioning: your warm-up and cool-down on one card (open it to see all and change), then the athletic drills */
 const condTags=(d,lib)=>`${d.clips==="read"?'<span class="tag rd">Film</span>':lib&&(state.condGrp||"all")!=="all"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard</span>':""}`;
+/* Conditioning list rows show at most two tags (the drill sheet still shows them all).
+   1st: the evidence tag (Studied / Injury prevention / Coaching), since "How these drills work" says every drill shows it.
+   2nd: the first that applies of: In next workout, your how-often setting, Partner, Hard (leg load), Film, the group
+   (only under "All"; a group filter already says it), Decision. Your own choices beat facts you can read on the sheet. */
+const condTop2=(d,f)=>[`<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>`,
+  inNext(d.id)&&'<span class="tag nx">In next workout</span>',f!=="auto"&&`<span class="tag fq">${esc(fqText(d.id))}</span>`,
+  d.partner&&'<span class="tag p">Partner</span>',d.hard&&'<span class="tag hard">Hard</span>',
+  d.clips==="read"?'<span class="tag rd">Film</span>':(state.condGrp||"all")==="all"&&`<span class="tag c">${CGR[d.cond]}</span>`,
+  d.read&&'<span class="tag rd">Decision</span>'].filter(Boolean).slice(0,2).join("");
 function viewBody(){const open=!!state.rtOpen,g=state.condGrp||"all";
   const grp=k=>{const cur=rtPick(k).id;return `<div class="sechead"><h2>${k==="warm"?"Warm-ups":"Cool-downs"}</h2><button class="linkbtn" data-rec="rt:${k}" style="padding:0">Change yours ›</button></div>
    <div class="list">${RTS(k).map((d,i)=>`<div class="planline">${drillRow(d,i+1,{why:d.id===cur?{k:"fixed",t:`Your ${RT_NAME[k]}: in every workout`}:{k:"note",t:d.short||""}})}</div>`).join("")}</div>`};
