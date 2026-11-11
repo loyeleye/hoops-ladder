@@ -1,0 +1,417 @@
+{
+ "id": "s14",
+ "name": "IQ test: name the coverage",
+ "blurb": "Thirteen WNBA ball screens. Read the screener's man and your man, then name the coverage.",
+ "src": {
+  "FR-IQ4": {
+   "v": "B-ouIZ0NDJ0",
+   "t": "Basketball IQ Test #4 - How to Read Ballscreen Coverages",
+   "who": "The Film Room · former Big 12 player"
+  }
+ },
+ "m": [
+  {
+   "id": "s14-01",
+   "src": "FR-IQ4",
+   "start": 240,
+   "pause": 248,
+   "end": 258,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 1: Sky at Fever",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Flat Hedge",
+     "ok": true
+    },
+    {
+     "t": "Hard Hedge"
+    },
+    {
+     "t": "Drop"
+    }
+   ],
+   "ans": "The screener's defender gets level with the screener, on the same line, and stays flat in front of the ball so you can't turn the corner.",
+   "quote": "Flat Hedge",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-02",
+   "src": "FR-IQ4",
+   "start": 260,
+   "pause": 264,
+   "end": 274,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 2: Fever at Storm",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Flat Hedge"
+    },
+    {
+     "t": "Drop"
+    },
+    {
+     "t": "Switch",
+     "ok": true
+    }
+   ],
+   "ans": "Your man goes under the screener so the two defenders can trade matchups without losing leverage.",
+   "quote": "Switch",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-03",
+   "src": "FR-IQ4",
+   "start": 276,
+   "pause": 282,
+   "end": 294,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 3: Fever at Aces",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Hard Hedge"
+    },
+    {
+     "t": "Switch",
+     "ok": true
+    },
+    {
+     "t": "Drop"
+    }
+   ],
+   "ans": "Your man goes under the screener so the two defenders can trade matchups without losing leverage.",
+   "quote": "Switch",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-04",
+   "src": "FR-IQ4",
+   "start": 296,
+   "pause": 300,
+   "end": 310,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 4: Fever at Storm",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Switch"
+    },
+    {
+     "t": "Drop"
+    },
+    {
+     "t": "Flat Hedge",
+     "ok": true
+    }
+   ],
+   "ans": "The screener's defender gets level with the screener, on the same line, and stays flat in front of the ball so you can't turn the corner.",
+   "quote": "Flat Hedge",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-05",
+   "src": "FR-IQ4",
+   "start": 312,
+   "pause": 314,
+   "end": 326,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 5: Wings at Sparks",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Flat Hedge"
+    },
+    {
+     "t": "Switch"
+    },
+    {
+     "t": "Drop",
+     "ok": true
+    }
+   ],
+   "ans": "The screener's defender stays back with a gap between him and the screener, below the roller, giving himself room to react.",
+   "quote": "Drop",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-06",
+   "src": "FR-IQ4",
+   "start": 328,
+   "pause": 334,
+   "end": 344,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 6: Wings at Sparks",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Drop",
+     "ok": true
+    },
+    {
+     "t": "Flat Hedge"
+    },
+    {
+     "t": "Switch"
+    }
+   ],
+   "ans": "The screener's defender stays back with a gap between him and the screener, below the roller, giving himself room to react.",
+   "quote": "Drop",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-07",
+   "src": "FR-IQ4",
+   "start": 346,
+   "pause": 350,
+   "end": 360,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 7: Wings at Sparks",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Hard Hedge",
+     "ok": true
+    },
+    {
+     "t": "Flat Hedge"
+    },
+    {
+     "t": "Switch"
+    }
+   ],
+   "ans": "The screener's defender comes up the floor, hugged up to the screener, to get in the ball handler's way while your man gets over.",
+   "quote": "Hard Hedge",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-08",
+   "src": "FR-IQ4",
+   "start": 362,
+   "pause": 370,
+   "end": 380,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 8: Fever at Aces",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Switch",
+     "ok": true
+    },
+    {
+     "t": "Flat Hedge"
+    },
+    {
+     "t": "Hard Hedge"
+    }
+   ],
+   "ans": "Your man goes under the screener so the two defenders can trade matchups without losing leverage.",
+   "quote": "Switch",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-09",
+   "src": "FR-IQ4",
+   "start": 382,
+   "pause": 386,
+   "end": 396,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 9: Fever at Dream",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Drop",
+     "ok": true
+    },
+    {
+     "t": "Switch"
+    },
+    {
+     "t": "Hard Hedge"
+    }
+   ],
+   "ans": "The screener's defender stays back with a gap between him and the screener, below the roller, giving himself room to react. It drifted toward a flat hedge as the play went on.",
+   "quote": "Drop. Somewhat turned into Flat Hedge :)",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-10",
+   "src": "FR-IQ4",
+   "start": 398,
+   "pause": 402,
+   "end": 414,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 10: Wings at Sparks",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Switch"
+    },
+    {
+     "t": "Hard Hedge",
+     "ok": true
+    },
+    {
+     "t": "Flat Hedge"
+    }
+   ],
+   "ans": "The screener's defender comes up the floor, hugged up to the screener, to get in the ball handler's way while your man gets over.",
+   "quote": "Hard Hedge",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-11",
+   "src": "FR-IQ4",
+   "start": 416,
+   "pause": 420,
+   "end": 432,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 11: Fever at Aces",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Hard Hedge"
+    },
+    {
+     "t": "Drop"
+    },
+    {
+     "t": "Flat Hedge",
+     "ok": true
+    }
+   ],
+   "ans": "The screener's defender gets level with the screener, on the same line, and stays flat in front of the ball so you can't turn the corner.",
+   "quote": "Flat Hedge",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-12",
+   "src": "FR-IQ4",
+   "start": 434,
+   "pause": 440,
+   "end": 452,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 12: Fever at Storm",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Hard Hedge"
+    },
+    {
+     "t": "Drop"
+    },
+    {
+     "t": "Switch",
+     "ok": true
+    }
+   ],
+   "ans": "Your man goes under the screener so the two defenders can trade matchups without losing leverage.",
+   "quote": "Switch",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s14-13",
+   "src": "FR-IQ4",
+   "start": 454,
+   "pause": 462,
+   "end": 472,
+   "lv": "I",
+   "checked": false,
+   "title": "Coverage 13: Wings at Sparks",
+   "q": "Watch the man guarding the screener and your man. What coverage is the defense in?",
+   "choices": [
+    {
+     "t": "Hard Hedge",
+     "ok": true
+    },
+    {
+     "t": "Switch"
+    },
+    {
+     "t": "Flat Hedge"
+    }
+   ],
+   "ans": "The screener's defender comes up the floor, hugged up to the screener, to get in the ball handler's way while your man gets over.",
+   "quote": "Hard Hedge",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER"
+   ]
+  }
+ ]
+}
