@@ -7000,7 +7000,7 @@ route();
       box.innerHTML = `<b>Place the phone</b>
         <div class="lf-seg"><button data-lf="view" data-v="behind" aria-pressed="${B && !F}">Behind</button><button data-lf="view" data-v="front" aria-pressed="${F}">In front</button><button data-lf="view" data-v="side" aria-pressed="${!B}">Side</button></div>
         <ul>${F
-          ? "<li>Straight in front of you, facing you, on the line from the rim to where you shoot. At a Shoot360, under the machine with you at the 3-point line. Not off to an angle: that throws off the elbow and ball-line numbers.</li><li>That shows left and right, like from behind: your elbow, the ball's line, your guide hand. Keep it below or beside the machine's chute so passes don't hit it.</li>"
+          ? "<li>Straight in front of you, facing you, on the line from the rim to where you shoot, for example under the basket. Not off to an angle: that throws off the elbow and ball-line numbers.</li><li>That shows left and right, like from behind: your elbow, the ball's line, your guide hand. Keep it out of the way of passes and rebounds.</li>"
           : B
           ? "<li>Behind you, on the straight line from you to the rim. That shows left and right: your elbow, the ball's line, your guide hand.</li><li>About 10 to 15 ft back, at waist height. At a Shoot360, prop it at the back of your lane, out of the way of the machine's passes and the net.</li>"
           : "<li>Level with where you shoot, off to your shooting-hand side, so your shooting arm faces the phone. That shows balance, timing, set point and arc.</li><li>About 10 to 15 ft away, at waist height, out of the way of the ball and the rebound.</li>"}
@@ -7744,7 +7744,7 @@ route();
     };
     const list = BF.free ? L.slice().sort((a, b) => buBytes(b, sz) - buBytes(a, sz)) : L.slice(0, 10);
     const body = `<p class="small" style="margin:0">Turn on <b>Keep video</b> in Live form check and each shot keeps its own few seconds of video, with its numbers. Only the shots are saved, never the time in between. A clip longer than ${BU.CLIP_MIN} s picked above is split into its shots the same way.</p>
-      <p class="small muted" style="margin:6px 0 0">At a Shoot360, prop the phone behind you in the lane, or straight in front of you under the machine. Live form check asks which before you start.</p>
+      <p class="small muted" style="margin:6px 0 0">At a Shoot360, prop the phone behind you in the lane, or straight in front of you under the basket. Live form check asks where before you start.</p>
       ${list.length ? `<div class="bu-list">${list.map(row).join("")}</div>` : ""}
       ${tot ? `<p class="small muted" style="margin:0">Shot videos use ${fmtMB(tot)}${CO.usage ? ` of the ${fmtMB(CO.usage)} the app uses on this phone` : ""}. Video for shots with no ★ or Keep is deleted 14 days after filming. The numbers stay.</p>
       <button class="btn sec small" data-buf="free" style="margin-top:6px">${BF.free ? "Done" : "Free up space"}</button>` : ""}`;
