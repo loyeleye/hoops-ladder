@@ -930,8 +930,8 @@
      During a coach session the share sheet also shows "Session · <coach>" (a sharing shortcut the page turns on and
      off through hoopsSesShare). A share through it arrives with target "session" and goes to sesShared(), never
      to a take-home drill. Shared videos arrive as a file the plugin copied into the app's cache. They're read back
-     here as a Blob and always go to sesShared(), which puts them in the session or, with none running, keeps them in
-     My videos.
+     here as a Blob and always go to sesShared(), which asks Coach or Me and puts them in the session or, with none
+     running, sends them where the owner chose (asked the first time: My videos, or a new coach session).
      It sits before section 8 because that one stops early on a phone without the HoopsRemote plugin.
      See docs/LEARNING.md, steps 20 and 27. */
   {

@@ -972,11 +972,26 @@ speech engine to read a file (Android 13 and later), which is planned.
 shows in the share sheet. Ending the session removes it. A link shared through it goes to the session's *Add a link*
 screen and never to a take-home drill. The plain *Hoops Ladder* target still works as in step 20. Videos can be
 shared in too (`video/*`): the plugin copies the file into the app's cache, the page reads it back as a Blob, and it
-becomes a coach piece. With no session running, a shared video goes to My videos.
+asks *Coach or Me*: Coach starts a new topic when the current one already has a try, and Me becomes the topic's next
+numbered try. Several shares wait in line and are asked one at a time. With no session running, the first shared video
+asks where shared videos should go (My videos, or start a coach session with it) and remembers the answer in
+`S.settings.shareTo`. Change it on the Coach tab's session card (*Videos shared in with no session running*).
 - `HoopsSharePlugin.sessionStart/sessionEnd` push and remove the shortcut. `res/xml/shortcuts.xml` declares the
   share target.
 - A share through the shortcut carries `target: "session"`.
 - The share target only shows on Android 10 and later.
+
+**Best and latest.** In each topic the highest-numbered try is marked *Latest* once there are two, and *Best try* (★)
+is your pick: one per topic, set from the star on the replay (or the dock when there's nothing to compare). Both marks
+show on the board and in the compare picker. Nothing is deleted because of them.
+
+**Importing past clips** (storyboard frame 21). *Import past clips* on the Coach tab's session card picks several
+videos (`<input type=file multiple accept=video/*>`). Each clip's time comes from the MP4's own creation time (the
+`mvhd` box), else a date in the file name (`VID_20240428_173912`), else the file's date. More than 3 minutes between
+clips starts a new topic. The first clip of a topic with more than one is guessed as Coach, the rest Me, and each can be
+switched. Each topic goes to a past session it falls within, else a new session shared with topics less than 2 hours
+apart on the same day, and that can be changed (another new session, any past session, or left out). Clips are kept
+with the same `sesStore` as filmed ones. New sessions wait under *Finish setting up …* so the topics get named.
 
 **Homework and wrap-up.** *Homework* adds the topic to the take-home list straight away, with the goal chips from One
 at a time and the topic's links. The take-home row gets a *Session clips* button that opens the topic. *End* opens the
