@@ -280,6 +280,12 @@ section{display:flex;flex-direction:column;gap:10px}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .metric.arc .btn{margin-top:8px}
 .bt-cue{margin-top:10px;font-size:16px;opacity:.75}
+.mdir.one{grid-template-columns:auto 1fr}
+.bigtap .bt-sw{align-self:center;margin-top:8px;position:relative;z-index:2;background:color-mix(in srgb,var(--bg) 14%,transparent);color:var(--bg);border:0}
+.bigtap .bt-sw[aria-pressed="true"]{background:var(--good);color:#fff}
+.camtip b{color:var(--accent)}
+.c3{display:grid;grid-template-columns:1fr auto auto auto;gap:6px 12px;font-size:14px;align-items:center}
+.c3 .hd{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .numpad{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
 .numpad .btn{padding:12px 0;font-size:22px}
 .bigtap{position:fixed;inset:0;z-index:40;background:var(--ink);color:var(--bg);display:flex;flex-direction:column;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
@@ -599,6 +605,23 @@ const DRILLS=[
   what:"From your shooting coach: pivots are what level up your game. Start under the basket, spin-throw the ball out to a lane-line mark, run it down, gather on two feet, then pivot a full 180 and shoot. Four shots at each spot, one per pivot, all the way around the lane and the free throw line. It's on the clock: record your time and beat it next time.",
   steps:["Spots: the lane-line marks where players line up for a free throw, four on each side (the block and the three marks above it), plus the free throw line in the middle. Go up the right side, across the free throw line, then down the left. Four shots at each spot.","Start under the basket. Spin-throw the ball out to the mark with backspin so it stops right there.","As soon as it leaves your hand, run to the ball and gather it on two feet, back to the rim. Landing on both feet means you haven't picked a pivot foot yet. Keep the jump stop low: the feet barely leave the floor.","Shot 1, front pivot on the left foot: the right foot steps forward and around a full 180 until you face the rim. Shoot.","Shot 2, reverse pivot on the left foot: the right foot swings back and around a full 180. Shoot.","Shot 3, front pivot on the right foot: the left foot steps forward and around. Shoot.","Shot 4, reverse pivot on the right foot: the left foot swings back and around. Shoot.","Keep the ball away from the defender as you turn: chin it and keep it on the side away from them, and sweep the free leg through to make space. Square up, then rise onto your toes and shoot. No jump needed.","Get your rebound, go back under the basket and throw to the next rep. The clock starts on your first tap and runs to the last shot. Beat your best time next session."],
   cue:"Ball away from the defender. Turn the full 180, square up, shoot.",src:[{label:"From your shooting coach",url:""},YTT("S9eWP-Qg7Jg",40,"Foxboro Cable Access: the four pivots"),YTT("MV2N0tjfdbo",0,"ShotMechanics: reverse pivots for space")]},
+ // ---------- SHOOTING: the three parts of a shot (left/right, depth, arc) ----------
+ // Each one works on one part on its own. cam says where to put the phone for that part; focus names the part.
+ {id:"s_rimline",skill:"s",name:"Rim Line Shots",role:"volume",focus:"lr",unlock:2,mins:6,log:"makes",att:30,stages:["5 ft, straight on","Free throw line","Top of the key"],stageBy:"shots",stageN:10,t0:45,tstep:1,tmax:65,
+  what:"Left/right accuracy on its own. Every shot comes from the line straight out from the rim, so a ball that drifts left or right is easy to see. 10 shots from each distance, moving back.",
+  steps:["Find the line straight out from the middle of the rim: through the middle of the free throw line and on to the top of the key. A strip of tape or a row of cones helps.","Put your shooting foot on the line with your toes toward the rim. If your feet turn a little when you shoot, that's fine, as long as it's the same every time.","Ball, shooting eye and elbow on the line to the rim. The ball goes up that line and leaves your fingers straight down it.","Tag every miss: Left or Right (or Short or Long). The summary and the Progress tab show which side you miss to and what usually causes it."],
+  cue:"Ball, eye and rim on one line.",cam:{view:"behind",text:"Put the phone on the floor 10 to 15 ft behind you, on the same line, looking at the rim. From there a left or right miss is obvious, and the Form tab's behind check measures your elbow, ball line and guide hand."},
+  src:[{label:"Built around Shoot360's three parts of a shot: left/right, depth and arc",url:""}]},
+ {id:"s_depth",skill:"s",name:"Depth Calls",role:"volume",focus:"depth",unlock:3,mins:6,log:"makes",att:24,calls:["Just over the front rim","Middle of the rim","Back of the rim"],t0:40,tstep:1,tmax:60,
+  what:"Depth is how far the ball goes: short or long. The best makes land a little past the middle of the rim, about 11 inches past the front. The phone calls an aim point before each shot, so you learn to move the ball deeper or shorter on purpose with the same shot.",
+  steps:["Pick one spot, the free throw line or a little further, and stay there.","Read the call before each shot: just over the front rim, the middle of the rim, or the back of the rim.","Change only where you aim, not your form. Same dip, same set point, same follow-through.","Log every shot and tag misses Short or Long. The summary shows makes and misses for each aim point, so you can see where your best depth is."],
+  cue:"Same shot, new target. Feel the distance.",cam:{view:"side",text:"Phone side-on, level with the rim and 15 to 20 ft away, so the ball and the rim are both in frame. For now you tag depth yourself."},
+  src:[{label:"Built around Shoot360's three parts of a shot",url:""},{label:"11-inch depth target from Noah Basketball, which sells a shot tracker",url:""}]},
+ {id:"s_arc",skill:"s",name:"Arc Calls",role:"volume",focus:"arc",unlock:3,mins:6,log:"makes",att:24,calls:["Low arc","Your normal arc","High arc"],t0:40,tstep:1,tmax:60,
+  what:"Arc is how high the ball goes. A flat shot gives the ball a smaller target, and a very high one makes depth hard to control. The target is about a 45° entry. The phone calls an arc before each shot, and the summary shows which arc goes in most for you.",
+  steps:["Pick one spot, mid-range or the 3-point line, and stay there.","Read the call. Low: the ball peaks about level with the top of the backboard. Normal: your usual shot. High: it peaks a few feet above the backboard.","Get the height from your legs and a high release (elbow to the rim), not by flicking your wrist harder or leaning back.","Log every shot and tag misses Short or Long. If your normal arc goes in less often than your high one, your normal shot is probably too flat."],
+  cue:"Up and over the rim.",cam:{view:"side",text:"Phone side-on, like the form check. Film a few shots and use Measure arc on the Form tab, with the distance you shot from, to check your entry angle."},
+  src:[{label:"Built around Shoot360's three parts of a shot",url:""},{label:"45° entry target from Noah Basketball, which sells a shot tracker",url:""}]},
  // ---------- SHOOTING: decision reps ----------
  {id:"s_r_spot",skill:"s",name:"Called-Spot 3s",role:"core",read:true,unlock:3,mins:8,log:"spots",per:6,random:true,t0:30,tstep:2,tmax:48,
   what:"Your phone picks the next spot at random, so you can't settle into a groove at one spot. Closer to a game, where you never know where the catch is.",
@@ -896,7 +919,10 @@ const STEP_CLIPS={
 };
 /* which form-check measurements each shooting drill trains */
 const CHECKS={s_line:["Line Test (balance)"],s_pullup:["Line Test (balance)"],s_seq:["Ball leads, body attaches","Tempo (dip to release)"],s_5spot:["Ball leads, body attaches","Tempo (dip to release)"],s_tired:["Tempo (dip to release)"],
- s_elbow:["Forearm at set point"],s_elbowrim:["Arm extension at release","Forearm at set point"],s_ladder:["Arm extension at release"],s_ft:["Follow-through hold","Line Test (balance)"]};
+ s_elbow:["Forearm at set point"],s_elbowrim:["Arm extension at release","Forearm at set point"],s_ladder:["Arm extension at release"],s_ft:["Follow-through hold","Line Test (balance)"],
+ s_rimline:["Elbow under the ball","Ball line at release","Guide hand at release"],s_guide:["Guide hand at release","Ball line at release"],s_arc:["Arc"],s_depth:["Arc"]};
+/* which camera view each check needs: side (default) or behind the shooter */
+const CHECK_VIEW={s_rimline:"behind",s_guide:"behind"};
 const STEP_ANIM={"s_line":["s_line_1.gif","s_line_2.gif","s_line_3.gif","s_line_4.gif"],"s_rollup":["s_rollup_1.gif","s_rollup_2.gif","s_rollup_3.gif","s_rollup_4.gif"],"s_elbow":["s_elbow_1.gif","s_elbow_2.gif","s_elbow_3.gif","s_elbow_4.gif"],"s_ft":["s_ft_1.gif","s_ft_2.gif","s_ft_3.gif","s_ft_4.gif","s_ft_5.gif"],"s_guide":["s_guide_1.gif","s_guide_2.gif","s_guide_3.gif","s_guide_4.gif"],"s_elbowrim":["s_elbowrim_1.gif","s_elbowrim_2.gif","s_elbowrim_3.gif","s_elbowrim_4.gif"],"h_2walk":[1,1,1],"h_2release":[1,1,1,1,1,1],"h_r_2cones":[1,1,1],"h_2pass":[1,1,1,1],"f_mikan":["f_mikan_1.gif","f_mikan_2.gif","f_mikan_3.gif","f_mikan_4.gif"],"f_corner":["f_corner_1.gif","f_corner_2.gif","f_corner_3.gif","f_corner_4.gif"],"f_power":["f_power_1.gif","f_power_2.gif","f_power_3.gif","f_power_4.gif"],"f_weak":["f_weak_1.gif","f_weak_2.gif","f_weak_3.gif"],"f_foot5":["f_foot5_1.gif","f_foot5_2.gif","f_foot5_3.gif","f_foot5_4.gif","f_foot5_5.gif"],"f_float":["f_float_1.gif","f_float_2.gif","f_float_3.gif","f_float_4.gif"],"f_reverse":["f_reverse_1.gif","f_reverse_2.gif","f_reverse_3.gif"],"f_called":["f_called_1.gif","f_called_2.gif","f_called_3.gif"],"f_divergent":["f_divergent_1.gif","f_divergent_2.gif","f_divergent_3.gif","f_divergent_4.gif"],"f_bump":["f_bump_1.gif","f_bump_2.gif","f_bump_3.gif","f_bump_4.gif"],"f_chair":["f_chair_1.gif","f_chair_2.gif","f_chair_3.gif"],"f_spots":["f_spots_1.gif","f_spots_2.gif","f_spots_3.gif"],"f_read":["f_read_1.gif","f_read_2.gif","f_read_3.gif","f_read_4.gif","f_read_5.gif"]};
 /* Hoops Ladder: vector animations for the Finishing drills.
    Side view of one basket (player faces right). An optional top-down inset shows the approach path.
@@ -1989,8 +2015,23 @@ function domDir(t){const n=t.short+t.long+t.left+t.right;if(n<4)return null;cons
 const ADVICE={
  short:{t:"Most of your misses are short.",fix:"That's usually energy, not aim: the legs attach late or the shot runs out of power. Let the ball lead to your set point and the legs attach underneath it, and send it up and over the rim.",drill:"s_seq",cue:1},
  long:{t:"Most of your misses are long.",fix:"Long misses usually mean extra leg or a flat push at the end. Keep the same dip every shot and let the finish be two, then through.",drill:"s_ft",cue:3},
- side:{t:"Most of your misses go left or right.",fix:"Side misses are alignment: the ball drifts outside your frame or the elbow swings. Keep the ball in front, inside your shoulders, with the elbow under it.",drill:"s_rollup",cue:4}};
-function missAdvice(t){const dd=domDir(t);return dd?Object.assign({p:dd.p,n:dd.n,k:dd.k},ADVICE[dd.k]):null}
+ side:{t:"Most of your misses go left or right.",fix:"Side misses are alignment: the ball drifts outside your frame or the elbow swings. Keep the ball in front, in line with your shooting eye, with the elbow under it.",drill:"s_rimline",cue:7},
+ off:{fix:"Missing to your guide-hand side usually means the elbow flares out or the ball crosses in front of your face, so the push goes across your body. Keep the elbow under the ball and the ball by your shooting eye, and shoot it straight up the line to the rim.",drill:"s_rimline",cue:7},
+ strong:{fix:"Missing to your shooting-hand side usually means the guide hand is pushing (a thumb flick) or the ball sits outside your shooting shoulder. Let the guide hand only balance the ball and come off at the release.",drill:"s_guide",cue:8}};
+/* left and right by the shooting hand: a right-hander's guide-hand side is the left */
+const sideNames=()=>S.settings.hand==="L"?{g:"right",s:"left"}:{g:"left",s:"right"};
+function sideKey(t){const n=sideNames(),g=t[n.g],s=t[n.s];return g>=1.5*s?"off":s>=1.5*g?"strong":"side"}
+function missAdvice(t){const dd=domDir(t);if(!dd)return null;const n=sideNames(),sk=dd.k==="side"?sideKey(t):dd.k,a=ADVICE[sk];
+  const w=sk==="off"?n.g:sk==="strong"?n.s:sk==="side"?"left or right":sk;
+  const tt=sk==="off"?`Most of your misses go ${n.g}, to your guide-hand side.`:sk==="strong"?`Most of your misses go ${n.s}, to your shooting-hand side.`:a.t;
+  return Object.assign({p:dd.p,n:dd.n,k:dd.k,sk,w},a,{t:tt})}
+/* three tagged misses in a row that share a direction get one quick fix, said and shown during the drill.
+   It fires again only after three more tagged misses, so it never nags on every shot. */
+function repTip(){if(!R||R.d.skill!=="s")return null;const tg=R.hist.filter(h=>!h.chunk&&!h.hit&&h.dir).map(h=>h.dir).concat((R.smd||[]).filter(Boolean));
+  if(tg.length<(R.rtAt||0))R.rtAt=tg.length;if(tg.length-(R.rtAt||0)<3)return null;
+  const last=tg.slice(-3).map(dParts),x=Object.keys(DIRS).find(k=>last.every(p=>p.includes(k)));if(!x)return null;
+  R.rtAt=tg.length;const n=sideNames();
+  return R.rtip=x==="short"?"Three short. Legs under the ball, up and over the rim.":x==="long"?"Three long. Same dip, softer finish: two, then through.":x===n.g?`Three ${x}. Elbow under the ball, ball by your shooting eye.`:`Three ${x}. Guide hand only balances it.`}
 function sessMiss(hist){const t={short:0,long:0,left:0,right:0};for(const h of hist)for(const x of dParts(h.dir))t[x]++;return t}
 function streaks(hist){if(hist.some(h=>h.chunk||h.sg))return null;let best=0,run=0;const by={},rs={};let last=null;
   for(const h of hist){run=h.hit?run+1:0;best=Math.max(best,run);if(h.sp){if(h.sp!==last)rs[h.sp]=0;rs[h.sp]=h.hit?(rs[h.sp]||0)+1:0;by[h.sp]=Math.max(by[h.sp]||0,rs[h.sp]);last=h.sp}}
@@ -2002,8 +2043,8 @@ function drillPct(ids,days){const cut=cutOf(days);let m=0,a=0;for(const se of S.
 function bestStreak(days){const cut=cutOf(days);let b=null;for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){if(it.st!=null&&D[it.id]&&D[it.id].log==="spots"&&(!b||it.st>b.n))b={n:it.st,d:se.d}}}return b}
 function spotStreaks(days){const cut=cutOf(days),out={};for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items)if(it.ss)for(const k in it.ss)out[k]=Math.max(out[k]||0,it.ss[k])}return out}
 function ladderHist(){const rows=[];for(const se of S.sessions)for(const it of se.items)if(it.id==="s_ladder"&&it.lad)rows.push({d:se.d,lad:it.lad});return rows}
-const CUES=[{t:"Drop straight down",w:"Balance on one vertical line, from the Line Test."},{t:"Ball leads, body attaches",w:"Ball gets to the set point, then the legs attach under it."},{t:"Elbow to the rim",w:"Keeps the ball moving forward instead of drifting back."},{t:"Two, then through",w:"The whole shot in two words."},{t:"Keep it in front",w:"Ball inside your frame, elbow under it."},{t:"Up and over the rim",w:"Arc first. Most misses are short."},{t:"Same speed all the way up",w:"No stop on the way to the release."}];
-const FORM_CUE={drift:0,knee:1,seq:1,tilt:2,ext:2,hold:3,tempo:6};
+const CUES=[{t:"Drop straight down",w:"Balance on one vertical line, from the Line Test."},{t:"Ball leads, body attaches",w:"Ball gets to the set point, then the legs attach under it."},{t:"Elbow to the rim",w:"Keeps the ball moving forward instead of drifting back."},{t:"Two, then through",w:"The whole shot in two words."},{t:"Keep it in front",w:"Ball inside your frame, elbow under it."},{t:"Up and over the rim",w:"Arc first. Most misses are short."},{t:"Same speed all the way up",w:"No stop on the way to the release."},{t:"Ball, eye, rim on one line",w:"Left or right is alignment: ball by your shooting eye, elbow under it."},{t:"Guide hand only balances",w:"It comes off at the release without pushing the ball."},{t:"Same shot, new target",w:"Depth is distance: aim deeper or shorter without changing your form."}];
+const FORM_CUE={drift:0,knee:1,seq:1,tilt:2,ext:2,hold:3,tempo:6,bElbow:7,bLine:7,bGuide:8,bSway:0,bStance:7};
 function todayCue(){const c=S.settings.cue;if(c&&c.d===today()&&CUES[c.i])return{i:c.i,why:"Your pick for today."};
   const ma=missAdvice(missStats(30).tot);if(ma)return{i:ma.cue,why:`Suggested: ${ma.t.toLowerCase().replace(/\.$/,"")} (${ma.p}% of your tagged misses).`};
   const f=(S.forms||[])[S.forms?.length-1];if(f){const bad=Object.entries(f.st).find(([k,v])=>v==="fix")||Object.entries(f.st).find(([k,v])=>v==="watch");if(bad&&FORM_CUE[bad[0]]!=null)return{i:FORM_CUE[bad[0]],why:"Suggested from your last form check."}}
@@ -2051,7 +2092,7 @@ const isFav=id=>favScore(id)>=3&&(S.rec.pref[id]||0)>=0;
 function needsWork(){const out=[],add=(id,t,why)=>{if(D[id]&&!out.some(x=>x.d.id===id))out.push({d:D[id],t,why})};
   const ws=weakSpot();if(ws)add("s_focus",`Needs work: ${SPOT[ws.id].name} ${Math.round(ws.p*100)}%`,`Your ${SPOT[ws.id].name.toLowerCase()} 3s are at ${Math.round(ws.p*100)}% over 30 days, your coldest spot.`);
   const fw=finWeak(30);if(fw)add(fw.drill,`Needs work: ${FT_NAMES[fw.k].toLowerCase()}, ${fw.h==="W"?"weak":"strong"} hand ${Math.round(fw.p*100)}%`,`Your ${FT_NAMES[fw.k].toLowerCase()} finishes with your ${fw.h==="W"?"weak":"strong"} hand are at ${Math.round(fw.p*100)}% (${fw.m}/${fw.a}) this month, your weakest finish.`);
-  const ma=missAdvice(missStats(30).tot);if(ma)add(ma.drill,`Needs work: ${ma.p}% of misses ${ma.k==="side"?"left or right":ma.k}`,`${ma.t} ${ma.fix}`);
+  const ma=missAdvice(missStats(30).tot);if(ma)add(ma.drill,`Needs work: ${ma.p}% of misses ${ma.w}`,`${ma.t} ${ma.fix}`);
   let hd=null;const cut=cutOf(30);for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){const d=D[it.id];if(d&&d.skill==="h"&&!d.body&&it.lost>=3&&(!hd||it.lost>=hd.lost))hd={id:it.id,lost:it.lost}}}
   if(hd)add(hd.id,`Needs work: ${hd.lost} drops last time`,`You lost the ball ${hd.lost} times the last time you ran it. Clean reps here carry over to games.`);
   return out.filter(x=>!((S.rec.paused||{})[x.d.id]>today()))}
@@ -2112,7 +2153,7 @@ function plan0(){
 /* alternatives for a swap: same slot (or same weakness for a needs-work drill), not already in today's plan */
 function swapOptions(x,p){const inPlan=new Set(p.map(y=>y.d.id)),body=bodyToday(),ml={s:maxLvl("s"),h:maxLvl("h"),f:maxLvl("f")};
   let pool=DRILLS.filter(d=>eligible(d,body)&&lvlOf(d)<=ml[d.skill]&&!inPlan.has(d.id)&&!FIXED.has(d.id));
-  if(x.why&&x.why.k==="need"){const fam=x.d.skill==="s"?["s_focus","s_seq","s_ft","s_rollup","s_r_spot","s_atw"]:x.d.skill==="f"?DRILLS.filter(d=>d.skill==="f"&&(d.weak||d.ft===x.d.ft)).map(d=>d.id):DRILLS.filter(d=>d.skill==="h"&&!d.read&&d.role==="handle").map(d=>d.id);pool=pool.filter(d=>fam.includes(d.id))}
+  if(x.why&&x.why.k==="need"){const fam=x.d.skill==="s"?["s_focus","s_seq","s_ft","s_rollup","s_r_spot","s_atw","s_rimline","s_guide","s_depth","s_arc"]:x.d.skill==="f"?DRILLS.filter(d=>d.skill==="f"&&(d.weak||d.ft===x.d.ft)).map(d=>d.id):DRILLS.filter(d=>d.skill==="h"&&!d.read&&d.role==="handle").map(d=>d.id);pool=pool.filter(d=>fam.includes(d.id))}
   else pool=pool.filter(d=>slotOf(d)===x.slot);
   const m0=realMins(x.d);pool.forEach(d=>d._s=favScore(d.id)+Math.min(2,daysAgo(lastDone(d.id))/7)-Math.abs(realMins(d)-m0)/3);pool.sort((a,b)=>b._s-a._s);
   return pool.slice(0,3).map(d=>{const ld=lastDone(d.id);return{d,t:isFav(d.id)?"Favorite":!ld?"New to try":daysAgo(ld)>=10?`Last done ${daysAgo(ld)} days ago`:""}})}
@@ -2257,7 +2298,7 @@ function viewProgress(){
    <div class="card">${courtSVG({data:tot})}<div class="legend" style="margin-top:8px;justify-content:center"><span><i style="background:var(--bad)"></i>Under 28%</span><span><i style="background:var(--warn)"></i>28–35%</span><span><i style="background:var(--good)"></i>36%+</span></div></div></section>
   <section><div class="stats"><div class="stat"><b>${a3?pct(m3,a3)+"%":"–"}</b><span>3PT · ${m3}/${a3}</span></div><div class="stat"><b>${aft?pct(mft,aft)+"%":"–"}</b><span>Free throws · ${mft}/${aft}</span></div><div class="stat"><b>${decisions}</b><span>Decision drills</span></div></div></section>
   ${progClimb()}
-  ${progConsistency()}${progMiss()}${progLadder()}${finCard(state.range==="30"?30:0)}
+  ${progConsistency()}${progMiss()}${progCalls()}${progLadder()}${finCard(state.range==="30"?30:0)}
   <section><div class="sechead"><h2>Trend</h2><div class="legend"><span><i style="background:var(--accent)"></i>3PT %</span><span><i style="background:var(--read)"></i>FT %</span></div></div>
    ${series.length>=2?`<div class="card">${spark(series)}</div>`:`<div class="empty">Log the 5-Spot 3s on two different days and your 3-point trend line shows up here.</div>`}</section>
   <section><div class="sechead"><h2>Sessions</h2><span class="muted small">${shots} shots logged</span></div>
@@ -2279,6 +2320,15 @@ function progMiss(){const ms=missStats(state.range==="30"?30:0);
    ${a?`<p style="margin:10px 0 0"><b>${esc(a.t)}</b> ${esc(a.fix)}</p><button class="linkbtn" data-open="${a.drill}">Drill: ${esc(D[a.drill].name)} →</button>`:`<p class="small muted" style="margin:10px 0 0">No single direction stands out yet${ms.n<8?". Tag a few more misses":""}.</p>`}
    ${spotLines?`<ul class="tips small" style="margin-top:8px">${spotLines}</ul>`:""}
    <p class="small muted" style="margin:8px 0 0">Short or long is about energy and arc. Left or right is about alignment. Most misses in the NBA are short.</p></div></section>`}
+/* Arc Calls and Depth Calls by call, plus how many makes were swishes (only shots logged one at a time can be tagged) */
+function progCalls(){const cut=cutOf(state.range==="30"?30:0),by={s_arc:{},s_depth:{}};let sw=0,swm=0;
+  for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){if(it.cb&&by[it.id])for(const c in it.cb){const v=by[it.id][c]=by[it.id][c]||[0,0,0,0];it.cb[c].forEach((x,i)=>v[i]+=x)}if(it.sw){sw+=it.sw;swm+=it.swm||it.sw}}}
+  const tbl=id=>{const o=by[id],ks=D[id].calls.filter(c=>o[c]);if(!ks.length)return"";let best=null;for(const c of ks){const p=o[c][0]/o[c][1];if(o[c][1]>=5&&(!best||p>best.p))best={c,p}}
+    return `<div class="label" style="margin-top:4px">${esc(D[id].name)}</div><div class="c3"><span class="hd">Call</span><span class="hd">Made</span><span class="hd">Short</span><span class="hd">Long</span>${ks.map(c=>`<span>${esc(c)}${best&&best.c===c?" ★":""}</span><b class="num">${o[c][0]}/${o[c][1]}</b><span class="num">${o[c][2]}</span><span class="num">${o[c][3]}</span>`).join("")}</div>`};
+  const a=tbl("s_arc"),dp=tbl("s_depth");if(!a&&!dp&&!sw)return"";
+  return `<section><div class="sechead"><h2>Arc and depth</h2></div><div class="card">${a}${dp}
+   ${sw?`<p style="margin:10px 0 0"><b>Swishes:</b> ${sw} of ${swm} makes you logged one at a time (${Math.round(100*sw/Math.max(1,swm))}%). A swish means the depth and the arc were both right.</p>`:""}
+   <p class="small muted" style="margin:8px 0 0">★ goes in most often (5 shots or more). Arc Calls show which arc suits you; Depth Calls show whether you can move the ball shorter or deeper on purpose.</p></div></section>`}
 function progLadder(){const rows=ladderHist(),d=D.s_ladder;if(!rows.length)return"";const last=rows[rows.length-1];
   const best=d.stages.map((_,i)=>{const v=rows.map(r=>r.lad[i]).filter(x=>x&&x[1]>=d.stageN).map(x=>x[0]);return v.length?Math.min(...v):null});
   return `<section><div class="sechead"><h2>Range ladder</h2><span class="muted small">shots needed for ${d.stageN} makes</span></div>
@@ -2291,7 +2341,9 @@ function render(){renderPlate();
   document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"))}
 
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-open],[data-mins],[data-dtab],[data-range],[data-hand],[data-jump],[data-coach],[data-play],[data-cue],[data-arc]");if(!t)return;
+  const t=e.target.closest("[data-open],[data-mins],[data-dtab],[data-range],[data-hand],[data-jump],[data-coach],[data-play],[data-cue],[data-arc],[data-fcview],[data-arcd]");if(!t)return;
+  if(t.dataset.fcview){S.settings.fcView=t.dataset.fcview;persist();reView();return}
+  if(t.dataset.arcd){S.settings.arcDist=+t.dataset.arcd;persist();if(FC.arc&&!FC.arc.err){FC.arc.dist=S.settings.arcDist;FC.arc.entry=entryOf(FC.arc.launch,FC.arc.dist);const f=(S.forms||[])[S.forms.length-1];if(f&&f.t>=(FC.savedAt||0)){f.v.entry=FC.arc.entry;f.v.ad=FC.arc.dist;persist()}}render();return}
   if(t.dataset.cue){S.settings.cue={d:today(),i:+t.dataset.cue};persist();render();return}
   if(t.dataset.arc){arcAct(t.dataset.arc);return}
   if(t.dataset.play){startPlayer(t.dataset.play.split(","),false);return}
@@ -2306,7 +2358,7 @@ document.addEventListener("change",e=>{
   if(e.target.id==="optPartner"){S.settings.partner=e.target.checked;persist();render()}
   if(e.target.id==="fcFile"&&e.target.files[0]){analyze(e.target.files[0]);return}
   if(e.target.id==="optHeavy"){S.settings.heavy=e.target.checked;persist();render()}});
-document.addEventListener("click",e=>{const a=e.target.closest("[data-check]");if(!a)return;FC.focus=a.dataset.check;closeRunner(true)},true);
+document.addEventListener("click",e=>{const a=e.target.closest("[data-check]");if(!a)return;FC.focus=a.dataset.check;const v=CHECK_VIEW[FC.focus]||"side";if(S.settings.fcView!==v){S.settings.fcView=v;persist();reView()}closeRunner(true)},true);
 window.addEventListener("hashchange",route);
 let scrubBusy=false;document.addEventListener("input",async e=>{if(e.target.id!=="fcScrub")return;FC.idx=+e.target.value;if(scrubBusy)return;scrubBusy=true;let last=-1;while(last!==FC.idx){last=FC.idx;await drawFrame(last,$("#fcCanvas"))}scrubBusy=false});
 
@@ -2571,7 +2623,8 @@ function drawRunner(){
    <ol class="steps">${d.steps.map((s,i)=>`<li>${hasAnim(d)?`<div class="srow">${stepAnim(d,i)}<div>${esc(s)}${stepClips(d,i)}</div></div>`:`${esc(s)}${stepClips(d,i)}`}</li>`).join("")}</ol>
    ${d.grid?`<div class="hgrid"><h3 class="partshead">${esc(d.grid.title)}</h3><table><thead><tr>${d.grid.head.map(h=>`<th scope="col">${esc(h)}</th>`).join("")}</tr></thead><tbody>${d.grid.rows.map(r=>`<tr><th scope="row">${esc(r[0])}</th>${r.slice(1).map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table><p class="small muted" style="margin:6px 0 0">${esc(d.grid.note)}</p></div>`:""}
    ${STEP_CLIPS[d.id]?`<p class="small muted" style="margin:0">▶ opens ${d.skill==="f"||d.coachClips?"a coach":"SeeMikeDunn"} showing that step on YouTube.</p>`:""}
-   ${CHECKS[d.id]?`<div class="checkit"><div><b>Check it on video</b><span class="small">Film one shot from the side. The form check measures ${CHECKS[d.id].map(esc).join(" and ")}.</span></div><a class="btn sec small" href="#form" data-check="${d.id}">Check it</a></div>`:""}
+   ${d.cam?`<div class="tip camtip"><b>Phone setup${d.cam.view==="behind"?", behind you":", side-on"}:</b> ${esc(d.cam.text)}</div>`:""}
+   ${CHECKS[d.id]?`<div class="checkit"><div><b>Check it on video</b><span class="small">Film one shot ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}. The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")}.</span></div><a class="btn sec small" href="#form" data-check="${d.id}">Check it</a></div>`:""}
    <div class="cue">${esc(d.cue)}</div>${d.skill==="s"?`<div class="tip"><b>Today's one cue:</b> ${esc(CUES[todayCue().i].t)}. Think only this between shots. Change it on the Today tab.</div>`:""}${d.stages&&d.between?`<div class="tip"><b>Before each round:</b> ${esc(d.between)}</div>`:""}${heavy}${tgt}
    ${recCard(d)}
    <div class="src">Source: ${src}</div>
@@ -2604,13 +2657,13 @@ function drawDock(){
     el.innerHTML=`${modeSeg}${R.mode==="big"?`<button class="btn pri" data-k="big">Open shot-by-shot screen</button>`:""}${d.random?`<div class="call sm ${R.flash?"flash":""}">${cur?SPOT[cur].name:"Done"}</div>`:""}
      ${courtSVG({cur,done:doneSpots,labels,size:300})}
      <div class="tally"><span class="label">${cur?`${SPOT[cur].name} · shot ${R.spots[cur][1]+1} of ${d.per}`:"All spots done"}</span><span class="num">${R.m}/${R.a}</span></div>
-     <div class="big2"><button class="btn make" data-k="make" ${cur?"":"disabled"}>Make</button><button class="btn miss" data-k="miss" ${cur?"":"disabled"}>Miss</button></div>${missRow(!cur)}
+     <div class="big2"><button class="btn make" data-k="make" ${cur?"":"disabled"}>Make</button><button class="btn miss" data-k="miss" ${cur?"":"disabled"}>Miss</button></div>${swishRow(!cur)}${missRow(!cur)}${rtipBox()}
      <div class="big2"><button class="btn sec small" data-k="undo" ${R.hist.length?"":"disabled"}>Undo</button><button class="btn pri small" data-k="finish" ${R.a?"":"disabled"}>Finish</button></div>`}
   else if(d.log==="makes"){
     const tp=targetPct(d), p=pct(R.m,R.a);
     el.innerHTML=`${modeSeg}${R.mode==="big"?`<button class="btn pri" data-k="big">Open shot-by-shot screen</button>`:""}${R.call?`<div class="call sm ${R.flash?"flash":""}">${esc(R.call)}</div>`:""}
      <div class="tally"><span class="label">${d.stages?stageLabel(d):d.gm==="streak"?`${sState(d).run} in a row so far (need ${d.streakK})${d.streakN>1?` · ${sState(d).done} of ${d.streakN} done`:""}`:d.goal?`${R.m} of ${d.goal} makes`:`Shot ${Math.min(R.a+1,d.att)} of ${d.att}`}${p==null?"":` · ${p}%`}</span><span class="num">${R.m}/${R.a}</span></div>${d.skill==="f"?finDock(d):""}
-     <div class="big2"><button class="btn make" data-k="make">Make</button><button class="btn miss" data-k="miss">Miss</button></div>${missRow(false)}
+     <div class="big2"><button class="btn make" data-k="make">Make</button><button class="btn miss" data-k="miss">Miss</button></div>${R.d.skill==="s"?swishRow(false):""}${missRow(false)}${rtipBox()}
      <div class="big2"><button class="btn sec small" data-k="undo" ${R.hist.length?"":"disabled"}>Undo</button><button class="btn pri small" data-k="finish" ${R.a?"":"disabled"}>Finish</button></div>`}
   else if(d.log==="timer"){
     const ph=d.phases;
@@ -2638,6 +2691,8 @@ function bind(){
 const fmt=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+":"+pad(s%60)};
 
 function modesFor(d){return setsOK(d)?["sets","big","tap"]:["big","tap"]}
+const swishRow=dis=>`<div class="mdir one" role="group" aria-label="A clean make"><span class="small muted">Made it clean</span><button class="btn sec small" data-k="swish" ${dis?"disabled":""}>Swish</button></div>`;
+const rtipBox=()=>R.rtip?`<div class="tip"><b>Fix:</b> ${esc(R.rtip)}</div>`:"";
 const missRow=dis=>`<div class="mdir" role="group" aria-label="Log a miss with its direction"><span class="small muted">Missed</span>${Object.entries(DIRS).map(([k,l])=>`<button class="btn sec small" data-k="miss:${k}" ${dis?"disabled":""}>${l}</button>`).join("")}</div>`;
 /* big tap screen: whole screen is the button */
 /* hands-free logging. Two full-screen modes share one input layer:
@@ -2714,7 +2769,7 @@ function setMiss(dir){const s=setSpec();if(!s)return;const d=R.d;
   if(d.timed&&!R.t0){R.t0=Date.now();beep(880,160);say("Go");return drawBig()}
   if(s.kind==="att"&&R.sm>=s.n){beep(300,200);say(`That's all ${s.n} missed. Hold or double-click to close the set`);return}
   R.sm++;R.smd.push(dir||null);beep(440,110);try{navigator.vibrate?.([40,60,40])}catch(e){}
-  say(dir?`${dirName(dir)}. ${R.sm} missed`:`${R.sm} missed`);drawBig()}
+  const tp=dir?repTip():null;say((dir?`${dirName(dir)}. ${R.sm} missed`:`${R.sm} missed`)+(tp?". "+tp:""));drawBig()}
 function setDone(score){const s=setSpec();if(!s)return;const d=R.d;
   if(d.timed&&!R.t0){R.t0=Date.now();beep(880,160);say("Go");return drawBig()}
   const made=s.kind==="goal"?s.n:(score!=null?Math.min(score,s.n):s.n-R.sm),miss=s.kind==="goal"?R.sm:s.n-made,g=(R.setNo||0)+1;
@@ -2735,6 +2790,7 @@ function setUndo(){if(R.sm>0){R.sm--;R.smd.pop();beep(520,90);say(`Undo. ${R.sm}
   act("undo");say(`Last set removed. ${R.m} for ${R.a}. ${setIntro()}`);drawBig()}
 function sig(k){if(!R||R.finished||!bigEl)return;
   if(R.mode==="sets"){if(k==="a")setMiss();else if(k==="b")setDone();else if(k==="u")setUndo();else if(k.startsWith("n:"))setDone(+k.slice(2));else if(k.startsWith("dir:"))setMiss(k.slice(4));return}
+  if(k==="swish"){bigRec(true,null,true);return}
   if(k==="b"||k==="make")bigRec(true);else if(k==="a"||k==="miss")bigRec(false);else if(k.startsWith("dir:"))bigRec(false,k.slice(4));else if(k==="u"){act("undo");drawBig();say(`Undo. ${R.m} for ${R.a}`)}}
 function openBig(){closeBig();if(R.mode==="sets"){R.sm=R.sm||0;R.smd=R.smd||[]}
   bigEl=document.createElement("div");bigEl.className="bigtap"+(R.mode==="sets"?" sets":"");bigEl.setAttribute("role","application");
@@ -2763,23 +2819,23 @@ function drawBig(){if(!bigEl||!R)return;const d=R.d,p=pct(R.m,R.a),last=R.hist[R
       <div class="bt-set">${s?`Set ${(R.setNo||0)+1} · ${s.kind==="goal"?`make ${s.n}`:`${s.n} shot${s.n===1?"":"s"}`}`:""}</div>
       ${wait?`<div class="bt-last">Tap or click to start the clock</div>`:`<div class="bt-count num ${R.sm?"ms":""}">${R.sm}<span> missed</span></div>`}
       <div class="bt-pct">Total ${R.m}/${R.a}${p==null?"":" · "+p+"%"}${d.goal?` · ${R.m} of ${d.goal} makes`:d.att?` · ${R.a} of ${d.att}`:d.per?` · ${R.a} of ${d.per*5}`:""}${d.timed&&R.t0?` · <span class="num" id="btClock">${fmt((Date.now()-R.t0)/1000)}</span>`:""}</div></div>
-     ${d.skill==="s"?`<div class="bt-cue">Cue: ${esc(CUES[todayCue().i].t)}</div>`:d.skill==="f"&&R.tip?`<div class="bt-cue">${esc(R.tip)}${R.hand==="W"&&R.call!=="Weak hand"?" · weak hand":""}</div>`:""}
+     ${d.skill==="s"?`<div class="bt-cue">${R.rtip?"Fix: "+esc(R.rtip):"Cue: "+esc(CUES[todayCue().i].t)}</div>`:d.skill==="f"&&R.tip?`<div class="bt-cue">${esc(R.tip)}${R.hand==="W"&&R.call!=="Weak hand"?" · weak hand":""}</div>`:""}
      ${s&&s.kind==="att"&&!wait?`<div class="bt-padl">Or tap how many went in</div><div class="bt-pad">${[...Array(s.n+1)].map((_,k)=>`<button class="btn ${k===s.n?"full":""}" data-b="n:${k}">${k}</button>`).join("")}</div>`:""}
      <div class="bt-hint">${s&&s.kind==="goal"?"Make "+s.n+". ":""}Don't touch anything while you shoot. Each miss: tap anywhere (or swipe the way it missed, diagonal for long-left and so on)${media?", click your earbuds":""}${voice?', or say "miss"':""}. Set done: hold${media?", double-click":""}${voice?', say "done" or the number made':""}.${media?" Triple-click: undo.":""}</div>`}
   else bigEl.innerHTML=`<div class="bt-zones" aria-hidden="true"><div class="z mk"><b>Make</b><span>tap the top half · or hold</span></div><div class="z ms"><b>Miss</b><span>tap the bottom half · or swipe the way it missed</span></div></div>${bigTop()}
    <div class="bt-mid"><div class="bt-label">${esc(bigLabel()||(R.finished?"Finished":""))}</div><div class="bt-count num">${R.m}<span>/${R.a}</span></div>
    <div class="bt-last ${last?(last.hit?"mk":"ms"):""}">${last?(last.hit?"Make":"Miss"+(last.dir?" · "+dirName(last.dir).toLowerCase():"")):"Ready"}</div><div class="bt-pct">${p==null?"":p+"%"}${d.stages?` · ${esc(stageLabel(d))}`:d.goal?` · ${R.m} of ${d.goal} makes`:d.att?` · ${R.a} of ${d.att}`:d.per?` · ${R.a} of ${d.per*5}`:""}</div></div>
-   ${d.skill==="s"?`<div class="bt-cue">Cue: ${esc(CUES[todayCue().i].t)}</div>`:d.skill==="f"&&R.tip?`<div class="bt-cue">${esc(R.tip)}${R.hand==="W"&&R.call!=="Weak hand"?" · weak hand":""}</div>`:""}
-   <div class="bt-hint">Swipe the way the ball missed: up long, down short, sideways left or right, diagonal for both (up-left = long and left)${media?" · Earbuds: click = miss, double-click = make, triple-click = undo":""}${voice?' · Say "make", "miss", a direction like "long left", or "undo"':""}</div>`;
+   ${d.skill==="s"?`<div class="bt-cue">${R.rtip?"Fix: "+esc(R.rtip):"Cue: "+esc(CUES[todayCue().i].t)}</div>${last&&last.hit&&!last.chunk?`<button class="btn sec small bt-sw" data-b="sw" aria-pressed="${!!last.sw}">${last.sw?"Swish ✓":"That was a swish"}</button>`:""}`:d.skill==="f"&&R.tip?`<div class="bt-cue">${esc(R.tip)}${R.hand==="W"&&R.call!=="Weak hand"?" · weak hand":""}</div>`:""}
+   <div class="bt-hint">Swipe the way the ball missed: up long, down short, sideways left or right, diagonal for both (up-left = long and left)${media?" · Earbuds: click = miss, double-click = make, triple-click = undo":""}${voice?' · Say "make", "swish", "miss", a direction like "long left", or "undo"':""}</div>`;
   const pc=bigEl.querySelector(".bt-pct");if(pc&&pc.innerHTML.startsWith(" · "))pc.innerHTML=pc.innerHTML.slice(3);
   bigEl.querySelectorAll("[data-b]").forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.b;
-    if(k==="exit"){closeBig();lockOff();drawDock()}else if(k==="undo")sig("u");else if(k==="ear"){media?stopMedia():startMedia();drawBig()}else if(k==="voice"){voice?stopVoice():startVoice();drawBig()}else if(k.startsWith("n:"))sig(k)})}
+    if(k==="exit"){closeBig();lockOff();drawDock()}else if(k==="undo")sig("u");else if(k==="ear"){media?stopMedia():startMedia();drawBig()}else if(k==="voice"){voice?stopVoice():startVoice();drawBig()}else if(k==="sw"){const l=R.hist[R.hist.length-1];if(l&&l.hit&&!l.chunk){l.sw=!l.sw;if(l.sw)beep(1318,80)}drawBig()}else if(k.startsWith("n:"))sig(k)})}
 setInterval(()=>{const c=document.getElementById("btClock");if(c&&R&&R.t0)c.textContent=fmt((Date.now()-R.t0)/1000)},500);
-function bigRec(hit,dir){if(!R||R.finished)return;
-  const before=bigLabel();act(hit?"make":dir?"miss:"+dir:"miss");beep(hit?988:440,hit?110:220);try{navigator.vibrate?.(hit?30:[40,60,40])}catch(e){}
+function bigRec(hit,dir,sw){if(!R||R.finished)return;
+  const before=bigLabel();act(hit?(sw&&R.d.skill==="s"?"swish":"make"):dir?"miss:"+dir:"miss");beep(hit?988:440,hit?110:220);try{navigator.vibrate?.(hit?30:[40,60,40])}catch(e){}
   if(R.finished){say(`Done. ${R.m} for ${R.a}`);closeBig();lockOff();drawDock();return}
   const after=bigLabel(),nl=after&&after!==before;
-  say(`${dir?dirName(dir)+". ":""}${R.m} for ${R.a}${nl?". "+after+(R.d.between?". "+R.d.between:""):""}${R.d.skill==="s"&&R.a%10===0?". Cue: "+CUES[todayCue().i].t:R.d.skill==="f"&&R.a%5===0&&R.tip?". "+R.tip:""}`);drawBig()}
+  say(`${dir?dirName(dir)+". ":""}${R.m} for ${R.a}${nl?". "+after+(R.d.between?". "+R.d.between:""):""}${R.rtNew?". "+R.rtNew:""}${R.d.skill==="s"&&R.a%10===0?". Cue: "+CUES[todayCue().i].t:R.d.skill==="f"&&R.a%5===0&&R.tip?". "+R.tip:""}`);drawBig()}
 function silentWav(){const n=8000,b=new ArrayBuffer(44+n),v=new DataView(b),w=(o,t)=>[...t].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
   w(0,"RIFF");v.setUint32(4,36+n,true);w(8,"WAVEfmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,8000,true);v.setUint32(28,8000,true);v.setUint16(32,1,true);v.setUint16(34,8,true);w(36,"data");v.setUint32(40,n,true);for(let i=0;i<n;i++)v.setUint8(44+i,128);
   return URL.createObjectURL(new Blob([b],{type:"audio/wav"}))}
@@ -2806,21 +2862,21 @@ const NUMW={zero:0,oh:0,none:0,nothing:0,one:1,won:1,two:2,to:2,too:2,three:3,fo
 function voiceCmd(t){const w=t.toLowerCase().replace(/[^a-z0-9 ]/g," ").split(/\s+/).filter(Boolean);
   const dv=w.find(x=>x==="short"||x==="long"),dh=w.find(x=>x==="left"||x==="right");
   for(const x of w){if(/^(undo|oops|back)$/.test(x))return"u";if(/^(short|long|left|right)$/.test(x))return"dir:"+[dv,dh].filter(Boolean).join("+");if(/^(miss|missed|brick|no)$/.test(x))return dv||dh?"dir:"+[dv,dh].filter(Boolean).join("+"):"a_miss";
-    if(/^(make|made|good|yes|bucket|money|swish)$/.test(x))return"make";if(/^(done|next|set|finished)$/.test(x))return"b"}
+    if(/^(swish|splash|clean|net)$/.test(x))return R&&R.mode==="sets"?null:"swish";if(/^(make|made|good|yes|bucket|money)$/.test(x))return"make";if(/^(done|next|set|finished)$/.test(x))return"b"}
   if(R&&R.mode==="sets")for(const x of w){if(/^\d+$/.test(x))return"n:"+(+x);if(x in NUMW){const s=setSpec();return"n:"+(NUMW[x]<0?(s?s.n:0):NUMW[x])}}
   return null}
 function startVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){toast("Voice isn't available here","This browser has no speech recognition. Use earbuds, a clicker or tap.");return}
   try{const r=new SR();r.continuous=true;r.interimResults=false;r.lang="en-US";voice=r;
     r.onresult=e=>{if(performance.now()<talkUntil||speechSynthesis.speaking)return;const res=e.results[e.results.length-1];if(!res||!res.isFinal)return;
-      let k=voiceCmd(res[0].transcript);if(!k)return;if(k==="a_miss")k=R&&R.mode==="sets"?"a":"miss";if(k==="make"&&R&&R.mode==="sets")return;if(k==="b"&&R&&R.mode!=="sets")return;sig(k)};
+      let k=voiceCmd(res[0].transcript);if(!k)return;if(k==="a_miss")k=R&&R.mode==="sets"?"a":"miss";if((k==="make"||k==="swish")&&R&&R.mode==="sets")return;if(k==="b"&&R&&R.mode!=="sets")return;sig(k)};
     r.onerror=e=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"||e.error==="audio-capture"){voice=null;micOK=false;drawBig();toast("Voice isn't allowed on this page","The page can't use the mic here. Use earbuds, a clicker or tap. The phone app will have voice.")}};
     r.onend=()=>{if(voice===r)setTimeout(()=>{if(voice===r)try{r.start()}catch(e){}},250)};
     r.start();say(R&&R.mode==="sets"?'Voice on. Say miss, done, or the number you made.':'Voice on. Say make or miss.')}catch(e){voice=null;toast("Voice isn't available here","Use earbuds, a clicker or tap.")}}
 function stopVoice(){if(!voice)return;const r=voice;voice=null;try{r.abort()}catch(e){}}
 function flash(){R.flash=true;drawDock();setTimeout(()=>{if(R){R.flash=false;drawDock()}},350)}
 function act(k){
-  const d=R.d;let dir=null;if(k.startsWith("miss:")){dir=k.slice(5);k="miss"}
+  const d=R.d;let dir=null,sw=false;if(k.startsWith("miss:")){dir=k.slice(5);k="miss"}if(k==="swish"){sw=true;k="make"}
   if(k.startsWith("d2r:")){const[,f,v]=k.split(":"),c=D2R(),n=+v;const cl=(x,a,b)=>Math.max(a,Math.min(b,x));if(f==="gap")c.gap=n;else if(f==="n")c.n=cl(c.n+n,1,10);else if(f==="work")c.work=cl(c.work+15*n,15,180);else if(f==="rest")c.rest=cl(c.rest+15*n,0,120);else if(f==="lo")c.lo=cl(c.lo+5*n,40,c.hi-10);else if(f==="hi")c.hi=cl(c.hi+5*n,c.lo+10,160);S.settings.d2r=c;persist();return drawDock()}
   if(k.startsWith("vol:")){S.settings.vol={d:today(),big:k==="vol:1"};persist();return drawDock()}
   if(k.startsWith("hand:")){R.hand=k.slice(5);return drawDock()}
@@ -2829,10 +2885,11 @@ function act(k){
   if(k==="discard"){return closeRunner(true)}
   if(k==="make"||k==="miss"){
     const hit=k==="make";
-    if(d.log==="spots"){const sp=R.order[R.si];if(!sp)return;R.spots[sp][1]++;if(hit)R.spots[sp][0]++;R.hist.push({sp,hit,dir});R.si++;if(d.random&&R.order[R.si]&&R.mode!=="big"){beep(hit?988:660,110);flash();say(SPOT[R.order[R.si]].name)}}
-    else{if(d.timed&&!R.t0)R.t0=Date.now();R.hist.push(d.skill==="f"?{hit,call:R.call,dir,hand:R.call==="Weak hand"?"W":R.hand,ft:ftOf(d,R.call)}:{hit,call:R.call,dir});if(d.skill==="f"&&(R.a+1)%3===0)R.tip=pickFTip(d);if(d.calls){const prev=R.call;let nx;do{nx=d.calls[Math.floor(Math.random()*d.calls.length)]}while(d.noRepeat&&nx===prev);R.call=nx;if(R.mode!=="big"){beep(880,100);flash();say(R.call)}}}
+    if(d.log==="spots"){const sp=R.order[R.si];if(!sp)return;R.spots[sp][1]++;if(hit)R.spots[sp][0]++;R.hist.push(sw?{sp,hit,dir,sw}:{sp,hit,dir});R.si++;if(d.random&&R.order[R.si]&&R.mode!=="big"){beep(hit?988:660,110);flash();say(SPOT[R.order[R.si]].name)}}
+    else{if(d.timed&&!R.t0)R.t0=Date.now();R.hist.push(d.skill==="f"?{hit,call:R.call,dir,hand:R.call==="Weak hand"?"W":R.hand,ft:ftOf(d,R.call)}:sw?{hit,call:R.call,dir,sw}:{hit,call:R.call,dir});if(d.skill==="f"&&(R.a+1)%3===0)R.tip=pickFTip(d);if(d.calls){const prev=R.call;let nx;do{nx=d.calls[Math.floor(Math.random()*d.calls.length)]}while(d.noRepeat&&nx===prev);R.call=nx;if(R.mode!=="big"){beep(880,100);flash();say(R.call)}}}
     R.a++;if(hit)R.m++;
     if(d.stages){const c=stageCall(d,stageIdx(d));if(c!==R.call){R.call=c;R.newStage=true;if(R.mode!=="big"){beep(880,160);flash();say(c+(d.between?". "+d.between:""))}}}
+    R.rtNew=dir?repTip():null;if(R.rtNew&&R.mode!=="big")say((d.calls&&R.call?R.call+". ":"")+R.rtNew);
     if(runDone(d))R.finished=true;
     return drawDock()}
   if(k==="undo"){const h=R.hist.pop();if(!h)return;
@@ -2889,9 +2946,13 @@ function drawRate(){
 function rateSummary(d){const bits=[];if(d.timed&&R.t0&&(d.goal?R.m>=d.goal:d.att&&R.a>=d.att)){const t=Math.round((Date.now()-R.t0)/1000),b=bestSecs(d.id,d.goal||d.att);bits.push(`Time: <b>${fmt(t)}</b>${b?` (best ${fmt(b)}${t<b?", new best":""})`:""}.`)}const st=streaks(R.hist);if(st&&st.best>1)bits.push(`Best streak: <b>${st.best} in a row</b>.`);
   if(d.gm==="streak"&&runDone(d)){const b=bestShots(d.id,d.streakK);bits.push(`Done in <b>${R.a} shots</b>${b?` (fewest ${b}${R.a<b?", new best":""})`:""}.`)}
   if(d.stages&&d.stageBy==="makes"&&!d.gm){const r=ladderRungs(d,R.hist);bits.push("Shots for "+d.stageN+" makes: "+r.map((x,i)=>`${esc(d.stages[i])} <b>${x[1]>=d.stageN?x[0]:x[0]+"+"}</b>`).join(" · ")+".")}
+  const cb=callBreak(R.hist);if(d.skill==="s"&&cb)bits.push("By call: "+Object.entries(cb).sort((x,y)=>d.calls.indexOf(x[0])-d.calls.indexOf(y[0])).map(([c,v])=>`${esc(c)} <b>${v[0]}/${v[1]}</b>${v[2]||v[3]?` (${[v[2]?v[2]+" short":"",v[3]?v[3]+" long":""].filter(Boolean).join(", ")})`:""}`).join(" · ")+".");
+  const sw=R.hist.filter(h=>h.sw).length;if(sw)bits.push(`Swishes: <b>${sw}</b> of ${R.m} makes.`);
   const t=sessMiss(R.hist),n=t.short+t.long+t.left+t.right;if(n){bits.push("Misses: "+Object.keys(DIRS).filter(k=>t[k]).map(k=>`${t[k]} ${k}`).join(", ")+".");const a=missAdvice(t);if(a)bits.push(esc(a.t))}
   else if(R.a-R.m>=3)bits.push("Tip: tap Short, Long, Left or Right when you miss, and the app finds your miss pattern.");
   return bits.length?`<div class="tip">${bits.join(" ")}</div>`:""}
+/* makes, shots, short and long misses for each call (Arc Calls, Depth Calls) */
+function callBreak(hist){const o={};let any=false;for(const h of hist){if(h.chunk||h.call==null||R&&!R.d.calls)continue;const v=o[h.call]=o[h.call]||[0,0,0,0];v[1]++;if(h.hit)v[0]++;const ps=dParts(h.dir);if(ps.includes("short"))v[2]++;if(ps.includes("long"))v[3]++;any=true}return any?o:null}
 function xpFor(){const d=R.d;let xp=15+5*Math.floor(d.unlock/3)+(d.read?5:0);
   if(d.log==="makes"||d.log==="spots"){xp+=Math.min(40,R.m);if(R.a&&pct(R.m,R.a)>=targetPct(d))xp+=20}
   if(d.log==="timer"){const tot=d.phases.reduce((a,p)=>a+p[1],0);const doneSecs=d.phases.slice(0,R.phase).reduce((a,p)=>a+p[1],0)+(R.phase<d.phases.length?d.phases[R.phase][1]-R.left:0);xp=Math.round(xp*Math.max(.3,Math.min(1,doneSecs/tot)))}
@@ -3076,6 +3137,7 @@ function save(){
   if(d.gm){it.gm=d.gm;if(d.gm==="streak"){it.sk=d.streakK;if(R.finished&&runDone(d))it.sa=R.a}}
   if(d.log==="spots"){it.spots={};for(const k in R.spots)if(R.spots[k][1])it.spots[k]=R.spots[k]}
   if(d.log==="makes"||d.log==="spots"){const md={};let any=false;for(const h of R.hist){if(h.dir){const k=h.sp||"_";md[k]=md[k]||{};md[k][h.dir]=(md[k][h.dir]||0)+1;any=true}}if(any)it.md=md;
+    if(d.skill==="s"){const cb=d.calls&&callBreak(R.hist);if(cb)it.cb=cb;const sw=R.hist.filter(h=>h.sw).length;if(sw){it.sw=sw;it.swm=R.hist.filter(h=>h.hit&&!h.chunk&&h.sg==null).length}}
     const st=streaks(R.hist);if(st){it.st=st.best;if(d.log==="spots"&&Object.keys(st.by).length)it.ss=st.by}
     if(d.stages&&d.stageBy==="makes"&&!d.gm)it.lad=ladderRungs(d,R.hist);
     if(d.skill==="f"){const fp={};for(const h of R.hist){if(h.chunk||!h.ft)continue;const c=(fp[h.ft]=fp[h.ft]||{S:[0,0],W:[0,0]})[h.hand||"S"];c[1]++;if(h.hit)c[0]++}if(Object.keys(fp).length)it.fp=fp;if(d.timed&&R.t0&&R.finished&&d.goal&&R.m>=d.goal)it.secs=Math.round((Date.now()-R.t0)/1000)}
@@ -3136,9 +3198,56 @@ async function analyze(file){
     for(const [lab,i] of [["Dip",res.p],["Set point",res.sp],["Release",res.r]]){await drawFrame(i,work,true);FC.keys.push(await snap(lab))}
     saveForm(res);render();checkCoach();
   }catch(e){FC.status="fail";FC.msg=e.message||"Something went wrong reading that clip. Try a shorter clip.";render()}}
+/* switching between side and behind re-reads the same clip with the other view's checks */
+async function reView(){if(!FC.frames||FC.status==="busy"){render();return}const res=compute(FC.frames,FC.fps);FC.res=res;FC.keys=[];
+  if(!res.ok){FC.status="fail";FC.msg=res.msg;render();return}FC.status="done";FC.msg="";FC.idx=res.r;FC.arc=null;
+  const f=(S.forms||[])[S.forms.length-1];if(f&&FC.savedAt&&f.t>=FC.savedAt){f.v=res.vals;f.st=Object.fromEntries(res.M.map(m=>[m.k,m.st]));if(res.view==="behind")f.w="b";else delete f.w;persist()}
+  for(const [lab,i] of [["Dip",res.p],["Set point",res.sp],["Release",res.r]]){await drawFrame(i,work,true);FC.keys.push(await snap(lab))}render()}
 function snap(label){return new Promise(res=>work.toBlob(b=>res({label,blob:b,url:b?URL.createObjectURL(b):""}),"image/jpeg",.82))}
 
-function compute(F,fps){
+/* the form check films from the side (balance, timing, set point, arc) or from behind (left/right alignment) */
+const fcView=()=>S.settings.fcView==="behind"?"behind":"side";
+function compute(F,fps){return fcView()==="behind"?computeBehind(F,fps):computeSide(F,fps)}
+/* Behind the shooter, on the line to the rim. Left and right only show up from here. The shooting arm is the one whose
+   wrist gets highest, so it works for either hand and even if the pose model swaps left and right on a back view.
+   sgn points from the guide shoulder to the shooting shoulder in the picture: + is toward the shooting-hand side. */
+function computeBehind(F,fps){
+  const vis=(f,j)=>!!(f.lm&&f.lm[j]&&f.lm[j].v>.3),okf=f=>vis(f,11)&&vis(f,12)&&(vis(f,15)||vis(f,16));
+  const idx=F.map((f,i)=>okf(f)?i:-1).filter(i=>i>=0);
+  if(idx.length<6)return{ok:false,msg:"Couldn't find your body in enough frames. Film from behind with your whole body, feet included, in frame."};
+  const L=i=>F[i].lm,mid=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2}),shM=i=>mid(L(i)[11],L(i)[12]),hipM=i=>mid(L(i)[23],L(i)[24]);
+  let top=null;for(const i of idx)for(const w of [15,16])if(vis(F[i],w)&&(!top||L(i)[w].y<top.y))top={y:L(i)[w].y,w};
+  const wr=top.w,el=wr-2,sh=wr-4,gw=wr===16?15:16,gsh=sh===12?11:12;
+  const W=Math.max(8,med(idx.map(i=>Math.abs(L(i)[11].x-L(i)[12].x))));
+  const ft=idx.filter(i=>vis(F[i],27)&&vis(F[i],28));
+  const Hb=Math.max(40,ft.length?med(ft.map(i=>((L(i)[27].y+L(i)[28].y)/2-shM(i).y)/.88)):3.4*W);
+  const sgn=Math.sign(med(idx.map(i=>L(i)[sh].x-L(i)[gsh].x)))||1;
+  const up=idx.filter(i=>vis(F[i],wr)&&L(i)[wr].y<shM(i).y-.1*Hb);
+  if(!up.length)return{ok:false,msg:"Couldn't find the release. Make sure the whole shot, hands above your head, is in frame."};
+  const minY=Math.min(...up.map(i=>L(i)[wr].y)),r=up.find(i=>L(i)[wr].y<=minY+.02*Hb);
+  const pre=idx.filter(i=>i<=r&&i>=r-2*fps),p=pre.reduce((b,i)=>hipM(i).y>hipM(b).y?i:b,pre[0]);
+  const sp=idx.find(i=>i>p&&i<=r&&vis(F[i],wr)&&L(i)[wr].y<=shM(i).y-.12*Hb)??r;
+  const dip=(hipM(p).y-Math.min(...pre.filter(i=>i<=p).map(i=>hipM(i).y)))/Hb*100;
+  const se=vis(F[sp],el)?sp:r,elb=Math.atan2((L(se)[el].x-L(se)[wr].x)*sgn,Math.max(1,L(se)[el].y-L(se)[wr].y))*180/Math.PI;
+  const line=(L(r)[wr].x-L(r)[sh].x)*sgn/W*100;
+  const r1=idx.filter(i=>i>r&&i<=r+2).pop()??r,gOK=vis(F[sp],gw)&&vis(F[r1],gw),guide=gOK?(L(r1)[gw].x-L(sp)[gw].x)*sgn/W*100:null;
+  const sway=(hipM(r).x-hipM(p).x)*sgn/Hb*100;
+  const stOK=vis(F[p],27)&&vis(F[p],28),stance=stOK?Math.abs(L(p)[27].x-L(p)[28].x)/W:null;
+  const n=sideNames(),M=[];
+  const ae=Math.abs(elb);
+  M.push({k:"bElbow",label:"Elbow under the ball",val:`${elb>0?"+":""}${elb.toFixed(0)}°`,st:ae<=10?"good":ae<=20?"watch":"fix",
+    text:ae<=10?"Your elbow sits under the ball at the set point, so the push goes straight up the line.":elb>0?`Your elbow flares out past the ball at the set point, so the push goes across your body. That usually misses to your guide-hand side (${n.g}). Tuck the elbow under the ball.`:`Your elbow is tucked in past the ball, so the ball sits outside the elbow and gets pushed out to your shooting-hand side (${n.s}). Stack the ball right over the elbow.`,drill:elb>0?"s_rimline":"s_elbow"});
+  M.push({k:"bLine",label:"Ball line at release",val:`${line>0?"+":""}${line.toFixed(0)}%`,st:line>=-60&&line<=15?"good":line>=-75&&line<=30?"watch":"fix",
+    text:line>15?`The ball leaves outside your shooting shoulder, so it tends to drift to your shooting-hand side (${n.s}). Bring it in so it goes up in front of your shooting eye.`:line<-60?`The ball crosses in front of your face before it leaves, so it tends to go to your guide-hand side (${n.g}). Keep it in front of your shooting eye, not your nose.`:"The ball goes up between your shooting shoulder and your head, in line with your shooting eye.",drill:line>15?"s_rollup":"s_rimline"});
+  M.push({k:"bGuide",label:"Guide hand at release",val:guide==null?"–":`${guide>0?"+":""}${guide.toFixed(0)}%`,st:guide==null?"info":guide<=12?"good":guide<=25?"watch":"fix",
+    text:guide==null?"Couldn't see your guide hand at the release. Film with both hands in view.":guide>12?`Your guide hand moves toward the ball as it leaves, a thumb push that sends it to your shooting-hand side (${n.s}). Let it just balance the ball and come off.`:"Your guide hand balances the ball and comes off without pushing it.",drill:"s_guide"});
+  const as=Math.abs(sway);
+  M.push({k:"bSway",label:"Side-to-side balance",val:`${sway>0?"+":""}${sway.toFixed(1)}%`,st:as<=3?"good":as<=6?"watch":"fix",
+    text:as<=3?"Your hips stay over the same spot from the dip to the release.":`Your hips drift ${sway>0?`toward your shooting-hand side (${n.s})`:`toward your guide-hand side (${n.g})`} by about ${as.toFixed(0)}% of your height between the dip and the release. Drop straight down and go straight up, landing where you took off.`,drill:"s_line"});
+  M.push({k:"bStance",label:"Stance width",val:stance==null?"–":`${stance.toFixed(1)}× shoulders`,st:stance==null?"info":stance>=.7&&stance<=1.6?"good":"watch",
+    text:stance==null?"Couldn't see both feet at the dip. Get your feet in frame.":stance<.7?"Your feet are close together, which makes it harder to stay square to the rim. Try about shoulder width.":stance>1.6?"A wide stance. It can pull the shot off line when you jump. Try about shoulder width.":"About shoulder width, a solid base to shoot straight up the line.",drill:"s_rimline"});
+  return{ok:true,view:"behind",p,sp,r,le:sp,f:sgn,Hb,headX:L(p)[sh].x,arm:{sh,el,wr},M,vals:{bElbow:Math.round(elb),bLine:Math.round(line),bGuide:guide==null?null:Math.round(guide),bSway:+sway.toFixed(1),bStance:stance==null?null:+stance.toFixed(1),dip:+dip.toFixed(1)}}}
+function computeSide(F,fps){
   const s=SIDE[S.settings.hand||"R"],ok=f=>f.lm&&f.lm[s.wr].v>.3&&f.lm[0].v>.3;
   const idx=F.map((f,i)=>ok(f)?i:-1).filter(i=>i>=0);
   if(idx.length<6)return{ok:false,msg:"Couldn't find your body in enough frames. Film from the side with your whole body, feet included, in frame."};
@@ -3185,13 +3294,14 @@ async function drawFrame(i,cv,toWork){
   c.drawImage(vid,0,0,FC.cw,FC.ch);
   const cs=getComputedStyle(document.documentElement),acc=cs.getPropertyValue("--accent").trim()||"#E2601A";
   if(FC.res&&FC.res.ok){c.save();c.setLineDash([6,5]);c.strokeStyle="rgba(255,255,255,.85)";c.lineWidth=2;c.beginPath();c.moveTo(FC.res.headX,0);c.lineTo(FC.res.headX,FC.ch);c.stroke();c.restore()}
-  if(!fr.lm)return;const s=SIDE[S.settings.hand||"R"],hot=new Set([s.sh,s.el,s.wr]);
+  if(!fr.lm)return;const s=FC.res&&FC.res.arm||SIDE[S.settings.hand||"R"],hot=new Set([s.sh,s.el,s.wr]);
   c.lineCap="round";
   for(const [a,b] of BONES){const A=fr.lm[a],B=fr.lm[b];if(A.v<.3||B.v<.3)continue;c.strokeStyle=hot.has(a)&&hot.has(b)?acc:"rgba(255,255,255,.9)";c.lineWidth=hot.has(a)&&hot.has(b)?5:3;c.beginPath();c.moveTo(A.x,A.y);c.lineTo(B.x,B.y);c.stroke()}
   for(const j of [0,11,12,13,14,15,16,23,24,25,26,27,28]){const P=fr.lm[j];if(P.v<.3)continue;c.fillStyle=hot.has(j)?acc:"#fff";c.beginPath();c.arc(P.x,P.y,hot.has(j)?4.5:3.5,0,7);c.fill()}}
 
 function saveForm(res){FC.savedAt=Date.now();
-  S.forms=(S.forms||[]).concat([{d:today(),t:Date.now(),v:res.vals,st:Object.fromEntries(res.M.map(m=>[m.k,m.st]))}]).slice(-60);
+  const fe={d:today(),t:Date.now(),v:res.vals,st:Object.fromEntries(res.M.map(m=>[m.k,m.st]))};if(res.view==="behind")fe.w="b";
+  S.forms=(S.forms||[]).concat([fe]).slice(-60);
   const se0=todaySession(),n=se0?se0.items.filter(i=>i.id==="form").length:0;
   if(n<2){let se=se0;if(!se){se={d:today(),items:[]};S.sessions.push(se)}se.items.push({id:"form",t:Date.now(),xp:20});S.xp.s+=20;toast("Form check saved","+20 Shooting XP")}
   persist()}
@@ -3204,7 +3314,7 @@ async function askCoach(){
   const drills=DRILLS.filter(d=>d.skill==="s"&&!d.read).map(d=>d.name).join(", ");
   const meas=(FC.res&&FC.res.ok?FC.res.M.map(m=>`${m.label}: ${m.val} (${m.st})`).join("; "):"No measurements (pose model unavailable).")+(FC.arc&&!FC.arc.err?`; Launch angle ${FC.arc.launch}°, estimated entry ${FC.arc.entry}° (target about 45°)`:"");
   const prompt=`You are a basketball shooting coach who teaches SeeMikeDunn's principles: balance on a vertical line (the Line Test: drop straight down leading with the hips, chest, chin and eyes up), connection (ball close to the body, moving in one direction), the ball leads and the body attaches underneath (ball reaches the set point near eyebrow height before the legs finish), a short shot (elbow to the rim, the ball never drifts back behind the head), the guide hand stays on to balance the ball, and "two, then through".
-The attached images are frames from a side-on phone video of an intermediate player's jump shot (they're working on inconsistent 3-pointers). ${FC.res&&FC.res.ok?"They show a pose skeleton overlay (shooting arm in orange, dashed line = head position at the dip). Order: dip, set point, release.":"Frames are evenly spaced through the clip."}
+The attached images are frames from a ${fcView()==="behind"?"phone video filmed from behind the shooter, on the line to the rim, of":"side-on phone video of"} an intermediate player's jump shot (they're working on inconsistent 3-pointers). ${FC.res&&FC.res.ok?"They show a pose skeleton overlay (shooting arm in orange, dashed line = "+(fcView()==="behind"?"shooting shoulder":"head position")+" at the dip). Order: dip, set point, release.":"Frames are evenly spaced through the clip."}
 Measurements from on-device pose estimation (approximate, one camera): ${meas}.
 Reply in plain text, under 150 words: one sentence on what's working, then the two most important fixes in order. For each fix give one short cue and one drill from this list: ${drills}. Don't over-read small numbers.`;
   try{const out=await FC.sample(prompt,{images:FC.keys.map(k=>k.blob).filter(Boolean),onText:({text})=>{FC.coach=text;const el=$("#fcCoach");if(el)el.textContent=text}});FC.coach=out.text}
@@ -3219,7 +3329,8 @@ function viewForm(){
   const hist=(S.forms||[]).slice(-5).reverse();
   return `<section><div class="sechead"><h2>Form check</h2><div class="seg" role="group" aria-label="Shooting hand"><button data-hand="R" aria-pressed="${hand==="R"}">Right-handed</button><button data-hand="L" aria-pressed="${hand==="L"}">Left-handed</button></div></div>
    ${FC.focus&&D[FC.focus]?`<div class="card small focusnote"><b>Checking for ${esc(D[FC.focus].name)}:</b> ${CHECKS[FC.focus].map(esc).join(" and ")} will show first. <button class="linkbtn" data-open="${FC.focus}">Back to the drill</button></div>`:""}
-   <div class="card small"><div class="label">How to film</div><ul class="tips"><li>Film from the side, with your shooting arm toward the camera.</li><li>Your whole body, feet included, in frame. Phone about waist height, 10 to 15 ft away.</li><li>One shot per clip, under 10 seconds. Keep filming a second after you release.</li></ul></div>
+   <div class="row" style="justify-content:center;gap:10px;margin-bottom:8px"><span class="small muted">Camera</span><div class="seg" role="group" aria-label="Where the camera is"><button data-fcview="side" aria-pressed="${fcView()==="side"}">From the side</button><button data-fcview="behind" aria-pressed="${fcView()==="behind"}">From behind</button></div></div>
+   <div class="card small"><div class="label">How to film</div><ul class="tips">${fcView()==="behind"?`<li>Film from behind you, on the line from you to the rim. This view shows left and right: your elbow, the ball's line and your guide hand.</li><li>Your whole body, feet included, in frame. Phone about waist height, 10 to 15 ft back.</li>`:`<li>Film from the side, with your shooting arm toward the camera. This view shows balance, timing and arc.</li><li>Your whole body, feet included, in frame. Phone about waist height, 10 to 15 ft away.</li>`}<li>One shot per clip, under 10 seconds. Keep filming a second after you release.</li></ul></div>
    <label class="btn pri filebtn" for="fcFile" ${busy?'aria-disabled="true"':""}>${busy?"Analyzing…":res||FC.keys.length?"Check another shot":"Record or choose a clip"}</label>
    <input type="file" id="fcFile" accept="video/*" ${busy?"disabled":""} hidden>
    <p class="muted small" id="fcStatus" style="margin:0" role="status">${esc(FC.msg)}</p></section>
@@ -3229,12 +3340,12 @@ function viewForm(){
    <div class="card"><canvas id="fcCanvas" class="fccanvas" aria-label="Shot frame with pose overlay"></canvas>
     ${FC.arcMode?`<p class="small" id="fcArcMsg" style="margin:0 0 8px" role="status">${esc(arcMsg())}</p>
     <div class="row small"><button class="btn sec small" data-arc="prev">◀ Back</button><button class="btn sec small" data-arc="next">Forward ▶</button><button class="btn sec small" data-arc="cancel">Cancel</button></div>`:`<label class="small muted" for="fcScrub">Step through the shot</label><input type="range" id="fcScrub" min="0" max="${FC.frames.length-1}" value="${FC.idx}">
-    <div class="row small"><button class="btn sec small" data-jump="${res.p}">Dip</button><button class="btn sec small" data-jump="${res.sp}">Set point</button><button class="btn sec small" data-jump="${res.le}">Legs extended</button><button class="btn sec small" data-jump="${res.r}">Release</button></div>`}</div>
-   ${arcCard()}
+    <div class="row small"><button class="btn sec small" data-jump="${res.p}">Dip</button><button class="btn sec small" data-jump="${res.sp}">Set point</button>${res.view==="behind"?"":`<button class="btn sec small" data-jump="${res.le}">Legs extended</button>`}<button class="btn sec small" data-jump="${res.r}">Release</button></div>`}</div>
+   ${res.view==="behind"?"":arcCard()}
    <p class="muted small" style="margin:0">Measured from one phone camera, so treat these as estimates (a few degrees either way). Compare checks filmed from the same spot.</p></section>`:""}
   ${FC.status==="nopose"&&FC.keys.length?`<section><div class="keys">${FC.keys.map(k=>`<figure><img src="${k.url}" alt="${esc(k.label)}"><figcaption>${esc(k.label)}</figcaption></figure>`).join("")}</div></section>`:""}
   ${(res&&res.ok)||FC.status==="nopose"?`<section>${FC.canCoach?`<button class="btn sec" data-coach="1" ${FC.coachBusy?"disabled":""}>Ask the coach about this shot</button>`:""}${FC.coach?`<div class="card coach" id="fcCoach">${esc(FC.coach)}</div>`:""}</section>`:""}
-  <section><div class="sechead"><h2>Recent checks</h2></div>${hist.length?`<div class="card hist">${hist.map(h=>`<div><span>${new Date(h.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="muted">Line ${h.v.drift>0?"+":""}${h.v.drift}% · arm ${h.v.ext}° · timing ${h.v.seq>=0?"+":""}${h.v.seq}s${h.v.arc!=null?` · arc ${h.v.arc}°`:""}</span><b class="num">${Object.values(h.st).filter(x=>x==="good").length}/${Object.keys(h.st).length}</b></div>`).join("")}</div>`:`<div class="empty">Your form checks show up here so you can see if your balance and timing improve.</div>`}</section>`}
+  <section><div class="sechead"><h2>Recent checks</h2></div>${hist.length?`<div class="card hist">${hist.map(h=>`<div><span>${new Date(h.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="muted">${h.w==="b"?`Behind · elbow ${h.v.bElbow>0?"+":""}${h.v.bElbow}° · ball line ${h.v.bLine>0?"+":""}${h.v.bLine}%`:`Line ${h.v.drift>0?"+":""}${h.v.drift}% · arm ${h.v.ext}° · timing ${h.v.seq>=0?"+":""}${h.v.seq}s${h.v.entry!=null?` · entry ${h.v.entry}°`:h.v.arc!=null?` · arc ${h.v.arc}°`:""}`}</span><b class="num">${Object.values(h.st).filter(x=>x==="good").length}/${Object.keys(h.st).length}</b></div>`).join("")}</div>`:`<div class="empty">Your form checks show up here so you can see if your balance and timing improve.</div>`}</section>`}
 async function afterFormRender(){if(state.tab!=="form"||!FC.res||!FC.res.ok)return;const cv=$("#fcCanvas");if(!cv)return;
   cv.onclick=FC.arcMode?arcTap:null;cv.style.cursor=FC.arcMode?"crosshair":"";
   if(FC.arcMode)await drawArc(cv);else await drawFrame(FC.idx,cv)}
@@ -3254,19 +3365,25 @@ function arcTap(e){const cv=e.currentTarget,b=cv.getBoundingClientRect(),x=(e.cl
   if(FC.arcPts.length===1){FC.arcT=Math.min(FC.arcT+ARC_DT*2,Math.max(0,(vid.duration||1)-0.02));const m=$("#fcArcMsg");if(m)m.textContent=arcMsg();drawArc(cv);return}
   const [a,q]=FC.arcPts.sort((u,v)=>u.t-v.t),dx=Math.abs(q.x-a.x),dy=a.y-q.y;FC.arcMode=false;FC.arcPts=[];
   if(dy<=0||dx<2){FC.arc={err:"The second tap wasn't higher than the first. Tap the ball while it's still rising, a few frames after release."};render();return}
-  const launch=Math.atan2(dy,dx)*180/Math.PI,entry=Math.atan(Math.max(0,Math.tan(launch*Math.PI/180)-0.18))*180/Math.PI;
-  FC.arc={launch:Math.round(launch),entry:Math.round(entry)};
-  const f=(S.forms||[])[S.forms.length-1];if(f&&f.t>=(FC.savedAt||0)){f.v.arc=FC.arc.launch;f.v.entry=FC.arc.entry;persist()}
+  const launch=Math.atan2(dy,dx)*180/Math.PI,dist=arcDist();
+  FC.arc={launch:Math.round(launch),entry:entryOf(launch,dist),dist};
+  const f=(S.forms||[])[S.forms.length-1];if(f&&f.t>=(FC.savedAt||0)){f.v.arc=FC.arc.launch;f.v.entry=FC.arc.entry;f.v.ad=dist;persist()}
   render()}
-function arcCard(){const a=FC.arc;let body;
-  if(!a)body=`<p>Tap the ball in two frames just after it leaves your hand, and the app works out your launch angle and the angle it would enter the rim from the 3-point line.</p>`;
-  else if(a.err)body=`<p>${esc(a.err)}</p>`;
+/* Entry angle of a ball released h ft below the rim from d ft away: tan(entry) = tan(launch) - 2h/d (a parabola).
+   h is taken as 2 ft; d comes from the distance picker. */
+const ARC_D=[[8,"Close · 8 ft"],[14,"Free throw · 14 ft"],[17,"Mid · 17 ft"],[22,"Three · 22 ft"]];
+const arcDist=()=>ARC_D.some(x=>x[0]===S.settings.arcDist)?S.settings.arcDist:22;
+const entryOf=(launch,d)=>Math.round(Math.atan(Math.max(0,Math.tan(launch*Math.PI/180)-4/d))*180/Math.PI);
+function arcCard(){const a=FC.arc;let body;const dist=arcDist();
+  const dseg=`<div class="row" style="gap:6px 8px;margin:6px 0 2px;flex-wrap:wrap"><span class="small muted">Shot from</span><div class="seg" role="group" aria-label="Shot distance">${ARC_D.map(([v,l])=>`<button data-arcd="${v}" aria-pressed="${dist===v}">${esc(l.split(" · ")[0])}</button>`).join("")}</div></div>`;
+  if(!a)body=`<p>Tap the ball in two frames just after it leaves your hand, and the app works out your launch angle and the angle it will enter the rim from where you shot.</p>${dseg}`;
+  else if(a.err)body=`<p>${esc(a.err)}</p>${dseg}`;
   else{const e=a.entry,st=e>=42&&e<=48?"good":(e>=38&&e<42)||(e>48&&e<=52)?"watch":"fix";
     body=`<div class="mh"><b>Launch ${a.launch}° · entry about ${e}°</b><span class="pill ${st}">${{good:"Good",watch:"Watch",fix:"Fix"}[st]}</span></div>
-    <p>${e<42?"A flat shot. The flatter the ball comes in, the smaller the target the rim gives you. Think up and over the rim.":e>48?"A very high arc. Above about 48° it gets harder to control depth, so long and short misses grow.":"Close to the 45° entry angle that shot-tracking data points to, with room for depth."}</p>`}
+    <p>${e<42?"A flat shot. The flatter the ball comes in, the smaller the target the rim gives you. Think up and over the rim.":e>48?"A very high arc. Above about 48° it gets harder to control depth, so long and short misses grow.":"Close to the 45° entry angle that shot-tracking data points to, with room for depth."}${e<42?" Arc Calls helps you find a higher arc that still feels like your shot.":""}</p>${dseg}`}
   return `<div class="metric arc">${a&&!a.err?"":`<div class="mh"><b>Arc</b><span class="pill info">Tap to measure</span></div>`}${body}
    ${FC.arcMode?"":`<button class="btn sec small" data-arc="start">${a?"Measure again":"Measure arc"}</button>`}
-   <p class="small muted">Side-on clips only, so the ball travels across the screen. Assumes you release about 2 ft below the rim from 22 ft, so treat it as an estimate within a few degrees. Arc target from Noah Basketball, which sells a shot tracker.</p></div>`}
+   <p class="small muted">Side-on clips only, so the ball travels across the screen. Pick where you shot from. Assumes you release about 2 ft below the rim, so treat it as an estimate within a few degrees. Arc target from Noah Basketball, which sells a shot tracker.</p></div>`}
 
 /* ---------- coach: take-home drills from a coach + my training videos ----------
    Take-home lists live in S.coach with the rest of the progress. Videos never leave the phone: they're kept in this
@@ -3909,9 +4026,19 @@ route();
       ext: () => "Reach for the rim.",
       hold: () => "Hold the follow-through.",
       tempo: m => (/stops/.test(m.text) ? "One speed up. No stop." : "Shorter, quicker motion."),
-      knee: m => (/shallow/.test(m.text) ? "Use your legs." : "Not so deep.")
+      knee: m => (/shallow/.test(m.text) ? "Use your legs." : "Not so deep."),
+      // from behind (left/right alignment)
+      bElbow: m => (m.val.startsWith("-") ? "Ball over the elbow." : "Elbow in, under the ball."),
+      bLine: m => (m.val.startsWith("-") ? "Don't cross your face." : "Ball by your shooting eye."),
+      bGuide: () => "Guide hand just balances.",
+      bSway: () => "Straight up, land where you took off.",
+      bStance: () => "Feet about shoulder width."
     };
-    const ORDER = ["drift", "seq", "tilt", "tempo", "ext", "hold", "knee"];
+    const ORDER = ["drift", "bSway", "seq", "tilt", "bElbow", "bLine", "bGuide", "tempo", "ext", "hold", "knee", "bStance"];
+    const behind = () => fcView() === "behind";
+    const filmTip = () => behind() ? "Film from behind you, on the line to the rim, whole body in frame." : "Film from the side, shooting arm toward the phone, whole body in frame.";
+    // From behind, the shooting arm is the one with the higher wrist (the pose model can swap left and right on a back view).
+    const armOf = lm => { if (!behind()) return SIDE[S.settings.hand || "R"]; const a = lm[15].v > .3 ? lm[15].y : 1e9, b = lm[16].v > .3 ? lm[16].y : 1e9; return b <= a ? { sh: 12, el: 14, wr: 16 } : { sh: 11, el: 13, wr: 15 }; };
     let L = null; // the open live session
 
     const st = document.createElement("style");
@@ -3975,7 +4102,7 @@ route();
       el.innerHTML = `<div class="lf-top"><div class="lf-title">Live <span class="lf-n" style="opacity:.7"></span></div>
         <button class="btn sec small" data-lf="talk" aria-pressed="true">Cues</button><button class="btn sec small" data-lf="flip">Flip</button><button class="btn sec small" data-lf="close">Done</button></div>
         <div class="lf-stage"><video playsinline muted autoplay></video><canvas></canvas><div class="lf-msg" role="status">Starting the camera…</div><div class="lf-cue" aria-live="polite"></div></div>
-        <div class="lf-shot"><span>Film from the side, shooting arm toward the phone, whole body in frame. Shoot when you're ready.</span></div>`;
+        <div class="lf-shot"><span>${filmTip()} Shoot when you're ready.</span></div>`;
       document.body.appendChild(el);
       L = { el, video: el.querySelector("video"), cv: el.querySelector("canvas"), stream: null, face: "environment", talk: true,
             buf: [], shots: [], up: 0, cool: 0, armed: true, lastT: 0, noBody: 0, raf: 0, pl: null, busy: false };
@@ -4047,7 +4174,7 @@ route();
       const c = cv.getContext("2d");
       c.clearRect(0, 0, cw, ch);
       if (!lm) return;
-      const s = SIDE[S.settings.hand || "R"], hot = new Set([s.sh, s.el, s.wr]);
+      const s = armOf(lm), hot = new Set([s.sh, s.el, s.wr]);
       c.lineCap = "round";
       for (const [a, b] of BONES) {
         const A = lm[a], B = lm[b];
@@ -4061,21 +4188,25 @@ route();
     // Shot finder: the shooting wrist above the nose starts a shot; it's over when the wrist drops back below the
     // shoulder (follow-through done) or 1.8 s later. Then compute() runs on the 3.5 s before, resampled to 10 fps.
     function track(lm, t) {
-      const s = SIDE[S.settings.hand || "R"];
-      const body = lm && lm[0].v > .3 && lm[s.wr].v > .3 && (lm[s.an].v > .3 || lm[s.an === 28 ? 27 : 28].v > .3);
+      const B = behind(), side = SIDE[S.settings.hand || "R"];
+      const body = B ? lm && lm[11].v > .3 && lm[12].v > .3 && (lm[15].v > .3 || lm[16].v > .3) && (lm[27].v > .3 || lm[28].v > .3)
+                     : lm && lm[0].v > .3 && lm[side.wr].v > .3 && (lm[side.an].v > .3 || lm[side.an === 28 ? 27 : 28].v > .3);
       if (!body) {
         L.noBody = L.noBody || t;
-        if (t - L.noBody > 1.5) msg("Step back until your whole body, feet included, is in frame. Film from the side.");
+        if (t - L.noBody > 1.5) msg("Step back until your whole body, feet included, is in frame. " + (B ? "Film from behind, on the line to the rim." : "Film from the side."));
         return;
       }
+      // From behind the nose is hidden, so "above the head" is measured from the shoulders (the head is about 0.6 shoulder widths above them).
+      const s = B ? armOf(lm) : side;
+      const shY = B ? (lm[11].y + lm[12].y) / 2 : lm[s.sh].y, headY = B ? shY - .6 * Math.abs(lm[11].x - lm[12].x) : lm[0].y;
       L.noBody = 0;
       msg("");
       // After a shot, wait for the ball to come back down (wrist below the shoulder) before looking for the next
       // one, so a long follow-through or a wave doesn't count twice.
       // (for 0.3 s, so one jumpy pose frame doesn't count)
-      if (!L.armed) { if (lm[s.wr].y > lm[s.sh].y) { L.downAt = L.downAt || t; if (t - L.downAt > .3) L.armed = true; } else L.downAt = 0; }
+      if (!L.armed) { if (lm[s.wr].y > shY) { L.downAt = L.downAt || t; if (t - L.downAt > .3) L.armed = true; } else L.downAt = 0; }
       if (t < L.cool || !L.armed) return;
-      const above = lm[s.wr].y < lm[0].y, down = lm[s.wr].y > lm[s.sh].y;
+      const above = lm[s.wr].y < headY, down = lm[s.wr].y > shY;
       if (above && !L.up) L.up = t;
       // Over when the hand comes back below the shoulder. (Below the nose isn't enough: a set point at forehead
       // height, or one jumpy frame, would cut the shot off before the release.)
@@ -4102,7 +4233,7 @@ route();
       try { res = compute(frames, FPS); } catch (e) { return; }
       if (!res || !res.ok) return;
       // A hand raised without a dip and a long arm (a wave, a catch, fixing a sleeve) isn't a shot.
-      if (res.vals.knee > 165 || res.vals.ext < 120) return;
+      if (res.view === "behind" ? res.vals.dip < 1.5 : res.vals.knee > 165 || res.vals.ext < 120) return;
       L.shots.push(res);
       drawTop();
       showShot(res);
@@ -4125,13 +4256,13 @@ route();
       if (!shots.length) return;
       // Save one form entry for the session: the median of each number, and each check's most common status.
       const vals = {}, M = [];
-      for (const k of Object.keys(shots[0].vals)) vals[k] = med(shots.map(r => r.vals[k]));
+      for (const k of Object.keys(shots[0].vals)) { const xs = shots.map(r => r.vals[k]).filter(x => x != null); vals[k] = xs.length ? med(xs) : null; }
       for (const m of shots[0].M) {
         const n = {};
         for (const r of shots) { const x = r.M.find(y => y.k === m.k); if (x) n[x.st] = (n[x.st] || 0) + 1; }
         M.push({ k: m.k, st: Object.keys(n).sort((a, b) => n[b] - n[a])[0] });
       }
-      saveForm({ vals, M });
+      saveForm({ vals, M, view: shots[0].view });
       render();
     }
   }

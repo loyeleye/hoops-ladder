@@ -366,9 +366,19 @@
       ext: () => "Reach for the rim.",
       hold: () => "Hold the follow-through.",
       tempo: m => (/stops/.test(m.text) ? "One speed up. No stop." : "Shorter, quicker motion."),
-      knee: m => (/shallow/.test(m.text) ? "Use your legs." : "Not so deep.")
+      knee: m => (/shallow/.test(m.text) ? "Use your legs." : "Not so deep."),
+      // from behind (left/right alignment)
+      bElbow: m => (m.val.startsWith("-") ? "Ball over the elbow." : "Elbow in, under the ball."),
+      bLine: m => (m.val.startsWith("-") ? "Don't cross your face." : "Ball by your shooting eye."),
+      bGuide: () => "Guide hand just balances.",
+      bSway: () => "Straight up, land where you took off.",
+      bStance: () => "Feet about shoulder width."
     };
-    const ORDER = ["drift", "seq", "tilt", "tempo", "ext", "hold", "knee"];
+    const ORDER = ["drift", "bSway", "seq", "tilt", "bElbow", "bLine", "bGuide", "tempo", "ext", "hold", "knee", "bStance"];
+    const behind = () => fcView() === "behind";
+    const filmTip = () => behind() ? "Film from behind you, on the line to the rim, whole body in frame." : "Film from the side, shooting arm toward the phone, whole body in frame.";
+    // From behind, the shooting arm is the one with the higher wrist (the pose model can swap left and right on a back view).
+    const armOf = lm => { if (!behind()) return SIDE[S.settings.hand || "R"]; const a = lm[15].v > .3 ? lm[15].y : 1e9, b = lm[16].v > .3 ? lm[16].y : 1e9; return b <= a ? { sh: 12, el: 14, wr: 16 } : { sh: 11, el: 13, wr: 15 }; };
     let L = null; // the open live session
 
     const st = document.createElement("style");
@@ -432,7 +442,7 @@
       el.innerHTML = `<div class="lf-top"><div class="lf-title">Live <span class="lf-n" style="opacity:.7"></span></div>
         <button class="btn sec small" data-lf="talk" aria-pressed="true">Cues</button><button class="btn sec small" data-lf="flip">Flip</button><button class="btn sec small" data-lf="close">Done</button></div>
         <div class="lf-stage"><video playsinline muted autoplay></video><canvas></canvas><div class="lf-msg" role="status">Starting the camera…</div><div class="lf-cue" aria-live="polite"></div></div>
-        <div class="lf-shot"><span>Film from the side, shooting arm toward the phone, whole body in frame. Shoot when you're ready.</span></div>`;
+        <div class="lf-shot"><span>${filmTip()} Shoot when you're ready.</span></div>`;
       document.body.appendChild(el);
       L = { el, video: el.querySelector("video"), cv: el.querySelector("canvas"), stream: null, face: "environment", talk: true,
             buf: [], shots: [], up: 0, cool: 0, armed: true, lastT: 0, noBody: 0, raf: 0, pl: null, busy: false };
@@ -504,7 +514,7 @@
       const c = cv.getContext("2d");
       c.clearRect(0, 0, cw, ch);
       if (!lm) return;
-      const s = SIDE[S.settings.hand || "R"], hot = new Set([s.sh, s.el, s.wr]);
+      const s = armOf(lm), hot = new Set([s.sh, s.el, s.wr]);
       c.lineCap = "round";
       for (const [a, b] of BONES) {
         const A = lm[a], B = lm[b];
@@ -518,21 +528,25 @@
     // Shot finder: the shooting wrist above the nose starts a shot; it's over when the wrist drops back below the
     // shoulder (follow-through done) or 1.8 s later. Then compute() runs on the 3.5 s before, resampled to 10 fps.
     function track(lm, t) {
-      const s = SIDE[S.settings.hand || "R"];
-      const body = lm && lm[0].v > .3 && lm[s.wr].v > .3 && (lm[s.an].v > .3 || lm[s.an === 28 ? 27 : 28].v > .3);
+      const B = behind(), side = SIDE[S.settings.hand || "R"];
+      const body = B ? lm && lm[11].v > .3 && lm[12].v > .3 && (lm[15].v > .3 || lm[16].v > .3) && (lm[27].v > .3 || lm[28].v > .3)
+                     : lm && lm[0].v > .3 && lm[side.wr].v > .3 && (lm[side.an].v > .3 || lm[side.an === 28 ? 27 : 28].v > .3);
       if (!body) {
         L.noBody = L.noBody || t;
-        if (t - L.noBody > 1.5) msg("Step back until your whole body, feet included, is in frame. Film from the side.");
+        if (t - L.noBody > 1.5) msg("Step back until your whole body, feet included, is in frame. " + (B ? "Film from behind, on the line to the rim." : "Film from the side."));
         return;
       }
+      // From behind the nose is hidden, so "above the head" is measured from the shoulders (the head is about 0.6 shoulder widths above them).
+      const s = B ? armOf(lm) : side;
+      const shY = B ? (lm[11].y + lm[12].y) / 2 : lm[s.sh].y, headY = B ? shY - .6 * Math.abs(lm[11].x - lm[12].x) : lm[0].y;
       L.noBody = 0;
       msg("");
       // After a shot, wait for the ball to come back down (wrist below the shoulder) before looking for the next
       // one, so a long follow-through or a wave doesn't count twice.
       // (for 0.3 s, so one jumpy pose frame doesn't count)
-      if (!L.armed) { if (lm[s.wr].y > lm[s.sh].y) { L.downAt = L.downAt || t; if (t - L.downAt > .3) L.armed = true; } else L.downAt = 0; }
+      if (!L.armed) { if (lm[s.wr].y > shY) { L.downAt = L.downAt || t; if (t - L.downAt > .3) L.armed = true; } else L.downAt = 0; }
       if (t < L.cool || !L.armed) return;
-      const above = lm[s.wr].y < lm[0].y, down = lm[s.wr].y > lm[s.sh].y;
+      const above = lm[s.wr].y < headY, down = lm[s.wr].y > shY;
       if (above && !L.up) L.up = t;
       // Over when the hand comes back below the shoulder. (Below the nose isn't enough: a set point at forehead
       // height, or one jumpy frame, would cut the shot off before the release.)
@@ -559,7 +573,7 @@
       try { res = compute(frames, FPS); } catch (e) { return; }
       if (!res || !res.ok) return;
       // A hand raised without a dip and a long arm (a wave, a catch, fixing a sleeve) isn't a shot.
-      if (res.vals.knee > 165 || res.vals.ext < 120) return;
+      if (res.view === "behind" ? res.vals.dip < 1.5 : res.vals.knee > 165 || res.vals.ext < 120) return;
       L.shots.push(res);
       drawTop();
       showShot(res);
@@ -582,13 +596,13 @@
       if (!shots.length) return;
       // Save one form entry for the session: the median of each number, and each check's most common status.
       const vals = {}, M = [];
-      for (const k of Object.keys(shots[0].vals)) vals[k] = med(shots.map(r => r.vals[k]));
+      for (const k of Object.keys(shots[0].vals)) { const xs = shots.map(r => r.vals[k]).filter(x => x != null); vals[k] = xs.length ? med(xs) : null; }
       for (const m of shots[0].M) {
         const n = {};
         for (const r of shots) { const x = r.M.find(y => y.k === m.k); if (x) n[x.st] = (n[x.st] || 0) + 1; }
         M.push({ k: m.k, st: Object.keys(n).sort((a, b) => n[b] - n[a])[0] });
       }
-      saveForm({ vals, M });
+      saveForm({ vals, M, view: shots[0].view });
       render();
     }
   }
