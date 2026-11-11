@@ -882,7 +882,7 @@ They were also run through the handling and finishing checks to make sure nothin
 there are no handling or finishing clips yet, so those thresholds are a first guess to tune.
 
 **Privacy.** The clip lives in memory and is gone when you close the screen. *Keep clip* saves it with your
-training videos (step 7), named after the drill, so it shows in My videos on the Coach tab. Android's back button
+training videos (step 7), named after the drill, so it shows in My videos on the Form tab. Android's back button
 closes the compare screen first.
 
 ## Step 26. Film study: make the read on real film

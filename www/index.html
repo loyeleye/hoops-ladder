@@ -4340,6 +4340,14 @@ Reply in plain text, under 150 words: one sentence on what's working, then the t
 
 const focusSet=()=>new Set(FC.focus&&CHECKS[FC.focus]||[]);
 const focusSort=M=>{const f=focusSet();return [...M].sort((a,b)=>f.has(b.label)-f.has(a.label))};
+/* My videos: clips you film of yourself, kept on this phone. Lives on Form, beside form check; clips filmed for a coach's drill stay under that drill on Coach. */
+function myVideos(){if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
+  const free=CO.vids.filter(v=>!v.item||(!coFind(v.item)&&!(CO.wiz&&v.item===CO.wiz.id)));
+  return `<section><div class="sechead"><h2>My videos</h2>${CO.vids.length?`<span class="muted small">${CO.vids.length} clip${CO.vids.length>1?"s":""}${CO.usage?` · ${fmtMB(CO.vids.reduce((a,v)=>a+v.size,0))}`:""}</span>`:""}</div>
+   <div class="row">${recCtl("","pri small")}<label class="btn sec small filebtn" for="coPick" data-hw="pick:">Add a clip</label></div>
+   ${CO.vidErr?`<div class="empty">${esc(CO.vidErr)}</div>`:free.length?`<div class="vgrid">${free.map(vCard).join("")}</div>`:CO.vids.length?"":`<div class="empty">Film your reps to watch them back, slow them down, or show your coach next session. Clips you film for a drill on your list show up under that drill.</div>`}
+   <p class="muted small" style="margin:0">Videos are kept only on this phone and are never uploaded. Deleting the app deletes them, so use Save to phone for any you want to keep.</p></section>
+   <input type="file" id="coCap" accept="video/*" capture="environment" hidden><input type="file" id="coPick" accept="video/*" hidden>`}
 function viewForm(){
   const hand=S.settings.hand||"R",res=FC.res,busy=FC.status==="busy";
   const pill=st=>`<span class="pill ${st}">${{good:"Good",watch:"Watch",fix:"Fix",info:"Check"}[st]}</span>`;
@@ -4362,7 +4370,8 @@ function viewForm(){
    <p class="muted small" style="margin:0">Measured from one phone camera, so treat these as estimates (a few degrees either way). Compare checks filmed from the same spot.</p></section>`:""}
   ${FC.status==="nopose"&&FC.keys.length?`<section><div class="keys">${FC.keys.map(k=>`<figure><img src="${k.url}" alt="${esc(k.label)}"><figcaption>${esc(k.label)}</figcaption></figure>`).join("")}</div></section>`:""}
   ${(res&&res.ok)||FC.status==="nopose"?`<section>${FC.canCoach?`<button class="btn sec" data-coach="1" ${FC.coachBusy?"disabled":""}>Ask the coach about this shot</button>`:""}${FC.coach?`<div class="card coach" id="fcCoach">${esc(FC.coach)}</div>`:""}</section>`:""}
-  <section><div class="sechead"><h2>Recent checks</h2></div>${hist.length?`<div class="card hist">${hist.map(h=>`<div><span>${new Date(h.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="muted">${h.w==="b"?`Behind · elbow ${h.v.bElbow>0?"+":""}${h.v.bElbow}° · ball line ${h.v.bLine>0?"+":""}${h.v.bLine}%`:`Line ${h.v.drift>0?"+":""}${h.v.drift}% · arm ${h.v.ext}° · timing ${h.v.seq>=0?"+":""}${h.v.seq}s${h.v.entry!=null?` · entry ${h.v.entry}°`:h.v.arc!=null?` · arc ${h.v.arc}°`:""}`}</span><b class="num">${Object.values(h.st).filter(x=>x==="good").length}/${Object.keys(h.st).length}</b></div>`).join("")}</div>`:`<div class="empty">Your form checks show up here so you can see if your balance and timing improve.</div>`}</section>`}
+  <section><div class="sechead"><h2>Recent checks</h2></div>${hist.length?`<div class="card hist">${hist.map(h=>`<div><span>${new Date(h.t).toLocaleDateString(undefined,{month:"short",day:"numeric"})}</span><span class="muted">${h.w==="b"?`Behind · elbow ${h.v.bElbow>0?"+":""}${h.v.bElbow}° · ball line ${h.v.bLine>0?"+":""}${h.v.bLine}%`:`Line ${h.v.drift>0?"+":""}${h.v.drift}% · arm ${h.v.ext}° · timing ${h.v.seq>=0?"+":""}${h.v.seq}s${h.v.entry!=null?` · entry ${h.v.entry}°`:h.v.arc!=null?` · arc ${h.v.arc}°`:""}`}</span><b class="num">${Object.values(h.st).filter(x=>x==="good").length}/${Object.keys(h.st).length}</b></div>`).join("")}</div>`:`<div class="empty">Your form checks show up here so you can see if your balance and timing improve.</div>`}</section>
+  ${myVideos()}`}
 async function afterFormRender(){if(state.tab!=="form"||!FC.res||!FC.res.ok)return;const cv=$("#fcCanvas");if(!cv)return;
   cv.onclick=FC.arcMode?arcTap:null;cv.style.cursor=FC.arcMode?"crosshair":"";
   if(FC.arcMode)await drawArc(cv);else await drawFrame(FC.idx,cv)}
@@ -4565,7 +4574,7 @@ function vdb(){return vdbP||(vdbP=new Promise((a,b)=>{let r;try{r=indexedDB.open
   r.onsuccess=()=>a(r.result);r.onerror=()=>{vdbP=null;b(r.error)}}))}
 async function vtx(mode,fn){const db=await vdb();return new Promise((a,b)=>{const t=db.transaction(["meta","blobs"],mode);let out;Promise.resolve(fn(t.objectStore("meta"),t.objectStore("blobs"))).then(v=>out=v,b);t.oncomplete=()=>a(out);t.onerror=t.onabort=()=>b(t.error)})}
 async function loadVids(){try{CO.vids=(await vtx("readonly",m=>rq(m.getAll()))).sort((a,b)=>b.t-a.t);CO.vidErr=""}catch(e){CO.vids=[];CO.vidErr="This browser won't let the app keep videos (private mode or storage turned off)."}
-  CO.vidsLoaded=true;try{const e=await navigator.storage?.estimate?.();CO.usage=e?e.usage:null}catch(e){}if(state.tab==="coach")render()}
+  CO.vidsLoaded=true;try{const e=await navigator.storage?.estimate?.();CO.usage=e?e.usage:null}catch(e){}if(state.tab==="coach"||state.tab==="form")render()}
 async function coThumb(id){if(CO.thumbs[id]!==undefined)return CO.thumbs[id];CO.thumbs[id]=null;try{const b=await vtx("readonly",(m,bl)=>rq(bl.get(id+":t")));if(b)CO.thumbs[id]=URL.createObjectURL(b)}catch(e){}return CO.thumbs[id]}
 function makeThumb(blob){return new Promise(res=>{const v=document.createElement("video"),u=URL.createObjectURL(blob);let done=false;
   const fin=b=>{if(done)return;done=true;URL.revokeObjectURL(u);v.removeAttribute("src");v.load();res(b)};
@@ -4579,7 +4588,7 @@ async function saveVid(blob,o={}){toast("Saving…","Keeping the clip on this ph
     const meta={id,t:o.t||Date.now(),dur:Math.round(dur),size:blob.size,type:blob.type||"video/mp4",item:o.item||null,name:o.name||""};
     await vtx("readwrite",(m,bl)=>{m.put(meta);bl.put(blob,id);if(th)bl.put(th,id+":t")});
     try{if(navigator.storage?.persist&&!(await navigator.storage.persisted?.()))await navigator.storage.persist()}catch(e){}
-    await loadVids();const f=meta.item&&coFind(meta.item),w=meta.item&&CO.wiz&&CO.wiz.id===meta.item;toast("Saved on this phone",f?`Clip added to “${f.it.text}”.`:w?`Clip attached to “${CO.wiz.text||"this drill"}”.`:"It's in My videos. It never leaves this phone.")}
+    await loadVids();const f=meta.item&&coFind(meta.item),w=meta.item&&CO.wiz&&CO.wiz.id===meta.item;toast("Saved on this phone",f?`Clip added to “${f.it.text}”.`:w?`Clip attached to “${CO.wiz.text||"this drill"}”.`:"It's in My videos on the Form tab. It never leaves this phone.")}
   catch(e){toast("Couldn't save the clip",e&&e.name==="QuotaExceededError"?"Your phone is out of space for videos. Delete a few clips and try again.":"This browser won't let the app keep videos.")}}
 async function delVid(id){try{await vtx("readwrite",(m,bl)=>{m.delete(id);bl.delete(id);bl.delete(id+":t")})}catch(e){}if(CO.thumbs[id])URL.revokeObjectURL(CO.thumbs[id]);delete CO.thumbs[id];closeVid();await loadVids()}
 const fmtDur=s=>s?`${Math.floor(s/60)}:${String(Math.round(s)%60).padStart(2,"0")}`:"";
@@ -4681,7 +4690,7 @@ document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(CO.view)cl
    model reads your clip at 10 frames a second, like the form check, and adds up to three notes, each with a
    "See it" button that jumps your clip to that moment. Shooting drills reuse the form check's own numbers (the
    drill's own checks first); handling and finishing get simpler body checks. Nothing leaves the phone: Keep saves
-   the clip to My videos on the Coach tab. See docs/LEARNING.md, step 25. */
+   the clip to My videos on the Form tab. See docs/LEARNING.md, step 25. */
 let CMP=null;
 const CMP_FPS=10;
 function cmpDemos(d){const out=[];if(!d)return out;
@@ -4942,12 +4951,8 @@ function viewCoach(){if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
     <p class="muted small" id="coMicMsg" role="status" style="margin:0">${CO.dict?"Listening. Pause between drills, or say “next drill”.":""}</p>
     <p class="muted small" style="margin:0">${dictOK()?"Say them, or":"To say them, tap"} the mic on your phone's keyboard${dictOK()?" works too":""}. A link on its own line goes with the drill above it. To add a video or clip and a goal to each drill, use One at a time.</p>`}
    </div></section>`}
-  <section><div class="sechead"><h2>My videos</h2>${CO.vids.length?`<span class="muted small">${CO.vids.length} clip${CO.vids.length>1?"s":""}${CO.usage?` · ${fmtMB(CO.vids.reduce((a,v)=>a+v.size,0))}`:""}</span>`:""}</div>
-   <div class="row">${recCtl("","pri small")}<label class="btn sec small filebtn" for="coPick" data-hw="pick:">Add a clip</label></div>
-   <input type="file" id="coCap" accept="video/*" capture="environment" hidden><input type="file" id="coPick" accept="video/*" hidden>
-   ${CO.vidErr?`<div class="empty">${esc(CO.vidErr)}</div>`:free.length?`<div class="vgrid">${free.map(vCard).join("")}</div>`:CO.vids.length?"":`<div class="empty">Film your reps to watch them back, slow them down, or show your coach next session. Clips you film for a drill on your list show up under that drill.</div>`}
-   <p class="muted small" style="margin:0">Videos are kept only on this phone and are never uploaded. Deleting the app deletes them, so use Save to phone for any you want to keep.</p></section>`}
-async function afterCoachRender(){if(state.tab!=="coach")return;for(const el of document.querySelectorAll("[data-th]")){if(el.querySelector("img"))continue;const u=await coThumb(el.dataset.th);if(u&&el.isConnected&&!el.querySelector("img"))el.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`)}}
+  <input type="file" id="coCap" accept="video/*" capture="environment" hidden><input type="file" id="coPick" accept="video/*" hidden>`}
+async function afterCoachRender(){if(state.tab!=="coach"&&state.tab!=="form")return;for(const el of document.querySelectorAll("[data-th]")){if(el.querySelector("img"))continue;const u=await coThumb(el.dataset.th);if(u&&el.isConnected&&!el.querySelector("img"))el.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`)}}
 function coachTodayCard(){const ls=coLists(),open=ls.flatMap(l=>l.items.filter(x=>!x.done));if(!open.length)return"";
   return `<section><div class="card small cohome"><div class="label">Take-home from ${ls.find(l=>l.items.some(x=>!x.done))?.coach?esc(ls.find(l=>l.items.some(x=>!x.done)).coach):"your coach"}</div>
    <b>${open.length} drill${open.length>1?"s":""} to do:</b> ${open.slice(0,3).map(x=>esc(x.text)).join(" · ")}${open.length>3?" …":""}
