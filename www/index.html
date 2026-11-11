@@ -61,6 +61,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .skill .bar i{display:block;height:100%;background:var(--accent)}
 .skill .bar.h i{background:var(--read)}
 .skill .bar.f i{background:var(--good)}
+.skill .bar.c i{background:var(--warn)}
 .syncnote{font-size:12px;opacity:.75}
 /* Drills tab: Shooting / Handling / Finishing tabs at the bottom of the sticky plate. The plate keeps its own (brighter) skill colours so the blue and green read on navy in both themes. */
 .plate{--read:#8FA8FF;--good:#46C489}
@@ -129,6 +130,20 @@ section{display:flex;flex-direction:column;gap:10px}
 .ftip{font-weight:600;text-align:center}
 .tag.rd{background:var(--ink);color:var(--bg)}
 .tag.p{border:1px solid var(--muted);color:var(--muted)}
+.tag.c{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.tag.ev-st{border:1px solid var(--good);color:var(--good)}.tag.ev-inj{border:1px solid var(--read);color:var(--read)}.tag.ev-co{border:1px solid var(--muted);color:var(--muted)}
+.tag.hard{background:var(--bad-soft);color:var(--bad)}
+.evbox{border-left:3px solid var(--muted);padding:6px 10px;font-size:14px;background:var(--surface-2);border-radius:0 8px 8px 0}.evbox.st{border-color:var(--good)}.evbox.inj{border-color:var(--read)}
+.legcard{display:flex;flex-direction:column;gap:6px}.lrow{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.loadbar{display:block;height:8px;border-radius:5px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}.loadbar i{display:block;height:100%;background:var(--warn)}.loadbar i.w{background:var(--bad)}
+.capset summary{cursor:pointer;color:var(--muted);font-weight:600}
+.player .loadbar{background:color-mix(in srgb,var(--bg) 14%,transparent);border-color:transparent}
+.pq{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%;max-width:420px}
+.pq-q{font-size:20px;font-weight:700}
+.pq-a{display:grid;grid-template-columns:1fr;gap:10px;width:100%}
+.pq-a button{font:inherit;font-size:20px;font-weight:700;padding:16px 12px;border-radius:14px;border:2px solid color-mix(in srgb,var(--bg) 35%,transparent);background:color-mix(in srgb,var(--bg) 10%,transparent);color:inherit;min-height:60px}
+.pq-a button[aria-pressed="true"]{background:var(--bg);color:var(--ink);border-color:var(--bg)}
+.condrow .sechead{margin-top:6px}
 .slot{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:6px 0 -2px}
 
 .focus{display:flex;gap:12px;align-items:center}
@@ -978,6 +993,123 @@ function volBig(){const v=S.settings.vol;return !!(v&&v.d===today()&&v.big)}
 DRILLS.forEach(d=>{if(d.volume)Object.defineProperty(d,"phases",{get(){const big=volBig(),m=S.settings.beat||1;
   return d.volume.flatMap(([n,a,b,bpm],i)=>{const reps=big?b:a,t=Math.round(bpm*m),part=[`${n} · ${reps} reps`,Math.round(reps*60/t),reps,t];return i?[["Rest · shake out your hands",20],part]:[part]})}})});
 DRILLS.forEach(d=>{if(d.skill==="h"&&d.log==="reps"){d.log="timer";d.phases=d.sets.map(x=>[x,d.partner?60:40])}});
+/* ---------- conditioning: athletic drills on Drills → Conditioning ----------
+   Hands-free while you move: every set starts on a beep and the timer runs it. Anything to log is asked in the rest,
+   one question with three big answers (skip it and the set logs as the first answer). Hard drills and jumps count
+   toward today's leg-load caps: jump contacts and hard minutes. */
+const CGR={fd:"Footwork & D",jl:"Jump & land",sp:"Speed",st:"Strength"};
+const CGB={all:"Four groups, one ladder. Every drill works alone. Hard drills count toward today's leg-load caps.",fd:"Stay in front. Reaction drills come first because the research backs them most. Planned slides build the legs.",jl:"Jump higher and land safer. Jump contacts are counted and capped.",sp:"First-step speed and getting up and down the floor.",st:"Strength that keeps your ankles, Achilles and hamstrings healthy. Fine on rest days from jumping."};
+const CEV={st:"Studied",inj:"Injury prevention",co:"Coaching"};
+const WRONG={q:"How many did you get wrong?",a:["None","1 or 2","3 or more"]},LAND={q:"How were the landings?",a:["All clean","A wobble or two","Lots of wobbles"]};
+const COND=[
+ {id:"c_called",cond:"fd",unlock:1,ev:"st",name:"Called Slides",meta:"2 × 45 s · random calls",set:["Move on each call",45],nsets:2,rest:45,ask:WRONG,
+  calls:["Slide left","Slide right","Drop left","Drop right","Sprint","Closeout"],gap:[1.6,3.2],
+  what:"The phone calls a direction at random gaps: slide left, slide right, drop left, drop right, sprint, closeout. Move on the call, then hold your stance until the next one.",
+  steps:["Stance at the free-throw line, phone propped at the baseline facing you.","Move on each call. Two or three steps, then hold stance until the next call.","Don't cross your feet. Stay at one height the whole time.","In the rest, answer one question: how many did you get wrong?"],
+  cue:"React, don't guess.",evn:"Reacting to a cue trains decision speed better than planned drills. A filmed player is a stronger cue than a voice, so Film Reads will rank higher once it's built.",src:[]},
+ {id:"c_land",cond:"jl",unlock:1,ev:"inj",name:"Stick the Landing",meta:"3 × 6 landings",set:["6 landings, hold each one",40],nsets:3,rest:40,ask:LAND,jc:6,
+  what:"Small hops that you land soft and hold: two feet first, then one foot, knees over your toes. Hold each landing for 2 seconds.",
+  steps:["Small hop forward and land on two feet.","Hips back, knees over your toes, hold 2 seconds.","Then the same landing on one foot, both legs.","Any wobble, step down and reset. In the rest, say how the landings went."],
+  cue:"Quiet feet. Knees over toes.",evn:"Landing control is part of the injury-prevention warm-ups that cut basketball injuries in trials.",src:[]},
+ {id:"c_pogo",cond:"jl",unlock:1,hard:true,ev:"st",name:"Pogo Hops",meta:"3 × 15 hops",set:["15 quick pogo hops",10],nsets:3,rest:40,jc:15,
+  what:"Quick, small hops off the balls of your feet with stiff ankles and almost no knee bend. Springy, not high.",
+  steps:["Feet hip width, arms relaxed.","Bounce off the balls of your feet. About 15 hops in the 10 seconds.","Short ground contact, small height.","Rest until the beep. Nothing to log."],
+  cue:"Stiff ankles, fast off the floor.",evn:"Plyometric training improved jumping, sprinting and change of direction across 32 basketball trials.",src:[]},
+ {id:"c_burst",cond:"sp",unlock:1,ev:"co",name:"First-Step Bursts",meta:"6 × 5 m",unit:"Rep",set:["Burst 5 m on the beep",6],nsets:6,rest:25,
+  what:"From a defensive stance, explode for 5 meters on the start beep, then walk back. Alternate which way you start.",
+  steps:["Stance on the baseline.","On the beep, push off and go 5 m.","Walk back. The next beep comes 25 seconds later.","Alternate your start direction each rep."],
+  cue:"Low and long first step.",evn:"Short sprints are standard coaching. No trial on this exact drill.",src:[]},
+ {id:"c_balance",cond:"st",unlock:1,ev:"inj",name:"Single-Leg Balance",meta:"2 × 30 s each leg",set:["Balance, each leg",60],nsets:2,rest:20,
+  what:"Stand on one leg for 30 seconds, then switch at the call. Make it harder by passing a ball around your waist or closing your eyes.",
+  steps:["One leg, slight knee bend.","Hold 30 seconds. The app calls the switch.","Harder: pass a ball around your waist.","Harder still: eyes closed."],
+  cue:"Big toe down, hip level.",evn:"Balance work is part of the injury-prevention programs that cut ankle sprains in basketball trials.",src:[]},
+ {id:"c_calf",cond:"st",unlock:1,ev:"co",name:"Calf Raises",meta:"3 × 12 each leg",set:["12 slow calf raises, each leg",120],nsets:3,rest:45,
+  what:"Slow single-leg calf raises on a step, all the way up and all the way down. Builds the Achilles and ankles.",
+  steps:["Ball of one foot on a step, hold a wall for balance.","Up for 2 seconds, down for 3.","Full range: heel below the step at the bottom.","12 on one leg, then switch at the call."],
+  cue:"Slow down, all the way.",evn:"Standard Achilles and ankle strengthening. No basketball trial on its own.",src:[]},
+ {id:"c_pinky",cond:"fd",unlock:4,hard:true,ev:"co",name:"Pinky Drags",meta:"3 runs · sideline to lane",set:["Pinky drag, sideline to lane and back",40],nsets:3,rest:75,ask:{q:"Finished it clean?",a:["Clean","Restarted once","Restarted 2+"]},
+  what:"Marcus Smart's drill: a suicide run in a defensive slide with one pinky touching the floor the whole way. If it comes up, start that run over.",
+  steps:["Start on the sideline in a low slide, pinky on the floor.","Slide to the lane line and back. Switch hands when you switch direction.","Pinky comes up: restart that run.","Work up to half court, then the full suicide. In the rest, say whether it was clean."],
+  cue:"Pinky stays down. Push, don't step.",evn:"Planned movement, so it carries over weakly to reacting. The pinky is a built-in check that you stayed low. Hard on the legs and lower back.",src:[YTT("o1Eid7669zY",310,"Marcus Smart Teaches Defense · 5:10")]},
+ {id:"c_zig",cond:"fd",unlock:4,hard:true,ev:"co",name:"Zig-Zag Slides",meta:"4 trips · timed",unit:"Trip",set:["Zig-zag up the floor, tap the phone when you're back",45],nsets:4,rest:60,tapEnd:{},
+  what:"Slide on a diagonal to each cone, drop step and slide to the next. Start and finish at the phone so it can time each trip.",
+  steps:["Cones in a zig-zag up the floor, about 4 m apart. Phone at the start.","Slide on the diagonal. Drop step at each cone.","Jog back and tap the phone as you pass it. That stops the clock.","60 seconds rest between trips."],
+  cue:"Open the hip, not the shoulders.",evn:"Planned change of direction: you get better at the drill, with little carry-over to reacting.",src:[]},
+ {id:"c_bound",cond:"jl",unlock:4,hard:true,ev:"st",name:"Lateral Bounds",meta:"3 × 6 each side",set:["6 bounds each way, stick each one",40],nsets:3,rest:60,ask:LAND,jc:12,
+  what:"Jump sideways off one leg, land on the other and stick it. It's the push behind a defensive slide.",
+  steps:["Stand on your right leg.","Bound left and land on your left leg.","Stick it for a second.","Bound back. In the rest, say how the landings went."],
+  cue:"Push from the hip. Stick it.",evn:"Plyometric, the same evidence as Pogo Hops. Lateral jumps also train the slide push.",src:[]},
+ {id:"c_rsa",cond:"sp",unlock:4,hard:true,ev:"st",name:"Repeated Sprints with a Cut",meta:"2 sets of 6",unit:"Rep",set:["Sprint to half court, cut, sprint back",10],nsets:12,rest:15,bigRest:[6,180],
+  what:"Sprint to half court, cut and sprint back, on a beep every 25 seconds. Two sets of six with 3 minutes between.",
+  steps:["Start on the baseline.","On the beep: sprint to half court, plant, cut and sprint back.","Rest until the next beep.","3 minutes between the two sets. Nothing to log."],
+  cue:"Hard cut, low hips.",evn:"A 6-week randomized trial in college players found sprints with direction changes beat straight sprints for repeated-sprint fitness.",src:[]},
+ {id:"c_nordic",cond:"st",unlock:4,ev:"inj",name:"Nordic Curls",meta:"2 × 5",set:["5 Nordic curls, as slow as you can",60],nsets:2,rest:90,
+  what:"Kneel with your ankles held under something heavy and lower your body forward as slowly as you can.",
+  steps:["Kneel on a pad, ankles under a bench, bar or a partner's hands.","Body straight from knees to head.","Lower slowly. Catch yourself with your hands.","Push back up. 5 reps."],
+  cue:"Slow as you can, hips straight.",evn:"Programs that include Nordics roughly halved hamstring injuries, mostly in soccer. How much comes from the Nordics alone is debated.",src:[]},
+ {id:"c_split",cond:"st",unlock:4,ev:"co",name:"Split Squats",meta:"3 × 8 each leg",set:["8 split squats, each leg",70],nsets:3,rest:60,
+  what:"Rear foot on a bench, lower until your front thigh is flat. Strength for your stance and your first step.",
+  steps:["Rear foot on a bench behind you.","Lower straight down.","Front knee over your toes.","8 on one leg, then switch at the call."],
+  cue:"Straight down, chest up.",evn:"Standard leg strength work. Strength gains feed sprint and change of direction in many studies, not in this exact form.",src:[]},
+ {id:"c_help",cond:"fd",unlock:7,ev:"st",name:"Help and Recover",meta:"2 × 45 s · court calls",set:["Move on each call",45],nsets:2,rest:45,ask:{q:"How many wrong moves?",a:["None","1 or 2","3 or more"]},
+  calls:["Help","Ball","Closeout"],gap:[2.2,4],
+  what:"The phone calls where the ball is. On Help, slide to the help spot. On Ball, sprint back toward your player. On Closeout, close out to the wing.",
+  steps:["Start on the weak-side wing.","Help: slide to the help spot in the lane.","Ball: sprint back toward your player.","Closeout: from help out to the wing, short steps at the end, hand high."],
+  cue:"See ball, see your player.",evn:"Reaction training on a court pattern. It improves test scores. No game studies.",src:[]},
+ {id:"c_jumps",cond:"jl",unlock:7,hard:true,ev:"st",name:"Line Jumps to Max Jump",meta:"4 × 5",set:["Quick, quick, high. 5 times",35],nsets:4,rest:75,jc:15,
+  what:"Two quick hops over a line, then straight into one max jump. Land soft. Five in a set.",
+  steps:["Two fast hops over a line.","Straight into one max vertical jump.","Land on two feet, hips back.","Walk back between jumps. Full rest between sets."],
+  cue:"Quick, quick, high.",evn:"Plyometric. Each set is 15 jump contacts toward today's cap.",src:[]},
+ {id:"c_farmers",cond:"sp",unlock:7,hard:true,ev:"co",name:"Farmers",meta:"Full and half court in 17 s",unit:"Run",set:["Full court and back, half court and back. Tap the phone at the end",30],nsets:4,rest:60,tapEnd:{target:17},
+  what:"Smart's high school conditioning: baseline to baseline and back, then to half court and back, all inside 17 seconds.",
+  steps:["Baseline to baseline and back.","Then to half court and back.","Tap the phone as you finish. Beat 17 seconds. Rest 60.","Start with 4. Never more than 8."],
+  cue:"Touch every line.",evn:"A coaching conditioning test. Do it only after the speed and strength drills feel easy.",src:[YTT("o1Eid7669zY",397,"Marcus Smart Teaches Defense · 6:37")]}
+];
+function condPhases(d,n){const u=d.unit||"Set",out=[];for(let i=1;i<=n;i++){out.push([`${u} ${i} of ${n}: ${d.set[0]}`,d.set[1]]);
+  if(i<n){const big=d.bigRest&&i%d.bigRest[0]===0;out.push([big?"Rest · long break":"Rest",big?d.bigRest[1]:d.rest])}else if(d.ask||d.tapEnd)out.push(["Rest · last check",15])}return out}
+function condSets(d){try{const g=condGate(d);return g.ok?g.n:d.nsets}catch(e){return d.nsets}}
+COND.forEach(d=>{d.skill="c";d.log="timer";d.role="cond";d.mins=Math.max(1,Math.round(condPhases(d,d.nsets).reduce((a,p)=>a+p[1],0)/60));
+  Object.defineProperty(d,"phases",{get(){return condPhases(d,condSets(d))}});DRILLS.push(d)});
+/* leg load: jump contacts and hard minutes per day. Caps start at 80 and 12 and are halved for your first two sessions,
+   and the first two after a 2-week break. A big day (half a cap or more) rests jumps and hard slides the next day. */
+const CAP_ANY={};
+function legCapsFull(){const c=S.settings.legCap||{};return{j:c.j||80,h:c.h||12}}
+function legLoad(day){let j=0,s=0;const se=S.sessions.find(x=>x.d===day);if(se)for(const it of se.items){j+=it.jc||0;s+=it.hs||0}return{j,h:s/60}}
+function legEasing(){const ds=S.sessions.filter(se=>se.d<today()&&se.items.some(it=>it.jc||it.hs)).map(se=>se.d).sort();if(!ds.length||daysAgo(ds[ds.length-1])>=14)return true;
+  let i=ds.length-1;while(i>0&&dayDiff(ds[i-1],ds[i])<14)i--;return ds.length-i<2}
+function legCaps(){const f=legCapsFull();return legEasing()?{j:Math.round(f.j/2),h:Math.round(f.h/2),easing:true}:{...f,easing:false}}
+function legRestDay(){const f=legCapsFull(),y=legLoad(addDays(today(),-1));return y.j>=f.j/2||y.h>=f.h/2}
+function condGate(d){if(!d||!d.cond||(!d.hard&&!d.jc))return{ok:true,n:d?d.nsets:0};
+  if(CAP_ANY[d.id]===today())return{ok:true,n:d.nsets,any:true};
+  if(d.hard&&legRestDay())return{ok:false,n:d.nsets,rest:true,why:"Rest day for jumps and hard slides after yesterday's big load. They're back tomorrow. Strength, balance and the reaction drills are fine today."};
+  const c=legCaps(),t=legLoad(today()),hs=d.hard?d.set[1]:0;let n=d.nsets;
+  if(d.jc)n=Math.min(n,Math.floor((c.j-t.j)/d.jc));if(hs)n=Math.min(n,Math.floor((c.h*60-t.h*60)/hs));
+  if(n<1)return{ok:false,n:d.nsets,why:`That's today's leg-load cap${c.easing?" (half caps while you ease in)":""}. Strength and balance drills are still fine.`};
+  return{ok:true,n,trim:n<d.nsets}}
+const fmtM=m=>Math.round(m*10)/10;
+function legBars(t,c){const bar=(v,m)=>`<span class="loadbar"><i class="${v>=m?"w":""}" style="width:${Math.min(100,100*v/Math.max(1,m))}%"></i></span>`;
+  return `<div class="lrow"><span>Jump contacts</span><b class="num">${t.j} of ${c.j}</b></div>${bar(t.j,c.j)}<div class="lrow"><span>Hard minutes</span><b class="num">${fmtM(t.h)} of ${c.h}</b></div>${bar(t.h,c.h)}`}
+function legCard(){const c=legCaps(),f=legCapsFull(),t=legLoad(today()),rd=legRestDay();
+  const st=(k,v,u,dn,up)=>`<div class="pcd"><span class="small">${u}</span><div class="seg"><button data-cond="cap:${k}:-1" aria-label="${dn}">−</button><span class="num cdv">${v}</span><button data-cond="cap:${k}:1" aria-label="${up}">+</button></div></div>`;
+  return `<div class="card legcard"><div class="label">Leg load today</div>${legBars(t,c)}
+   <p class="small muted" style="margin:0">${rd?"Yesterday was a big day, so jumps and hard slides rest today. Strength, balance and the reaction drills are fine.":c.easing?"Easing in: your first two sessions, and the first two after a 2-week break, use half caps.":"Hard drills and jumps count toward these caps. After a big day, half a cap or more, jumps and hard slides rest a day."}</p>
+   <details class="capset"><summary class="small">Change the caps</summary><div class="row" style="justify-content:center;gap:4px 14px;flex-wrap:wrap">${st("j",f.j,"Jump contacts","Lower","Higher")}${st("h",f.h,"Hard minutes","Lower","Higher")}</div></details></div>`}
+function condRest(){if(!P||P.stage!=="work"||!isRestPart())return"";const d=P.items[P.i];if(!d.cond)return"";
+  const ph=phasesOf(d),k=ph.slice(0,P.pi).filter(p=>!/^rest\b/i.test(p[0])).length-1;if(k<0)return"";const u=(d.unit||"Set").toLowerCase();
+  if(d.tapEnd){const t=P.times[P.i][k],tg=d.tapEnd.target;return `<div class="pq"><div class="pmeta">${d.unit||"Set"} ${k+1} time</div><div class="pcall">${t==null?"No tap":t.toFixed(1)+" s"}</div>${tg&&t!=null?`<div class="pq-q">${t<=tg?`Made ${tg} s`:`${(t-tg).toFixed(1)} s over ${tg} s`}</div>`:""}</div>`}
+  if(!d.ask)return"";const a=P.ans[P.i][k];
+  return `<div class="pq"><div class="pq-q">${esc(d.ask.q)}</div><div class="pq-a">${d.ask.a.map((l,i)=>`<button data-p="ans:${k}:${i}" aria-pressed="${a===i}">${esc(l)}</button>`).join("")}</div><div class="pmeta">${a==null?`Skip it and ${u} ${k+1} logs as “${esc(d.ask.a[0])}”`:"Got it"}</div></div>`}
+/* when a set ends (time up, Skip, a tap at the finish, or End): count it if at least half done, and add its hard seconds */
+function condEndPart(){if(!P||P.stage!=="work")return;const d=P.items[P.i],cur=phasesOf(d)[P.pi];if(!d.cond||!cur||/^rest\b/i.test(cur[0]))return;
+  const el=cur[1]-Math.max(0,P.left);if(d.tapEnd&&!P.tapped)P.times[P.i].push(null);
+  if(el>=cur[1]*.5||P.tapped){P.sd[P.i]++;if(d.hard)P.hs[P.i]+=el}P.tapped=false}
+function condTap(){const d=P.items[P.i],cur=phasesOf(d)[P.pi];P.times[P.i].push(Math.round((cur[1]-P.left)*10)/10);P.tapped=true;beep(988,160);advance()}
+function condSum(d,i){const n=phasesOf(d).filter(p=>!/^rest\b/i.test(p[0])).length,u=(d.unit||"set").toLowerCase(),bits=[`${P.sd[i]} of ${n} ${u}s`];
+  if(d.ask&&P.sd[i]){const c=d.ask.a.map(()=>0);for(let k=0;k<P.sd[i];k++)c[P.ans[i][k]??0]++;bits.push(d.ask.a.map((l,j)=>c[j]?`${c[j]} ${l.toLowerCase()}`:"").filter(Boolean).join(", "))}
+  if(d.tapEnd){const ts=P.times[i].filter(x=>x!=null);if(ts.length)bits.push(d.tapEnd.target?`made ${d.tapEnd.target} s: ${ts.filter(x=>x<=d.tapEnd.target).length} of ${ts.length}`:`best ${Math.min(...ts).toFixed(1)} s`)}
+  return bits.join(" · ")}
+function condRating(d,i){if(d.ask&&P.sd[i]){let s=0;for(let k=0;k<P.sd[i];k++)s+=P.ans[i][k]??0;const a=s/P.sd[i];return a<.5?2:a<1.5?1:0}
+  if(d.tapEnd&&d.tapEnd.target){const ts=P.times[i].filter(x=>x!=null);if(ts.length){const f=ts.filter(x=>x<=d.tapEnd.target).length/ts.length;return f>=.75?2:f>=.4?1:0}}return 1}
 const D=Object.fromEntries(DRILLS.map(d=>[d.id,d]));
 /* demo clips: one entry per phase; each phase lists [videoId,start,end,label]. Walking drills that go down and back get both clips. */
 const LAB="hUPaKPN2crI",WALK="Z8xg6cJKMcE",RJ="CLoWxOvlHkk",MH="oADaM2L1YLc",CM="q-tg_pGEXfU",PH="DdfWxlFoENw",PT="pFUtTyQ619I";
@@ -2157,15 +2289,15 @@ function stepClips(d,i){const c=(STEP_CLIPS[d.id]||[])[i];if(!c)return"";return 
 function clipLinks(d,pi,cc){const c=cc||(CLIPS[d.id]||[])[pi];if(!c)return"";
   return `<span class="clips">${c.map(([v,a,b,l])=>`<a class="clip" href="https://www.youtube.com/watch?v=${v}&t=${a}s" target="_blank" rel="noopener" data-clip>▶ ${l?esc(l):"Demo"} · ${b-a}s</a>`).join("")}</span>`}
 
-const RANK={s:["Rookie","Rotation shooter","Spot-up threat","Knockdown shooter","Sniper","Range for days"],h:["Rookie","Steady hands","Tight handle","Shifty","Floor general","Ankle breaker"],f:["Rookie","Layup line","Glass work","Crafty","Paint finisher","Bag of tricks"],o:["Rookie","Pickup regular","League starter","Run-it-back captain","Gym legend"]};
+const RANK={s:["Rookie","Rotation shooter","Spot-up threat","Knockdown shooter","Sniper","Range for days"],h:["Rookie","Steady hands","Tight handle","Shifty","Floor general","Ankle breaker"],f:["Rookie","Layup line","Glass work","Crafty","Paint finisher","Bag of tricks"],c:["Rookie","Light feet","Quick first step","Two-way player","Engine","Athletic freak"],o:["Rookie","Pickup regular","League starter","Run-it-back captain","Gym legend"]};
 
 /* ---------- state ---------- */
 const clone=o=>JSON.parse(JSON.stringify(o));
-const DEF={v:1,xp:{s:0,h:0,f:0},sessions:[],settings:{mins:30,partner:false,heavy:false,hand:"R",input:"sets",inV:2},forms:[],coach:{lists:[]},
+const DEF={v:1,xp:{s:0,h:0,f:0,c:0},sessions:[],settings:{mins:30,partner:false,heavy:false,hand:"R",input:"sets",inV:2},forms:[],coach:{lists:[]},
   rec:{added:[],addedDone:{},freq:{},pref:{},nw:{20:1,30:2,45:2},swaps:null,body:null,plan:null,workouts:[],recap:null,start:null,seen:false,gadj:{},log:[],paused:{}}};
 let S=clone(DEF), syncNote="", dbRef=null, saving=Promise.resolve();
 const LS="hoopsLadder.v1";
-function normalize(x){const s=Object.assign(clone(DEF),x||{});s.xp=Object.assign({s:0,h:0,f:0},s.xp);s.settings=Object.assign(clone(DEF.settings),s.settings);if(!Array.isArray(s.sessions))s.sessions=[];if(!Array.isArray(s.forms))s.forms=[];if(!s.coach||!Array.isArray(s.coach.lists))s.coach={lists:[]};s.rec=Object.assign(clone(DEF.rec),s.rec||{});for(const k of ["added","workouts","log"])if(!Array.isArray(s.rec[k]))s.rec[k]=[];for(const k of ["addedDone","freq","pref","gadj","paused"])if(!s.rec[k]||typeof s.rec[k]!=="object")s.rec[k]={};if(!s.rec.nw)s.rec.nw={...DEF.rec.nw};return s}
+function normalize(x){const s=Object.assign(clone(DEF),x||{});s.xp=Object.assign({s:0,h:0,f:0,c:0},s.xp);s.settings=Object.assign(clone(DEF.settings),s.settings);if(!Array.isArray(s.sessions))s.sessions=[];if(!Array.isArray(s.forms))s.forms=[];if(!s.coach||!Array.isArray(s.coach.lists))s.coach={lists:[]};s.rec=Object.assign(clone(DEF.rec),s.rec||{});for(const k of ["added","workouts","log"])if(!Array.isArray(s.rec[k]))s.rec[k]=[];for(const k of ["addedDone","freq","pref","gadj","paused"])if(!s.rec[k]||typeof s.rec[k]!=="object")s.rec[k]={};if(!s.rec.nw)s.rec.nw={...DEF.rec.nw};return s}
 try{const raw=localStorage.getItem(LS);if(raw)S=normalize(JSON.parse(raw))}catch(e){}
 function persist(){
   try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
@@ -2175,9 +2307,9 @@ function persist(){
 /* ---------- math ---------- */
 const need=L=>100+50*(L-1);
 function lvl(xp,mult=1){let L=1,x=xp;while(x>=need(L)*mult){x-=need(L)*mult;L++}return{L,into:x,need:need(L)*mult}}
-const sL=()=>lvl(S.xp.s).L, hL=()=>lvl(S.xp.h).L, fL=()=>lvl(S.xp.f||0).L, oL=()=>lvl(S.xp.s+S.xp.h+(S.xp.f||0),2).L;
-const skillL=k=>k==="s"?sL():k==="f"?fL():hL();
-const SK={s:"Shooting",h:"Handling",f:"Finishing"},SKS={s:"Shot",h:"Handle",f:"Finish"},SKA={s:"SHT",h:"HND",f:"FIN"};
+const sL=()=>lvl(S.xp.s).L, hL=()=>lvl(S.xp.h).L, fL=()=>lvl(S.xp.f||0).L, cL=()=>lvl(S.xp.c||0).L, oL=()=>lvl(S.xp.s+S.xp.h+(S.xp.f||0)+(S.xp.c||0),2).L;
+const skillL=k=>k==="s"?sL():k==="f"?fL():k==="c"?cL():hL();
+const SK={s:"Shooting",h:"Handling",f:"Finishing",c:"Conditioning"},SKS={s:"Shot",h:"Handle",f:"Finish",c:"Conditioning"},SKA={s:"SHT",h:"HND",f:"FIN",c:"CND"};
 const rankOf=(k,L)=>{const r=RANK[k];return r[Math.min(r.length-1,Math.floor((L-1)/(k==="o"?4:3)))]};
 /* Levels and XP are medals only. Goals come from your own recent numbers on each drill,
    moved a step by Easy or Hard on the end-of-workout recap. Every drill is open. */
@@ -2302,13 +2434,13 @@ function needsWork(){const out=[],add=(id,t,why)=>{if(D[id]&&!out.some(x=>x.d.id
   let hd=null;const cut=cutOf(30);for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){const d=D[it.id];if(d&&d.skill==="h"&&!d.body&&it.lost>=3&&(!hd||it.lost>=hd.lost))hd={id:it.id,lost:it.lost}}}
   if(hd)add(hd.id,`Needs work: ${hd.lost} drops last time`,`You lost the ball ${hd.lost} times the last time you ran it. Clean reps here carry over to games.`);
   return out.filter(x=>!((S.rec.paused||{})[x.d.id]>today()))}
-function slotOf(d){if(d.id==="s_cold")return"Cold shots";if(d.rt==="warm")return"Body warm-up";if(d.rt==="cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
+function slotOf(d){if(d.cond)return"Conditioning";if(d.id==="s_cold")return"Cold shots";if(d.rt==="warm")return"Body warm-up";if(d.rt==="cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
   if(d.role==="warm")return"Warm-up";if(d.id==="h_live")return"Live";
   if(d.skill==="h")return d.read?"Handle · decisions":"Handle · mechanics";
   if(d.skill==="f")return"Finishing";
   if(d.role==="form")return"Shot · form";if(d.id==="s_5spot")return"3-point test";if(d.id==="s_ft")return"Finisher";
   return d.read?"Shot · decisions":"Shot · volume"}
-const ORDER=["Cold shots","Body warm-up","Warm-up","Live","Handle · mechanics","Handle · decisions","Finishing","Shot · form","3-point test","Shot · decisions","Shot · volume","Finisher","Tired shots","Cool-down"];
+const ORDER=["Cold shots","Body warm-up","Warm-up","Live","Handle · mechanics","Handle · decisions","Finishing","Shot · form","3-point test","Shot · decisions","Shot · volume","Finisher","Tired shots","Conditioning","Cool-down"];
 const bodyToday=()=>{const b=S.rec.body;return b&&b.d===today()&&b.k!=="good"?b.k:null};
 const planMins=()=>bodyToday()==="game"?20:S.settings.mins;
 function nwCount(mins){const v=(S.rec.nw||{})[mins];return v==null?NW_DEF[mins]??2:v}
@@ -2317,7 +2449,7 @@ function customToday(){const p=S.rec.plan;if(!p||(p.d!==today()&&!p.stay))return
 /* a workout set to stay on carries over to the next day, with that day's skips and add-ins cleared */
 function planRoll(){const p=S.rec.plan;if(p&&p.stay&&p.d!==today()){S.rec.plan={...p,d:today(),extra:[],skip:[]};persist()}}
 const skipped=id=>{const p=S.rec.plan;return !!(p&&customToday()&&(p.skip||[]).includes(id))};
-function eligible(d,body){return d&&!d.body&&fq(d.id).k!=="never"&&!((S.rec.paused||{})[d.id]>today())&&(!d.partner||S.settings.partner)&&!(body&&(JUMPY.has(d.id)||(body==="game"&&d.role==="volume")))}
+function eligible(d,body){return d&&!d.body&&!(d.cond&&(body&&(d.hard||d.jc)||!condGate(d).ok))&&fq(d.id).k!=="never"&&!((S.rec.paused||{})[d.id]>today())&&(!d.partner||S.settings.partner)&&!(body&&(JUMPY.has(d.id)||(body==="game"&&d.role==="volume")))}
 function plan0(){
   const cw=customToday();if(cw){const ids=[...cw.items,...((S.rec.plan.extra)||[]).filter(id=>!cw.items.includes(id))];
     const out=ids.map(id=>D[id]).filter(Boolean).map(d=>({slot:"Your workout",d,skip:skipped(d.id),why:skipped(d.id)?{k:"skip",t:"Skipped today"}:cw.items.includes(d.id)?null:{k:"you",t:"You added it"}}));out.custom=cw;out.over=[];return out}
@@ -2381,12 +2513,13 @@ function plan(){const t=today(),done=S.rec.addedDone||{};
 const $=s=>document.querySelector(s);
 function ring(frac){const C=2*Math.PI*26;return `<svg viewBox="0 0 58 58"><circle cx="29" cy="29" r="26" fill="none" stroke="currentColor" stroke-opacity=".18" stroke-width="4"/><circle cx="29" cy="29" r="26" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-frac)}" transform="rotate(-90 29 29)"/></svg>`}
 function renderPlate(){
-  const o=lvl(S.xp.s+S.xp.h+(S.xp.f||0),2), s=lvl(S.xp.s), h=lvl(S.xp.h), f=lvl(S.xp.f||0);
+  const o=lvl(S.xp.s+S.xp.h+(S.xp.f||0)+(S.xp.c||0),2), s=lvl(S.xp.s), h=lvl(S.xp.h), f=lvl(S.xp.f||0), c=lvl(S.xp.c||0);
   $("#plate").innerHTML=`<div class="wrap"><div class="lvl" title="Player level">${ring(o.into/o.need)}<b>${o.L}</b><small>LVL</small></div>
   <div><h1>${esc(rankOf("o",o.L))}</h1></div>
   <div class="skills"><span class="skill">Shooting <b class="num">Lv ${s.L}</b><span class="bar"><i style="width:${100*s.into/s.need}%"></i></span></span>
   <span class="skill">Handling <b class="num">Lv ${h.L}</b><span class="bar h"><i style="width:${100*h.into/h.need}%"></i></span></span>
-  <span class="skill">Finishing <b class="num">Lv ${f.L}</b><span class="bar f"><i style="width:${100*f.into/f.need}%"></i></span></span></div>
+  <span class="skill">Finishing <b class="num">Lv ${f.L}</b><span class="bar f"><i style="width:${100*f.into/f.need}%"></i></span></span>
+  <span class="skill">Conditioning <b class="num">Lv ${c.L}</b><span class="bar c"><i style="width:${100*c.into/c.need}%"></i></span></span></div>
   ${syncNote?`<div class="syncnote" style="grid-column:1/-1">${esc(syncNote)}</div>`:""}</div>${state.tab==="drills"?skillTabs():""}`;
   $("#plate").classList.toggle("compact",state.tab==="drills"&&plateSmall);placeInd(false)}
 /* Drills tab: the skill switch lives in the sticky plate so it stays reachable while scrolling a long ladder.
@@ -2424,7 +2557,7 @@ function courtSVG(opts={}){
   <line x1="135" y1="10" x2="165" y2="10" stroke="var(--wood-line)" stroke-width="3"/><circle class="rim" cx="150" cy="20" r="7"/>${spots}</svg>`}
 
 /* the goal line on a drill row, after the goal mode and any custom goal */
-function rowGoal(d){if(d.gm==="streak")return `${d.streakK} in a row${d.stages?" × "+d.stages.length+" parts":d.streakN>1?" × "+d.streakN:""}`;
+function rowGoal(d){if(d.cond)return d.meta;if(d.gm==="streak")return `${d.streakK} in a row${d.stages?" × "+d.stages.length+" parts":d.streakN>1?" × "+d.streakN:""}`;
   if(d.gm==="time")return `make ${d.goal} fast`;
   let tgt="";
   if(d.log==="spots")tgt=`${d.per*5} shots · goal ${targetPct(d)}%`;
@@ -2440,7 +2573,7 @@ function drillRow(d,i,opts={}){
   const w=opts.why, lib=opts.lib&&!d.body, f=lib?fq(d.id).k:"auto";
   return `<button class="drill ${done?"done":""} ${opts.next?"next":""}" data-open="${d.id}">
    <span class="ix">${done?"✓":i}</span>
-   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SKS[d.skill]}</span>${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}<span>${tgt}</span></span></span>
+   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}${d.cond?condTags(d,opts.lib):`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SKS[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}<span>${tgt}</span></span></span>
    <span class="go">${done?"Again":"Go"}</span></button>`}
 
 function weekDots(){
@@ -2487,12 +2620,27 @@ function viewDrills(){
    <p class="muted small" style="margin:0">${k==="f"?"Low-lift finishes: soft touch off the glass, two-foot stops, floaters, same-foot finishes and reverses that use the rim. No backboard slaps or big jumps. Then decision reps where the phone picks the finish.":k==="s"?"Form work from SeeMikeDunn, a tracked 3-point test, then decision reps that make the catch unpredictable.":"Mechanics from In The Lab, Phil Handy and ILB coaches, then decision reps where your phone calls the move so you react instead of recite."} Every drill is open. The dots show difficulty: one for Starter, two for Builder, three for Advanced. Open any drill to add it to your next workout or set how often it comes back.</p>
    <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div></section>${k==="f"?finCard(0):""}`}
 
-/* Drills → Conditioning: every warm-up and cool-down, which one your workouts use, and a way to run any of them on its own */
-function viewBody(){const grp=k=>{const cur=rtPick(k).id;return `<div class="sechead"><h2>${k==="warm"?"Warm-ups":"Cool-downs"}</h2><button class="linkbtn" data-rec="rt:${k}" style="padding:0">Change yours ›</button></div>
+/* Drills → Conditioning: your warm-up and cool-down on one card (open it to see all and change), then the athletic drills */
+const condTags=(d,lib)=>`${lib&&(state.condGrp||"all")!=="all"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard</span>':""}`;
+function viewBody(){const open=!!state.rtOpen,g=state.condGrp||"all";
+  const grp=k=>{const cur=rtPick(k).id;return `<div class="sechead"><h2>${k==="warm"?"Warm-ups":"Cool-downs"}</h2><button class="linkbtn" data-rec="rt:${k}" style="padding:0">Change yours ›</button></div>
    <div class="list">${RTS(k).map((d,i)=>`<div class="planline">${drillRow(d,i+1,{why:d.id===cur?{k:"fixed",t:`Your ${RT_NAME[k]}: in every workout`}:{k:"mix",t:d.short||""}})}</div>`).join("")}</div>`};
-  return `<section id="drillpanel" role="tabpanel" aria-labelledby="tab-b"><div class="sechead"><h2>Warm-up and cool-down</h2></div>
-   <p class="muted small" style="margin:0">Your recommended workout starts with your warm-up and ends with your cool-down. Pick which ones, or open any routine to run it on its own, like before a game or after club night. Each one is a timer that calls the next move, and tells you when to switch sides.</p>
-   ${grp("warm")}${grp("cool")}</section>`}
+  const w=rtPick("warm"),c=rtPick("cool");
+  const list=DRILLS.filter(d=>d.cond&&(g==="all"||d.cond===g)).sort((a,b)=>a.unlock-b.unlock);
+  const why=d=>{const x=condGate(d);return !x.ok?{k:"skip",t:x.rest?"Rest day today":"Over today's leg cap"}:x.trim?{k:"light",t:`${x.n} ${(d.unit||"set").toLowerCase()}s left under today's cap`}:null};
+  return `<div id="drillpanel" role="tabpanel" aria-labelledby="tab-b"><section><div class="sechead"><h2>Warm-up and cool-down</h2><button class="linkbtn" data-cond="rt" aria-expanded="${open}" style="padding:0">${open?"Done":"See all and change ›"}</button></div>
+   ${open?`<p class="muted small" style="margin:0">Your recommended workout starts with your warm-up and ends with your cool-down. Pick which ones, or open any routine to run it on its own, like before a game or after club night. Each one is a timer that calls the next move, and tells you when to switch sides.</p>${grp("warm")}${grp("cool")}`
+    :`<div class="list">${drillRow(w,1,{why:{k:"fixed",t:"Your warm-up: in every workout"}})}${drillRow(c,2,{why:{k:"fixed",t:"Your cool-down: in every workout"}})}</div>`}</section>
+   <section class="condrow"><div class="sechead"><h2>Athletic drills</h2></div>
+   <p class="muted small" style="margin:0">Footwork, defense, jumping, speed and strength, all solo. Hands-free while you move: each set starts on a beep, and anything to log is asked in the rest with big buttons. Every drill shows how well it's backed: <b>Studied</b> (trials found it works), <b>Injury prevention</b> (part of programs that cut injuries) or <b>Coaching</b> (standard practice, no trial). The dots show difficulty.</p>
+   <div class="chips" role="group" aria-label="Group">${[["all","All"],...Object.entries(CGR)].map(([k,v])=>`<button class="chip" data-cond="g:${k}" aria-pressed="${k===g}">${v}</button>`).join("")}</div>
+   <p class="small muted" style="margin:0">${esc(CGB[g])}</p>
+   ${legCard()}
+   <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true,why:why(d)})).join("")}</div></section></div>`}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-cond]");if(!t)return;const [k,a,b]=t.dataset.cond.split(":");
+  if(k==="g")state.condGrp=a;else if(k==="rt")state.rtOpen=!state.rtOpen;
+  else if(k==="cap"){const c=legCapsFull(),L={j:[20,200,10],h:[4,30,2]}[a];c[a]=Math.max(L[0],Math.min(L[1],c[a]+(+b)*L[2]));S.settings.legCap=c;persist()}
+  const y=window.scrollY,op=!!document.querySelector(".capset[open]");render();if(op){const d=document.querySelector(".capset");if(d)d.open=true}window.scrollTo(0,y);const f=document.querySelector(`[data-cond="${t.dataset.cond}"]`);if(f)f.focus({preventScroll:true})});
 function spark(series){
   const W=320,H=120,pl=30,pr=10,pt=10,pb=22,n=series.length;
   const x=i=>pl+(n<2?0:(W-pl-pr)*i/(n-1)), y=v=>pt+(H-pt-pb)*(1-v/70);
@@ -2913,12 +3061,12 @@ function dirty(){return R.a>0||R.checks.some(Boolean)||R.running||R.phase>0||R.c
 
 function drawRunner(){
   const d=R.d;
-  const src=d.src.map(s=>s.url?`<a href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}</a>`:esc(s.label)).join(" · ");
+  const src=(d.src||[]).map(s=>s.url?`<a href="${s.url}" target="_blank" rel="noopener">${esc(s.label)}</a>`:esc(s.label)).join(" · ");
   const heavy=d.heavy&&S.settings.heavy?`<div class="tip"><b>Heavy ball:</b> run the stationary rounds with the heavy ball, then switch to your regular ball for anything moving. The regular ball will feel light and quick after.</div>`:"";
   const bl=baseline(d),tgt=d.gm?gmTip(d):(d.log==="makes"||d.log==="spots")?`<div class="tip">Your goal: <b class="num">${targetPct(d)}%</b>${d.goal?` · finish at ${d.goal} makes`:""}. ${bl?`Your average over your last ${bl.n>1?bl.n+" sessions":"session"} is ${bl.p}%, so the goal is ${GOAL_UP} points above it. It moves when your numbers move.`:`A starter goal. After your first session it becomes your own average plus ${GOAL_UP} points.`}</div>`:"";
   $("#sheet").innerHTML=`<header><div class="wrap"><h2 id="sheetTitle">${esc(d.dynamic&&weakSpot()?d.name+": "+SPOT[weakSpot().id].name:d.name)}</h2><button class="x" aria-label="Close drill">×</button></div></header>
   <div class="sbody"><div class="wrap">
-   <div class="row"><span class="tag ${d.skill}">${SK[d.skill]}</span>${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
+   <div class="row"><span class="tag ${d.skill}">${SK[d.skill]}</span>${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}${d.cond?`<span class="tag c">${CGR[d.cond]}</span><span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard · counts toward leg load</span>':""}`:""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
    <p style="margin:0">${esc(d.what)}</p>
    ${d.read?`<div class="why">Why decision reps: drills where you already know the next move look clean but don't show up in games. Here the choice comes late, so your hands react instead of recite. Do these after your mechanics work.</div>`:""}
    ${hasParts(d)?`<h3 class="partshead">The parts · ${fmt(totalOf(d))}</h3><ol class="steps">${d.phases.map((p,i)=>`<li><div class="srow">${partAnim(d,i)}<div><b>${esc(p[0])}</b> · ${p[1]}s<div class="small muted">${esc(d.mv?BV.note(d.id+":"+i):HV.note(d.id+"p:"+i))}</div>${clipLinks(d,i)}</div></div></li>`).join("")}</ol><h3 class="partshead">Coaching points</h3>`:""}
@@ -2928,9 +3076,9 @@ function drawRunner(){
    ${d.cam?`<div class="tip camtip"><b>Phone setup${d.cam.view==="behind"?", behind you":", side-on"}:</b> ${esc(d.cam.text)}</div>`:""}
    ${cmpCard(d)}
    ${CHECKS[d.id]?`<div class="checkit"><div><b>Check it on video</b><span class="small">Film one shot ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}. The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")}.</span></div><a class="btn sec small" href="#form" data-check="${d.id}">Check it</a></div>`:""}
-   <div class="cue">${esc(d.cue)}</div>${d.skill==="s"?`<div class="tip"><b>Today's one cue:</b> ${esc(CUES[todayCue().i].t)}. Think only this between shots. Change it on the Today tab.</div>`:""}${d.stages&&d.between?`<div class="tip"><b>Before each round:</b> ${esc(d.between)}</div>`:""}${heavy}${tgt}
+   <div class="cue">${esc(d.cue)}</div>${d.cond?`<div class="tip"><b>Hands-free:</b> each ${(d.unit||"set").toLowerCase()} starts on a beep and the timer runs it. ${d.ask?`In the rest it asks: ${esc(d.ask.q.toLowerCase())} Skip it and it logs as “${esc(d.ask.a[0])}”.`:d.tapEnd?`Tap the phone as you pass it at the finish to log your time${d.tapEnd.target?` against ${d.tapEnd.target} s`:""}.`:"Nothing to tap until the end."}</div><div class="evbox ${d.ev}"><b>Evidence: ${CEV[d.ev]}.</b> ${esc(d.evn)}</div>`:""}${d.skill==="s"?`<div class="tip"><b>Today's one cue:</b> ${esc(CUES[todayCue().i].t)}. Think only this between shots. Change it on the Today tab.</div>`:""}${d.stages&&d.between?`<div class="tip"><b>Before each round:</b> ${esc(d.between)}</div>`:""}${heavy}${tgt}
    ${recCard(d)}
-   <div class="src">Source: ${src}</div>
+   ${src?`<div class="src">Source: ${src}</div>`:""}
   </div></div>
   <div class="dock"><div class="wrap" id="dock"></div></div>`;
   $("#sheet .x").onclick=()=>closeRunner();
@@ -2941,6 +3089,10 @@ function drawDock(){
   const d=R.d,el=$("#dock");if(!el)return;
   if(R.confirm){el.innerHTML=`<div class="confirm"><b>Discard this drill?</b><span class="small">What you've logged so far won't be saved.</span><div class="big2"><button class="btn sec small" data-k="keep">Keep going</button><button class="btn miss small" data-k="discard">Discard</button></div></div>`;return bind()}
   if(R.finished)return drawRate();
+  if(d.cond){const g=condGate(D[d.id]),n=phasesOf(d).filter(p=>!/^rest\b/i.test(p[0])).length,u=(d.unit||"set").toLowerCase();
+    el.innerHTML=`<div class="phases"><span class="prow2"><span>${n} ${u}${n===1?"":"s"} × ${d.set[1]} s · ${d.rest} s rest${d.bigRest?` · ${fmt(d.bigRest[1])} after every ${d.bigRest[0]}`:""}</span></span></div>
+     ${d.hard||d.jc?`<div class="tip">${g.ok?`<b>Leg load:</b> ${[d.jc?`${d.jc} jump contacts`:"",d.hard?`${d.set[1]} hard seconds`:""].filter(Boolean).join(" and ")} a ${u}.${g.trim?` <b>Cut to ${g.n} ${u}s</b> to stay under today's cap.`:""}${g.any?" Over today's cap: you chose to start anyway.":""}`:`<b>${g.rest?"Rest day.":"Cap reached."}</b> ${esc(g.why)}`}</div><div class="card legcard">${legBars(legLoad(today()),legCaps())}</div>`:""}
+     ${g.ok?`<button class="btn pri" data-k="play">Start · ${fmt(totalOf(d))}</button>`:`<button class="btn sec" data-k="anyway">Start anyway</button>`}<span class="small muted" style="text-align:center">5-second countdown, then each ${u} starts on a beep. Prop the phone where you can see and hear it.</span>`;return bind()}
   if(d.log==="timer"||d.log==="react"){const ph=phasesOf(d);
     el.innerHTML=`${hasParts(d)?"":`<div class="phases">${ph.map((p,i)=>`<span class="prow2"><span>${esc(p[0])} · ${p[1]}s</span>${clipLinks(d,i)}</span>`).join("")}</div>`}
      ${d.volume?`<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Set</span><div class="seg">${[[0,"Regular · 100"],[1,"Full D2 · 500"]].map(([v,l])=>`<button data-k="vol:${v}" aria-pressed="${volBig()===!!v}">${l}</button>`).join("")}</div></div><div class="dbeat">${beatSlider()}</div><div class="row" style="justify-content:center">${cdCtl("data-k")}</div>`:""}${d.tempoCalls?d2rCtl():""}
@@ -3025,7 +3177,7 @@ function gmVariant(d){if(!gmModes(d))return d;const gm=gmOf(d.id);if(gm==="pct")
    since skill checks are measured against them. */
 const GL_LIM={n:[5,5,200],stage:[1,1,50],k:[1,2,50],per:[1,1,20],sec:[15,15,900],time:[.25,.25,4]};
 const glOf=id=>((S.settings.goals||{})[id])||{};
-function glKind(d){if(!d)return null;if(d.gm==="streak")return"k";if(d.log==="spots")return"per";if(d.log==="makes")return d.stages?"stage":"n";
+function glKind(d){if(!d||d.cond)return null;if(d.gm==="streak")return"k";if(d.log==="spots")return"per";if(d.log==="makes")return d.stages?"stage":"n";
   if(d.tempoCalls||d.volume)return null;if(d.log==="react")return"sec";if(d.log==="timer"&&Array.isArray(d.phases)&&d.phases.every(p=>p.length<=2))return"time";return null}
 const glVal=(d,k)=>({k:d.streakK,per:d.per,n:d.goal||d.att,stage:d.stageN,sec:d.secs})[k];
 function goalVariant(d){const k=glKind(d);if(!k)return d;const x=glOf(d.id)[k];if(x==null)return d;const v={...d};
@@ -3185,6 +3337,7 @@ function act(k){
   if(k.startsWith("hand:")){R.hand=k.slice(5);return drawDock()}
   if(k.startsWith("cd:"))return setCd(+k.slice(3));
   if(k==="keep"){R.confirm=false;return drawDock()}
+  if(k==="anyway"){CAP_ANY[d.id]=today();return openRunner(d.id)}
   if(k==="discard"){return closeRunner(true)}
   if(k==="make"||k==="miss"){
     const hit=k==="make";
@@ -3308,7 +3461,7 @@ const TIPS={all:["Eyes up","Stay low, hips down","Pound it hard","Wide base","Fi
 const BODY_TIPS={all:["Warm, not tired","Breathe easy","Stay relaxed"],jog:["Light feet","Relaxed shoulders","Easy pace"],hops:["Small and quick","Land softly","Knees almost straight"],lunge:["Step long","Front knee over your foot","Reach tall"],swing:["Relaxed leg","Swing, don't kick","Stand tall"],calf:["Up slowly","Hold at the top","Down slowly"],slide:["Stay low","Feet never cross","Push off the trail foot"],run:["Build up slowly","Only go faster if you feel ready","Relaxed arms"],stretch:["Breathe out into it","No bouncing","Ease a little deeper","Hold it still"],walk:["Breathe out slowly","Shake out your arms"]};
 /* general handling tips that don't fit some parts: no dribble, eyes on a tennis ball, moving instead of a set stance */
 const TIP_SKIP=[[/no dribble|figure 8|toss/,["Pound it hard","Fingertips, not your palm","Keep the ball tight to your body"]],[/tennis|toss/,["Eyes up"]],[/walk|zigzag|skip|half court|forward|backward|moving|cone|retreat|speed stop/,["Wide base","Stay low, hips down"]],[/high.low|high-medium-low/,["Stay low, hips down","Pound it hard"]],[/two-ball|two ball|release and catch|double cross/,["Keep the ball tight to your body"]]];
-function pickTip(name,d){const n=name.toLowerCase(),full=n+" "+(d?d.name.toLowerCase():"");let pool,T=d&&d.body?BODY_TIPS:TIPS;pool=[...T.all];for(const k in T)if(k!=="all"&&n.includes(k))pool=pool.concat(T[k],T[k]);
+function pickTip(name,d){if(d&&d.cond){const pool=[d.cue,...(d.tips||[])];let t;do{t=pool[Math.floor(Math.random()*pool.length)]}while(pool.length>1&&t===P.tip);return t}const n=name.toLowerCase(),full=n+" "+(d?d.name.toLowerCase():"");let pool,T=d&&d.body?BODY_TIPS:TIPS;pool=[...T.all];for(const k in T)if(k!=="all"&&n.includes(k))pool=pool.concat(T[k],T[k]);
   if(!(d&&d.body)){const skip=new Set(TIP_SKIP.filter(([re])=>re.test(full)).flatMap(x=>x[1]));const f=pool.filter(t=>!skip.has(t));if(f.length)pool=f}
   let t;do{t=pool[Math.floor(Math.random()*pool.length)]}while(pool.length>1&&t===P.tip);return t}window.__hoopsPlayer=()=>P;
 const isRestPart=()=>P&&P.stage==="work"&&/^rest\b/i.test((phasesOf(P.items[P.i])[P.pi]||[""])[0]);
@@ -3316,9 +3469,10 @@ const phasesOf=d=>d.log==="react"&&!d.tempoCalls?[[d.silent?"Watch the signals":
 const totalOf=d=>phasesOf(d).reduce((a,p)=>a+p[1],0);
 function startPlayer(ids,fromRunner){
   const items=ids.map(id=>D[id]&&goalVariant(D[id])).filter(d=>d&&(d.log==="timer"||d.log==="react"));if(!items.length)return;
-  P={items,i:0,pi:0,stage:"ready",left:5,running:true,el:items.map(()=>0),ratings:items.map(()=>1),drops:items.map(()=>0),lost:false,call:null,nextAt:0,fromRunner};
+  P={items,i:0,pi:0,stage:"ready",left:5,running:true,el:items.map(()=>0),ratings:items.map(()=>1),drops:items.map(()=>0),lost:false,call:null,nextAt:0,fromRunner,
+    ans:items.map(()=>[]),sd:items.map(()=>0),hs:items.map(()=>0),times:items.map(()=>[]),tapped:false};
   pEl=document.createElement("div");pEl.className="bigtap player";document.body.appendChild(pEl);
-  pEl.addEventListener("click",e=>{if(!P||e.target.closest("button")||e.target.closest("a")||e.target.closest("input")||e.target.closest(".pbeat")||e.target.closest(".pcd")||P.stage==="rate")return;if(P.stage==="work"&&P.running&&!P.cd&&!P.items[P.i].body&&!isRestPart())lostIt();else togglePlay()});
+  pEl.addEventListener("click",e=>{if(!P||e.target.closest("button")||e.target.closest("a")||e.target.closest("input")||e.target.closest(".pbeat")||e.target.closest(".pcd")||P.stage==="rate")return;const cd=P.items[P.i];if(P.stage==="work"&&P.running&&!P.cd&&cd.cond&&cd.tapEnd&&!isRestPart())condTap();else if(P.stage==="work"&&P.running&&!P.cd&&!cd.body&&!cd.cond&&!isRestPart())lostIt();else togglePlay()});
   lockOn();beep(660,120);say(`Get ready. ${items[0].name}. ${phasesOf(items[0])[0][0]}`);drawPlayer();pmT=0;pmLast=0;cancelAnimationFrame(pmRAF);pmRAF=requestAnimationFrame(pmLoop);
   clearInterval(ptick);let last=performance.now();
   ptick=setInterval(()=>{const now=performance.now(),dt=(now-last)/1000;last=now;if(!P||!P.running||P.stage==="rate")return;stepPlayer(dt)},50)}
@@ -3352,10 +3506,10 @@ function stepPlayer(dt){
   const b=Math.ceil(P.left);P.left-=dt;const a=Math.ceil(P.left);if(a!==b&&a>=1&&a<=3)beep(a===1?880:660,90);
   const d=P.items[P.i];
   if(P.stage==="work"){P.el[P.i]+=dt;if(d.log==="timer")halfway(phasesOf(d)[P.pi],P.left,dt);
-    if(d.log!=="react"&&!/^rest\b/i.test(phasesOf(d)[P.pi][0])){P.tipAt=(P.tipAt==null?7:P.tipAt)-dt;if(P.tipAt<=0){P.tip=pickTip(phasesOf(d)[P.pi][0],d);P.tipAt=12+Math.random()*6;if(!d.silent)say(P.tip);P.tipFlash=Date.now()}}
+    if(d.log!=="react"&&!(d.cond&&(d.calls||d.set[1]<20))&&!/^rest\b/i.test(phasesOf(d)[P.pi][0])){P.tipAt=(P.tipAt==null?7:P.tipAt)-dt;if(P.tipAt<=0){P.tip=pickTip(phasesOf(d)[P.pi][0],d);P.tipAt=12+Math.random()*6;if(!d.silent)say(P.tip);P.tipFlash=Date.now()}}
     const cur=phasesOf(d)[P.pi];if(cur&&cur[3]){P.beat=(P.beat||0)+dt;const iv=60/cur[3];while(P.beat>=iv&&P.rep<cur[2]){P.beat-=iv;P.rep++;beep(P.rep%10===0?1320:1100,35);if(P.rep%50===0&&P.rep<cur[2])say(String(P.rep))}}
     if(d.log==="react"&&d.tempoCalls){if(!isRestPart())tempoCallStep(d,dt)}
-    else if(d.log==="react"){P.nextAt-=dt;if(P.nextAt<=0){const c=d.calls;let x;do{x=c[Math.floor(Math.random()*c.length)]}while(c.length>2&&x===P.call&&Math.random()<.6);P.call=x;P.nextAt=d.gap[0]+Math.random()*(d.gap[1]-d.gap[0]);beep(x.toLowerCase().startsWith("l")?740:988,160);if(!d.silent)say(x);P.flashAt=Date.now()}}}
+    else if(d.log==="react"||(d.cond&&d.calls&&!isRestPart())){P.nextAt-=dt;if(P.nextAt<=0){const c=d.calls;let x;do{x=c[Math.floor(Math.random()*c.length)]}while(c.length>2&&x===P.call&&Math.random()<.6);P.call=x;P.nextAt=d.gap[0]+Math.random()*(d.gap[1]-d.gap[0]);beep(x.toLowerCase().startsWith("l")?740:988,160);if(!d.silent)say(x);P.flashAt=Date.now()}}}
   if(P.left<=0)advance();else updPlayer()}
 /* called moves at a random tempo: never the same move twice, at least 3 ticks of a move (6 for Kobes) before the next call */
 function tempoCallStep(d,dt){const cur=phasesOf(d)[P.pi],c=D2R();P.nextAt-=dt;
@@ -3366,12 +3520,12 @@ function tempoCallStep(d,dt){const cur=phasesOf(d)[P.pi],c=D2R();P.nextAt-=dt;
   if(P.call&&P.bpm){P.beat=(P.beat||0)+dt;const iv=60/P.bpm;while(P.beat>=iv){P.beat-=iv;P.rep=(P.rep||0)+1;beep(P.rep%10===0?1320:1100,35)}}}
 function advance(){
   const d=P.items[P.i],ph=phasesOf(d);
-  if(P.stage==="ready"||P.stage==="rest"){if(P.stage==="rest")P.i++;const n=P.items[P.i];P.stage="work";P.pi=0;P.rep=0;P.beat=0;P.left=phasesOf(n)[0][1];P.call=null;P.nextAt=n.log==="react"?2:0;beep(988,200);say(phasesOf(n)[0][0]);return drawPlayer()}
-  if(P.stage==="work"){P.pi++;
-    if(P.pi<ph.length){P.rep=0;P.beat=0;if(d.tempoCalls){P.call=null;P.bpm=0;P.nextAt=1.5}P.left=ph[P.pi][1];beep(988,200);say(ph[P.pi][0]);return drawPlayer()}
+  if(P.stage==="ready"||P.stage==="rest"){if(P.stage==="rest")P.i++;const n=P.items[P.i];P.stage="work";P.pi=0;P.rep=0;P.beat=0;P.left=phasesOf(n)[0][1];P.call=null;P.nextAt=n.log==="react"||n.cond&&n.calls?2:0;beep(988,200);say(phasesOf(n)[0][0]);return drawPlayer()}
+  if(P.stage==="work"){condEndPart();P.pi++;
+    if(P.pi<ph.length){P.rep=0;P.beat=0;if(d.tempoCalls){P.call=null;P.bpm=0;P.nextAt=1.5}if(d.cond&&d.calls){P.call=null;P.nextAt=1.5}P.left=ph[P.pi][1];beep(988,200);say(ph[P.pi][0]);return drawPlayer()}
     if(P.i+1<P.items.length){P.stage="rest";P.left=10;beep(520,300);say(`Rest. Next: ${P.items[P.i+1].name}`);return drawPlayer()}
     return toRate()}}
-function toRate(){P.items.forEach((d,i)=>{const m=P.el[i]/60;if(m>0){const dpm=P.drops[i]/m;P.ratings[i]=dpm<=.5?2:dpm<=3?1:0}});P.stage="rate";P.running=false;lockOff();beep(784,120);setTimeout(()=>beep(1046,220),130);say("Done. How did it go?");drawPlayer()}
+function toRate(){condEndPart();P.items.forEach((d,i)=>{if(d.cond){P.ratings[i]=condRating(d,i);return}const m=P.el[i]/60;if(m>0){const dpm=P.drops[i]/m;P.ratings[i]=dpm<=.5?2:dpm<=3?1:0}});P.stage="rate";P.running=false;lockOff();beep(784,120);setTimeout(()=>beep(1046,220),130);say("Done. How did it go?");drawPlayer()}
 /* "Show the move": a bottom sheet over the timed player with the current part's animation. Opening it pauses the timer. */
 let seeEl=null,seeRAF=0;
 function seeIds(d,pi){if(!d)return[];const own=d.id+":"+pi;if(window.BV&&BV.has(own))return[{a:stepAnim(d,pi),t:BV.note(own),own:1}];if(hasParts(d)&&HV.has(d.id+"p:"+pi))return[{a:partAnim(d,pi),t:HV.note(d.id+"p:"+pi),own:1}];return(d.steps||[]).map((s,i)=>({a:stepAnim(d,i),t:s})).filter(x=>x.a)}
@@ -3404,11 +3558,12 @@ function pxp(d,i){const frac=Math.min(1,P.el[i]/totalOf(d));if(frac<.1)return 0;
 function drawPlayer(){
   if(!pEl||!P)return;const d=P.items[P.i];
   if(P.stage==="rate"){
-    const rows=P.items.map((d,i)=>{const done=P.el[i]/totalOf(d)>=.1,labels=d.body?["Felt tight","OK","Felt loose"]:d.read?["Late on most","Mixed","Reacted fast"]:["Lost it a lot","A few bobbles","Clean"];
+    const rows=P.items.map((d,i)=>{const done=P.el[i]/totalOf(d)>=.1,labels=d.cond?["Struggled","OK","Strong"]:d.body?["Felt tight","OK","Felt loose"]:d.read?["Late on most","Mixed","Reacted fast"]:["Lost it a lot","A few bobbles","Clean"];
       const prev=lastLost(d.id),dr=P.drops[i];
-      return `<div class="prow"><b>${esc(d.name)}</b>${done&&!d.body?`<span class="small" style="opacity:.8">${dr} drop${dr===1?"":"s"}${prev!=null?` · last time ${prev}`:""}</span>`:""}${done?`<div class="seg">${labels.map((l,r)=>`<button data-rate="${i}:${r}" aria-pressed="${P.ratings[i]===r}">${l}</button>`).join("")}</div>`:`<span class="muted">Skipped</span>`}</div>`}).join("");
+      return `<div class="prow"><b>${esc(d.name)}</b>${done&&d.cond?`<span class="small" style="opacity:.8">${esc(condSum(d,i))}</span>`:""}${done&&!d.body&&!d.cond?`<span class="small" style="opacity:.8">${dr} drop${dr===1?"":"s"}${prev!=null?` · last time ${prev}`:""}</span>`:""}${done?`<div class="seg">${labels.map((l,r)=>`<button data-rate="${i}:${r}" aria-pressed="${P.ratings[i]===r}">${l}</button>`).join("")}</div>`:`<span class="muted">Skipped</span>`}</div>`}).join("");
     const tot=P.items.reduce((a,d,i)=>a+pxp(d,i),0);
     pEl.innerHTML=`<div class="prate"><h2>How did it go?</h2><p class="small" style="opacity:.75;margin:0">Rate each drill. Honest ratings help you see when a drill is getting clean.</p>${rows}
+     ${(()=>{const t=legLoad(today());let add=0,ah=0;P.items.forEach((d,i)=>{if(d.cond&&P.el[i]/totalOf(d)>=.1){add+=P.sd[i]*(d.jc||0);ah+=P.hs[i]/60}});return add||ah?`<div class="pq" style="max-width:none;align-items:stretch"><div class="label">Leg load today with this</div>${legBars({j:t.j+add,h:t.h+ah},legCaps())}</div>`:""})()}
      ${tot?"":`<p class="small" style="opacity:.75;margin:0">Nothing to log yet. Do at least a tenth of a drill to earn XP.</p>`}<button class="btn pri" data-p="save" ${tot?"":"disabled"}>Save · +${tot} XP</button><button class="btn sec small" data-p="discard">Discard</button></div>`}
   else{
     const ph=phasesOf(d),nextLabel=P.stage==="rest"?`${P.items[P.i+1].name}: ${phasesOf(P.items[P.i+1])[0][0]}`:P.stage==="ready"?ph[0][0]:P.pi+1<ph.length?ph[P.pi+1][0]:P.i+1<P.items.length?`Rest, then ${P.items[P.i+1].name}`:"Finish";
@@ -3417,24 +3572,26 @@ function drawPlayer(){
     pEl.innerHTML=`<div class="bt-top"><button class="btn sec small" data-p="toggle">${P.running?"Pause":"Resume"}</button><button class="btn sec small" data-p="skip">${P.stage==="work"?"Skip":P.stage==="ready"?"Start now":"Skip rest"}</button><button class="btn sec small" data-p="end">End</button></div>
      <div class="bt-mid"><div class="pmeta">${P.items.length>1?`Drill ${P.i+(P.stage==="rest"?2:1)} of ${P.items.length} · `:""}${esc(P.stage==="rest"?P.items[P.i+1].name:d.name)}${head!==part?` · ${esc(part)}`:""}</div>
       <div class="bt-label${head!==part?" st":""}">${esc(head)}</div>${pMove()}
-      ${d.log==="react"&&P.stage==="work"&&!isRestPart()?`<div class="pcall${d.silent?" sig":""}" id="pCall">${esc(P.call||"Ready…")}</div>`:""}${d.tempoCalls&&P.stage==="work"&&!isRestPart()?`<div class="pmeta" id="pBpm">${P.bpm?`${P.bpm} per min · ${P.rep||0} reps`:"Get set…"}</div>`:""}
+      ${(d.log==="react"||d.cond&&d.calls)&&P.stage==="work"&&!isRestPart()?`<div class="pcall${d.silent?" sig":""}" id="pCall">${esc(P.call||"Ready…")}</div>`:""}${d.tempoCalls&&P.stage==="work"&&!isRestPart()?`<div class="pmeta" id="pBpm">${P.bpm?`${P.bpm} per min · ${P.rep||0} reps`:"Get set…"}</div>`:""}
       ${P.stage==="work"&&phasesOf(d)[P.pi][3]?`<div class="pcall" id="pRep">${P.rep||0} <span>/ ${phasesOf(d)[P.pi][2]}</span></div>`:""}
-      <div class="bt-count num" id="pClock">${P.cd>0?Math.ceil(P.cd):fmt(P.left)}</div>
-      ${P.stage==="work"&&d.log!=="react"?`<div class="ptip" id="pTip">${esc(P.tip||"")}</div>`:""}${P.cd>0?`<div class="pmeta">Dribbling starts at zero</div>`:""}${P.running?"":`${P.lost?`<div class="pmeta">Tap when you have it${P.stage==="work"&&phasesOf(d)[P.pi][3]&&cdSecs()?`, then a ${cdSecs()}-second countdown`:""}</div>`:""}${P.stage==="work"&&phasesOf(d)[P.pi][3]?cdCtl("data-p"):""}${P.lost&&P.back?`<div class="pmeta">Took back ${P.back} reps for the time it took to tap</div>`:""}<div style="display:none"></div>`}${P.stage==="work"&&P.drops[P.i]?`<div class="pmeta">${P.drops[P.i]} drop${P.drops[P.i]===1?"":"s"}</div>`:""}</div>
+      <div class="bt-count num" id="pClock">${P.cd>0?Math.ceil(P.cd):fmt(P.left)}</div>${condRest()}
+      ${P.stage==="work"&&d.log!=="react"&&!(d.cond&&isRestPart())?`<div class="ptip" id="pTip">${esc(P.tip||"")}</div>`:""}${P.cd>0?`<div class="pmeta">Dribbling starts at zero</div>`:""}${P.running?"":`${P.lost?`<div class="pmeta">Tap when you have it${P.stage==="work"&&phasesOf(d)[P.pi][3]&&cdSecs()?`, then a ${cdSecs()}-second countdown`:""}</div>`:""}${P.stage==="work"&&phasesOf(d)[P.pi][3]?cdCtl("data-p"):""}${P.lost&&P.back?`<div class="pmeta">Took back ${P.back} reps for the time it took to tap</div>`:""}<div style="display:none"></div>`}${P.stage==="work"&&P.drops[P.i]?`<div class="pmeta">${P.drops[P.i]} drop${P.drops[P.i]===1?"":"s"}</div>`:""}</div>
      ${P.stage==="work"&&phasesOf(d)[P.pi][3]?`<div class="pbeat">${beatSlider(Math.round(phasesOf(d)[P.pi][3]/(S.settings.beat||1)))}</div>`:""}
-     ${(()=>{const di=P.stage==="rest"?P.i+1:P.i,dpi=P.stage==="work"?P.pi:0,cl=clipLinks(P.items[di],dpi),sa=isRestPart()?0:seeIds(P.items[di],dpi).length;return cl||sa?`<div class="pdemo"><span>${cl?(P.stage==="work"?"Demo":"Watch first"):"Not sure how?"}</span>${sa?`<button class="clip" data-p="see">Show the move</button>`:""}${cl}</div>`:""})()}<div class="bt-hint"><b>Next:</b> ${esc(nextLabel)}<br>${!P.running?"Tap anywhere to go":P.cd>0?"Tap anywhere to pause":P.stage==="work"?(d.body||isRestPart()?"Tap anywhere to pause":"Lost the ball? Tap anywhere"):"Tap anywhere to pause"}</div>`}
+     ${(()=>{const di=P.stage==="rest"?P.i+1:P.i,dpi=P.stage==="work"?P.pi:0,cl=clipLinks(P.items[di],dpi),sa=isRestPart()?0:seeIds(P.items[di],dpi).length;return cl||sa?`<div class="pdemo"><span>${cl?(P.stage==="work"?"Demo":"Watch first"):"Not sure how?"}</span>${sa?`<button class="clip" data-p="see">Show the move</button>`:""}${cl}</div>`:""})()}<div class="bt-hint"><b>Next:</b> ${esc(nextLabel)}<br>${!P.running?"Tap anywhere to go":P.cd>0?"Tap anywhere to pause":P.stage==="work"?(d.cond&&d.tapEnd&&!isRestPart()?"Tap anywhere as you finish":d.body||d.cond||isRestPart()?"Tap anywhere to pause":"Lost the ball? Tap anywhere"):"Tap anywhere to pause"}</div>`}
   pEl.querySelectorAll("[data-clip]").forEach(a=>a.onclick=e=>{e.stopPropagation();if(P.running)togglePlay()});
   pEl.querySelectorAll("[data-p]").forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.p;
-    if(k.startsWith("cd:"))setCd(+k.slice(3));else if(k==="see")openSee();else if(k==="toggle")togglePlay();else if(k==="skip"){advance()}else if(k==="end"){P.el.some(x=>x>0)?toRate():(closePlayer())}
+    if(k.startsWith("ans:")){const [,a,v]=k.split(":").map(Number);P.ans[P.i][a]=v;beep(880,80);drawPlayer()}else if(k.startsWith("cd:"))setCd(+k.slice(3));else if(k==="see")openSee();else if(k==="toggle")togglePlay();else if(k==="skip"){advance()}else if(k==="end"){P.el.some(x=>x>0)?toRate():(closePlayer())}
     else if(k==="discard"){const fr=P.fromRunner;closePlayer();if(fr)closeRunner(true)}else if(k==="save")savePlayer()});
   pEl.querySelectorAll("[data-rate]").forEach(b=>b.onclick=e=>{e.stopPropagation();const [i,r]=b.dataset.rate.split(":").map(Number);P.ratings[i]=r;drawPlayer()})}
 function updPlayer(){const c=$("#pClock");if(c)c.textContent=P.cd>0?String(Math.ceil(P.cd)):fmt(P.left);const tp=$("#pTip");if(tp){if(tp.textContent!==(P.tip||""))tp.textContent=P.tip||"";tp.classList.toggle("flash",Date.now()-(P.tipFlash||0)<1500)}const rp=$("#pRep");if(rp&&rp.firstChild)rp.firstChild.nodeValue=(P.rep||0)+" ";const bp=$("#pBpm");if(bp&&P.bpm)bp.textContent=`${P.bpm} per min · ${P.rep||0} reps`;const k=$("#pCall");if(k){if(k.textContent!==(P.call||"Ready…"))k.textContent=P.call||"Ready…";k.classList.toggle("flash",Date.now()-(P.flashAt||0)<400)}}
 function savePlayer(){
-  const before=[sL(),hL(),oL(),fL()];let se=todaySession();if(!se){se={d:today(),items:[]};S.sessions.push(se)}let tot=0;
-  P.items.forEach((d,i)=>{const xp=pxp(d,i);if(!xp)return;se.items.push({id:d.id,t:Date.now(),xp,r:P.ratings[i],lost:P.drops[i]});doneWith(d.id);S.xp[d.skill]+=xp;tot+=xp});
-  persist();const after=[sL(),hL(),oL(),fL()];const fr=P.fromRunner;closePlayer();if(fr)closeRunner(true);else render();
-  let head="Logged";if(after[1]>before[1])head=`Handling Lv ${after[1]}`;if(after[2]>before[2])head=`Player Lv ${after[2]} · ${rankOf("o",after[2])}`;
-  toastNext(head,`+${tot} Handling XP.`);maybeRecap();if(after.some((v,i)=>v>before[i])){beep(784,120);setTimeout(()=>beep(1046,220),130)}}
+  const before=[sL(),hL(),oL(),fL(),cL()];let se=todaySession();if(!se){se={d:today(),items:[]};S.sessions.push(se)}let tot=0;const sks=new Set();
+  P.items.forEach((d,i)=>{const xp=pxp(d,i);if(!xp)return;const it={id:d.id,t:Date.now(),xp,r:P.ratings[i]};
+    if(d.cond){it.sd=P.sd[i];if(d.jc)it.jc=P.sd[i]*d.jc;if(d.hard)it.hs=Math.round(P.hs[i]);if(d.ask)it.ans=[...Array(P.sd[i])].map((_,k)=>P.ans[i][k]??0);if(d.tapEnd)it.times=P.times[i]}else it.lost=P.drops[i];
+    se.items.push(it);doneWith(d.id);S.xp[d.skill]=(S.xp[d.skill]||0)+xp;tot+=xp;sks.add(d.skill)});
+  persist();const after=[sL(),hL(),oL(),fL(),cL()];const fr=P.fromRunner;closePlayer();if(fr)closeRunner(true);else render();
+  let head="Logged";if(after[1]>before[1])head=`Handling Lv ${after[1]}`;if(after[4]>before[4])head=`Conditioning Lv ${after[4]} · ${rankOf("c",after[4])}`;if(after[2]>before[2])head=`Player Lv ${after[2]} · ${rankOf("o",after[2])}`;
+  toastNext(head,`+${tot} ${sks.size===1?SK[[...sks][0]]+" ":""}XP.`);maybeRecap();if(after.some((v,i)=>v>before[i])){beep(784,120);setTimeout(()=>beep(1046,220),130)}}
 
 function save(){
   const d=R.d,xp=xpFor(),before=[sL(),hL(),oL(),fL()];
@@ -4283,7 +4440,7 @@ route();
     dbRef.onSnapshot(snap=>{
       if(!snap.metadata?.fromCache){clearTimeout(timer);if(syncNote.startsWith("Can't reach")){syncNote="";}}
       if(snap.exists){const remote=normalize(snap.data());S=remote;try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
-      else if(first&&(S.sessions.length||S.xp.s||S.xp.h||S.xp.f)){persist()}
+      else if(first&&(S.sessions.length||S.xp.s||S.xp.h||S.xp.f||S.xp.c)){persist()}
       first=false;if(!R)render();else renderPlate()},
       err=>{clearTimeout(timer);syncNote="Sync is off right now. Progress is kept on this device.";renderPlate()});
   }catch(e){}
@@ -4318,7 +4475,7 @@ route();
     Prefs.get({ key: LS }).then(r => {
       loaded = true;
       // Something was saved before the stored copy arrived: keep the newer in-memory progress.
-      if (dirty || !r || !r.value) { if (dirty || S.sessions.length || S.xp.s || S.xp.h || S.xp.f) save(); return; }
+      if (dirty || !r || !r.value) { if (dirty || S.sessions.length || S.xp.s || S.xp.h || S.xp.f || S.xp.c) save(); return; }
       try {
         S = normalize(JSON.parse(r.value));
         try { localStorage.setItem(LS, r.value); } catch (e) {}
