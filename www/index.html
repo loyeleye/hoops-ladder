@@ -372,6 +372,10 @@ section{display:flex;flex-direction:column;gap:10px}
 .checkit{display:flex;align-items:center;gap:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:12px}
 .checkit>div{flex:1;display:flex;flex-direction:column;gap:2px}
 .checkit .btn{text-decoration:none;white-space:nowrap;color:var(--ink)}
+.filmcard{flex-direction:column;align-items:stretch;gap:8px}.filmcard>b{font-size:16px}.filmcard .row{gap:8px}.filmcard .linkbtn{align-self:flex-start;padding:0;text-decoration:none}
+.checkit.filmcard>.row{flex-direction:row;flex-wrap:wrap;align-items:center}
+.checkit.filmcard>.filmlast{flex-direction:row;gap:12px;align-items:center}.filmlast>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.filmlast .vthumb{flex:none;width:72px;border:1px solid var(--line);border-radius:10px;overflow:hidden;padding:0;cursor:pointer}
 .metric.focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .focusnote{border-left:4px solid var(--accent)}
 .clip{display:inline-flex;align-items:center;min-height:36px;padding:6px 12px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-size:13px;font-weight:600;text-decoration:none}
@@ -3265,15 +3269,14 @@ function drawRunner(){
    ${d.grid?`<div class="hgrid"><h3 class="partshead">${esc(d.grid.title)}</h3><table><thead><tr>${d.grid.head.map(h=>`<th scope="col">${esc(h)}</th>`).join("")}</tr></thead><tbody>${d.grid.rows.map(r=>`<tr><th scope="row">${esc(r[0])}</th>${r.slice(1).map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table><p class="small muted" style="margin:6px 0 0">${esc(d.grid.note)}</p></div>`:""}
    ${STEP_CLIPS[d.id]?`<p class="small muted" style="margin:0">▶ opens ${d.skill==="f"||d.coachClips?"a coach":"SeeMikeDunn"} showing that step on YouTube.</p>`:""}
    ${d.cam?`<div class="tip camtip"><b>Phone setup${d.cam.view==="behind"?", behind you":", side-on"}:</b> ${esc(d.cam.text)}</div>`:""}
-   ${cmpCard(d)}
-   ${CHECKS[d.id]?`<div class="checkit"><div><b>Check it on video</b><span class="small">Film one shot ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}. The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")}.</span></div><a class="btn sec small" href="#form" data-check="${d.id}">Check it</a></div>`:""}
+   ${filmCard(d)}
    <div class="cue">${esc(d.cue)}</div>${d.clips?`<div class="tip">${d.clips==="film"?"<b>Hands-free:</b> clips play on their own with a beep on each cut. After every 6 it asks how many you read wrong.":"Tap your read after each clip. It logs your score."}</div><div class="evbox ${d.ev}"><b>Evidence: ${CEV[d.ev]}.</b> ${esc(d.evn)}</div>`:d.cond?`<div class="tip"><b>Hands-free:</b> each ${(d.unit||"set").toLowerCase()} starts on a beep and the timer runs it. ${d.ask?`In the rest it asks: ${esc(d.ask.q.toLowerCase())} Skip it and it logs as “${esc(d.ask.a[0])}”.`:d.tapEnd?`Tap the phone as you pass it at the finish to log your time${d.tapEnd.target?` against ${d.tapEnd.target} s`:""}.`:"Nothing to tap until the end."}</div><div class="evbox ${d.ev}"><b>Evidence: ${CEV[d.ev]}.</b> ${esc(d.evn)}</div>`:""}${d.skill==="s"?`<div class="tip"><b>Today's one cue:</b> ${esc(CUES[todayCue().i].t)}. Think only this between shots. Change it on the Today tab.</div>`:""}${d.stages&&d.between?`<div class="tip"><b>Before each round:</b> ${esc(d.between)}</div>`:""}${heavy}${tgt}
    ${recCard(d)}
    ${src?`<div class="src">Source: ${src}</div>`:""}
   </div></div>
   <div class="dock"><div class="wrap" id="dock"></div></div>`;
   $("#sheet .x").onclick=()=>closeRunner();
-  fvStart();
+  fvStart();filmThumb();
   drawDock()}
 
 function drawDock(){
@@ -4657,7 +4660,7 @@ function vdb(){return vdbP||(vdbP=new Promise((a,b)=>{let r;try{r=indexedDB.open
   r.onsuccess=()=>a(r.result);r.onerror=()=>{vdbP=null;b(r.error)}}))}
 async function vtx(mode,fn){const db=await vdb();return new Promise((a,b)=>{const t=db.transaction(["meta","blobs"],mode);let out;Promise.resolve(fn(t.objectStore("meta"),t.objectStore("blobs"))).then(v=>out=v,b);t.oncomplete=()=>a(out);t.onerror=t.onabort=()=>b(t.error)})}
 async function loadVids(){try{CO.vids=(await vtx("readonly",m=>rq(m.getAll()))).sort((a,b)=>b.t-a.t);CO.vidErr=""}catch(e){CO.vids=[];CO.vidErr="This browser won't let the app keep videos (private mode or storage turned off)."}
-  CO.vidsLoaded=true;try{const e=await navigator.storage?.estimate?.();CO.usage=e?e.usage:null}catch(e){}if(state.tab==="coach"||state.tab==="form")render()}
+  CO.vidsLoaded=true;CO.loading=false;try{const e=await navigator.storage?.estimate?.();CO.usage=e?e.usage:null}catch(e){}if(state.tab==="coach"||state.tab==="form")render();filmUp()}
 async function coThumb(id){if(CO.thumbs[id]!==undefined)return CO.thumbs[id];CO.thumbs[id]=null;try{const b=await vtx("readonly",(m,bl)=>rq(bl.get(id+":t")));if(b)CO.thumbs[id]=URL.createObjectURL(b)}catch(e){}return CO.thumbs[id]}
 function makeThumb(blob){return new Promise(res=>{const v=document.createElement("video"),u=URL.createObjectURL(blob);let done=false;
   const fin=b=>{if(done)return;done=true;URL.revokeObjectURL(u);v.removeAttribute("src");v.load();res(b)};
@@ -4668,7 +4671,7 @@ function vidDur(blob){return new Promise(res=>{const v=document.createElement("v
   v.onloadedmetadata=()=>{clearTimeout(t);const d=isFinite(v.duration)?v.duration:0;URL.revokeObjectURL(u);res(d)};v.onerror=()=>{clearTimeout(t);URL.revokeObjectURL(u);res(0)}})}
 async function saveVid(blob,o={}){toast("Saving…","Keeping the clip on this phone.");
   try{const id=uid("v"),dur=o.dur||await vidDur(blob),th=await makeThumb(blob);
-    const meta={id,t:o.t||Date.now(),dur:Math.round(dur),size:blob.size,type:blob.type||"video/mp4",item:o.item||null,name:o.name||""};
+    const meta={id,t:o.t||Date.now(),dur:Math.round(dur),size:blob.size,type:blob.type||"video/mp4",item:o.item||null,name:o.name||"",drill:o.drill||null};
     await vtx("readwrite",(m,bl)=>{m.put(meta);bl.put(blob,id);if(th)bl.put(th,id+":t")});
     try{if(navigator.storage?.persist&&!(await navigator.storage.persisted?.()))await navigator.storage.persist()}catch(e){}
     await loadVids();const f=meta.item&&coFind(meta.item),w=meta.item&&CO.wiz&&CO.wiz.id===meta.item;toast("Saved on this phone",f?`Clip added to “${f.it.text}”.`:w?`Clip attached to “${CO.wiz.text||"this drill"}”.`:"It's in My videos on the Form tab. It never leaves this phone.")}
@@ -4783,8 +4786,33 @@ function cmpDemos(d){const out=[];if(!d)return out;
 const cmpView=d=>CHECK_VIEW[d.id]||(d.cam&&d.cam.view)||"side";
 function cmpWhat(d){if(d.skill==="s")return CHECKS[d.id]?CHECKS[d.id].join(" and "):cmpView(d)==="behind"?"your elbow, ball line and guide hand":"your balance, timing and release";
   if(d.skill==="h")return"stance, eyes up and staying level";if(d.skill==="f")return"knee drive, reach and landing";return""}
-function cmpCard(d){if(!cmpDemos(d).length)return"";const w=cmpWhat(d);
-  return `<div class="checkit cmpcard"><div><b>Film a rep</b><span class="small">Watch your rep next to the demo${w?`, with notes on ${esc(w)}`:""}. It stays on this phone.</span></div><button class="btn sec small" data-cmp="${d.id}">Compare</button></div>`}
+/* Film this rep: the drill sheet's one video card. It joins what were two cards, "Film a rep · Compare" (self-review
+   next to the demo) and "Check it on video" (the form check's measured numbers). With no clip it offers one record
+   button (Compare when the drill has a demo, else the form check), plus the form check as a text link. Once you keep a
+   self-review clip of this drill, the card leads with it: tap the thumbnail to watch it, then film again or check it.
+   It sits in the sheet, so nothing here is ever tapped mid-rep. Not a fold: folds never go on drill sheets. */
+const filmClip=d=>CO.vids.find(v=>v.drill===d.id||(!v.drill&&v.name===`Self-review: ${d.name}`))||null;
+function filmCard(d){const cmp=cmpDemos(d).length>0,chk=!!CHECKS[d.id];if(!cmp&&!chk)return"";
+  if(!CO.vidsLoaded&&!CO.loading){CO.loading=true;loadVids()}
+  const w=cmpWhat(d),v=filmClip(d),th=v&&CO.thumbs[v.id];
+  const chkTxt=chk?`The form check measures ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc (tap the ball after release)":x)).join(" and ")} from one shot filmed ${CHECK_VIEW[d.id]==="behind"?"from behind, on the line to the rim":"from the side"}.`:"";
+  const cmpTxt=cmp?`Film a rep and watch it next to the demo${w?`, with notes on ${esc(w)}`:""}.`:"";
+  const cmpBtn=(cls,lab)=>`<button class="btn ${cls} small" data-cmp="${d.id}" aria-label="${lab} and compare it with the demo">${lab}</button>`;
+  const chkBtn=`<a class="btn sec small" href="#form" data-check="${d.id}" aria-label="Check one shot with the form check">Check it</a>`;
+  const chkLink=`<a class="linkbtn" href="#form" data-check="${d.id}">Or measure one shot with the form check →</a>`;
+  const when=v?new Date(v.t).toLocaleDateString(undefined,{month:"short",day:"numeric"}):"";
+  const body=v
+    ?`<div class="filmlast"><button class="vthumb" data-hw="vid:${v.id}" data-th="${v.id}" aria-label="Watch your last clip of this drill, from ${when}">${th?`<img src="${th}" alt="">`:""}${v.dur?`<b>${fmtDur(v.dur)}</b>`:""}</button>
+       <div><span class="small"><b>Last clip</b> · ${when}${v.dur?` · ${fmtDur(v.dur)}`:""}</span><span class="small muted">Tap it to watch, slow it down or send it to your coach.</span></div></div>
+     <span class="small">${cmp&&chk?`Film again to watch it next to the demo, or check one shot to measure ${CHECKS[d.id].map(x=>esc(x==="Arc"?"your arc":x)).join(" and ")}.`:cmp?cmpTxt:chkTxt}</span>
+     <div class="row">${cmp?cmpBtn("sec","Film again"):""}${chk?chkBtn:""}</div>`
+    :`<span class="small">${cmp?cmpTxt:chkTxt} It stays on this phone.</span>
+     <div class="row">${cmp?cmpBtn("sec","Film a rep"):`<a class="btn sec small" href="#form" data-check="${d.id}" aria-label="Film one shot for the form check">Film a shot</a>`}</div>
+     ${cmp&&chk?chkLink:""}`;
+  return `<section class="checkit filmcard" id="filmcard" aria-labelledby="filmcardH"><b id="filmcardH">Film this rep</b>${body}</section>`}
+/* redraw the card in an open sheet once clips load, or after a clip is kept or deleted */
+function filmUp(){if(!R||$("#sheet").hidden)return;const c=$("#filmcard");if(!c)return;c.outerHTML=filmCard(R.d);filmThumb()}
+async function filmThumb(){const t=$("#filmcard [data-th]");if(t&&!t.querySelector("img")){const u=await coThumb(t.dataset.th);if(u&&t.isConnected&&!t.querySelector("img"))t.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`)}}
 
 function openCmp(id){const d=D[id];if(!d)return;closeCmp();const demos=cmpDemos(d);if(!demos.length)return;
   const el=document.createElement("div");el.className="cmp";el.setAttribute("role","dialog");el.setAttribute("aria-label","Compare your rep with the demo");
@@ -4993,7 +5021,7 @@ document.addEventListener("click",e=>{const o=e.target.closest("[data-cmp]");if(
   else if(a==="mir"){C.mir=!C.mir;t.setAttribute("aria-pressed",C.mir);C.el.querySelector(".cmp-cv")?.classList.toggle("mir",C.mir)}
   else if(a==="bones"){C.bones=!C.bones;t.setAttribute("aria-pressed",C.bones)}
   else if(a==="redo"){cmpPause();C.state="empty";C.frames=null;C.res=null;cmpDraw()}
-  else if(a==="keep"){if(!C.blob)return;C.kept=true;t.disabled=true;t.textContent="Kept";saveVid(C.blob,{dur:C.dur,name:`Self-review: ${C.d.name}`})}});
+  else if(a==="keep"){if(!C.blob)return;C.kept=true;t.disabled=true;t.textContent="Kept";saveVid(C.blob,{dur:C.dur,name:`Self-review: ${C.d.name}`,drill:C.d.id})}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&CMP){e.stopImmediatePropagation();closeCmp()}},true);
 
 /* ---------- the Coach tab ---------- */
