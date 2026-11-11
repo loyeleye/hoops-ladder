@@ -59,6 +59,8 @@
     window.hoopsBack = function () {
       const clip = document.querySelector(".ytsheet");
       if (clip) { if (!press(clip, '[data-yt="close"]')) clip.remove(); return true; }
+      // Coach session mode (step 27) sits over the player and the tabs: back steps out of its current screen.
+      if (window.sesBack && window.sesBack()) return true;
       const film = document.querySelector(".fsq");
       if (film) { if (!press(film, '[data-fq="ecancel"]') && !press(film, '[data-fq="end"]') && !press(film, '[data-fq="close"]')) closeFS(); return true; }
       if (CO.view) { closeVid(); return true; }
@@ -921,18 +923,41 @@
     drawBig = function () { origDrawBig.apply(this, arguments); if (typeof bigEl !== "undefined" && bigEl) place(bigEl); };
   }
 
-  /* ---------- 9. Share › Hoops Ladder: a YouTube video comes back to the drill you're adding ----------
+  /* ---------- 9. Share › Hoops Ladder: links and videos come back to the page ----------
      On the Coach tab, "Find it on YouTube" opens the YouTube app. The player picks a video and shares it to Hoops
      Ladder; the native HoopsShare plugin (android/.../share/) hands the link and the video's title to the page's
      coShared(), which adds it to the drill being added or edited. A share that started the app waits in take().
+     During a coach session the share sheet also shows "Session · <coach>" (a sharing shortcut the page turns on and
+     off through hoopsSesShare). A share through it arrives with target "session" and goes to sesShared(), never
+     to a take-home drill. Shared videos arrive as a file the plugin copied into the app's cache. They're read back
+     here as a Blob and always go to sesShared(), which puts them in the session or, with none running, keeps them in
+     My videos.
      It sits before section 8 because that one stops early on a phone without the HoopsRemote plugin.
-     See docs/LEARNING.md, step 20. */
+     See docs/LEARNING.md, steps 20 and 27. */
   {
     const Share = Plug.HoopsShare;
     if (Share) {
-      const got = s => { if (s && s.text) { try { coShared(s.text, s.subject || ""); } catch (e) {} } };
+      const toBlob = async s => {
+        if (!s.file) return null;
+        try { const r = await fetch(window.Capacitor.convertFileSrc(s.file)); return r.ok ? await r.blob() : null; } catch (e) { return null; }
+      };
+      const got = async s => {
+        if (!s) return;
+        const video = !!(s.file || s.error === "video");
+        if ((s.target === "session" || video) && typeof window.sesShared === "function") {
+          const blob = await toBlob(s);
+          let took = false;
+          try { took = !!window.sesShared({ text: s.text || "", subject: s.subject || "", blob, mime: s.mime || (blob && blob.type) || "", name: s.name || "", target: s.target || "", failed: s.error === "video" && !blob }); } catch (e) {}
+          if (took || video) return;
+        }
+        if (s.text) { try { coShared(s.text, s.subject || ""); } catch (e) {} }
+      };
       Share.addListener("shared", got);
       Share.take().then(r => got(r && r.share)).catch(() => {});
+      /* the page turns the session's share target on when a coach session starts, and off when it ends */
+      window.hoopsSesShare = (on, name) => {
+        try { return (on ? Share.sessionStart({ name: name || "" }) : Share.sessionEnd()).catch(() => {}); } catch (e) {}
+      };
     }
   }
 

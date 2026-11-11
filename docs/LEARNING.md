@@ -934,3 +934,59 @@ node tools/build_film.mjs --check   # checks only, and fails if www/index.html i
 **What's kept.** Each finished run (set, level, how many you read right) in `S.film.runs`, your level choice, and any
 diagrams and flags. No XP: film study is study, not a workout, so it doesn't touch your levels or the session
 calendar.
+
+## Step 27. Coach sessions: film the coach, then your try
+
+For practice with a coach. **Coach tab › Start coach session** (or **Coach** in the workout player) opens a separate,
+dark, full-screen mode built for the court. A back arrow returns to the app and leaves the session running. A pill
+above the tab bar, *Back to session*, stays on every tab until the session ends. The storyboard and the reasons behind
+each screen are in the project files (`hoops-app/coach-session/coach_session_storyboard.html`).
+
+**Setup.** Two questions, both remembered: the coach's name, and whether the phone is propped up or someone is holding
+it. The first time with a coach, Start stays off until you tap *They said yes*: ask before you film someone. The answer
+is kept per coach in `S.coach.ok`.
+
+**Topics and pieces.** A session (`S.coach.sess`) is a list of topics. Each topic keeps its pieces in the order they
+happened: `c` the coach on camera, `m` your tries (numbered), `t` voice notes, and `l` links. A topic can also hold
+`hw`, the id of the take-home drill made from it. *Film coach* starts a new topic when the current one already has a
+try. *Film me*, *Talk* and *Link* add to the current topic. Tapping a topic's name makes it current. The camera opens
+only when you film, so there's no live preview on the board.
+
+**Recording.** The camera is `getUserMedia` + `MediaRecorder` at 2.5 Mbps with sound, like the Coach recorder in
+step 7. A recording stops at 5 minutes (about 19 MB).
+- *Propped*: a 3-second count with a beep each second, so walking away doesn't end up in the clip. Then one
+  recording per turn. *My turn* and *Again* drop markers, and recording keeps going. A coach demo and your tries can
+  share one file, and each piece is a part of it (`v` the file, `a` to `b` in seconds).
+- *Handheld*: one clip per tap, with a single stop button.
+
+**Replay and compare.** *Done* opens the replay on your try by itself, looping only its own part at ½×. *Compare*
+puts another piece (the coach first) on the left. *Line up* pauses both and gives each a scrubber. Move them to the
+same moment, tap *Lock*, and from then on the left follows the right with the same offset. Links open in the in-app
+YouTube player (step 14), looping the part you marked.
+
+**Voice notes.** *Talk* records audio only (`MediaRecorder`, Opus where the phone has it). *Feedback* on a replay
+attaches the note to that try. Notes are kept as audio. Turning them into text afterward needs Android's
+speech engine to read a file (Android 13 and later), which is planned.
+
+**Links and shared videos.** While a session runs, the app pushes an Android sharing shortcut, *Session · Mo*, that
+shows in the share sheet. Ending the session removes it. A link shared through it goes to the session's *Add a link*
+screen and never to a take-home drill. The plain *Hoops Ladder* target still works as in step 20. Videos can be
+shared in too (`video/*`): the plugin copies the file into the app's cache, the page reads it back as a Blob, and it
+becomes a coach piece. With no session running, a shared video goes to My videos.
+- `HoopsSharePlugin.sessionStart/sessionEnd` push and remove the shortcut. `res/xml/shortcuts.xml` declares the
+  share target.
+- A share through the shortcut carries `target: "session"`.
+- The share target only shows on Android 10 and later.
+
+**Homework and wrap-up.** *Homework* adds the topic to the take-home list straight away, with the goal chips from One
+at a time and the topic's links. The take-home row gets a *Session clips* button that opens the topic. *End* opens the
+wrap-up: name each topic, switch on the ones to add to take-home, and Save for a flat 15 XP per session. *Later* keeps
+everything and leaves *Finish setting up …* on the Coach tab. A session left alone for 2 hours ends itself the same way.
+
+**Storage and privacy.** Clips and notes go in the same IndexedDB store as My videos, tagged with `ses`, so My videos
+leaves them out. Nothing is uploaded. *Delete session* on a past session removes its clips and notes. Take-home
+drills made from it stay.
+
+**Not built yet** (from the storyboard): Rewind (keeping the last 30 seconds while propped), trimming setup and
+the end of a clip with the pose model, finding the handoff between two people in one clip, importing past clips,
+drawing on a frame, the in-session quick test, voice-note transcripts, and spoken *my turn* / *again*.

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sharing shortcuts. While a coach session runs, HoopsSharePlugin.sessionStart() publishes a dynamic shortcut in
+     this category, so the share sheet offers "Session · <coach>" next to the plain Hoops Ladder target. Android 10+
+     shows it as a direct share target. See docs/LEARNING.md, step 27. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <share-target android:targetClass="com.ladioyeleye.hoopsladder.MainActivity">
+        <data android:mimeType="text/plain" />
+        <data android:mimeType="video/*" />
+        <category android:name="com.ladioyeleye.hoopsladder.category.SESSION_SHARE" />
+    </share-target>
+</shortcuts>
