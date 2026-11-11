@@ -30,6 +30,19 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
+            <!-- Share › Hoops Ladder with a video (a coach's clip from Quick Share, Messages or the gallery). During a
+                 coach session it lands in the session; otherwise it is kept in My videos. See docs/LEARNING.md, step 27. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+
+            <!-- The "Session · <coach>" share target that exists only while a coach session runs (res/xml/shortcuts.xml). -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+
         </activity>
 
         <!-- Keeps rep logging running with the screen locked, and owns the media session that receives the

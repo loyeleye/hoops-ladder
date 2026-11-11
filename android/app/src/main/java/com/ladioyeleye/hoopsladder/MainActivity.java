@@ -70,13 +70,14 @@ public class MainActivity extends BridgeActivity {
     }
 
     /**
-     * Share › Hoops Ladder from YouTube: the link goes to the drill on the Coach tab. The app is launchMode
-     * singleTask, so a share while it's open arrives here instead of starting a second copy. See docs/LEARNING.md, step 20.
+     * Share › Hoops Ladder from YouTube: the link goes to the drill on the Coach tab, or to the coach session when it
+     * came through the session's share target. The app is launchMode singleTask, so a share while it's open arrives
+     * here instead of starting a second copy. See docs/LEARNING.md, steps 20 and 27.
      */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        HoopsSharePlugin.receive(intent);
+        HoopsSharePlugin.receive(this, intent);
     }
 
     /**
