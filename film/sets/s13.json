@@ -1,0 +1,545 @@
+{
+ "id": "s13",
+ "name": "Mixed basics: real game film",
+ "blurb": "Jason Preston reviews players' own game film: swing it, take what's there, and drive with good angles.",
+ "src": {
+  "JP-LIVE1": {
+   "v": "2yghZWfoDTM",
+   "t": "NBA Player Breaks Down YOUR Film",
+   "who": "Jason Preston · NBA"
+  },
+  "JP-LIVE2": {
+   "v": "OCWLrf47qTQ",
+   "t": "NBA Player Breaks Down YOUR Film",
+   "who": "Jason Preston · NBA"
+  },
+  "JP-LIVE3": {
+   "v": "mN5ypk5CqOY",
+   "t": "NBA Player Breaks Down YOUR Film",
+   "who": "Jason Preston · NBA"
+  }
+ },
+ "m": [
+  {
+   "id": "s13-01",
+   "src": "JP-LIVE1",
+   "start": 871,
+   "pause": 873,
+   "end": 900,
+   "lv": "B",
+   "checked": false,
+   "title": "Attacking from the wing",
+   "q": "You're attacking and the defense is collapsing. Go up, or swing it?",
+   "choices": [
+    {
+     "t": "Swing it to the corner",
+     "ok": true
+    },
+    {
+     "t": "Go up and shoot"
+    }
+   ],
+   "ans": "He never once looked at the corner, and it was open.",
+   "quote": "He never once thought to swing it to this corner. Like that was never an option. Even here like it was it was never an option. It was always go up.",
+   "cast": [
+    "YOU · driving",
+    "TEAMMATE · corner",
+    "DEFENDER · helping"
+   ]
+  },
+  {
+   "id": "s13-02",
+   "src": "JP-LIVE1",
+   "start": 940,
+   "pause": 950,
+   "end": 988,
+   "lv": "B",
+   "checked": false,
+   "title": "Into the paint again",
+   "q": "You're getting into the paint again. Where's the open man?",
+   "choices": [
+    {
+     "t": "The corner",
+     "ok": true
+    },
+    {
+     "t": "The top of the key"
+    },
+    {
+     "t": "Nobody, shoot it"
+    }
+   ],
+   "ans": "The corner has been open the whole time. He wants to shoot it, but he can't this time.",
+   "quote": "Like corner's been open. And he he wants to shoot this, but he can't this time.",
+   "cast": [
+    "YOU · driving",
+    "TEAMMATE · corner",
+    "DEFENDER · in the paint"
+   ]
+  },
+  {
+   "id": "s13-03",
+   "src": "JP-LIVE1",
+   "start": 1014,
+   "pause": 1022,
+   "end": 1067,
+   "lv": "I",
+   "checked": false,
+   "title": "Right read, which pass?",
+   "q": "Your teammate is open. The defender between you isn't moving. What kind of pass?",
+   "choices": [
+    {
+     "t": "A pass around the defender's hands",
+     "ok": true
+    },
+    {
+     "t": "A chest pass straight past him"
+    }
+   ],
+   "ans": "The read is right, but a chest pass right in front of someone gets picked off against better players. Throw it around his hands.",
+   "quote": "Like this is not the right pass. You should never be able to throw a chest pass right in front of someone. He just look at this guy's not doing anything.",
+   "cast": [
+    "YOU · passer",
+    "TEAMMATE · open",
+    "DEFENDER · in the lane"
+   ]
+  },
+  {
+   "id": "s13-04",
+   "src": "JP-LIVE1",
+   "start": 1184,
+   "pause": 1192,
+   "end": 1216,
+   "lv": "I",
+   "checked": false,
+   "title": "Two in front of you",
+   "q": "Two defenders are in front of you and there's nowhere to drive. What now?",
+   "choices": [
+    {
+     "t": "Be patient and let the play develop",
+     "ok": true
+    },
+    {
+     "t": "Force the drive anyway"
+    },
+    {
+     "t": "Pick up the ball and look to pass"
+    }
+   ],
+   "ans": "Let the play develop. When the clear-out comes, then you go.",
+   "quote": "Cuz there's two people here. There's not really anywhere to drive. Kind of got to let the play develop a little bit. Okay, clear out. Now, now, now this is where we're going.",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · on you",
+    "DEFENDER · helping",
+    "TEAMMATE · clearing out"
+   ]
+  },
+  {
+   "id": "s13-05",
+   "src": "JP-LIVE1",
+   "start": 1504,
+   "pause": 1506,
+   "end": 1529,
+   "lv": "B",
+   "checked": false,
+   "title": "Pass ahead at half court",
+   "q": "You're passing ahead at half court. Bounce or chest?",
+   "choices": [
+    {
+     "t": "Chest pass",
+     "ok": true
+    },
+    {
+     "t": "Bounce pass"
+    }
+   ],
+   "ans": "A bounce pass at half court is slower and lets a defender get in the play. Throw a chest pass.",
+   "quote": "There's a little detail. Don't throw a bounce pass here. Not at half court. This is a slower pass, which is allowing somebody to get in the play.",
+   "cast": [
+    "YOU · passer",
+    "TEAMMATE · ahead"
+   ]
+  },
+  {
+   "id": "s13-06",
+   "src": "JP-LIVE1",
+   "start": 1672,
+   "pause": 1678,
+   "end": 1710,
+   "lv": "B",
+   "checked": false,
+   "title": "Catch in the corner",
+   "q": "The ball gets swung to you in the corner. Your man is standing in the paint. Shoot or pump fake?",
+   "choices": [
+    {
+     "t": "Shoot it",
+     "ok": true
+    },
+    {
+     "t": "Pump fake first"
+    },
+    {
+     "t": "Drive"
+    }
+   ],
+   "ans": "A guy standing in the paint means it's a shot every time, especially if you're a shooter.",
+   "quote": "There's no pump faking. There's no pump faking. The guy standing in the paint is a shot every time. Especially if you're a shooter.",
+   "cast": [
+    "YOU · corner",
+    "YOUR DEFENDER · in the paint"
+   ]
+  },
+  {
+   "id": "s13-07",
+   "src": "JP-LIVE1",
+   "start": 1881,
+   "pause": 1884,
+   "end": 1910,
+   "lv": "I",
+   "checked": false,
+   "title": "He's overplaying you",
+   "q": "Your man is overplaying you to one side. Where do you attack?",
+   "choices": [
+    {
+     "t": "His top leg, then read the big",
+     "ok": true
+    },
+    {
+     "t": "Away from him, to the open space"
+    },
+    {
+     "t": "Back him down"
+    }
+   ],
+   "ans": "Attack the top leg, then read the big who picks you up and make the pass.",
+   "quote": "Defender wants to sell him right, we attack top leg. Read big who picks him up, pass was made perfectly.",
+   "cast": [
+    "YOU · ball handler",
+    "YOUR DEFENDER · overplaying",
+    "DEFENDER · the big"
+   ]
+  },
+  {
+   "id": "s13-08",
+   "src": "JP-LIVE2",
+   "start": 481,
+   "pause": 488,
+   "end": 547,
+   "lv": "I",
+   "checked": false,
+   "title": "Which way do you drive?",
+   "q": "You're driving past your man. Do you drive to the open space or straight into him?",
+   "choices": [
+    {
+     "t": "Straight into him, with your shoulder",
+     "ok": true
+    },
+    {
+     "t": "Out to the open space"
+    }
+   ],
+   "ans": "The open space lets him time your shot and contest it. Drive into him so your shoulder makes contact and forces his hips open, and he's out of the play.",
+   "quote": "So, like this is the open space, right? But, you don't want to drive here. You want to drive this way.",
+   "cast": [
+    "YOU · driving",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s13-09",
+   "src": "JP-LIVE2",
+   "start": 737,
+   "pause": 741,
+   "end": 786,
+   "lv": "B",
+   "checked": false,
+   "title": "Catch on the break",
+   "q": "You catch it on the break with your bigs and wings running. First thing you do?",
+   "choices": [
+    {
+     "t": "Catch and look up the floor",
+     "ok": true
+    },
+    {
+     "t": "Catch and dribble"
+    },
+    {
+     "t": "Pull up"
+    }
+   ],
+   "ans": "Catch and look. As the defender comes closer to you, that's the pass to the runner.",
+   "quote": "Like see the first thing he does he catches it and dribbles it should really be catch look.",
+   "cast": [
+    "YOU · catching it on the break",
+    "TEAMMATE · running the floor",
+    "DEFENDER · coming at you"
+   ]
+  },
+  {
+   "id": "s13-10",
+   "src": "JP-LIVE2",
+   "start": 876,
+   "pause": 895,
+   "end": 931,
+   "lv": "B",
+   "checked": false,
+   "title": "All four come to you",
+   "q": "You drive and all four defenders come to you. What's open?",
+   "choices": [
+    {
+     "t": "Swing it out to one of your three teammates",
+     "ok": true
+    },
+    {
+     "t": "Finish over all of them"
+    },
+    {
+     "t": "Back it out"
+    }
+   ],
+   "ans": "When all four come to you, someone is open. Swing it out.",
+   "quote": "But just noticing that like all four come to him and then swinging out to one of these three.",
+   "cast": [
+    "YOU · driving",
+    "DEFENDER · helping",
+    "TEAMMATE · wing",
+    "TEAMMATE · corner"
+   ]
+  },
+  {
+   "id": "s13-11",
+   "src": "JP-LIVE2",
+   "start": 1298,
+   "pause": 1301,
+   "end": 1315,
+   "lv": "B",
+   "checked": false,
+   "title": "Help side about to come",
+   "q": "Help side is about to be active. Which way are you going?",
+   "choices": [
+    {
+     "t": "Drive at the help, and kick it if he comes",
+     "ok": true
+    },
+    {
+     "t": "Pull up now"
+    },
+    {
+     "t": "Pass it back out"
+    }
+   ],
+   "ans": "Drive it. If he helps, the man he left has a wide open shot.",
+   "quote": "me, I see something like this, I'm driving here. He helps, wide open shot here.",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · help side",
+    "TEAMMATE · help defender's man"
+   ]
+  },
+  {
+   "id": "s13-12",
+   "src": "JP-LIVE2",
+   "start": 1339,
+   "pause": 1342,
+   "end": 1354,
+   "lv": "B",
+   "checked": false,
+   "title": "Single-side tag",
+   "q": "You come off a ball screen and there's one tag defender on that side. Who do you read?",
+   "choices": [
+    {
+     "t": "The tag defender",
+     "ok": true
+    },
+    {
+     "t": "Your own man"
+    },
+    {
+     "t": "The screener's man"
+    }
+   ],
+   "ans": "Read what the tag has to do. If he helps, the corner is wide open. Here he stays, so beat the big on the outside.",
+   "quote": "We're just reading what this guy has to do. He helps in corners wide open, but we beat the big on the outside.",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · the tag",
+    "TEAMMATE · corner",
+    "DEFENDER · the big"
+   ]
+  },
+  {
+   "id": "s13-13",
+   "src": "JP-LIVE2",
+   "start": 1455,
+   "pause": 1461,
+   "end": 1481,
+   "lv": "I",
+   "checked": false,
+   "title": "First step off the screen",
+   "q": "You're coming off the ball screen. Where should your first step go?",
+   "choices": [
+    {
+     "t": "Downhill, toward the rim",
+     "ok": true
+    },
+    {
+     "t": "Toward the sideline"
+    }
+   ],
+   "ans": "His first step went to the sideline. Get a better angle and go downhill.",
+   "quote": "I'd say your angles can be better. Like here, you're coming off this ball screen and your first step is like to the sideline.",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s13-14",
+   "src": "JP-LIVE2",
+   "start": 1501,
+   "pause": 1509,
+   "end": 1537,
+   "lv": "B",
+   "checked": false,
+   "title": "He goes under twice",
+   "q": "Your man goes under the screen. You re-screen and he goes under again. What do you do?",
+   "choices": [
+    {
+     "t": "Shoot it",
+     "ok": true
+    },
+    {
+     "t": "Drive"
+    },
+    {
+     "t": "Reset again"
+    }
+   ],
+   "ans": "In the league it's a rule: under once, re-screen, under twice, automatic shot.",
+   "quote": "As a rule in the league, goes under once, re-screen, goes under twice, automatic shot.",
+   "cast": [
+    "YOU · ball handler",
+    "YOUR DEFENDER · going under",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s13-15",
+   "src": "JP-LIVE3",
+   "start": 757,
+   "pause": 764,
+   "end": 792,
+   "lv": "I",
+   "checked": false,
+   "title": "Into the ball screen",
+   "q": "You're coming into the ball screen and the screener slips out. What's open?",
+   "choices": [
+    {
+     "t": "A bounce pass to the slipping screener",
+     "ok": true
+    },
+    {
+     "t": "Use the screen anyway"
+    },
+    {
+     "t": "Spin back the other way"
+    }
+   ],
+   "ans": "The screener is the open one. Instead of spinning into where he's rolling, throw him a bounce pass around the defender for a layup.",
+   "quote": "This one's interesting here because the guy who's setting the screen is the one that's open.",
+   "cast": [
+    "YOU · ball handler",
+    "SCREENER · slipping",
+    "DEFENDER · on the screener"
+   ]
+  },
+  {
+   "id": "s13-16",
+   "src": "JP-LIVE3",
+   "start": 997,
+   "pause": 1005,
+   "end": 1144,
+   "lv": "I",
+   "checked": false,
+   "title": "After the ball fake",
+   "q": "Good ball fake. Now which way do you bump?",
+   "choices": [
+    {
+     "t": "Toward the top of the key, for a wide open three",
+     "ok": true
+    },
+    {
+     "t": "Back the way you came, toward the defender"
+    }
+   ],
+   "ans": "He bumped back toward the defender and let him back in the play. Bumping toward the top of the key is a wide open three.",
+   "quote": "If he bumps this way to the top of the key, it's a wide open three. We want to work smarter, not harder.",
+   "cast": [
+    "YOU · ball handler",
+    "YOUR DEFENDER",
+    "DEFENDER · help"
+   ]
+  },
+  {
+   "id": "s13-17",
+   "src": "JP-LIVE3",
+   "start": 1144,
+   "pause": 1160,
+   "end": 1194,
+   "lv": "B",
+   "checked": false,
+   "title": "Drive, then help comes",
+   "q": "You drive and a helper comes. Force it, or one more?",
+   "choices": [
+    {
+     "t": "Make the one more pass to the shooter",
+     "ok": true
+    },
+    {
+     "t": "Force it up"
+    },
+    {
+     "t": "Back it out"
+    }
+   ],
+   "ans": "As soon as the help comes, don't force it. Make the one more pass.",
+   "quote": "As soon as this guy helps like he's not going to go force it. He immediately makes the one more pass to the shooter.",
+   "cast": [
+    "YOU · driving",
+    "DEFENDER · helping",
+    "TEAMMATE · shooter"
+   ]
+  },
+  {
+   "id": "s13-18",
+   "src": "JP-LIVE3",
+   "start": 1194,
+   "pause": 1204,
+   "end": 1224,
+   "lv": "I",
+   "checked": false,
+   "title": "He keeps backing up",
+   "q": "You're driving and looking for contact, but your man keeps backing up. What now?",
+   "choices": [
+    {
+     "t": "Shoot it",
+     "ok": true
+    },
+    {
+     "t": "Keep driving into him"
+    },
+    {
+     "t": "Pass it out"
+    }
+   ],
+   "ans": "If he won't let you make contact and read off him, take the shot.",
+   "quote": "But if you're going to keep backing up if you're going to keep backing up though and and not allow me to make contact and make a read off of you, then I'll just shoot.",
+   "cast": [
+    "YOU · driving",
+    "YOUR DEFENDER · backing up"
+   ]
+  }
+ ]
+}

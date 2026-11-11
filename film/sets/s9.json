@@ -1,0 +1,200 @@
+{
+ "id": "s9",
+ "name": "Team defense: who's responsible?",
+ "blurb": "When the ball screen comes or someone gets beat, who has to stop the ball, and who helps the helper?",
+ "src": {
+  "FR-IQ3": {
+   "v": "FN4AS62sIBw",
+   "t": "Basketball IQ Test #3 - Team Defense",
+   "who": "The Film Room · former Big 12 player"
+  }
+ },
+ "m": [
+  {
+   "id": "s9-01",
+   "src": "FR-IQ3",
+   "start": 32,
+   "pause": 57,
+   "end": 120,
+   "lv": "I",
+   "checked": false,
+   "title": "Flat hedge, layup at the rim",
+   "q": "The ball screen gets set and the guard scores a layup. Who's mainly responsible: A, B or C?",
+   "choices": [
+    {
+     "t": "Player A"
+    },
+    {
+     "t": "Player B",
+     "ok": true
+    },
+    {
+     "t": "Player C"
+    }
+   ],
+   "ans": "They're in a flat hedge. A fought over the top and C is where he's supposed to be. B opened his shoulders and let the guard turn the corner, when he should stay flat and in front of the ball.",
+   "quote": "So, the correct answer is that player B did not do his job well. And the reason why is because his body position right now is opened up, allowing this guard to turn the corner and get downhill when he's supposed to be flat and in front of the ball to make sure that he can't turn the corner",
+   "cast": [
+    "YOU · player A, on the ball",
+    "DEFENDER · player B",
+    "DEFENDER · player C, in the paint",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s9-02",
+   "src": "FR-IQ3",
+   "start": 129,
+   "pause": 165,
+   "end": 239,
+   "lv": "I",
+   "checked": false,
+   "title": "Step-up screen, foul on the shooter",
+   "q": "Another ball screen. Who's mainly responsible for what happens?",
+   "choices": [
+    {
+     "t": "A: the two in the ball screen",
+     "ok": true
+    },
+    {
+     "t": "B: the backside tag defender"
+    },
+    {
+     "t": "C: the defender who fouls the shooter"
+    }
+   ],
+   "ans": "C is the strong-side corner, so he stays home. B should be at the midline but isn't the main mistake. One defender in the screen switched and the other hedged and recovered, so both chased the big, then both chased the ball, and the big was open at the rim.",
+   "quote": "They both try and recover to the big and then they both try and go back and recover to the basketball. And because they weren't on the same page about their coverage, that's what left the big open at the rim.",
+   "cast": [
+    "YOU · on the ball",
+    "DEFENDER · guarding the screener",
+    "DEFENDER · backside tag (B)",
+    "DEFENDER · player C"
+   ]
+  },
+  {
+   "id": "s9-03",
+   "src": "FR-IQ3",
+   "start": 246,
+   "pause": 273,
+   "end": 342,
+   "lv": "B",
+   "checked": false,
+   "title": "Slot drive",
+   "q": "Your teammate gets beat on a slot drive. Who stops the ball: A, B or C?",
+   "choices": [
+    {
+     "t": "Player A"
+    },
+    {
+     "t": "Player B",
+     "ok": true
+    },
+    {
+     "t": "Player C"
+    }
+   ],
+   "ans": "A is the strong-side corner, so he stays home or the kick-out is open. C is too far away and would leave his man. B steps up and protects the rim, C helps the helper by cracking back on B's man, and the last defender rotates out to the wing.",
+   "quote": "And that leaves player B as the man who needs to step up and help or be the rim protector on this drive.",
+   "cast": [
+    "YOU · player C, weak side",
+    "DEFENDER · player A, strong-side corner",
+    "DEFENDER · player B",
+    "DRIVER"
+   ]
+  },
+  {
+   "id": "s9-04",
+   "src": "FR-IQ3",
+   "start": 353,
+   "pause": 380,
+   "end": 435,
+   "lv": "B",
+   "checked": false,
+   "title": "Beat off the bounce after a hedge",
+   "q": "Number 40 beats his man off the bounce and scores. Who's responsible: A, B or C?",
+   "choices": [
+    {
+     "t": "Player A, who got beat"
+    },
+    {
+     "t": "Player B",
+     "ok": true
+    },
+    {
+     "t": "Player C"
+    }
+   ],
+   "ans": "A got beat, but he had just hedged and was recovering to a good shooter. C is the strong-side corner and stays home. When someone gets beat, it's B's job to step up out of the hole, then the others help the helper and rotate.",
+   "quote": "So inevitably when people get beat off the bounce, which is going to happen, it is the responsibility of player B to step up out of the hole and stop the basketball from scoring.",
+   "cast": [
+    "YOU · player C, strong-side corner",
+    "DEFENDER · player A, recovering",
+    "DEFENDER · player B",
+    "DRIVER · #40"
+   ]
+  },
+  {
+   "id": "s9-05",
+   "src": "FR-IQ3",
+   "start": 446,
+   "pause": 468,
+   "end": 512,
+   "lv": "I",
+   "checked": false,
+   "title": "Ghost screen, dunk at the rim",
+   "q": "The big steps up and stops the ball, but his man dunks it. How could the defense have stopped it?",
+   "choices": [
+    {
+     "t": "A backside defender cracks back on the big's man",
+     "ok": true
+    },
+    {
+     "t": "The big stays home and lets the guard score"
+    },
+    {
+     "t": "The guard fouls before the drive"
+    }
+   ],
+   "ans": "The big did his job stepping up. To stop the dunk, a backside defender has to crack back and take the big's man.",
+   "quote": "The big is now doing a great job of stepping up and stopping the ball. But to keep this big from getting an open dunk, we need a crack back from this man right here.",
+   "cast": [
+    "YOU · the big, stepping up",
+    "DRIVER",
+    "TEAMMATE · backside defender",
+    "OFFENSE · the big's man"
+   ]
+  },
+  {
+   "id": "s9-06",
+   "src": "FR-IQ3",
+   "start": 525,
+   "pause": 550,
+   "end": 603,
+   "lv": "I",
+   "checked": false,
+   "title": "Bonus: everything at once",
+   "q": "No prompts. Middle ball screen, a drive, and a layup. Who gives it up?",
+   "choices": [
+    {
+     "t": "The defender in the hole, who goes for the steal",
+     "ok": true
+    },
+    {
+     "t": "The crack-back defender"
+    },
+    {
+     "t": "The guard on the ball"
+    }
+   ],
+   "ans": "The guard laid on the screen and the big opened his shoulders, so the drive got downhill. The crack-back was great. But the defender in the hole faked at the pass to try to steal it instead of stepping up, so he gave up the layup.",
+   "quote": "But as he's doing that, this defender doesn't know he's going to get back. And so instead of stepping up and stopping the ball, he fakes at him to try and steal that pass if he makes it. And he ends up being the one that gives up the layup.",
+   "cast": [
+    "YOU · on the ball",
+    "DEFENDER · the big",
+    "DEFENDER · crack-back",
+    "DEFENDER · in the hole"
+   ]
+  }
+ ]
+}

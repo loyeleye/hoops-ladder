@@ -1,0 +1,277 @@
+{
+ "id": "s11",
+ "name": "Name the ball screen coverage",
+ "blurb": "Watch the screener's man (low, level or high) and your man (over or under) to name the coverage.",
+ "src": {
+  "FR-COV": {
+   "v": "r8cBVXdI698",
+   "t": "How to Understand the 7 Most Common Ballscreen Coverages",
+   "who": "The Film Room · former Big 12 player"
+  }
+ },
+ "m": [
+  {
+   "id": "s11-01",
+   "src": "FR-COV",
+   "start": 130,
+   "pause": 144,
+   "end": 174,
+   "lv": "B",
+   "checked": false,
+   "title": "Where's the big?",
+   "q": "Watch the man guarding the screener. Where is he?",
+   "choices": [
+    {
+     "t": "Low, back in the paint",
+     "ok": true
+    },
+    {
+     "t": "At the level of the screen"
+    },
+    {
+     "t": "High, up the floor"
+    }
+   ],
+   "ans": "He's low, which is drop coverage. He sits back and doesn't let anyone get downhill.",
+   "quote": "This is a perfect example in this clip of him being low or in what's called drop coverage and he is just sitting back not letting anybody get downhill.",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · guarding the screener",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s11-02",
+   "src": "FR-COV",
+   "start": 174,
+   "pause": 190,
+   "end": 216,
+   "lv": "B",
+   "checked": false,
+   "title": "Over or under?",
+   "q": "Watch the second ball screen. Does your man go over it or under it?",
+   "choices": [
+    {
+     "t": "Under",
+     "ok": true
+    },
+    {
+     "t": "Over"
+    }
+   ],
+   "ans": "On the ghost screen he fights over. On the second screen he goes under.",
+   "quote": "what you're going to see on this possession when he could either go over or under, is he is going to choose to go underneath this ball screen.",
+   "cast": [
+    "YOU · ball handler",
+    "YOUR DEFENDER",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s11-03",
+   "src": "FR-COV",
+   "start": 274,
+   "pause": 281,
+   "end": 305,
+   "lv": "I",
+   "checked": false,
+   "title": "What coverage is this?",
+   "q": "Your man goes under the screen. What coverage are they in?",
+   "choices": [
+    {
+     "t": "A switch",
+     "ok": true
+    },
+    {
+     "t": "Drop"
+    },
+    {
+     "t": "Hedge and recover"
+    }
+   ],
+   "ans": "A switch. The big is at the level of the screen, and the on-ball defender goes under so he can switch without losing leverage.",
+   "quote": "So, in this switch, what you're going to see is the big who is guarding the screener or the hedge defender, he's basically medium. He is right at the level of the screen, the on-ball defender went underneath. Here is your switch, and then he's going to come back and take him.",
+   "cast": [
+    "YOU · ball handler",
+    "YOUR DEFENDER",
+    "DEFENDER · guarding the screener",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s11-04",
+   "src": "FR-COV",
+   "start": 393,
+   "pause": 404,
+   "end": 435,
+   "lv": "I",
+   "checked": false,
+   "title": "Big back, guard under",
+   "q": "The big stays back and your man goes under. What is the defense giving you?",
+   "choices": [
+    {
+     "t": "The mid-range pull-up",
+     "ok": true
+    },
+    {
+     "t": "A layup"
+    },
+    {
+     "t": "The roller"
+    }
+   ],
+   "ans": "Drop coverage with the guard going under. They protect the paint and live with the mid-range jumper.",
+   "quote": "So, again, a perfect example of drop coverage with the guard going underneath being willing to give up a mid-range jump shot.",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · the big",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s11-05",
+   "src": "FR-COV",
+   "start": 454,
+   "pause": 470,
+   "end": 520,
+   "lv": "B",
+   "checked": false,
+   "title": "Where's the big now?",
+   "q": "Watch the man guarding the screener. Where is he this time?",
+   "choices": [
+    {
+     "t": "At the level of the screen",
+     "ok": true
+    },
+    {
+     "t": "Low, back in the paint"
+    },
+    {
+     "t": "High, trapping you"
+    }
+   ],
+   "ans": "Flat. He gets on the line of scrimmage, holds it while your man recovers over the top, then sinks back to his man.",
+   "quote": "So, as this guy comes off of the ball screen, pay attention to how he's right on the line of scrimmage and he's essentially going to let that guard get back in front while he stays and then after he feels like his guard is recovered, he's going to sink and get back to his match-up.",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · guarding the screener",
+    "YOUR DEFENDER",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s11-06",
+   "src": "FR-COV",
+   "start": 557,
+   "pause": 570,
+   "end": 583,
+   "lv": "I",
+   "checked": false,
+   "title": "Looks flat, then...",
+   "q": "The big is at the level and your man gets over the top. What happens next?",
+   "choices": [
+    {
+     "t": "They switch at the last second",
+     "ok": true
+    },
+    {
+     "t": "The big stays and your man recovers"
+    },
+    {
+     "t": "They trap you"
+    }
+   ],
+   "ans": "An emergency switch, which surprises a ball handler who thought it was drop or flat.",
+   "quote": "So, as the guard comes off of this ball screen, it looks like he's going to recover back or he's going to stay with his match-up as the guard gets over, but then they just decided at the last second to emergency switch this, and that leads to a very good contest on the ball handler who thought that they were in drop or flat coverage.",
+   "cast": [
+    "YOU · ball handler",
+    "YOUR DEFENDER",
+    "DEFENDER · guarding the screener"
+   ]
+  },
+  {
+   "id": "s11-07",
+   "src": "FR-COV",
+   "start": 644,
+   "pause": 652,
+   "end": 691,
+   "lv": "I",
+   "checked": false,
+   "title": "Hand on the screener",
+   "q": "Before the screen, the big has a hand on the screener. What's coming?",
+   "choices": [
+    {
+     "t": "A quick show, then he gets back to his man",
+     "ok": true
+    },
+    {
+     "t": "A switch"
+    },
+    {
+     "t": "Drop coverage"
+    }
+   ],
+   "ans": "That's the tell for a quick show. He lunges to reroute you, then recovers to the roller.",
+   "quote": "They will almost always have a hand on the screener. They're going to stay connected to him, and as soon as the ball handler comes off, you're going to see that positioning right there.",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · guarding the screener",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s11-08",
+   "src": "FR-COV",
+   "start": 750,
+   "pause": 758,
+   "end": 818,
+   "lv": "I",
+   "checked": false,
+   "title": "Show or hard hedge?",
+   "q": "The big comes up the floor at you. Quick show or hard hedge?",
+   "choices": [
+    {
+     "t": "Hard hedge",
+     "ok": true
+    },
+    {
+     "t": "Quick show"
+    }
+   ],
+   "ans": "Hard hedge. He goes two or three steps up and makes body contact, instead of showing a hand and bailing.",
+   "quote": "So, pay attention to the body collision or the contact that you see from these bigs that are going to go up the line and instead of just showing and bailing, they want that contact to happen.",
+   "cast": [
+    "YOU · ball handler",
+    "DEFENDER · guarding the screener",
+    "SCREENER"
+   ]
+  },
+  {
+   "id": "s11-09",
+   "src": "FR-COV",
+   "start": 831,
+   "pause": 845,
+   "end": 884,
+   "lv": "B",
+   "checked": false,
+   "title": "Screen on the side",
+   "q": "Your man jumps to the middle side of the screen. Where do they want you to go?",
+   "choices": [
+    {
+     "t": "Toward the sideline, away from the screen",
+     "ok": true
+    },
+    {
+     "t": "Over the screen to the middle"
+    }
+   ],
+   "ans": "That's ice. They force you to the sideline and the big comes over to corral the ball there.",
+   "quote": "they're actually going to jump into the ball handler over here, force him to have to drive towards the sideline, and then this hedge defender instead of staying towards the middle is going to rotate over, and they're going to corral the basketball on the sideline.",
+   "cast": [
+    "YOU · ball handler",
+    "YOUR DEFENDER",
+    "DEFENDER · guarding the screener"
+   ]
+  }
+ ]
+}

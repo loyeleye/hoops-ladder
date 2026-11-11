@@ -1,0 +1,200 @@
+{
+ "id": "s10",
+ "name": "Defense: who tags the roller?",
+ "blurb": "On a ball screen, the tag comes from the side the ball is going away from.",
+ "src": {
+  "FR-IQ6": {
+   "v": "2PAk0bcqpnw",
+   "t": "Basketball IQ Test #6 - Tag Defender",
+   "who": "The Film Room · former Big 12 player"
+  }
+ },
+ "m": [
+  {
+   "id": "s10-01",
+   "src": "FR-IQ6",
+   "start": 168,
+   "pause": 177,
+   "end": 199,
+   "lv": "B",
+   "checked": false,
+   "title": "Who tags?",
+   "q": "The ball handler comes off the screen. Which defender tags the roller?",
+   "choices": [
+    {
+     "t": "The defender on the side the ball is going away from",
+     "ok": true
+    },
+    {
+     "t": "The strong-side corner defender"
+    },
+    {
+     "t": "The defender in the middle, under the rim"
+    }
+   ],
+   "ans": "The tag comes from the weak side, the side the ball is being driven away from.",
+   "quote": "The correct answer was this player because the ball is being driven away from him. So, when you see the ball handler coming off the screen, look to the back side and that's the weak side tag defender.",
+   "cast": [
+    "YOU · on defense, backside",
+    "BALL HANDLER",
+    "ROLLER",
+    "DEFENDER · strong-side corner"
+   ]
+  },
+  {
+   "id": "s10-02",
+   "src": "FR-IQ6",
+   "start": 205,
+   "pause": 211,
+   "end": 248,
+   "lv": "B",
+   "checked": false,
+   "title": "Two screens in a row",
+   "q": "Two ball screens, one after the other. Who tags on the second one?",
+   "choices": [
+    {
+     "t": "The defender on the far side from the second screen",
+     "ok": true
+    },
+    {
+     "t": "The same defender who tagged the first one"
+    },
+    {
+     "t": "The strong-side corner defender"
+    }
+   ],
+   "ans": "The second screen is on the other side of the floor, so the tag switches. Here the new tag gets caught in no man's land and never tags, so the roller is open.",
+   "quote": "Because the ball screen was on the opposite side of the floor, this is the new tag defender. And this is a great example of why tagging is important because you can see that the tag defender ends up getting caught in no man's land. He never comes over and tags the big, and that's why he's open for this pass right here that leads to the layup.",
+   "cast": [
+    "YOU · on defense",
+    "BALL HANDLER",
+    "ROLLER",
+    "DEFENDER · first tag"
+   ]
+  },
+  {
+   "id": "s10-03",
+   "src": "FR-IQ6",
+   "start": 248,
+   "pause": 256,
+   "end": 289,
+   "lv": "I",
+   "checked": false,
+   "title": "Full speed",
+   "q": "Full speed this time. Who's the tag?",
+   "choices": [
+    {
+     "t": "The defender on the side the ball is going away from",
+     "ok": true
+    },
+    {
+     "t": "The strong-side corner defender"
+    },
+    {
+     "t": "The defender in the middle, under the rim"
+    }
+   ],
+   "ans": "Number 4, away from the ball. He gets his hands on the big, then closes out when the ball comes back to his man.",
+   "quote": "The ball is going away from him. He does a great job of getting his hands on the big, and then when the ball gets thrown back to his match-up, he closes out and keeps the ball in front. This is a perfect example of a good tag.",
+   "cast": [
+    "YOU · on defense",
+    "BALL HANDLER",
+    "ROLLER",
+    "DEFENDER · strong side"
+   ]
+  },
+  {
+   "id": "s10-04",
+   "src": "FR-IQ6",
+   "start": 289,
+   "pause": 306,
+   "end": 339,
+   "lv": "B",
+   "checked": false,
+   "title": "Ball goes middle",
+   "q": "The ball handler attacks the middle and the big rolls. Who should tag?",
+   "choices": [
+    {
+     "t": "The weak-side defender",
+     "ok": true
+    },
+    {
+     "t": "The strong-side defender next to the ball"
+    },
+    {
+     "t": "Nobody, the big's man recovers"
+    }
+   ],
+   "ans": "The weak-side defender should tag, then get back to his man. Here the strong-side defender came down instead, so his man was open for an easy kick-out three.",
+   "quote": "As the ball handler attacks the middle and the big is rolling to the rim, here's the weak side tag defender that we want to go in, tag the big, and then rotate back to 25. But this defender on the strong side rotates down to help when he sees the big, and that leaves his man open for this kick-out three, which is really easy for the point guard to see.",
+   "cast": [
+    "YOU · strong-side defender",
+    "BALL HANDLER",
+    "ROLLER",
+    "DEFENDER · weak side"
+   ]
+  },
+  {
+   "id": "s10-05",
+   "src": "FR-IQ6",
+   "start": 335,
+   "pause": 357,
+   "end": 385,
+   "lv": "I",
+   "checked": false,
+   "title": "Step-up screen, big rolls middle",
+   "q": "A step-up screen and the big rolls down the middle. Who can tag?",
+   "choices": [
+    {
+     "t": "Either weak-side defender",
+     "ok": true
+    },
+    {
+     "t": "Only the strong-side corner"
+    },
+    {
+     "t": "The guard who was screened"
+    }
+   ],
+   "ans": "Both weak-side defenders can tag. Teams pick the top, the bottom, or both. Neither did it here, which is why it's a layup.",
+   "quote": "As the guard comes off of this step up and the big rolls down the middle, you could have either one of these players be your tag defenders because they're both on the weak side. Some teams will have the top guy tag, some will have the bottom, some will have both of them tag, but neither one of them did their job in this possession and that's what led to this layup.",
+   "cast": [
+    "YOU · weak side, top",
+    "BALL HANDLER",
+    "ROLLER",
+    "DEFENDER · weak side, bottom"
+   ]
+  },
+  {
+   "id": "s10-06",
+   "src": "FR-IQ6",
+   "start": 386,
+   "pause": 398,
+   "end": 446,
+   "lv": "I",
+   "checked": false,
+   "title": "Handoff, then flip",
+   "q": "A handoff, then the screen flips the other way. Who should tag?",
+   "choices": [
+    {
+     "t": "The two defenders on the new weak side",
+     "ok": true
+    },
+    {
+     "t": "The defender standing on the strong side"
+    },
+    {
+     "t": "The defender who guarded the handoff"
+    }
+   ],
+   "ans": "Flipping the screen changes which side is weak. The two defenders on the new back side should tag. The strong-side defender helped instead and left a rhythm three.",
+   "quote": "And what we should know by now is that that changes where the weak side defenders are. So as this big rolls to the basket, we want these two defenders back here to be the tag defenders, not this guy standing right here on the strong side because that's what leaves this easy strong side kickout for the rhythm three wide open.",
+   "cast": [
+    "YOU · on defense",
+    "BALL HANDLER",
+    "ROLLER",
+    "DEFENDER · strong side"
+   ]
+  }
+ ]
+}

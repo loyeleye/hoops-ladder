@@ -1,12 +1,17 @@
 {
  "id": "s4",
- "name": "Pick and roll: NBA coverages",
- "blurb": "Read the coverage, then the low man, and let the defense tell you where the ball goes.",
+ "name": "Pick and roll: NBA reads",
+ "blurb": "Giddey and Steve Nash: set up your man, read the coverage, then the low man, and let the defense tell you where the ball goes.",
  "src": {
   "JG-PNR": {
    "v": "hNwxyd2qBNo",
    "t": "How I See The Game as an NBA Player",
    "who": "Josh Giddey · NBA"
+  },
+  "TB-NASH": {
+   "v": "wTHKJaVgxqU",
+   "t": "Steve Nash Breaks Down His Pick and Roll Mastery",
+   "who": "Steve Nash · two-time NBA MVP"
   }
  },
  "m": [
@@ -294,6 +299,220 @@
     "YOUR DEFENDER · Wells",
     "SCREENER'S DEFENDER · Randle",
     "SCREENER · Vučević"
+   ]
+  },
+  {
+   "id": "s4-10",
+   "src": "TB-NASH",
+   "start": 83,
+   "pause": 131,
+   "end": 168,
+   "lv": "I",
+   "checked": false,
+   "title": "Before the screen",
+   "q": "You're bringing it up and the screen is coming. What do you do with your own man first?",
+   "choices": [
+    {
+     "t": "Get some space from him before the screen",
+     "ok": true
+    },
+    {
+     "t": "Run him straight into the screen"
+    },
+    {
+     "t": "Wait for the screener to come to you"
+    }
+   ],
+   "ans": "Loosen your man up so he's an arm's length or more away before you reach the screen. Then the big is isolated on you and has to commit.",
+   "quote": "See how I've created that separation right there? The way I played, I thought this was extremely important. I didn't want my guy to be attached. If I could loosen my man up before I got to the screen where he was arms length or more. I just had such a big advantage because now I'm isolated on the big.",
+   "cast": [
+    "YOU · Nash",
+    "YOUR DEFENDER · Josh Howard",
+    "SCREENER · Amar'e",
+    "DEFENDER · the big"
+   ]
+  },
+  {
+   "id": "s4-11",
+   "src": "TB-NASH",
+   "start": 168,
+   "pause": 177,
+   "end": 228,
+   "lv": "I",
+   "checked": false,
+   "title": "The big has to choose",
+   "q": "You've walked your man into the screen. What's open?",
+   "choices": [
+    {
+     "t": "Whichever one the big doesn't take: the roller or your pull-up",
+     "ok": true
+    },
+    {
+     "t": "Only the roller"
+    },
+    {
+     "t": "Nothing, so reset"
+    }
+   ],
+   "ans": "Your man is stuck on the screen, so the big can't play two. He has to commit to you or the roller, and you take the other.",
+   "quote": "So, see, I'm isolated now on Damp, right? So, now Amari's got a role and Damp can't play the role. He's got to play me. Now, I've got both. I could have thrown this to Amari or I could take my pull-up.",
+   "cast": [
+    "YOU · Nash",
+    "DEFENDER · the big (Dampier)",
+    "ROLLER · Amar'e",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s4-12",
+   "src": "TB-NASH",
+   "start": 263,
+   "pause": 271,
+   "end": 316,
+   "lv": "I",
+   "checked": false,
+   "title": "Your man is still attached",
+   "q": "The screen is there, but your man is still right on you. Come off it now?",
+   "choices": [
+    {
+     "t": "No, back up and set him up first",
+     "ok": true
+    },
+    {
+     "t": "Yes, come off and attack the big"
+    },
+    {
+     "t": "Wave the screener away"
+    }
+   ],
+   "ans": "He backs up with a hang dribble to threaten the middle, gets his man between the screener's feet, then comes off and attacks the space when his man goes under.",
+   "quote": "So, like I could come off when Amari first offers the screen here, right? But he's he's in a good defensive position. So, when I see him start to go, I say, \"M, I'm not creating any space here. Let me back up.\"",
+   "cast": [
+    "YOU · Nash",
+    "YOUR DEFENDER",
+    "SCREENER · Amar'e"
+   ]
+  },
+  {
+   "id": "s4-13",
+   "src": "TB-NASH",
+   "start": 735,
+   "pause": 742,
+   "end": 760,
+   "lv": "B",
+   "checked": false,
+   "title": "Two seven-footers up high",
+   "q": "The big is up high and two seven-footers are above the free throw line. Use the screen?",
+   "choices": [
+    {
+     "t": "No, reject it and beat your own man into the open space",
+     "ok": true
+    },
+    {
+     "t": "Yes, go around the big"
+    },
+    {
+     "t": "Pass it back out"
+    }
+   ],
+   "ans": "Reject the screen and play one on one into the space behind them. If they all collapse, there are shooters everywhere.",
+   "quote": "Damp's up. So I could come off and I could go try to go around damp, but they've got two sevenfooters above the free throw line. So my thought is let me just get by my defender and in that pocket of space.",
+   "cast": [
+    "YOU · Nash",
+    "DEFENDER · the big, up high",
+    "DEFENDER · the other seven-footer",
+    "YOUR DEFENDER"
+   ]
+  },
+  {
+   "id": "s4-14",
+   "src": "TB-NASH",
+   "start": 760,
+   "pause": 768,
+   "end": 810,
+   "lv": "I",
+   "checked": false,
+   "title": "Man on your back, big back",
+   "q": "Your man is on your back and the big is staying with the roller. Not much space. What shot?",
+   "choices": [
+    {
+     "t": "A floater on the move",
+     "ok": true
+    },
+    {
+     "t": "Stop and pull up"
+    },
+    {
+     "t": "Drive at the big"
+    }
+   ],
+   "ans": "If he pulls up he gets blocked from behind. Shoot it on the move so the trailing defender can't recover.",
+   "quote": "But when I recognize he's on my back, I need to shoot this on the move so he can't recover and block this.",
+   "cast": [
+    "YOU · Nash",
+    "YOUR DEFENDER · on your back",
+    "DEFENDER · the big",
+    "ROLLER"
+   ]
+  },
+  {
+   "id": "s4-15",
+   "src": "TB-NASH",
+   "start": 937,
+   "pause": 944,
+   "end": 990,
+   "lv": "I",
+   "checked": false,
+   "title": "Corner empty, the big at the level",
+   "q": "Corner empty, and the big is guarding the baseline. Where does it go?",
+   "choices": [
+    {
+     "t": "Pocket pass to the roller",
+     "ok": true
+    },
+    {
+     "t": "Drive baseline"
+    },
+    {
+     "t": "Pull up"
+    }
+   ],
+   "ans": "It's a pick-your-poison read on the big: if he plays the pocket, go by him baseline; if he respects the baseline, the pocket pass is there.",
+   "quote": "If Durk tries to play the pocket, I'm going by him on the baseline. If he respects the baseline, the pocket's there,",
+   "cast": [
+    "YOU · Nash",
+    "DEFENDER · the big (Dirk)",
+    "ROLLER · Amar'e"
+   ]
+  },
+  {
+   "id": "s4-16",
+   "src": "TB-NASH",
+   "start": 1239,
+   "pause": 1248,
+   "end": 1305,
+   "lv": "I",
+   "checked": false,
+   "title": "Last defender at the rim",
+   "q": "You've beaten two defenders and the last big has to come stop you. When do you pass to the roller?",
+   "choices": [
+    {
+     "t": "When his hips turn to you",
+     "ok": true
+    },
+    {
+     "t": "Right away"
+    },
+    {
+     "t": "Never, finish it"
+    }
+   ],
+   "ans": "Take one more hard dribble to draw him. Once his hips turn, he can't get back to the roller.",
+   "quote": "As soon as I see his hips turn, I know Amari's open.",
+   "cast": [
+    "YOU · Nash",
+    "DEFENDER · the last big (Dirk)",
+    "ROLLER · Amar'e"
    ]
   }
  ]
