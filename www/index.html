@@ -448,6 +448,12 @@ section{display:flex;flex-direction:column;gap:10px}
 .bt-pct{font-size:16px;opacity:.75}
 .bt-hint{text-align:center;font-size:14px;opacity:.7}
 .bt-top .btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.bt-top .bt-sp{flex:1}
+/* Pause and Skip sit at the bottom, within thumb reach; End stays top-left, away from them */
+.bt-bot{display:flex;gap:10px;margin:4px 0 8px}
+.bt-bot .btn{flex:1;min-height:60px;font-size:18px;background:color-mix(in srgb,var(--bg) 16%,transparent);color:var(--bg);border:0}
+.bt-bot .btn.go{background:var(--accent);color:var(--accent-ink)}
+.bt-bot .btn{display:flex;align-items:center;justify-content:center;gap:8px}.bt-bot svg{width:30px;height:30px;fill:currentColor}
 .bt-set{font-size:18px;font-weight:700;opacity:.85}
 .bt-zones{position:absolute;inset:0;display:grid;grid-template-rows:1fr 1fr;pointer-events:none;z-index:0}
 .bt-zones .z{display:flex;flex-direction:column;align-items:center;gap:2px;padding:64px 16px 12px;font-family:var(--display);text-transform:uppercase}
@@ -3779,6 +3785,7 @@ function partCalls(d,pi){const ph=d&&d.phases&&d.phases[pi];if(!ph||d.log!=="tim
 const isRestPart=()=>P&&P.stage==="work"&&/^rest\b/i.test((phasesOf(P.items[P.i])[P.pi]||[""])[0]);
 const phasesOf=d=>d.log==="react"&&!d.tempoCalls?[[d.silent?"Watch the signals":"Follow the calls",d.secs]]:d.phases;
 const totalOf=d=>phasesOf(d).reduce((a,p)=>a+p[1],0);
+const IC_PAUSE=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>`,IC_PLAY=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>`,IC_SKIP=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7zM16 5h3v14h-3z"/></svg>`;
 function startPlayer(ids,fromRunner){
   const items=ids.map(id=>D[id]&&goalVariant(D[id])).filter(d=>d&&(d.log==="timer"||d.log==="react"));if(!items.length)return;
   P={items,i:0,pi:0,stage:"ready",left:5,running:true,el:items.map(()=>0),ratings:items.map(()=>1),drops:items.map(()=>0),lost:false,call:null,nextAt:0,fromRunner,
@@ -3881,7 +3888,7 @@ function drawPlayer(){
     const ph=phasesOf(d),nextLabel=P.stage==="rest"?`${P.items[P.i+1].name}: ${phasesOf(P.items[P.i+1])[0][0]}`:P.stage==="ready"?ph[0][0]:P.pi+1<ph.length?ph[P.pi+1][0]:P.i+1<P.items.length?`Rest, then ${P.items[P.i+1].name}`:"Finish";
     const part=P.stage==="ready"?"Get ready":P.stage==="rest"?"Rest":ph[P.pi][0];
     const head=P.cd>0?"Get set":!P.running?(P.lost?"Lost it":"Paused"):part;
-    pEl.innerHTML=`<div class="bt-top"><button class="btn sec small" data-p="toggle">${P.running?"Pause":"Resume"}</button><button class="btn sec small" data-p="skip">${P.stage==="work"?"Skip":P.stage==="ready"?"Start now":"Skip rest"}</button><button class="btn sec small" data-p="end">End</button></div>
+    pEl.innerHTML=`<div class="bt-top"><button class="btn sec small" data-p="end">End</button><span class="bt-sp"></span></div>
      <div class="bt-mid"><div class="pmeta">${P.items.length>1?`Drill ${P.i+(P.stage==="rest"?2:1)} of ${P.items.length} · `:""}${esc(P.stage==="rest"?P.items[P.i+1].name:d.name)}${head!==part?` · ${esc(part)}`:""}</div>
       <div class="bt-label${head!==part?" st":""}">${esc(head)}</div>${pMove()}
       ${(d.log==="react"||d.cond&&d.calls||P.stage==="work"&&partCalls(d,P.pi))&&P.stage==="work"&&!isRestPart()?`<div class="pcall${d.silent?" sig":""}" id="pCall">${esc(P.call||"Ready…")}</div>`:""}${d.tempoCalls&&P.stage==="work"&&!isRestPart()?`<div class="pmeta" id="pBpm">${P.bpm?`${P.bpm} per min · ${P.rep||0} reps`:"Get set…"}</div>`:""}
@@ -3889,7 +3896,7 @@ function drawPlayer(){
       <div class="bt-count num" id="pClock">${P.cd>0?Math.ceil(P.cd):fmt(P.left)}</div>${condRest()}
       ${P.stage==="work"&&d.log!=="react"&&!(d.cond&&isRestPart())?`<div class="ptip" id="pTip">${esc(P.tip||"")}</div>`:""}${P.cd>0?`<div class="pmeta">Dribbling starts at zero</div>`:""}${P.running?"":`${P.lost?`<div class="pmeta">Tap when you have it${P.stage==="work"&&phasesOf(d)[P.pi][3]&&cdSecs()?`, then a ${cdSecs()}-second countdown`:""}</div>`:""}${P.stage==="work"&&phasesOf(d)[P.pi][3]?cdCtl("data-p"):""}${P.lost&&P.back?`<div class="pmeta">Took back ${P.back} reps for the time it took to tap</div>`:""}<div style="display:none"></div>`}${P.stage==="work"&&P.drops[P.i]?`<div class="pmeta">${P.drops[P.i]} drop${P.drops[P.i]===1?"":"s"}</div>`:""}</div>
      ${P.stage==="work"&&phasesOf(d)[P.pi][3]?`<div class="pbeat">${beatSlider(Math.round(phasesOf(d)[P.pi][3]/(S.settings.beat||1)))}</div>`:""}
-     ${(()=>{const di=P.stage==="rest"?P.i+1:P.i,dpi=P.stage==="work"?P.pi:0,cl=clipLinks(P.items[di],dpi),sa=isRestPart()?0:seeIds(P.items[di],dpi).length;return cl||sa?`<div class="pdemo"><span>${cl?(P.stage==="work"?"Demo":"Watch first"):"Not sure how?"}</span>${sa?`<button class="clip" data-p="see">Show the move</button>`:""}${cl}</div>`:""})()}<div class="bt-hint"><b>Next:</b> ${esc(nextLabel)}<br>${!P.running?"Tap anywhere to go":P.cd>0?"Tap anywhere to pause":P.stage==="work"?(d.cond&&d.tapEnd&&!isRestPart()?"Tap anywhere as you finish":d.body||d.cond||isRestPart()?"Tap anywhere to pause":"Lost the ball? Tap anywhere"):"Tap anywhere to pause"}</div>`}
+     ${(()=>{const di=P.stage==="rest"?P.i+1:P.i,dpi=P.stage==="work"?P.pi:0,cl=clipLinks(P.items[di],dpi),sa=isRestPart()?0:seeIds(P.items[di],dpi).length;return cl||sa?`<div class="pdemo"><span>${cl?(P.stage==="work"?"Demo":"Watch first"):"Not sure how?"}</span>${sa?`<button class="clip" data-p="see">Show the move</button>`:""}${cl}</div>`:""})()}<div class="bt-bot"><button class="btn go" data-p="toggle" aria-label="${P.running?"Pause":"Resume"}">${P.running?IC_PAUSE:IC_PLAY}</button><button class="btn" data-p="skip" aria-label="${P.stage==="work"?"Skip":P.stage==="ready"?"Start now":"Skip rest"}">${IC_SKIP}${P.stage==="work"?"":`<span>${P.stage==="ready"?"Start now":"Skip rest"}</span>`}</button></div><div class="bt-hint"><b>Next:</b> ${esc(nextLabel)}<br>${!P.running?"Tap anywhere to go":P.cd>0?"Tap anywhere to pause":P.stage==="work"?(d.cond&&d.tapEnd&&!isRestPart()?"Tap anywhere as you finish":d.body||d.cond||isRestPart()?"Tap anywhere to pause":"Lost the ball? Tap anywhere"):"Tap anywhere to pause"}</div>`}
   pEl.querySelectorAll("[data-clip]").forEach(a=>a.onclick=e=>{e.stopPropagation();if(P.running)togglePlay()});
   pEl.querySelectorAll("[data-p]").forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.p;
     if(k.startsWith("ans:")){const [,a,v]=k.split(":").map(Number);P.ans[P.i][a]=v;beep(880,80);drawPlayer()}else if(k.startsWith("cd:"))setCd(+k.slice(3));else if(k==="see")openSee();else if(k==="toggle")togglePlay();else if(k==="skip"){advance()}else if(k==="end"){P.el.some(x=>x>0)?toRate():(closePlayer())}
@@ -5566,7 +5573,7 @@ route();
         if (who === "play") { vStop(); S.settings.pvoice = false; persist(); drawPlayer() }
         else vStart("play").then(() => { S.settings.pvoice = true; persist(); drawPlayer(); say("Voice on.") }).catch(() => drawPlayer());
       };
-      top.insertBefore(b, top.lastElementChild);
+      top.appendChild(b);
       const h = pEl.querySelector(".bt-hint");
       if (on && h) h.insertAdjacentHTML("beforeend", `<br>Say “pause”, “go”, “lost it”, “faster”, “slower” or “skip”.`);
     };
