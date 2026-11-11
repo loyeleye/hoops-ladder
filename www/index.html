@@ -504,6 +504,8 @@ section{display:flex;flex-direction:column;gap:10px}
 @media (prefers-reduced-motion:no-preference){.psee-card{animation:sheetup .25s ease-out}@keyframes sheetup{from{transform:translateY(40px);opacity:.4}}}
 .plantotal{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--muted)}.plantotal b{color:var(--ink);font-weight:600}
 .upnext{display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.1}
+.upnext.hello{animation:upHello .8s ease-out 2}@keyframes upHello{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 60%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+@media (prefers-reduced-motion:reduce){.upnext.hello{animation:none}}
 .upnext small{font-family:var(--body);font-size:13px;font-weight:600;text-transform:none;letter-spacing:0;opacity:.85}
 .drill.next{border:2px solid var(--accent);padding:11px}
 .partshead{font-size:18px;text-transform:uppercase;margin-top:4px}
@@ -2843,7 +2845,7 @@ function viewToday(){
    ${setupStrip(!started&&!cw)}
    ${waiting.length?addedCard(waiting):""}
    ${nowPlaying(p,ts)}
-   ${(()=>{if(!up.length)return rate?`<button class="btn pri" data-rec="recap">Rate today's drills<small style="display:block;font-family:var(--body);font-size:13px;text-transform:none;font-weight:600">Easy, Right or Hard · 10 seconds</small></button>`:`<button class="btn pri" disabled>Today's workout is done</button>`;const timed=x=>x.d.log==="timer"||x.d.log==="react";
+   ${(()=>{if(!S.sessions.length&&!S.rec.start)return"";if(!up.length)return rate?`<button class="btn pri" data-rec="recap">Rate today's drills<small style="display:block;font-family:var(--body);font-size:13px;text-transform:none;font-weight:600">Easy, Right or Hard · 10 seconds</small></button>`:`<button class="btn pri" disabled>Today's workout is done</button>`;const timed=x=>x.d.log==="timer"||x.d.log==="react";
      if(timed(up[0])){const secs=up.reduce((a,x)=>a+totalOf(x.d),0)+10*(up.length-1);return `<button class="btn pri upnext" data-play="${up.map(x=>x.d.id).join(",")}">Up next: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}<small>Timed · plays back to back · ${Math.round(secs/60)} min</small></button>`}
      return `<button class="btn pri upnext" data-open="${up[0].d.id}">Up next: ${esc(up[0].d.name)}<small>Opens the drill and its logger</small></button>`})()}
    ${cueCard()}
@@ -3009,10 +3011,12 @@ function openFold(k){foldSet(k,true);const d=document.querySelector(`details.fol
 let wkObs=null;
 function wkBar(){let el=document.getElementById("wkbar");if(!el){el=document.createElement("div");el.id="wkbar";el.className="wk-bar";el.setAttribute("role","region");el.setAttribute("aria-label","Workout");document.body.appendChild(el);
     el.addEventListener("click",e=>{const b=e.target.closest("[data-wk]");if(!b)return;const ids=b.dataset.wk.split(",");const d=D[ids[0]];if(!d)return;if(d.log==="timer"||d.log==="react")startPlayer(ids,false);else openRunner(ids[0])})}
-  const ts=todaySession(),p=plan(),up=upNext(p,ts),on=!!(ts&&up.length&&p.some(x=>ts.items.some(it=>it.id===x.d.id)));
+  const ts=todaySession(),p=plan(),up=upNext(p,ts),go=!!(ts&&p.some(x=>ts.items.some(it=>it.id===x.d.id)));
+  /* before the first drill it shows on Today only, once you scroll past the Up next button (wk-hide covers the rest) */
+  const on=!!(up.length&&(go||(state.tab==="today"&&(S.sessions.length||S.rec.start))));
   const was=document.body.classList.contains("wk-on");document.body.classList.toggle("wk-on",on);if(!on){el.innerHTML="";return}el.classList.toggle("wk-anim",!was);
-  const isDone=x=>ts.items.some(it=>it.id===x.d.id),live=p.filter(x=>!x.skip||isDone(x)),dn=live.filter(isDone).length;
-  el.innerHTML=`<div class="wk-row"><div class="wk-txt"><div class="wk-t">Workout · ${dn} of ${live.length}</div><div class="wk-s">Next: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}</div></div><button class="wk-go" data-wk="${up.map(x=>x.d.id).join(",")}">Start</button><i class="wk-bar-p" style="width:${live.length?Math.round(100*dn/live.length):0}%"></i></div>`;
+  const isDone=x=>!!ts&&ts.items.some(it=>it.id===x.d.id),live=p.filter(x=>!x.skip||isDone(x)),dn=live.filter(isDone).length;
+  el.innerHTML=`<div class="wk-row"><div class="wk-txt"><div class="wk-t">${go?`Workout · ${dn} of ${live.length}`:`Today · ${live.length} drill${live.length===1?"":"s"}`}</div><div class="wk-s">${go?"Next":"Up next"}: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}</div></div><button class="wk-go" data-wk="${up.map(x=>x.d.id).join(",")}">Start</button><i class="wk-bar-p" style="width:${live.length?Math.round(100*dn/live.length):0}%"></i></div>`;
   const tabs=document.querySelector(".tabs");document.documentElement.style.setProperty("--tabh",(tabs?tabs.offsetHeight:64)+"px");
   if(wkObs){wkObs.disconnect();wkObs=null}document.body.classList.remove("wk-hide");
   const u=state.tab==="today"&&document.querySelector(".upnext");if(u&&"IntersectionObserver" in window){wkObs=new IntersectionObserver(es=>document.body.classList.toggle("wk-hide",es[0].isIntersecting));wkObs.observe(u)}}
@@ -3089,7 +3093,9 @@ const STARTERS=[
  {id:"st_shoot",name:"Shooting day",note:"Form, then volume",items:["s_cold","b_body","s_line","s_rollup","s_elbow","s_5spot","s_ladder","s_atw","s_rimline","s_ft","b_cool"]},
  {id:"st_fin",name:"Finishing day",note:"Layups, floaters, footwork",items:["b_body","h_lab","f_mikan","f_corner","f_weak","f_foot5","f_float","f_reverse","f_called","s_ft","b_cool"]},
  {id:"st_handles",name:"Handles, no hoop",note:"Driveway, garage or a wall",items:["b_body","h_lab","h_pound","h_five","h_fig8","h_place","h_d2","h_tennis","b_cool"]},
- {id:"st_game",name:"Game-day tune-up",note:"Touch and rhythm, no jumping",items:["b_game","f_mikan","s_line","s_ft","b_cool"]}];
+ {id:"st_game",name:"Game-day tune-up",note:"Touch and rhythm, no jumping",items:["b_game","f_mikan","s_line","s_ft","b_cool"]},
+ {id:"st_warm",name:"Warm-up only",note:"Before pickup, a run or a game",items:["b_body"]},
+ {id:"st_cool",name:"Cool-down only",note:"After a game or a hard run",items:["b_cool2"]}];
 const wNew=()=>"w"+Date.now().toString(36)+Math.floor(Math.random()*36).toString(36);
 /* keep a workout's order rules: Cold 3s and the body warm-up first, the stretch last; finishing or jump work brings the warm-up in */
 function wOrder(items,keep){let ids=[...new Set(items)].filter(id=>D[id]);if(needsWarm(ids))ids=[rtPick("warm").id,...ids];if(!keep)return ids;const first=pinFirst(ids),last=pinLast(ids);return [...first,...ids.filter(id=>!first.includes(id)&&!last.includes(id)),...last]}
@@ -3281,8 +3287,9 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "body":{const cur=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;S.rec.body=cur===b?null:{d:today(),k:b};persist();return render()}
   case "lvl":state.start={...(state.start||{level:"regular",focus:"bal"}),level:b};return render();
   case "focus":state.start={...(state.start||{level:"regular",focus:"bal"}),focus:b};return render();
-  case "start":S.rec.start=state.start||{level:"regular",focus:"bal"};persist();return render();
-  case "startskip":S.rec.start={level:"regular",focus:"bal"};persist();return render();
+  case "start":case "startskip":S.rec.start=a==="start"&&state.start||{level:"regular",focus:"bal"};persist();render();
+    /* first run: the welcome card hands straight over to Up next, which is now the first button on screen */
+    {const u=document.querySelector(".upnext");if(u){u.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});u.focus({preventScroll:true});u.classList.add("hello");setTimeout(()=>u.classList.remove("hello"),1600)}}return;
   case "seen":S.rec.seen=true;persist();return render();
   case "addin":S.rec.plan.extra=[...new Set([...(S.rec.plan.extra||[]),...S.rec.added])];persist();return render();
   case "keepnext":state.keepNext=today();return render();
