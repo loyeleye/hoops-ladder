@@ -2608,9 +2608,12 @@ function plan0(){
     RH=DRILLS.filter(d=>d.skill==="h"&&d.read&&d.log==="react"),VOL=DRILLS.filter(d=>d.skill==="s"&&!FIXED.has(d.id)&&d.id!=="s_5spot"&&d.id!=="s_ft"&&(d.role==="volume"||(d.read&&d.role==="core"))),
     WARM=DRILLS.filter(d=>d.role==="warm");
   const POOL={s:[FORM,VOL],h:[H,RH],f:[F,F]},focus=S.rec.start&&S.rec.start.focus;
+  /* 3s are the main goal. Under 45 minutes the test is the short 5-Spot (6 per spot, about 7 min), reserved before the other picks
+     so it fits; at 45 it's the full 10 per spot. Both feed the same 3-point numbers. */
+  const t3=lastDone("s_5spot"),t3due=mins===45||!t3||t3===day||daysAgo(t3)>=2,sh=mins<45;SHORT5=null;
+  if(t3due&&ok(D.s_5spot)&&!body){if(sh){SHORT5=day;add({...D.s_5spot,per:6},{k:"fixed",t:"Your 3-point test, short: 6 per spot"},"fav")}else add(D.s_5spot,{k:"fixed",t:"Your 3-point test, every other session"},"fav")}
   fill(H);fill(F);
-  const t3=lastDone("s_5spot"),t3due=mins===45||!t3||t3===day||daysAgo(t3)>=2;
-  if(t3due&&ok(D.s_5spot))add(D.s_5spot,{k:"fixed",t:"Your 3-point test, every other session"},"fav");
+  if(t3due&&body&&ok(D.s_5spot))add(D.s_5spot,{k:"fixed",t:"Your 3-point test, every other session"},"fav");
   fill(FORM);
   if(POOL[focus])fill(POOL[focus][0]);
   {const w=pick(WARM)||D.h_lab;if(ok(w))add(w,{k:"fixed",t:"Ball warm-up, if there's time"},"fav")}
@@ -2733,7 +2736,7 @@ function viewToday(){
      return `<button class="btn pri upnext" data-open="${up[0].d.id}">Up next: ${esc(up[0].d.name)}<small>Opens the drill and its logger</small></button>`})()}
    ${cueCard()}
    ${ws?`<div class="card focus">${courtSVG({data:spotTotals(30),size:96})}<div class="small"><div class="label">Focus spot</div><b>${SPOT[ws.id].name}</b> is your coldest spot over 30 days at <b class="num">${Math.round(ws.p*100)}%</b>. Weak Spot Reps will target it.</div></div>`:""}
-   <div class="plantotal"><span>${p.length} drills${nNeed?` · ${nNeed} for what needs work`:""}</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min on the court</b></div>
+   <div class="plantotal"><span>${p.length} drill${p.length===1?"":"s"}${nNeed?` · ${nNeed} for what needs work`:""}</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min on the court</b></div>
    <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}<div class="planline${x.skip?" skipped":""}">${drillRow(x.d,i+1,{next:upIds.has(x.d.id),why:x.why})}${cw?`<button class="optb" data-rec="wopt:${x.d.id}" aria-label="${esc(x.d.name)}: skip today or remove">${MOREICON}</button>`:x.d.rt?`<button class="optb" data-rec="rt:${x.d.rt}" aria-label="${esc(x.d.name)}: pick your ${RT_NAME[x.d.rt]}">${SWAPICON}</button>`:!FIXED.has(x.d.id)?`<button class="optb" data-rec="opt:${x.d.id}" aria-label="${esc(x.d.name)}: why it's here, swap or how often">${SWAPICON}</button>`:`<span class="optb ph" aria-hidden="true"></span>`}</div>`).join("")}</div>
    ${cw&&ts?(()=>{const other=[...new Set(ts.items.map(it=>it.id))].filter(id=>D[id]&&!p.some(x=>x.d.id===id));return other.length?`<p class="muted small" style="margin:0">Also done today: ${other.map(id=>esc(D[id].name)).join(", ")}.</p>`:""})():""}
    ${cw?"":overflowCard(p)}
@@ -3382,7 +3385,8 @@ function goalVariant(d){const k=glKind(d);if(!k)return d;const x=glOf(d.id)[k];i
   else if(k==="stage"){v.stageN=x;if(v.goal)v.goal=x*v.stages.length;else v.att=x*v.stages.length}
   else v.phases=d.phases.map(p=>[p[0],Math.max(5,Math.round(p[1]*x/5)*5)]);
   return v}
-const drillGoal=d=>d&&goalVariant(gmVariant(d));
+let SHORT5=null;
+const drillGoal=d=>{if(!d)return d;const v=goalVariant(gmVariant(d));return d.id==="s_5spot"&&SHORT5===today()&&!customToday()?{...v,per:Math.min(v.per,6)}:v};
 function goalEdit(d){const k=glKind(d);if(!k||R.a||R.t0)return"";const cus=glOf(d.id)[k]!=null;
   const lab={k:"In a row",per:"Shots per spot",n:d.goal?"Makes":"Shots",stage:d.stageBy==="makes"?"Makes per part":"Shots per part",sec:"Time",time:"Time"}[k];
   const v=k==="sec"||k==="time"?fmt(totalOf(d)):glVal(d,k);
