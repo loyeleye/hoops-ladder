@@ -181,6 +181,8 @@ section{display:flex;flex-direction:column;gap:10px}
 .condrow .sechead{margin-top:6px}
 .cllib .bar .btn,.clrec .bar .btn,.rmv .bar .btn,.frd .bar .btn{width:auto;flex:0 0 auto}
 .lib-body{overflow-y:auto;padding:0 16px 20px;display:flex;flex-direction:column;gap:12px}.lib-body p{margin:0}
+.cllib .lib-body{flex:1 1 auto;min-height:0;overscroll-behavior:contain}
+.lib-foot{flex:0 0 auto;display:flex;flex-direction:column;padding:12px 16px;border-top:1px solid rgba(255,255,255,.12);background:#05080F}.lib-foot p{margin:0;text-align:center}
 .lib-tip{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;font-size:14px}
 .lib-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12)}.lib-row>span{flex:1;display:flex;flex-direction:column;min-width:0}.lib-row small{color:#9AA6BF}
 .cr-stage,.fr-stage{position:relative;flex:1;min-height:0;display:flex}.cr-stage video,.fr-stage video{flex:1;min-height:0;width:100%;object-fit:contain;background:#000}
@@ -428,7 +430,7 @@ section{display:flex;flex-direction:column;gap:10px}
 .metric.arc .btn{margin-top:8px}
 .bt-cue{margin-top:10px;font-size:16px;opacity:.75}
 .mdir.one{grid-template-columns:auto 1fr}
-.bigtap .bt-sw{align-self:center;margin-top:8px;position:relative;z-index:2;background:color-mix(in srgb,var(--bg) 14%,transparent);color:var(--bg);border:0}
+.bigtap .bt-sw,.bigtap .bt-film{align-self:center;margin-top:8px;position:relative;z-index:2;background:color-mix(in srgb,var(--bg) 14%,transparent);color:var(--bg);border:0}
 .bigtap .bt-sw[aria-pressed="true"]{background:var(--good);color:#fff}
 .camtip b{color:var(--accent)}
 .c3{display:grid;grid-template-columns:1fr auto auto auto;gap:6px 12px;font-size:14px;align-items:center}
@@ -504,6 +506,8 @@ section{display:flex;flex-direction:column;gap:10px}
 @media (prefers-reduced-motion:no-preference){.psee-card{animation:sheetup .25s ease-out}@keyframes sheetup{from{transform:translateY(40px);opacity:.4}}}
 .plantotal{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--muted)}.plantotal b{color:var(--ink);font-weight:600}
 .upnext{display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.1}
+.upnext.hello{animation:upHello .8s ease-out 2}@keyframes upHello{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 60%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+@media (prefers-reduced-motion:reduce){.upnext.hello{animation:none}}
 .upnext small{font-family:var(--body);font-size:13px;font-weight:600;text-transform:none;letter-spacing:0;opacity:.85}
 .drill.next{border:2px solid var(--accent);padding:11px}
 .partshead{font-size:18px;text-transform:uppercase;margin-top:4px}
@@ -2820,7 +2824,7 @@ function drillRow(d,i,opts={}){
   const w=opts.why, lib=opts.lib&&!d.body, f=lib?fq(d.id).k:"auto";
   return `<button class="drill ${done?"done":""} ${opts.next?"next":""}" data-open="${d.id}">
    <span class="ix">${done?"✓":i}</span>
-   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}${d.cond?condTags(d,opts.lib):`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}<span>${tgt}</span></span></span>
+   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}${lib&&d.cond?condTop2(d,f):d.cond?condTags(d,opts.lib):`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${lib&&d.cond?"":`${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}`}<span>${tgt}</span></span></span>
    <span class="go">${done?"Again":"Go"}</span></button>`}
 
 function weekDots(){
@@ -2843,7 +2847,7 @@ function viewToday(){
    ${setupStrip(!started&&!cw)}
    ${waiting.length?addedCard(waiting):""}
    ${nowPlaying(p,ts)}
-   ${(()=>{if(!up.length)return rate?`<button class="btn pri" data-rec="recap">Rate today's drills<small style="display:block;font-family:var(--body);font-size:13px;text-transform:none;font-weight:600">Easy, Right or Hard · 10 seconds</small></button>`:`<button class="btn pri" disabled>Today's workout is done</button>`;const timed=x=>x.d.log==="timer"||x.d.log==="react";
+   ${(()=>{if(!S.sessions.length&&!S.rec.start)return"";if(!up.length)return rate?`<button class="btn pri" data-rec="recap">Rate today's drills<small style="display:block;font-family:var(--body);font-size:13px;text-transform:none;font-weight:600">Easy, Right or Hard · 10 seconds</small></button>`:`<button class="btn pri" disabled>Today's workout is done</button>`;const timed=x=>x.d.log==="timer"||x.d.log==="react";
      if(timed(up[0])){const secs=up.reduce((a,x)=>a+totalOf(x.d),0)+10*(up.length-1);return `<button class="btn pri upnext" data-play="${up.map(x=>x.d.id).join(",")}">Up next: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}<small>Timed · plays back to back · ${Math.round(secs/60)} min</small></button>`}
      return `<button class="btn pri upnext" data-open="${up[0].d.id}">Up next: ${esc(up[0].d.name)}<small>Opens the drill and its logger</small></button>`})()}
    ${cueCard()}
@@ -2875,10 +2879,19 @@ function viewLadder(){
   const list=DRILLS.filter(d=>d.skill===k&&!d.body).sort((a,b)=>a.unlock-b.unlock||(a.read?1:0)-(b.read?1:0));
   return `<section id="drillpanel" role="tabpanel" aria-labelledby="tab-${k}"><div class="sechead"><h2>${k==="s"?"Shooting":k==="h"?"Handling":"Finishing"} ladder</h2></div>
    <p class="muted small" style="margin:0">${k==="f"?"Low-lift finishes: soft touch off the glass, two-foot stops, floaters, same-foot finishes and reverses that use the rim. No backboard slaps or big jumps. Then decision reps where the phone picks the finish.":k==="s"?"Form work from SeeMikeDunn, a tracked 3-point test, then decision reps that make the catch unpredictable.":"Mechanics from In The Lab, Phil Handy and ILB coaches, then decision reps where your phone calls the move so you react instead of recite."} Every drill is open. The dots show difficulty: one for Starter, two for Builder, three for Advanced. Open any drill to add it to your next workout or set how often it comes back.</p>
-   <div class="list">${list.map((d,i)=>drillRow(d,i+1,{lib:true})).join("")}</div></section>${k==="f"?finCard(0):""}`}
+   <div class="list">${list.map((d,i)=>`${i===0||lvlOf(list[i-1])!==lvlOf(d)?`<h3 class="slot lvlhead">${LVL_NAME[lvlOf(d)]}</h3>`:""}${drillRow(d,i+1,{lib:true})}`).join("")}</div></section>${k==="f"?finCard(0):""}`}
 
 /* Drills → Conditioning: your warm-up and cool-down on one card (open it to see all and change), then the athletic drills */
 const condTags=(d,lib)=>`${d.clips==="read"?'<span class="tag rd">Film</span>':lib&&(state.condGrp||"all")!=="all"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard</span>':""}`;
+/* Conditioning list rows show at most two tags (the drill sheet still shows them all).
+   1st: the evidence tag (Studied / Injury prevention / Coaching), since "How these drills work" says every drill shows it.
+   2nd: the first that applies of: In next workout, your how-often setting, Partner, Hard (leg load), Film, the group
+   (only under "All"; a group filter already says it), Decision. Your own choices beat facts you can read on the sheet. */
+const condTop2=(d,f)=>[`<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>`,
+  inNext(d.id)&&'<span class="tag nx">In next workout</span>',f!=="auto"&&`<span class="tag fq">${esc(fqText(d.id))}</span>`,
+  d.partner&&'<span class="tag p">Partner</span>',d.hard&&'<span class="tag hard">Hard</span>',
+  d.clips==="read"?'<span class="tag rd">Film</span>':(state.condGrp||"all")==="all"&&`<span class="tag c">${CGR[d.cond]}</span>`,
+  d.read&&'<span class="tag rd">Decision</span>'].filter(Boolean).slice(0,2).join("");
 function viewBody(){const open=!!state.rtOpen,g=state.condGrp||"all";
   const grp=k=>{const cur=rtPick(k).id;return `<div class="sechead"><h2>${k==="warm"?"Warm-ups":"Cool-downs"}</h2><button class="linkbtn" data-rec="rt:${k}" style="padding:0">Change yours ›</button></div>
    <div class="list">${RTS(k).map((d,i)=>`<div class="planline">${drillRow(d,i+1,{why:d.id===cur?{k:"fixed",t:`Your ${RT_NAME[k]}: in every workout`}:{k:"note",t:d.short||""}})}</div>`).join("")}</div>`};
@@ -3009,10 +3022,12 @@ function openFold(k){foldSet(k,true);const d=document.querySelector(`details.fol
 let wkObs=null;
 function wkBar(){let el=document.getElementById("wkbar");if(!el){el=document.createElement("div");el.id="wkbar";el.className="wk-bar";el.setAttribute("role","region");el.setAttribute("aria-label","Workout");document.body.appendChild(el);
     el.addEventListener("click",e=>{const b=e.target.closest("[data-wk]");if(!b)return;const ids=b.dataset.wk.split(",");const d=D[ids[0]];if(!d)return;if(d.log==="timer"||d.log==="react")startPlayer(ids,false);else openRunner(ids[0])})}
-  const ts=todaySession(),p=plan(),up=upNext(p,ts),on=!!(ts&&up.length&&p.some(x=>ts.items.some(it=>it.id===x.d.id)));
+  const ts=todaySession(),p=plan(),up=upNext(p,ts),go=!!(ts&&p.some(x=>ts.items.some(it=>it.id===x.d.id)));
+  /* before the first drill it shows on Today only, once you scroll past the Up next button (wk-hide covers the rest) */
+  const on=!!(up.length&&(go||(state.tab==="today"&&(S.sessions.length||S.rec.start))));
   const was=document.body.classList.contains("wk-on");document.body.classList.toggle("wk-on",on);if(!on){el.innerHTML="";return}el.classList.toggle("wk-anim",!was);
-  const isDone=x=>ts.items.some(it=>it.id===x.d.id),live=p.filter(x=>!x.skip||isDone(x)),dn=live.filter(isDone).length;
-  el.innerHTML=`<div class="wk-row"><div class="wk-txt"><div class="wk-t">Workout · ${dn} of ${live.length}</div><div class="wk-s">Next: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}</div></div><button class="wk-go" data-wk="${up.map(x=>x.d.id).join(",")}">Start</button><i class="wk-bar-p" style="width:${live.length?Math.round(100*dn/live.length):0}%"></i></div>`;
+  const isDone=x=>!!ts&&ts.items.some(it=>it.id===x.d.id),live=p.filter(x=>!x.skip||isDone(x)),dn=live.filter(isDone).length;
+  el.innerHTML=`<div class="wk-row"><div class="wk-txt"><div class="wk-t">${go?`Workout · ${dn} of ${live.length}`:`Today · ${live.length} drill${live.length===1?"":"s"}`}</div><div class="wk-s">${go?"Next":"Up next"}: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}</div></div><button class="wk-go" data-wk="${up.map(x=>x.d.id).join(",")}">Start</button><i class="wk-bar-p" style="width:${live.length?Math.round(100*dn/live.length):0}%"></i></div>`;
   const tabs=document.querySelector(".tabs");document.documentElement.style.setProperty("--tabh",(tabs?tabs.offsetHeight:64)+"px");
   if(wkObs){wkObs.disconnect();wkObs=null}document.body.classList.remove("wk-hide");
   const u=state.tab==="today"&&document.querySelector(".upnext");if(u&&"IntersectionObserver" in window){wkObs=new IntersectionObserver(es=>document.body.classList.toggle("wk-hide",es[0].isIntersecting));wkObs.observe(u)}}
@@ -3089,7 +3104,9 @@ const STARTERS=[
  {id:"st_shoot",name:"Shooting day",note:"Form, then volume",items:["s_cold","b_body","s_line","s_rollup","s_elbow","s_5spot","s_ladder","s_atw","s_rimline","s_ft","b_cool"]},
  {id:"st_fin",name:"Finishing day",note:"Layups, floaters, footwork",items:["b_body","h_lab","f_mikan","f_corner","f_weak","f_foot5","f_float","f_reverse","f_called","s_ft","b_cool"]},
  {id:"st_handles",name:"Handles, no hoop",note:"Driveway, garage or a wall",items:["b_body","h_lab","h_pound","h_five","h_fig8","h_place","h_d2","h_tennis","b_cool"]},
- {id:"st_game",name:"Game-day tune-up",note:"Touch and rhythm, no jumping",items:["b_game","f_mikan","s_line","s_ft","b_cool"]}];
+ {id:"st_game",name:"Game-day tune-up",note:"Touch and rhythm, no jumping",items:["b_game","f_mikan","s_line","s_ft","b_cool"]},
+ {id:"st_warm",name:"Warm-up only",note:"Before pickup, a run or a game",items:["b_body"]},
+ {id:"st_cool",name:"Cool-down only",note:"After a game or a hard run",items:["b_cool2"]}];
 const wNew=()=>"w"+Date.now().toString(36)+Math.floor(Math.random()*36).toString(36);
 /* keep a workout's order rules: Cold 3s and the body warm-up first, the stretch last; finishing or jump work brings the warm-up in */
 function wOrder(items,keep){let ids=[...new Set(items)].filter(id=>D[id]);if(needsWarm(ids))ids=[rtPick("warm").id,...ids];if(!keep)return ids;const first=pinFirst(ids),last=pinLast(ids);return [...first,...ids.filter(id=>!first.includes(id)&&!last.includes(id)),...last]}
@@ -3281,8 +3298,9 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "body":{const cur=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;S.rec.body=cur===b?null:{d:today(),k:b};persist();return render()}
   case "lvl":state.start={...(state.start||{level:"regular",focus:"bal"}),level:b};return render();
   case "focus":state.start={...(state.start||{level:"regular",focus:"bal"}),focus:b};return render();
-  case "start":S.rec.start=state.start||{level:"regular",focus:"bal"};persist();return render();
-  case "startskip":S.rec.start={level:"regular",focus:"bal"};persist();return render();
+  case "start":case "startskip":S.rec.start=a==="start"&&state.start||{level:"regular",focus:"bal"};persist();render();
+    /* first run: the welcome card hands straight over to Up next, which is now the first button on screen */
+    {const u=document.querySelector(".upnext");if(u){u.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});u.focus({preventScroll:true});u.classList.add("hello");setTimeout(()=>u.classList.remove("hello"),1600)}}return;
   case "seen":S.rec.seen=true;persist();return render();
   case "addin":S.rec.plan.extra=[...new Set([...(S.rec.plan.extra||[]),...S.rec.added])];persist();return render();
   case "keepnext":state.keepNext=today();return render();
@@ -3580,12 +3598,17 @@ let micOK=!!(window.SpeechRecognition||window.webkitSpeechRecognition);try{navig
 function bigTop(){return `<div class="bt-top"><button class="btn sec small" data-b="undo" ${R.hist.length||R.sm?"":"disabled"}>Undo</button><button class="btn sec small" data-b="ear" aria-pressed="${!!media}">Earbuds</button>${micOK||voice?`<button class="btn sec small" data-b="voice" aria-pressed="${!!voice}">Voice</button>`:""}<button class="btn sec small" data-b="exit">Done</button></div>`}
 function drawBig(){if(!bigEl||!R)return;const d=R.d,p=pct(R.m,R.a),last=R.hist[R.hist.length-1];
   if(R.mode==="sets"){const s=setSpec(),wait=d.timed&&!R.t0;
+    /* Film the next set: only in the rest after a logged set (no misses yet on the next one) and only for drills whose
+       sheet card offers Compare. It opens that same compare screen on top; R and this screen stay as they are under it,
+       and earbuds, clicker and voice keep logging the set while you film. */
+    if(R.cmpN==null)R.cmpN=cmpDemos(d).length;const rest=!!s&&!wait&&R.setNo>0&&!R.sm&&R.cmpN>0;
     bigEl.innerHTML=`${bigTop()}
      <div class="bt-mid"><div class="bt-label">${esc(s?s.label||d.name:"Finished")}</div>
       <div class="bt-set">${s?`Set ${(R.setNo||0)+1} · ${s.kind==="goal"?`make ${s.n}`:`${s.n} shot${s.n===1?"":"s"}`}`:""}</div>
       ${wait?`<div class="bt-last">Tap or click to start the clock</div>`:`<div class="bt-count num ${R.sm?"ms":""}">${R.sm}<span> missed</span></div>`}
       <div class="bt-pct">Total ${R.m}/${R.a}${p==null?"":" · "+p+"%"}${d.goal?` · ${R.m} of ${d.goal} makes`:d.att?` · ${R.a} of ${d.att}`:d.per?` · ${R.a} of ${d.per*5}`:""}${d.timed&&R.t0?` · <span class="num" id="btClock">${fmt((Date.now()-R.t0)/1000)}</span>`:""}</div></div>
      ${d.skill==="s"?`<div class="bt-cue">${R.rtip?"Fix: "+esc(R.rtip):"Cue: "+esc(CUES[todayCue().i].t)}</div>`:d.skill==="f"&&R.tip?`<div class="bt-cue">${esc(R.tip)}${R.hand==="W"&&R.call!=="Weak hand"?" · weak hand":""}</div>`:""}
+     ${rest?`<button class="btn sec small bt-film" data-b="film" aria-label="Film the next set and watch it next to the demo">Film the next set</button>`:""}
      ${s&&s.kind==="att"&&!wait?`<div class="bt-padl">Or tap how many went in</div><div class="bt-pad">${[...Array(s.n+1)].map((_,k)=>`<button class="btn ${k===s.n?"full":""}" data-b="n:${k}">${k}</button>`).join("")}</div>`:""}
      <div class="bt-hint">${s&&s.kind==="goal"?"Make "+s.n+". ":""}Don't touch anything while you shoot. Each miss: tap anywhere (or swipe the way it missed, diagonal for long-left and so on)${media?", click your earbuds":""}${voice?', or say "miss"':""}. Set done: hold${media?", double-click":""}${voice?', say "done" or the number made':""}.${media?" Triple-click: undo.":""}</div>`}
   else bigEl.innerHTML=`<div class="bt-zones" aria-hidden="true"><div class="z mk"><b>Make</b><span>tap the top half · or hold</span></div><div class="z ms"><b>Miss</b><span>tap the bottom half · or swipe the way it missed</span></div></div>${bigTop()}
@@ -3595,7 +3618,7 @@ function drawBig(){if(!bigEl||!R)return;const d=R.d,p=pct(R.m,R.a),last=R.hist[R
    <div class="bt-hint">Swipe the way the ball missed: up long, down short, sideways left or right, diagonal for both (up-left = long and left)${media?" · Earbuds: click = miss, double-click = make, triple-click = undo":""}${voice?' · Say "make", "swish", "miss", a direction like "long left", or "undo"':""}</div>`;
   const pc=bigEl.querySelector(".bt-pct");if(pc&&pc.innerHTML.startsWith(" · "))pc.innerHTML=pc.innerHTML.slice(3);
   bigEl.querySelectorAll("[data-b]").forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.b;
-    if(k==="exit"){closeBig();lockOff();drawDock()}else if(k==="undo")sig("u");else if(k==="ear"){media?stopMedia():startMedia();drawBig()}else if(k==="voice"){voice?stopVoice():startVoice();drawBig()}else if(k==="sw"){const l=R.hist[R.hist.length-1];if(l&&l.hit&&!l.chunk){l.sw=!l.sw;if(l.sw)beep(1318,80)}drawBig()}else if(k.startsWith("n:"))sig(k)})}
+    if(k==="exit"){closeBig();lockOff();drawDock()}else if(k==="undo")sig("u");else if(k==="ear"){media?stopMedia():startMedia();drawBig()}else if(k==="voice"){voice?stopVoice():startVoice();drawBig()}else if(k==="sw"){const l=R.hist[R.hist.length-1];if(l&&l.hit&&!l.chunk){l.sw=!l.sw;if(l.sw)beep(1318,80)}drawBig()}else if(k.startsWith("n:"))sig(k);else if(k==="film")openCmp(R.d.id)})}
 setInterval(()=>{const c=document.getElementById("btClock");if(c&&R&&R.t0)c.textContent=fmt((Date.now()-R.t0)/1000)},500);
 function bigRec(hit,dir,sw){if(!R||R.finished)return;
   const before=bigLabel();act(hit?(sw&&R.d.skill==="s"?"swish":"make"):dir?"miss:"+dir:"miss");beep(hit?988:440,hit?110:220);try{navigator.vibrate?.(hit?30:[40,60,40])}catch(e){}
@@ -3617,10 +3640,12 @@ function stopMedia(){if(!media)return;try{media.pause()}catch(e){}for(const k in
    One press = a, two quick presses or a long press = b, three presses or a back key = u. */
 const KEY_A=new Set([" ","Enter","ArrowRight","ArrowDown","PageDown","AudioVolumeUp","AudioVolumeDown","VolumeUp","VolumeDown","Unidentified"]),KEY_U=new Set(["ArrowLeft","ArrowUp","PageUp","Backspace"]);
 let kN=0,kT=null,kDown=0;
-document.addEventListener("keydown",e=>{if(!bigEl||!R)return;
+/* with the compare screen open over the sets screen, a key aimed at one of its controls goes to that control, not the log */
+let kSkip=false;const cmpKey=e=>!!(CMP&&CMP.el.contains(e.target)&&e.target.closest("button,input,select,label,a,[tabindex]"));
+document.addEventListener("keydown",e=>{if(!bigEl||!R)return;if(cmpKey(e)){kSkip=true;return}kSkip=false;
   if(KEY_U.has(e.key)){e.preventDefault();if(!e.repeat)sig("u");return}
   if(!KEY_A.has(e.key))return;e.preventDefault();if(e.repeat||kDown)return;kDown=performance.now()},true);
-document.addEventListener("keyup",e=>{if(!bigEl||!R||!KEY_A.has(e.key))return;e.preventDefault();const held=kDown?performance.now()-kDown:0;kDown=0;
+document.addEventListener("keyup",e=>{if(!bigEl||!R||!KEY_A.has(e.key))return;if(kSkip||cmpKey(e)){kSkip=false;return}e.preventDefault();const held=kDown?performance.now()-kDown:0;kDown=0;
   if(held>600){clearTimeout(kT);kN=0;sig("b");return}
   kN++;clearTimeout(kT);kT=setTimeout(()=>{const n=kN;kN=0;sig(n>=3?"u":n===2?"b":"a")},380)},true);
 /* voice: the browser's own speech recognition, listening only for a few words. Pages that can't use the mic say so and fall back. */
@@ -4001,15 +4026,16 @@ function openLib(){if(LIB)return;const el=overlay("cllib","Your clip library");L
     if(k==="close")closeLib();else if(k==="rec"){LIB.arm=null;openClipRec(a)}
     else if(k==="clr"){if(LIB.arm!==a){LIB.arm=a;libDraw();return}LIB.arm=null;await clearClips(a)}})}
 function closeLib(){if(!LIB)return;unOverlay(LIB.el);LIB=null;if(R&&R.d&&R.d.clips)drawDock();else if(state.tab==="drills")render()}
-function libDraw(){if(!LIB)return;const n=CL.list.length,tot=FMV.length*TAKES,next=FMV.find(m=>clipCount(m.k)<TAKES);
+function libDraw(){if(!LIB)return;const sy=LIB.el.querySelector(".lib-body")?.scrollTop||0,n=CL.list.length,tot=FMV.length*TAKES,next=FMV.find(m=>clipCount(m.k)<TAKES);
   LIB.el.innerHTML=`<div class="bar top"><span class="small">Your clip library</span><button class="hx dk" data-cl="close" aria-label="Close">×</button></div>
    <div class="lib-body"><p>You play the ball handler. Film each move ${TAKES} times. The app cuts each take where you commit to the move and also plays it mirrored, so ${tot} takes become ${tot*2} clips. About 20 minutes on a court.</p>
    <div class="lib-tip"><b>Set up like a defender.</b> Phone on a ball bag or tripod at chest height, about 2 m away, with your whole body in frame. Each take: hold your stance with the ball, then go on the beep. Make the moves the way you'd make them in a game.</div>
    ${CL.err?`<p class="small">${esc(CL.err)}</p>`:""}
    <div class="label">${FMV.length} moves · ${n} of ${tot} takes${n>=CLIP_MIN?" · enough to start":` · ${CLIP_MIN} needed to start`}</div>
    <div class="lib-list">${FMV.map(m=>{const c=clipCount(m.k);return `<div class="lib-row"><span><b>${esc(m.n)}</b><small>Reads as ${RDN[m.r]} · ${c} of ${TAKES} takes</small></span>${c?`<button class="btn sec small" data-cl="clr:${m.k}">${LIB.arm===m.k?"Tap to delete":"Clear"}</button>`:""}<button class="btn sec small" data-cl="rec:${m.k}">${c?"Add takes":"Record"}</button></div>`}).join("")}</div>
-   ${next?`<button class="btn pri" data-cl="rec:${next.k}">Record next: ${esc(next.n)}</button>`:`<p>All ${FMV.length} moves are filmed. Redo any that look staged.</p>`}
-   <p class="small" style="opacity:.7;margin:0">Clips stay on this phone. They never go to your account.</p></div>`}
+   <p class="small" style="opacity:.7;margin:0">Clips stay on this phone. They never go to your account.</p></div>
+   <div class="lib-foot">${next?`<button class="btn pri" data-cl="rec:${next.k}">Record next: ${esc(next.n)}</button>`:`<p>All ${FMV.length} moves are filmed. Redo any that look staged.</p>`}</div>`;
+  const lb=LIB.el.querySelector(".lib-body");if(lb)lb.scrollTop=sy}
 
 /* the recorder: hands-free, ${TAKES} takes in a row. The phone calls each take, beeps Go and records 4 seconds. */
 let CR=null,crFace="user";
