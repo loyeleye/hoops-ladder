@@ -103,11 +103,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .plate:has(.sktabs){box-shadow:none!important;border-bottom:1px solid rgb(242 245 250/.12)}
 .plate .skills{max-height:120px;transition:max-height .2s ease-out,opacity .2s ease-out}
 .plate .lvl{transition:width .2s ease-out,height .2s ease-out}
-.plate.compact .skills,.plate.compact .syncnote{max-height:0;opacity:0;overflow:hidden}
+.plate.compact .skills{max-height:0;opacity:0;overflow:hidden}
+/* The plate stays slim; the chevron opens the skill levels on tap (no scroll-driven resizing, which made it bounce near the top). */
+.plate .wrap:first-child{grid-template-columns:auto 1fr auto}.plate .skills{grid-column:2/-1}
+.plate .pltog{grid-column:3;grid-row:1;border:0;background:none;color:inherit;width:44px;height:44px;margin-right:-10px;display:grid;place-items:center;border-radius:50%;opacity:.8}
+.plate .pltog svg{transition:transform .2s ease-out}.plate .pltog[aria-expanded="true"] svg{transform:rotate(180deg)}.plate .pltog:active{opacity:1}
 .plate.compact .wrap:first-child{padding-block:8px;row-gap:0}.plate.compact .lvl{width:38px;height:38px}.plate.compact .lvl b{font-size:18px}.plate.compact .lvl small{display:none}
 @keyframes enterL{from{opacity:0;transform:translateX(-24px)}}@keyframes enterR{from{opacity:0;transform:translateX(24px)}}@keyframes enterF{from{opacity:0}}
 .enter-l{animation:enterL .22s cubic-bezier(.2,.8,.2,1)}.enter-r{animation:enterR .22s cubic-bezier(.2,.8,.2,1)}
-@media (prefers-reduced-motion: reduce){.sktabs .ind,.plate .skills,.plate .lvl{transition:none}.enter-l,.enter-r{animation:enterF .12s linear}}
+@media (prefers-reduced-motion: reduce){.sktabs .ind,.plate .skills,.plate .lvl,.plate .pltog svg{transition:none}.enter-l,.enter-r{animation:enterF .12s linear}}
 
 /* sections */
 section{display:flex;flex-direction:column;gap:10px}
@@ -2763,15 +2767,16 @@ function renderPlate(){
   const o=lvl(S.xp.s+S.xp.h+(S.xp.f||0)+(S.xp.c||0),2), s=lvl(S.xp.s), h=lvl(S.xp.h), f=lvl(S.xp.f||0), c=lvl(S.xp.c||0);
   $("#plate").innerHTML=`<div class="wrap"><div class="lvl" title="Player level">${ring(o.into/o.need)}<b>${o.L}</b><small>LVL</small></div>
   <div><h1>${esc(rankOf("o",o.L))}</h1></div>
-  <div class="skills"><span class="skill">Shooting <b class="num">Lv ${s.L}</b><span class="bar"><i style="width:${100*s.into/s.need}%"></i></span></span>
+  <button class="pltog" type="button" aria-expanded="${plateOpen}" aria-controls="plateskills" aria-label="Skill levels"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <div class="skills" id="plateskills"><span class="skill">Shooting <b class="num">Lv ${s.L}</b><span class="bar"><i style="width:${100*s.into/s.need}%"></i></span></span>
   <span class="skill">Handling <b class="num">Lv ${h.L}</b><span class="bar h"><i style="width:${100*h.into/h.need}%"></i></span></span>
   <span class="skill">Finishing <b class="num">Lv ${f.L}</b><span class="bar f"><i style="width:${100*f.into/f.need}%"></i></span></span>
   <span class="skill">Conditioning <b class="num">Lv ${c.L}</b><span class="bar c"><i style="width:${100*c.into/c.need}%"></i></span></span></div>
   ${syncNote?`<div class="syncnote" style="grid-column:1/-1">${esc(syncNote)}</div>`:""}</div>${state.tab==="drills"?skillTabs():""}`;
-  $("#plate").classList.toggle("compact",state.tab==="drills"&&plateSmall);$("#plate").classList.toggle("free",state.tab!=="drills");placeInd(false)}
+  $("#plate").classList.toggle("compact",!plateOpen);$("#plate").classList.toggle("free",state.tab!=="drills");placeInd(false)}
 /* Drills tab: the skill switch lives in the sticky plate so it stays reachable while scrolling a long ladder.
    Switching updates the tabs in place (keeps focus, lets the underline slide), re-renders only the list, and remembers each ladder's scroll spot. */
-const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"],["b","Conditioning"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)",b:"var(--warn)"},tabScroll={};let plateSmall=false;
+const SKT=[["s","Shooting"],["h","Handling"],["f","Finishing"],["b","Conditioning"]],SKC={s:"var(--accent)",h:"var(--read)",f:"var(--good)",b:"var(--warn)"},tabScroll={};let plateOpen=false;
 function skillTabs(){const k=state.drillTab;
   return `<div class="wrap sktabs" role="tablist" aria-label="Skill">${SKT.map(([v,l])=>`<button role="tab" id="tab-${v}" aria-controls="drillpanel" data-dtab="${v}" aria-selected="${k===v}" tabindex="${k===v?0:-1}">${l}</button>`).join("")}<i class="ind" aria-hidden="true"></i></div>`}
 function placeInd(anim){const b=$("#tab-"+state.drillTab),ind=$(".sktabs .ind");if(!b||!ind)return;
@@ -2787,8 +2792,8 @@ function setDrillTab(k,focus){const old=state.drillTab;if(k===old){if(focus)$("#
 document.addEventListener("keydown",e=>{const t=e.target.closest?.(".sktabs [role=tab]");if(!t)return;
   const ks=SKT.map(x=>x[0]),i=ks.indexOf(state.drillTab),j={ArrowRight:i+1,ArrowLeft:i-1,Home:0,End:ks.length-1}[e.key];
   if(j==null)return;e.preventDefault();setDrillTab(ks[(j+ks.length)%ks.length],true)});
-window.addEventListener("scroll",()=>{if(state.tab!=="drills")return;const y=window.scrollY,small=plateSmall?y>16:y>120;
-  if(small!==plateSmall){plateSmall=small;$("#plate").classList.toggle("compact",small)}},{passive:true});
+document.addEventListener("click",e=>{const t=e.target.closest?.(".pltog");if(!t)return;
+  plateOpen=!plateOpen;t.setAttribute("aria-expanded",plateOpen);$("#plate").classList.toggle("compact",!plateOpen)});
 window.addEventListener("resize",()=>placeInd(false));
 
 function courtSVG(opts={}){
@@ -2978,7 +2983,7 @@ function progLadder(){const rows=ladderHist(),d=D.s_ladder;if(!rows.length)retur
    <div class="card hist">${d.stages.map((st,i)=>{const x=last.lad[i];return `<div><span>${esc(st)}</span><span class="muted">${best[i]!=null?`best ${best[i]}`:""}</span><b class="num">${x?(x[1]>=d.stageN?x[0]:x[0]+"+ ("+x[1]+" made)"):"–"}</b></div>`}).join("")}</div>
    <p class="muted small" style="margin:0">Last ladder on ${new Date(last.d+"T12:00").toLocaleDateString(undefined,{month:"short",day:"numeric"})}. Where the count jumps is where your shot starts to change.</p></section>`}
 const state={tab:"today",drillTab:"s",range:"30"};
-function route(){const h=location.hash.slice(1);state.tab=["today","drills","progress","form","coach"].includes(h)?h:"today";plateSmall=state.tab==="drills"&&window.scrollY>120;render()}
+function route(){const h=location.hash.slice(1);state.tab=["today","drills","progress","form","coach"].includes(h)?h:"today";render()}
 function render(){planRoll();renderPlate();
   $("#view").innerHTML=state.tab==="today"?viewToday():state.tab==="drills"?viewDrills():state.tab==="form"?viewForm():state.tab==="coach"?viewCoach():viewProgress();afterFormRender();afterCoachRender();
   document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));wkBar()}
