@@ -993,6 +993,10 @@ const DRILLS=[
   what:"Shooting and conditioning together, with no rebounder needed. Shoot a corner 3, sprint after your own shot, then sprint to the other corner for the next one. A good way to end a workout.",
   steps:["Start in a corner. Spin the ball out to yourself and shoot a catch-and-shoot 3.","As soon as it leaves your hand, sprint after it and catch it as early as you can.","Sprint out to the opposite corner, set your feet and shoot fast. Don't take your time setting up.","Long rebound? Shoot from the 3-point line wherever it took you, then go back to the corners."],
   cue:"Fast feet, quick target, same shot.",src:[YTT("LDScIl0O1Ps",383,"ShotMechanics: baseline sprint 3s")]},
+ {id:"s_2chair",skill:"s",name:"Chair Cross Pull-Up",role:"volume",unlock:5,mins:6,log:"makes",att:20,t0:35,tstep:1,tmax:55,coachClips:true,
+  what:"Two-ball handling into a jump shot. Dribble two balls to a chair, set one ball on it, cross over and shoot. Then come back, scoop the ball off the chair and shoot again.",
+  steps:["Put a chair at the elbow or the wing. Start a few steps out with two balls going.","At the chair, set one ball on it and keep the other dribble alive.","Crossover, then a jump shot off your inside foot.","Get your rebound, come back to the chair, scoop the ball off it and shoot again. Switch which hand sets the ball down."],
+  cue:"Set it, cross, inside foot, shoot.",src:[YTT("wJK-BT1GBIc",122,"BreakthroughBBall: two-ball chair shooting")]},
  // ---------- SHOOTING: the three parts of a shot (left/right, depth, arc) ----------
  // Each one works on one part on its own. cam says where to put the phone for that part; focus names the part.
  {id:"s_rimline",skill:"s",name:"Rim Line Shots",role:"volume",focus:"lr",unlock:2,mins:6,log:"makes",att:30,stages:["5 ft, straight on","Free throw line","Top of the key"],stageBy:"shots",stageN:10,t0:45,tstep:1,tmax:65,
@@ -1164,6 +1168,56 @@ const DRILLS=[
   what:"Needs a partner who walks backward in front of you. Pass one ball away, work the other through your legs and behind your back, and catch the return.",
   steps:["Partner walks backward in front of you while you pound-walk forward with two balls.","On \"Pass right\", pass the right ball to your partner.","Left ball: quick between the legs, then behind the back.","Catch the return pass in your right hand, pound a few times, then wait for the next call. \"Pass left\" is the mirror."],
   cue:"Eyes on your partner, not the ball.",src:[{label:"Marcus Hodges: Two Ball Between and Behind",url:"https://www.youtube.com/watch?v=Wskw-FifPGE"}]},
+ // ---------- HANDLING: more two-ball work, from YouTube, Nov 2026 ----------
+ {id:"h_2drum",skill:"h",name:"Fingertips and Drumroll",role:"handle",unlock:2,mins:2,log:"timer",
+  phases:[["Two-ball fingertips in front, shin height",20],["Two-ball fingertips side to side",20],["Two-ball drumroll, all out",20],["Two-ball drumroll again, faster",20]],
+  what:"A quick two-ball warm-up that gets your hands sticky. Fast fingertip taps low to the floor, then an all-out alternating drumroll that burns your forearms and shoulders.",
+  steps:["Squat low. Arms nearly straight, elbows about 75 to 90 percent locked.","Tap both balls with just your fingertips at shin height or lower, right in front of you.","Keep tapping and move both balls side to side together, like windshield wipers.","Drumroll: alternate the balls as fast and hard as you can at hip to knee height."],
+  cue:"Fingertips only, then all out.",src:[YTT("MOiEoEyvnXM",50,"Marcus Hodges: two-ball fingertips and drumroll")]},
+ {id:"h_2pc",skill:"h",name:"Pass-and-Cross",role:"handle",partner:true,unlock:2,mins:4,log:"timer",
+  phases:[["Both balls together, pass with the right",40],["Both balls together, pass with the left",40],["Alternating dribbles, pass with the right",40],["Alternating dribbles, pass with the left",40]],
+  what:"A beginner two-ball drill with a partner. Keep both balls going, pass one away, cross the other into the empty hand, and catch the return without losing your rhythm.",
+  steps:["Stand facing your partner, both balls pounding at the same time, eyes up.","On \"pass\", make a good bounce pass to your partner with one hand.","Cross the other ball over into the hand that just passed.","Catch the return pass in the free hand and keep both balls going. Switch hands, then do it with alternating dribbles."],
+  cue:"Good pass, cross, catch, keep it going.",src:[YTT("qltYXVrUMiY",236,"Howard Elite: two-ball dribble and pass")]},
+ {id:"h_2v",skill:"h",name:"Two-Ball V Dribbles",role:"handle",unlock:3,mins:3,log:"timer",
+  phases:[["V dribbles, balls follow each other",45],["V dribbles, balls mirror toward each other",45],["Both versions, faster",30]],
+  what:"V dribbles with a ball in each hand. First the balls move side to side together, then they come in toward each other and back out without ever touching.",
+  steps:["Low stance, both balls at knee to hip height.","Version 1: V dribble both balls side to side together, like one follows the other. Keep them tight.","Version 2: both wrists turn in, then both turn out, so the balls almost touch in the middle.","Get them as close as you can without letting them hit."],
+  cue:"Close together, never touching.",src:[YTT("MOiEoEyvnXM",182,"Marcus Hodges: two-ball V dribbles")]},
+ {id:"h_2shapes",skill:"h",name:"Two-Ball Shape Series",role:"handle",unlock:3,mins:5,log:"timer",
+  phases:[["Two-ball in-and-outs",30],["Two-ball windshield wipers",30],["Two-ball side-of-leg dribbles",30],["Two-ball side-of-leg, alternating",30],["Two-ball L dribble: in-and-out, then side of leg",30],["Two-ball in-and-outs, big circles",30]],
+  what:"A short two-ball routine of dribble shapes, 30 seconds each: in-and-outs, windshield wipers, dribbles by the side of each leg, then the L, which puts the in-and-out and the side-of-leg dribble together. Good before a workout.",
+  steps:["In-and-outs: both balls at once, hand rolls over the side of the ball to take it in, then out. Make big circles.","Windshield wipers: both balls side to side in front of you, as wide as you can stretch them.","Side of the leg: both balls dribble front to back next to each leg, then alternate them.","The L: in-and-out, then front to back by the side of your leg, both balls at once."],
+  cue:"Big shapes, both hands at once.",src:[YTT("g2FaABi85nY",219,"THINCPRO: 5-minute two-ball routine"),YTT("K1vAmgLhfRw",113,"Jordan McCabe: two-ball windshield wipers and in-and-outs")]},
+ {id:"h_2around",skill:"h",name:"Pound and Around",role:"handle",unlock:4,mins:4,log:"timer",
+  phases:[["Left hand pounds, right ball goes around the right leg",40],["Right hand pounds, left ball goes around the left leg",40],["Right ball around, faster than the pound",40],["Left ball around, faster than the pound",40]],
+  what:"One hand keeps a steady pound while the other ball circles the leg on its side. Each hand has its own job. Once the even version is easy, speed up the ball going around while the pound stays steady.",
+  steps:["Low stance. Left hand pounds a steady dribble the whole time.","Right hand takes its ball around the right leg on your fingertips, low by the shin. Control, not speed.","Keep your big toe on the floor. Your foot can lift a little, but don't step out of the way.","Five or six times around, then switch sides.","Harder: the ball going around moves at a faster rhythm than the pound."],
+  cue:"Steady pound, quick around.",src:[YTT("MOiEoEyvnXM",446,"Marcus Hodges: pound and around")]},
+ {id:"h_2xladder",skill:"h",name:"Stationary Exchange Ladder",role:"handle",unlock:4,mins:5,log:"timer",
+  phases:[["Pound, pound, cross: right hand goes under",40],["Pound, pound, cross: left hand goes under",40],["Between the legs, other ball crosses in front",45],["Behind the back, other ball crosses in front",45],["One pound between each exchange",40]],
+  what:"Two-ball exchanges standing still: a few pounds, then swap the balls with a crossover, then between the legs, then behind the back. Start with several pounds between moves and work down to one.",
+  steps:["Two or three pounds with both balls, then cross them over at the same time.","One ball has to go under the other, or they hit. Switch which hand goes under so both get the work.","Between the legs: a few pounds, one ball goes through your legs while the other crosses in front of you.","Behind the back: one ball goes behind you while the other stays out in front and crosses. Bring it back up in front by your toe.","Cut the pounds down until you're at one pound between each exchange."],
+  cue:"One under, one over. Down to one pound.",src:[YTT("K1vAmgLhfRw",231,"Jordan McCabe: two-ball cross, between, behind"),YTT("MOiEoEyvnXM",345,"Marcus Hodges: pound and exchange")]},
+ {id:"h_2full",skill:"h",name:"Full-Court Two-Ball",role:"handle",unlock:4,mins:6,log:"timer",
+  phases:[["Speed dribble down and back",40],["Slow and go: 3 or 4 hesitations each way",40],["Crossover down and back",45],["Behind the back down and back",45],["Between the legs down and back",45],["Mix moves down and back",45]],
+  what:"Two balls the length of the floor: a speed dribble, then hesitations, then crossovers, behind the back and between the legs, then any moves you like. Ball low and out in front. If you lose one, go get it and restart where you lost it.",
+  steps:["Speed dribble both balls down and back, out in front of you, head up.","Slow and go: three or four hesitations each way.","Crossover: one ball goes in front of the other or they hit. Angle left and right instead of going straight.","Behind the back: if you're right-handed, the left ball crosses in front while the right ball goes behind you. Keep them low.","Between the legs: step the leg out and go through the front, not behind.","Mix moves: any combination of the moves down and back."],
+  cue:"Low, out in front, head up.",src:[YTT("G6V5jxsY8pU",64,"Teach Hoops: two-ball full court")]},
+ {id:"h_2juggle",skill:"h",name:"Two-Ball Juggle",role:"handle",unlock:5,mins:3,log:"timer",
+  phases:[["Juggle slowly, find the rhythm",45],["Juggle, faster",45],["Juggle, as fast as you can control",30]],
+  what:"Standing still: let one ball go, cross the other into that hand, then pick up the first one. Slow at first to find the rhythm, then speed it up. The walking version is the Release-and-Catch Walk.",
+  steps:["Pound both balls in a low stance.","Push one ball down and let it go.","Cross the other ball into the hand that let go.","Pick up the first ball with your free hand and keep going.","Go slow until it feels like a rhythm, then speed up."],
+  cue:"Drop one, cross it over.",src:[YTT("K1vAmgLhfRw",286,"Jordan McCabe: two-ball juggle")]},
+ {id:"h_r_2yoyo",skill:"h",name:"Two-Ball Yo-Yo",role:"handle",read:true,unlock:5,mins:3,log:"react",secs:90,gap:[2.2,3.8],calls:["Forward","Back"],
+  what:"Retreat-dribble work with two balls. The phone calls the direction: attack forward, or back out with both balls still going. A coach runs it with a leader you mirror; the phone plays the leader here.",
+  steps:["Give yourself room in front and behind. Pound both balls, eyes up.","On \"Forward\", attack forward with both balls.","On \"Back\", retreat-dribble backward. Keep both balls low and in front of you.","Change direction right on the call."],
+  cue:"Change direction on the call. Balls stay low.",src:[YTT("G6V5jxsY8pU",513,"Teach Hoops: the yo-yo")]},
+ {id:"h_2fig8",skill:"h",name:"Two-Ball Figure 8",role:"handle",unlock:6,mins:3,log:"timer",
+  phases:[["Left ball pounds in front, right ball runs the figure 8",45],["Right ball pounds in front, left ball runs the figure 8",45],["Both, faster",30]],
+  what:"One ball keeps pounding in front of you while the other runs a figure 8 dribble through and around your legs. Hard because the ball in front can't stop while you weave the other one.",
+  steps:["Wide stance, low. One hand pounds a steady dribble in front of you.","The other ball weaves a figure 8 around and between your legs.","Keep the pounding ball going the whole time and out of the way of the figure 8.","Switch which ball pounds."],
+  cue:"Front ball never stops.",src:[{label:"Elite Hoops: 2 Ball Figure 8",url:"https://www.youtube.com/watch?v=vk67K8Qny8A"}]},
  {id:"h_retreat",skill:"h",name:"Retreat Series",role:"handle",unlock:9,mins:4,log:"timer",
   phases:[["V-dribble retreats",45],["Crossover retreats",45],["Between-the-legs retreat",45],["Behind-the-back retreat",45]],
   what:"Get out of trouble: retreat dribble back, then attack with a move.",
@@ -1305,7 +1359,16 @@ const DRILLS=[
  {id:"f_eyes",skill:"f",name:"Eyes-Closed Finishes",role:"fin",unlock:8,mins:5,log:"makes",att:16,ft:"Layup",t0:30,tstep:2,tmax:55,
   what:"Drive with your eyes closed and open them as late as you can, ideally after you take off, then adjust to where you are around the rim. It makes easy layups hard again. Only on an empty court with nothing near the basket.",
   steps:["Clear the area: no people, balls or chairs near the basket.","Start a few dribbles out. Close your eyes and drive in at different angles, with different moves.","Open your eyes as late as you can, after you take off if possible.","Find the rim and finish. Slow down first if you need to, then build the speed back up."],
-  cue:"Open late, adjust, finish soft.",src:[YTT("zh2JLinO-ws",334,"By Any Means: eyes-closed finishing")]}
+  cue:"Open late, adjust, finish soft.",src:[YTT("zh2JLinO-ws",334,"By Any Means: eyes-closed finishing")]},
+ // ---------- FINISHING: two-ball finishes (BreakthroughBBall) ----------
+ {id:"f_2hammer",skill:"f",name:"Two-Ball Hammer",role:"fin",unlock:4,mins:4,log:"makes",att:16,ft:"Layup",t0:50,tstep:2,tmax:75,
+  what:"Two-ball dribble out, turn, and go full speed in a straight line to the rim. Lay up one ball while the other keeps dribbling. You never get to carry the second ball, so your other hand has to keep working.",
+  steps:["Start under the basket with two balls. Dribble both out toward the top of the key.","Turn and go full speed in a straight line back to the rim.","Right side: right-hand layup while the left ball keeps bouncing. Don't carry it.","Left side: left-hand layup while the right ball keeps bouncing."],
+  cue:"Straight line, never carry the other ball.",src:[YTT("wJK-BT1GBIc",24,"BreakthroughBBall: two-ball hammer")]},
+ {id:"f_2post",skill:"f",name:"Pivot, Pass and Post",role:"fin",partner:true,unlock:6,mins:5,log:"makes",att:16,ft:"Power",t0:45,tstep:2,tmax:70,
+  what:"Two-ball dribbling into two finishes. Needs a passer. Pound both balls to the elbow, jump stop and reverse pivot, pass one ball away, score with the other off two feet, then post up and finish a drop step from the pass.",
+  steps:["Pound both balls together toward the elbow, eyes up.","Jump stop at the elbow with both dribbles still alive, then reverse pivot.","Push-pass one ball to your partner with your inside hand, then attack and finish the other off two feet.","Post up just above the block, low and wide, hands up.","Catch with the ball and your feet in the air, chin it, look over your inside shoulder, drop step and score."],
+  cue:"Jump stop, pivot, pass, then score twice.",src:[YTT("wJK-BT1GBIc",649,"BreakthroughBBall: two-ball pivot, pass and drop step")]}
 ];
 function daysSinceHandle(){for(let i=S.sessions.length-1;i>=0;i--){const se=S.sessions[i];if(se.d<today()&&se.items.some(it=>(D[it.id]||{}).skill==="h"))return Math.round((new Date(today())-new Date(se.d))/864e5)}return null}
 const D2R=()=>Object.assign({lo:70,hi:110,gap:1,n:4,work:60,rest:30},S.settings.d2r||{});
@@ -1522,6 +1585,18 @@ const STEP_CLIPS={
  c_recover:[null,[["s46bufWWJ6c",131,200,"Turn and sprint"]],[["s46bufWWJ6c",200,223]],null],
  c_multi:[[["sPO_61SOahU",64,141]],null,null,null],
  c_hokie:[[["NlGG6s1DeVw",0,30]],[["NlGG6s1DeVw",0,30]],[["NlGG6s1DeVw",30,60]],[["NlGG6s1DeVw",60,76,"Three spots"]]],
+ h_2drum:[[["MOiEoEyvnXM",50,104]],[["MOiEoEyvnXM",50,104]],[["MOiEoEyvnXM",50,104]],[["MOiEoEyvnXM",104,138,"Drumroll"]]],
+ h_2pc:[[["qltYXVrUMiY",236,265]],[["qltYXVrUMiY",236,300]],[["qltYXVrUMiY",236,300]],[["qltYXVrUMiY",265,360]]],
+ h_2v:[[["MOiEoEyvnXM",182,240]],[["MOiEoEyvnXM",182,215,"Following each other"]],[["MOiEoEyvnXM",205,240,"Mirrored"]],[["MOiEoEyvnXM",205,240]]],
+ h_2shapes:[[["g2FaABi85nY",219,247]],[["g2FaABi85nY",247,277]],[["g2FaABi85nY",277,330]],[["g2FaABi85nY",330,388,"The L"]]],
+ h_2around:[[["MOiEoEyvnXM",446,500]],[["MOiEoEyvnXM",446,500]],[["MOiEoEyvnXM",446,500]],[["MOiEoEyvnXM",446,500]],[["MOiEoEyvnXM",500,575,"Faster rhythm"]]],
+ h_2xladder:[[["MOiEoEyvnXM",345,446]],[["MOiEoEyvnXM",345,446,"Switch which hand goes under"]],[["K1vAmgLhfRw",242,260]],[["K1vAmgLhfRw",259,279]],[["K1vAmgLhfRw",231,279]]],
+ h_2full:[[["G6V5jxsY8pU",64,153]],[["G6V5jxsY8pU",153,216]],[["G6V5jxsY8pU",216,303]],[["G6V5jxsY8pU",303,400]],[["G6V5jxsY8pU",400,473]],[["G6V5jxsY8pU",473,513]]],
+ h_2juggle:[null,[["K1vAmgLhfRw",286,303]],[["K1vAmgLhfRw",286,303]],[["K1vAmgLhfRw",286,303]],[["K1vAmgLhfRw",295,303,"Speed it up"]]],
+ h_r_2yoyo:[[["G6V5jxsY8pU",513,600]],null,null,null],
+ s_2chair:[[["wJK-BT1GBIc",122,140]],[["wJK-BT1GBIc",132,142]],[["wJK-BT1GBIc",136,150]],[["wJK-BT1GBIc",142,210,"Scoop and shoot"]]],
+ f_2hammer:[[["wJK-BT1GBIc",24,60]],[["wJK-BT1GBIc",37,60]],[["wJK-BT1GBIc",42,92]],[["wJK-BT1GBIc",92,122,"Left side"]]],
+ f_2post:[[["wJK-BT1GBIc",649,672]],[["wJK-BT1GBIc",670,684]],[["wJK-BT1GBIc",678,700]],[["wJK-BT1GBIc",697,718]],[["wJK-BT1GBIc",714,752,"Drop step"]]],
  s_line:[[[LINE,23,44]],[[LINE,55,82]],[[LINE,72,97,"On the line vs leaning"]],[[LINE,143,186,"Drop, raise, shot"]]],
  s_rollup:[[[ROLL,59,67]],[[ROLL,63,80]],[[ROLL,74,112]],[[ROLL,112,166]]],
  s_elbow:[[[ELB,12,30,"Legs locked"]],[[ELB,30,39,"On one knee"]],[[ELB,39,46,"Sitting"]],[[ELB,20,30]]],
@@ -2139,6 +2214,8 @@ function ballAt(s,tr){const{b,u:u0}=tr,op=b.op;const bx=s.cx+s.sway*.7;
   if(b.kind==="hold"){const p=op.at?{x:s.cx+op.at.dx,y:s.hy+op.at.dy}:Ap;return{x:p.x,y:p.y,back:false,A:p,C:p,held:1}}
   if(b.kind==="path"||b.kind==="fig8"){const pts=(op.pts||fig8(s)).map(q=>({x:s.cx+q[0],y:s.hy+q[1],back:!!q[2]}));const n=pts.length-1,f=u*n,i=Math.min(n-1,Math.floor(f)),p=f-i;
     return{x:lerp(pts[i].x,pts[i+1].x,p),y:lerp(pts[i].y,pts[i+1].y,p),back:pts[i].back&&pts[i+1].back||(p<.5?pts[i].back:pts[i+1].back),A:Ap,C:Cp,held:1}}
+  if(b.kind==="float"){const H=op.h||46;if(u<.18){const q=u/.18;return{x:Ap.x,y:lerp(Ap.y,FY,q*q),back:false,loose:1}}
+    const q=(u-.18)/.82;return{x:lerp(Ap.x,Cp.x,q),y:lerp(FY,Cp.y,q)-H*Math.sin(PI*q),back:false,loose:1}}
   if(b.kind==="away"){const to=op.to;return{x:lerp(Ap.x,to.x,u),y:FY-Math.abs(Math.sin(u*3*PI))*(FY-Ap.y)*(1-u)*.9,back:false,loose:1}}
   if(b.kind==="loose")return{x:op.at.x,y:FY,back:false,loose:1};
   if(b.kind==="fetch"){const fr=op.from;return{x:lerp(fr.x,Cp.x,u),y:u<.4?FY:lerp(FY,Cp.y,(u-.4)/.6),back:false,held:u>.4?1:0,A:Cp,C:Cp,fetch:1}}
@@ -2377,8 +2454,57 @@ const steps={
  h_free:[
   [topV([[0,TP({x:75,y:130,dv:1,dx:75,dy:66})],[1.2,TP({x:75,y:90,dv:1,dx:75,dy:68,side:1})],[1.5,TP({x:75,y:88,dv:1,dx:80,dy:76,lv:1,lx:84,ly:84,side:1}),{label:"Today: the reach got me",col:C.bad}],[2.3,TP({x:75,y:88,dv:1,dx:80,dy:76,lv:1,lx:110,ly:70}),{label:"Today: the reach got me",col:C.bad}],[3,TP({x:75,y:130,dv:1,dx:75,dy:66})]],{arms:true}),"Pick one moment from today, like a reach that took the ball."],
   [topV([[0,TP({x:75,y:130,dv:1,dx:75,dy:66})],[1.2,TP({x:75,y:90,dv:1,dx:75,dy:68,side:1})],[1.5,TP({x:75,y:92,dv:1,dx:80,dy:76,side:-1}),{label:"New answer: cross away",col:C.good,mv:"cross"}],[2.4,TP({x:50,y:48,dv:1,dx:82,dy:74,side:-1}),{label:"New answer: cross away",col:C.good}],[3,TP({x:50,y:20,dv:1,dx:80,dy:72,side:-1})],[3.4,TP({x:75,y:130,dv:1,dx:75,dy:66})]],{arms:true}),"Replay it at game speed and beat it with a different answer."],
-  [topV([[0,TP({x:75,y:130,dv:1,dx:75,dy:60})],[1,TP({x:75,y:100,dv:1,dx:58,dy:66,side:1}),{label:"Imagined defender"}],[1.6,TP({x:92,y:76,dv:1,dx:62,dy:66,side:1})],[2.2,TP({x:86,y:58,dv:1,dx:86,dy:56,side:1})],[2.6,TP({x:70,y:50,dv:1,dx:86,dy:54,side:-1}),{mv:"between"}],[3.4,TP({x:56,y:16,dv:1,dx:82,dy:56,side:-1})],[3.8,TP({x:75,y:130,dv:1,dx:75,dy:60})]],{arms:true,ghost:true}),"Freestyle: react to where you picture the defender."]]
+  [topV([[0,TP({x:75,y:130,dv:1,dx:75,dy:60})],[1,TP({x:75,y:100,dv:1,dx:58,dy:66,side:1}),{label:"Imagined defender"}],[1.6,TP({x:92,y:76,dv:1,dx:62,dy:66,side:1})],[2.2,TP({x:86,y:58,dv:1,dx:86,dy:56,side:1})],[2.6,TP({x:70,y:50,dv:1,dx:86,dy:54,side:-1}),{mv:"between"}],[3.4,TP({x:56,y:16,dv:1,dx:82,dy:56,side:-1})],[3.8,TP({x:75,y:130,dv:1,dx:75,dy:60})]],{arms:true,ghost:true}),"Freestyle: react to where you picture the defender."]],
+ /* ---------- two-ball drills added Nov 2026: track 0 starts in the player's right hand (screen left), track 1 in the left ---------- */
+ h_2drum:[
+  [front([rep(8,()=>pd(.2)),rep(8,()=>pd(.2))],[-1,1],FP({hy:106,w:23,hw:27,top:124}),{label:"Arms nearly straight",sub:"squat low"}),"Low squat, arms almost locked out, both balls tapping just off the floor."],
+  [front([rep(8,()=>pd(.2)),rep(8,()=>pd(.2))],[-1,1],FP({hy:106,w:23,hw:24,top:124}),{label:"Fingertips, shin height",over:kneeLine}),"Tiny, fast taps with the fingertips, well below the knee."],
+  [front([rep(8,i=>pd(.2,{bx:[52,40,28,40][i%4]})),rep(8,i=>pd(.2,{bx:[98,110,122,110][i%4]}))],[-1,1],[[0,FP({hy:106,w:23,top:124})],[.4,FP({hy:106,w:23,top:124,sway:-6})],[1.2,FP({hy:106,w:23,top:124,sway:6})],[1.6,FP({hy:106,w:23,top:124})]],{label:"Side to side together"}),"Both balls move side to side together while you keep tapping."],
+  [front([rep(8,()=>pd(.2,{burst:1})),[pd(.1),...rep(7,()=>pd(.2,{burst:1})),pd(.1)]],[-1,1],FP({hy:100,w:22}),{label:"Drumroll: all out",over:all(hipLine,kneeLine)}),"Alternating as fast and hard as you can, between hip and knee."]],
+ h_2v:[
+  [front([rep(4,()=>pd(.55)),rep(4,()=>pd(.55))],[-1,1],FP({hy:100,w:22}),{label:"Knee to hip",over:all(hipLine,kneeLine)}),"Low stance, both balls between knee and hip."],
+  [front([rep(4,i=>pd(.45,{bx:i%2?62:40})),rep(4,i=>pd(.45,{bx:i%2?110:88}))],[-1,1],[[0,FP({hy:100,w:22,sway:-5})],[.45,FP({hy:100,w:22,sway:5})],[.9,FP({hy:100,w:22,sway:-5})],[1.35,FP({hy:100,w:22,sway:5})],[1.8,FP({hy:100,w:22,sway:-5})]],{label:"Follow each other"}),"Both balls V dribble the same way, side to side together."],
+  [front([rep(4,i=>pd(.45,{bx:i%2?40:62})),rep(4,i=>pd(.45,{bx:i%2?110:88}))],[-1,1],FP({hy:100,w:22}),{label:"Mirror: in, then out"}),"Both wrists turn in so the balls come together, then both turn out."],
+  [front([rep(6,i=>pd(.32,{bx:i%2?40:64})),rep(6,i=>pd(.32,{bx:i%2?110:86}))],[-1,1],FP({hy:100,w:22}),{label:"Close, never touching",under:()=>spotX(75)}),"As close as you can get them in the middle without a touch."]],
+ h_2shapes:[
+  [front([rep(4,()=>io(.6,{in:8})),rep(4,()=>io(.6,{in:8}))],[-1,1],FP({hy:98,w:20}),{label:"In-and-outs: big circles"}),"Both hands roll over the side of the ball, in toward the middle and back out."],
+  [front([rep(4,i=>pd(.4,{bx:[42,24,42,60][i]})),rep(4,i=>pd(.4,{bx:[108,90,108,126][i]}))],[-1,1],[[0,FP({hy:100,w:22})],[.4,FP({hy:100,w:22,sway:-7})],[1.2,FP({hy:100,w:22,sway:7})],[1.6,FP({hy:100,w:22})]],{label:"Windshield wipers: wide"}),"Both balls swing side to side together, stretched as wide as you can."],
+  [front([[[1.2,"path",-1,{pts:[[-27,6,0],[-25,40,0],[-23,6,1],[-25,40,1],[-27,6,0]]}]],[[1.2,"path",1,{pts:[[27,6,0],[25,40,0],[23,6,1],[25,40,1],[27,6,0]]}]]],[-1,1],FP({hy:96,w:16}),{label:"Side of the leg",sub:"dashed = behind"}),"Front to back next to each leg. Dashed means the ball is behind you."],
+  [front([[[1.2,"path",-1,{pts:[[-27,6,0],[-25,40,0],[-23,6,1],[-25,40,1],[-27,6,0]]}]],[[1.2,"path",1,{pts:[[23,6,1],[25,40,1],[27,6,0],[25,40,0],[23,6,1]]}]]],[-1,1],FP({hy:96,w:16}),{label:"The L: in-and-out, then side",sub:"alternate: one front, one back"}),"Alternate the side-of-leg dribble, then put the in-and-out and the side-of-leg dribble together into the L."]],
+ h_2around:[
+  [front([rep(2,()=>pd(.6)),rep(2,()=>pd(.6))],[-1,1],FP({hy:100,w:20}),{label:"Left hand: steady pound"}),"Low stance. One hand keeps a steady pound."],
+  [front([[[1.2,"path",-1,{pts:[[-3,30,0],[-16,33,0],[-30,30,0],[-30,25,1],[-16,22,1],[-3,25,1],[-3,30,0]]}]],rep(2,()=>pd(.6))],[-1,1],FP({hy:100,w:16}),{label:"Around the right leg",sub:"dashed = behind",hl:[0]}),"The other ball circles the leg on its side, low, on the fingertips."],
+  [front([[[1.2,"path",-1,{pts:[[-3,30,0],[-16,33,0],[-30,30,0],[-30,25,1],[-16,22,1],[-3,25,1],[-3,30,0]]}]],rep(2,()=>pd(.6))],[-1,1],FP({hy:100,w:16}),{label:"Big toe stays down",under:()=>spotX(59)}),"The foot can lift a little, but the big toe stays on the floor."],
+  [front([[[1.2,"path",1,{pts:[[3,30,0],[16,33,0],[30,30,0],[30,25,1],[16,22,1],[3,25,1],[3,30,0]]}]],rep(2,()=>pd(.6))],[1,-1],FP({hy:100,w:16}),{label:"Switch sides",hl:[0]}),"Five or six times around, then the other hand pounds and the other ball goes around."],
+  [front([rep(3,()=>[.4,"path",-1,{pts:[[-3,30,0],[-16,33,0],[-30,30,0],[-30,25,1],[-16,22,1],[-3,25,1],[-3,30,0]]}]),rep(2,()=>pd(.6))],[-1,1],FP({hy:100,w:16}),{label:"Faster around, same pound",hl:[0]}),"The ball going around runs at a quicker rhythm than the steady pound."]],
+ h_2xladder:[
+  [front([[pd(),pd(),cr(1,.6,{off:-3,label:"Cross both"}),pd(),pd(),cr(-1,.6,{off:-3,label:"Cross both"})],[pd(),pd(),cr(-1,.6,{off:3}),pd(),pd(),cr(1,.6,{off:3})]],[-1,1],A,{label:"Pound, pound"}),"Two pounds with both balls, then both cross at once."],
+  [front([[pd(),pd(),cr(1,.6,{label:"Right hand under"}),pd(),pd(),cr(-1,.6,{label:"Left hand under"})],[pd(),pd(),cr(-1,.6,{off:4}),pd(),pd(),cr(1,.6,{off:-4})]],[-1,1],A,{hl:[0]}),"One ball has to go under the other. Switch which hand goes under."],
+  [front([[pd(),pd(),bt(1,.75,{label:"Between"}),pd(),pd(),cr(-1,.7)],[pd(),pd(),cr(-1,.75,{off:6}),pd(),pd(),bt(1,.7)]],[-1,1],[[0,A],[.9,FP({w:25,hy:100,toe:1})],[1.75,A],[2.65,FP({w:25,hy:100,toe:-1})],[3.4,A]],{hl:[0],over:feetLines()}),"One ball goes through the legs while the other crosses in front."],
+  [front([[pd(),pd(),bh(1,.85,{label:"Behind the back"}),pd(),pd(),cr(-1,.7)],[pd(),pd(),cr(-1,.85,{off:6}),pd(),pd(),bh(1,.7)]],[-1,1],A,{hl:[0],sub:"dashed = behind"}),"One ball goes behind you while the other crosses out in front."],
+  [front([[pd(.4),cr(1,.5),pd(.4),bt(-1,.6),pd(.4),bh(1,.7),pd(.4),cr(-1,.5)],[pd(.4),cr(-1,.5,{off:4}),pd(.4),cr(1,.6,{off:6}),pd(.4),cr(-1,.7,{off:6}),pd(.4),cr(1,.5,{off:4})]],[-1,1],A,{label:"One pound between"}),"Cut it down to one pound between each exchange."]],
+ h_2full:[
+  [front([rep(6,()=>pd(.34)),rep(6,()=>pd(.34))],[-1,1],FP({walk:1,hy:92}),{label:"Speed dribble",sub:"ball out in front"}),"Both balls pushed out in front, head up, going hard."],
+  [front([rep(6,i=>pd(i<3?.55:.34)),rep(6,i=>pd(i<3?.55:.34))],[-1,1],[[0,FP({hy:96}),{label:"Slow..."}],[1.6,FP({hy:96}),{label:"Slow..."}],[1.7,FP({walk:1,hy:92}),{label:"Go!"}],[2.67,FP({walk:1,hy:92}),{label:"Go!"}]],{}),"Slow down with a hesitation, then explode out of it."],
+  [front([[pd(),cr(1,.6,{off:-3}),pd(),cr(-1,.6,{off:-3})],[pd(),cr(-1,.6,{off:3}),pd(),cr(1,.6,{off:3})]],[-1,1],[[0,FP({walk:1,cx:84})],[.8,FP({walk:1,cx:66})],[1.6,FP({walk:1,cx:84})],[2.2,FP({walk:1,cx:84})]],{label:"Cross: one in front"}),"One ball crosses just in front of the other. Angle left and right as you go."],
+  [front([[pd(),cr(1,.7),pd(),bh(-1,.8)],[pd(),bh(-1,.7),pd(),cr(1,.8)]],[1,-1],FP({walk:1}),{label:"Behind the back",sub:"dashed = behind",hl:[1]}),"One ball crosses in front while the other goes behind you. Keep them low."],
+  [front([[pd(),cr(1,.75),pd(),bt(-1,.75)],[pd(),bt(-1,.75),pd(),cr(1,.75)]],[1,-1],[[0,FP({walk:1})],[.5,FP({walk:1,w:24,toe:1})],[1.25,FP({walk:1})],[1.75,FP({walk:1,w:24,toe:-1})],[2.5,FP({walk:1})]],{label:"Between: through the front",hl:[1],over:feetLines()}),"Step the leg out and go through the front, not from behind."],
+  [front([[pd(),cr(1,.6,{off:-3,label:"Cross"}),pd(),bt(-1,.7,{label:"Between"}),pd(),bh(1,.8,{label:"Behind"}),pd(),cr(-1,.6,{off:-3,label:"Cross"})],[pd(),cr(-1,.6,{off:3}),pd(),cr(1,.7,{off:6}),pd(),cr(-1,.8,{off:6}),pd(),cr(1,.6,{off:3})]],[-1,1],FP({walk:1}),{label:"Mix moves"}),"Any mix of moves down and back."]],
+ h_2juggle:[
+  [front([rep(4,()=>pd()),rep(4,()=>pd())],[-1,1],FP({hy:98,w:20}),{label:"Both balls going, low"}),"Pound both balls in a low stance."],
+  [front([[pd(),pd(),[1,"float",1,{label:"Let it go"}],pd(),pd(),[1,"float",-1,{label:"Let it go"}]],[pd(),pd(),pd(.3),cr(-1,.6,{off:4}),pd(.1),pd(),pd(),pd(.3),cr(1,.6,{off:4}),pd(.1)]],[-1,1],FP({hy:98,w:20}),{hl:[0]}),"Push one ball down hard and let go of it. It bounces up on its own."],
+  [front([[pd(),pd(),[1,"float",1],pd(),pd(),[1,"float",-1]],[pd(),pd(),pd(.3),cr(-1,.6,{off:4,label:"Cross it over"}),pd(.1),pd(),pd(),pd(.3),cr(1,.6,{off:4,label:"Cross it over"}),pd(.1)]],[-1,1],FP({hy:98,w:20}),{hl:[1]}),"The other ball crosses into the hand that let go."],
+  [front([[pd(),pd(),[1,"float",1,{label:"Pick it up"}],pd(),pd(),[1,"float",-1,{label:"Pick it up"}]],[pd(),pd(),pd(.3),cr(-1,.6,{off:4}),pd(.1),pd(),pd(),pd(.3),cr(1,.6,{off:4}),pd(.1)]],[-1,1],FP({hy:98,w:20}),{hl:[0]}),"The free hand picks up the first ball as it comes down, and you keep going."],
+  [front([[pd(.35),[.7,"float",1],pd(.35),[.7,"float",-1]],[pd(.35),pd(.2),cr(-1,.4,{off:4}),pd(.1),pd(.35),pd(.2),cr(1,.4,{off:4}),pd(.1)]],[-1,1],FP({hy:98,w:20}),{label:"Find the rhythm, then speed up"}),"Slow until it's a rhythm, then faster."]],
+ h_r_2yoyo:[
+  [front([rep(4,()=>pd()),rep(4,()=>pd())],[-1,1],A,{label:"Room in front and behind",ph:()=>"●"}),"Both balls going, eyes up on the phone."],
+  [front([rep(4,()=>pd(.4)),rep(4,()=>pd(.4))],[-1,1],FP({walk:1,hy:92}),{label:"Attack forward",ph:()=>"Forward"}),"On \"Forward\", attack with both balls. The floor lines show you're moving forward."],
+  [front([rep(4,()=>pd(.45)),rep(4,()=>pd(.45))],[-1,1],FP({walk:-1,hy:100,top:112}),{label:"Retreat: balls low, in front",ph:()=>"Back"}),"On \"Back\", retreat-dribble with both balls low and in front."],
+  [front([rep(8,()=>pd(.4)),rep(8,()=>pd(.4))],[-1,1],[[0,FP({walk:1,hy:92}),{call:"Forward"}],[1.5,FP({walk:1,hy:92}),{call:"Forward"}],[1.7,FP({walk:-1,hy:100,top:112}),{call:"Back"}],[3.2,FP({walk:-1,hy:100,top:112}),{call:"Back"}]],{label:"Change on the call"}),"Switch direction the moment the call changes."]],
 };
+/* the timed parts of the new two-ball drills reuse their step animations */
+{const P=(d,...ix)=>{steps[d+"p"]=ix.map(i=>steps[d][i])};
+ P("h_2drum",1,2,3,3);P("h_2v",1,2,3);P("h_2shapes",0,1,2,3,3,0);P("h_2around",1,3,4,4);P("h_2xladder",0,1,2,3,4);P("h_2full",0,1,2,3,4,5);P("h_2juggle",1,2,4)}
 const get=id=>{const[d,i]=String(id).split(":");return(steps[d]||[])[+i]};
 const cache=new WeakMap();
 function render(svg,id,t){const s=get(id);if(!s)return;let c=cache.get(svg);if(!c||c.id!==id){c={id,tick:s[0](svg)};cache.set(svg,c)}c.tick(t)}
