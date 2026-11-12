@@ -1241,3 +1241,36 @@ are listed at the top of the script, each with why. Try it: put `var(--card,#fff
 - The library slides in from the right (260 ms) and back out (200 ms); with Android's *Remove animations* it fades.
 - With music playing, the page keeps extra bottom padding (`body.mz-on main`) so *Free up space* can scroll clear of
   the mini-player.
+
+## Step 33. The camera counts makes and misses
+
+**What it does.** In the shot-by-shot logger, *Camera* opens the back camera. Put the phone on the ground a few steps
+behind and to the side of the basket, standing up and tilted so the rim is near the top with open sky above it, and tap
+the rim. From then on each shot is logged by itself through `sig("make")` or `sig("miss")`, the same path a tap, an
+earbud click or "make" takes, so the score, beeps, spoken count and Undo all work as before.
+
+**How it reads a shot** (`mmNew` / `mmStep` in section 4c of `native-web/native.js`):
+1. Each frame is shrunk to 240 px on the short side and turned grey.
+2. A slowly updated background picture is kept. Pixels much darker than a bright background are the ball against the sky.
+3. Round, ball-sized blobs are kept (the size scales with the picture).
+4. A shot arrives when the ball comes within 170 units of the rim after five sightings in the last second heading toward it.
+5. In the 1.6 s after its closest approach, if the ball shows up in the sky again, either above where it touched or well
+   to the side of the rim, it bounced out: **miss**. Otherwise it dropped through: **make**.
+6. If most of the picture changes at once, the phone is moving (being set down). It starts over and waits until the
+   phone is still.
+
+Units: 1 unit is 1 px when the long side of the picture is 1280 px.
+
+**Why this angle.** From the ground, the sky is a plain bright background, so a small dark ball is easy to find
+without a trained model. It can't see arc, depth or left/right; those need a side view.
+
+**How it was checked.** Three of Ladi's clips (Nov 11, phone on the ground, 3.6 to 5.7 minutes each) were run frame by
+frame through the same two functions in Node, at the same 240 px size. Every call was compared by eye against frame
+strips of the rim:
+- 010748584: 25/25 right, plus one false shot.
+- 010308494: 11/12 right, plus two false shots while a finger was over the lens.
+- 005716109: about 33/35 right; one rebound counted as a second shot.
+
+It ran at about 380 frames a second in Node, so it has room on a phone at 30. A Playwright run fed a minute of a
+clip in as the camera: it logged 1 for 1, 2 for 2, 3 for 3, 3 for 4 and 3 for 5, which matches the clip.
+The analysis scripts are in the project files under `hoops-app/ball-tracking/`.

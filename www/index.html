@@ -6576,6 +6576,7 @@ route();
       // the live form check does what Done does (saves and opens the shots it kept).
       if (window.burstBack && window.burstBack()) return true;
       if (window.liveBack && window.liveBack()) return true;
+      if (window.mmBack && window.mmBack()) return true; // camera make/miss counter (step 33) sits over the rep logger
       const film = document.querySelector(".fsq");
       if (film) { if (!press(film, '[data-fq="ecancel"]') && !press(film, '[data-fq="end"]') && !press(film, '[data-fq="close"]')) closeFS(); return true; }
       if (CO.view) { closeVid(); return true; }
@@ -8899,6 +8900,214 @@ route();
       toast("Videos deleted", n ? "The shots' numbers are still there." : "Nothing to delete.");
     }
   });
+
+  /* ---------- 4c. Camera counts makes and misses ----------
+     In the rep logger's big tap screen, "Camera" opens the back camera. Put the phone on the ground near the basket,
+     standing up and tilted so the rim is near the top with open sky above it, and tap the rim once. Each shot is then
+     logged on its own, the same way a tap or "make" would be (sig), so the count, beeps and spoken score are the
+     logger's own. How it reads a shot: the ball is a dark dot on the bright sky. When it reaches the rim, a miss
+     bounces back out into the sky within a second and a half; a make drops behind the rim and isn't seen again.
+     Frames are read in memory at 240 px and thrown away; nothing is recorded. Undo still works if it calls one wrong.
+     Tested on real clips: docs/LEARNING.md, step 33. */
+  {
+    let C = null; // the open counter
+      // BEGIN mmcore (tests: scratch Node harness feeds real clip frames through this)
+      // Make/miss from a phone on the ground looking up past the rim: the ball is a dark dot on the sky. A miss bounces
+      // back out into the sky; a make drops behind the rim and is gone. Units: u = 1 at 1280 px on the long side.
+      function mmNew(W, H, rim) {
+        const u = Math.max(W, H) / 1280, n = W * H;
+        return { W, H, u, rim: { x: rim.x * W, y: rim.y * H }, bg: null, prev: null, lab: new Int32Array(n), fgm: new Uint8Array(n),
+                 dets: [], shot: null, shots: [], moveT: -1e9, still: false, lastDecide: -1e9 };
+      }
+      // one frame: gray = Uint8Array(W*H), t in seconds. Returns "make" | "miss" | null.
+      function mmStep(M, gray, t) {
+        const { W, H, u } = M, n = W * H;
+        if (!M.bg) { M.bg = Float32Array.from(gray); M.prev = Uint8Array.from(gray); M.moveT = t; return null; }
+        // phone moving (being set down or picked up): most of the picture changes at once. Start over until it's still.
+        let diff = 0; for (let i = 0; i < n; i += 7) diff += Math.abs(gray[i] - M.prev[i]); diff /= n / 7;
+        M.prev.set(gray);
+        if (diff > 9) { M.moveT = t; M.bg.set(gray); M.dets.length = 0; M.shot = null; return null; }
+        const warm = t - M.moveT < 1.5;
+        const bg = M.bg, fg = M.fgm, a = warm ? 0.3 : 0.04;
+        for (let i = 0; i < n; i++) { const g = gray[i], b = bg[i]; fg[i] = (b - g > 22 && b > 95) ? 1 : 0; bg[i] = b + a * (g - b); }
+        M.still = !warm;
+        if (warm) return null;
+        // dark blobs on the bright background, round, ball-sized
+        const lab = M.lab; lab.fill(0); let nl = 0; const stack = [];
+        const amin = 150 * u * u * 0.9, amax = 900 * u * u * 1.1;
+        for (let s = 0; s < n; s++) {
+          if (!fg[s] || lab[s]) continue;
+          nl++; lab[s] = nl; stack.length = 0; stack.push(s);
+          let area = 0, sx = 0, sy = 0, x0 = W, x1 = 0, y0 = H, y1 = 0;
+          while (stack.length) {
+            const p = stack.pop(), x = p % W, y = (p / W) | 0; area++; sx += x; sy += y;
+            if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+            if (area > amax * 3) continue;
+            if (x > 0 && fg[p - 1] && !lab[p - 1]) { lab[p - 1] = nl; stack.push(p - 1); }
+            if (x < W - 1 && fg[p + 1] && !lab[p + 1]) { lab[p + 1] = nl; stack.push(p + 1); }
+            if (y > 0 && fg[p - W] && !lab[p - W]) { lab[p - W] = nl; stack.push(p - W); }
+            if (y < H - 1 && fg[p + W] && !lab[p + W]) { lab[p + W] = nl; stack.push(p + W); }
+          }
+          const w = x1 - x0 + 1, h = y1 - y0 + 1;
+          if (area < amin || area > amax || w > 2.2 * h || h > 2.2 * w || area / (w * h) < 0.45) continue;
+          M.dets.push({ t, x: sx / area, y: sy / area });
+        }
+        while (M.dets.length && M.dets[0].t < t - 3) M.dets.shift();
+        const R = 170 * u, rx = M.rim.x, ry = M.rim.y, D = d => Math.hypot(d.x - rx, d.y - ry);
+        // a shot arrives: the ball comes within R of the rim after 5+ sightings in the last second heading toward it
+        if (!M.shot && t - M.lastDecide > 0.3) {
+          const now = M.dets.filter(d => d.t === t && D(d) < R);
+          if (now.length) {
+            const pre = M.dets.filter(d => d.t >= t - 1 && d.t < t && d.y < ry + 10 * u);
+            if (pre.length >= 5 && D(pre[0]) > D(pre[pre.length - 1]) + 40 * u && D(pre[0]) > R) M.shot = { t0: t, best: now[0], bestD: D(now[0]) };
+          }
+        }
+        if (M.shot) {
+          const S = M.shot;
+          if (t - S.t0 <= 0.5) for (const d of M.dets) if (d.t === t && D(d) < S.bestD) { S.bestD = D(d); S.best = d; }
+          const tc = S.best.t;
+          if (t - tc >= 1.6) {
+            const out = M.dets.filter(d => d.t > tc + 0.2 && d.t < tc + 1.6 && (d.y < S.best.y - 20 * u || Math.abs(d.x - rx) > 75 * u) && d.y < ry + 40 * u && D(d) < 260 * u);
+            const r = out.length >= 3 ? "miss" : "make";
+            M.shots.push({ t: tc, r }); M.shot = null; M.lastDecide = t;
+            // the rebound's own sightings must not start the next shot
+            M.dets = M.dets.filter(d => d.t >= t);
+            return r;
+          }
+        }
+        return null;
+      }
+      // END mmcore
+
+    const st = document.createElement("style");
+    st.textContent = `
+.livefc .mm-tip{position:absolute;left:12px;right:12px;bottom:12px;background:rgba(5,8,15,.88);border-radius:14px;padding:12px 14px;font-size:14.5px;z-index:3}
+.livefc .mm-tip b{font-family:var(--display);font-size:18px;text-transform:uppercase}
+.livefc .mm-score{font-family:var(--display);font-weight:800;font-size:22px;padding:0 4px}
+.livefc .lf-stage.mm-aim{cursor:crosshair}`;
+    document.head.appendChild(st);
+
+    // Rep logger, shot drills only: a Camera button next to Undo / Voice / Done.
+    const origTop = bigTop;
+    bigTop = function () {
+      const h = origTop.apply(this, arguments);
+      if (!R || R.mode === "sets") return h;
+      return h.replace(/(<button[^>]*data-b="exit")/, `<button class="btn sec small" data-b="cam">Camera</button>$1`);
+    };
+    // capture phase, so the big tap area under it doesn't also log a make or miss
+    document.addEventListener("click", e => {
+      const b = e.target.closest && e.target.closest('[data-b="cam"]');
+      if (!b || !bigEl || !bigEl.contains(b)) return;
+      e.preventDefault(); e.stopPropagation(); openMM();
+    }, true);
+
+    const TIP = `<b>Place the phone</b><ul style="margin:6px 0 8px;padding-left:18px">
+      <li>On the ground a few steps behind and to the side of the basket, standing up.</li>
+      <li>Tilt it up so the rim is near the top or side of the picture with open sky above it.</li>
+      <li>Then tap the rim on the screen. It counts once the phone is still.</li></ul>`;
+
+    function score() { return R ? `${R.m}/${R.a}` : ""; }
+    function drawMM() {
+      if (!C) return;
+      C.el.querySelector(".mm-score").textContent = score();
+      const tip = C.el.querySelector(".mm-tip");
+      if (!C.rim) { tip.innerHTML = TIP + (C.lastRim ? `<button class="btn sec small" data-mm="same" style="width:100%">Same spot as last time</button>` : ""); tip.hidden = false; }
+      else tip.hidden = true;
+      C.el.querySelector(".lf-stage").classList.toggle("mm-aim", !C.rim);
+    }
+    function mmMsg(t) { const m = C && C.el.querySelector(".lf-msg"); if (m && m.textContent !== t) m.textContent = t; }
+    function cue(t) { const c = C && C.el.querySelector(".lf-cue"); if (!c) return; c.textContent = t; clearTimeout(C.cueT); C.cueT = setTimeout(() => { if (C) c.textContent = ""; }, 1200); }
+
+    async function openMM() {
+      if (C || !R) return;
+      const el = document.createElement("div");
+      el.className = "livefc"; el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "Camera counts makes and misses");
+      el.innerHTML = `<div class="lf-top"><div class="lf-title">Auto <span class="mm-score"></span></div>
+        <button class="btn sec small" data-mm="rim">Rim</button><button class="btn sec small" data-b2="undo">Undo</button><button class="btn sec small" data-mm="close">Done</button></div>
+        <div class="lf-stage"><video playsinline muted autoplay></video><canvas></canvas><div class="lf-msg" role="status">Starting the camera…</div><div class="lf-cue" aria-live="polite"></div><div class="mm-tip"></div></div>`;
+      document.body.appendChild(el);
+      let last = null; try { last = S.settings.mmRim || null; } catch (e) {}
+      C = { el, video: el.querySelector("video"), cv: el.querySelector("canvas"), stream: null, rim: null, lastRim: last, M: null, raf: 0, oc: document.createElement("canvas"), lastT: 0 };
+      el.addEventListener("click", e => {
+        if (!C) return;
+        const b = e.target.closest("[data-mm],[data-b2]");
+        if (b) {
+          if (b.dataset.mm === "close") return closeMM();
+          if (b.dataset.mm === "rim") { C.rim = null; C.M = null; mmMsg(""); return drawMM(); }
+          if (b.dataset.mm === "same") return setRim(C.lastRim);
+          if (b.dataset.b2 === "undo") { sig("u"); return drawMM(); }
+          return;
+        }
+        if (C.rim || e.target.closest(".mm-tip")) return;
+        const r = C.video.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        if (x < 0 || x > 1 || y < 0 || y > 1) return;
+        setRim({ x, y });
+      });
+      lockOn();
+      drawMM();
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } }, audio: false });
+        if (!C) { stream.getTracks().forEach(t => t.stop()); return; }
+        C.stream = stream;
+      } catch (e) { if (C) mmMsg("Couldn't open the camera. Allow the camera for Hoops Ladder in your phone's settings, then try again."); return; }
+      if (!C) return;
+      C.video.srcObject = C.stream;
+      try { await C.video.play(); } catch (e) {}
+      mmMsg("");
+      C.raf = requestAnimationFrame(loop);
+    }
+    function setRim(p) {
+      if (!C) return;
+      C.rim = p; C.M = null;
+      try { S.settings.mmRim = p; persist(); } catch (e) {}
+      C.lastRim = p;
+      mmMsg("Hold still…");
+      drawMM();
+    }
+    function closeMM() {
+      if (!C) return;
+      cancelAnimationFrame(C.raf); clearTimeout(C.cueT);
+      if (C.stream) C.stream.getTracks().forEach(t => t.stop());
+      C.el.remove(); C = null;
+      if (bigEl) drawBig();
+    }
+    window.mmBack = () => { if (!C) return false; closeMM(); return true; };
+
+    function loop() {
+      if (!C) return;
+      C.raf = requestAnimationFrame(loop);
+      if (!bigEl || !R || R.finished) return closeMM(); // the drill ended (last shot logged): back to its summary
+      const v = C.video, now = performance.now();
+      if (!v.videoWidth || v.readyState < 2 || now - C.lastT < 1000 / 31) return;
+      C.lastT = now;
+      // processing size: 240 px on the short side, like the tests
+      const sc = 240 / Math.min(v.videoWidth, v.videoHeight), W = Math.round(v.videoWidth * sc), H = Math.round(v.videoHeight * sc);
+      const oc = C.oc; if (oc.width !== W || oc.height !== H) { oc.width = W; oc.height = H; C.M = null; }
+      // overlay canvas matches the video's on-screen box
+      const r = v.getBoundingClientRect(), stg = C.el.querySelector(".lf-stage").getBoundingClientRect(), cv = C.cv;
+      if (cv.width !== Math.round(r.width) || cv.height !== Math.round(r.height)) { cv.width = Math.round(r.width); cv.height = Math.round(r.height); }
+      cv.style.left = (r.left - stg.left) + "px"; cv.style.top = (r.top - stg.top) + "px";
+      const g = cv.getContext("2d"); g.clearRect(0, 0, cv.width, cv.height);
+      if (!C.rim) return;
+      const x = oc.getContext("2d", { willReadFrequently: true });
+      x.drawImage(v, 0, 0, W, H);
+      const px = x.getImageData(0, 0, W, H).data, gray = new Uint8Array(W * H);
+      for (let i = 0, j = 0; j < gray.length; i += 4, j++) gray[j] = (px[i] * 77 + px[i + 1] * 150 + px[i + 2] * 29) >> 8;
+      if (!C.M) C.M = mmNew(W, H, C.rim);
+      const M = C.M, wasStill = M.still;
+      const res = mmStep(M, gray, now / 1000);
+      if (M.still !== wasStill) mmMsg(M.still ? "" : "Hold still…");
+      if (res) { cue(res === "make" ? "Make" : "Miss"); sig(res); drawMM(); }
+      // the rim and the reach it watches, and the ball when it's seen
+      const k = cv.width / W;
+      g.lineWidth = 2; g.strokeStyle = M.still ? "rgba(255,138,61,.9)" : "rgba(242,245,250,.5)";
+      g.beginPath(); g.arc(M.rim.x * k, M.rim.y * k, 9, 0, 7); g.stroke();
+      g.setLineDash([4, 6]); g.beginPath(); g.arc(M.rim.x * k, M.rim.y * k, 170 * M.u * k, 0, 7); g.stroke(); g.setLineDash([]);
+      g.fillStyle = "#FF8A3D";
+      for (const d of M.dets) if (d.t > now / 1000 - .3) { g.beginPath(); g.arc(d.x * k, d.y * k, 4, 0, 7); g.fill(); }
+    }
+  }
 
   /* ---------- 5. Match the beat to the player's real dribble ----------
      On a part with a beat, "Match my dribble" listens with the mic for 8 seconds while the player dribbles at their
