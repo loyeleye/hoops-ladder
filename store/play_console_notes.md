@@ -58,6 +58,7 @@ Why each feature still counts as "not collected":
 | Form check video | Read in memory, pose model runs on-device, only numbers kept | No |
 | Match my dribble (mic, 8 s) | Web Audio on the phone finds bounce thuds; only the speed is kept | No |
 | Live form check (camera) | `getUserMedia` frames read in memory, pose model runs on-device, only numbers kept | No |
+| Camera make/miss counter | `getUserMedia` frames read in memory at 240 px, ball found on-device, only make/miss logged; the rim spot is saved in settings | No |
 | Film a rep (self-review) | Clip recorded with `getUserMedia` (no audio) or picked, held in memory; pose model runs on-device; kept only if the user taps Keep clip (then stored like Training videos) | No |
 | Camera | Opened by Android's picker when you record a clip | No |
 | Training videos (camera + mic audio) | Stored in the app's IndexedDB on the phone | No |
