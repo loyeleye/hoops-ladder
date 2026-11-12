@@ -1063,6 +1063,11 @@ const DRILLS=[
   what:"Four minutes to get your ankles, calves, hamstrings and hips ready before you jump, sprint or finish at the rim. It comes right after Cold 3s, which you shoot with no warm-up at all.",
   steps:["Start easy. You should feel warm and a little loose by the end, not tired.","Keep the hops small and quick, landing softly on the balls of your feet.","On lunges, step long and keep your front knee over your foot.","Build-up runs: start easy and only go faster when your legs feel ready. Skip the last round if anything feels tight."],
   cue:"Warm, not tired.",src:[{label:"Standard dynamic warm-up"}]},
+ {id:"c_burn",skill:"h",body:true,name:"No-Court Burner",role:"body",short:"Gets you tired for Tired 3s when there's no court to run.",unlock:1,mins:2,log:"timer",
+  phases:[["Star jumps",20],["Push-ups",20],["Max jumps, stick each landing",20],["Mountain climbers",20],["Squat jumps",20]],
+  what:"The 17s for a driveway: about two minutes of no-equipment moves back to back, so the Tired 3s that follow are shot on tired legs. Four or five moves from a basketball bodyweight circuit, a different mix each day.",
+  steps:["No rest between moves: the app calls the next one.","Jumps: land soft with your knees over your toes. Push-ups: knees down is fine.","Hard enough to breathe heavy, not a max-effort sprint.","Go straight into Tired 3s."],
+  cue:"Move fast, land soft.",src:[{label:"UH Life: 30-second bodyweight circuit for basketball shape",url:"https://www.uhlife.com/stories/effective-at-home-workout-to-get-into-basketball-shape"},{label:"Breakthrough Basketball: at-home conditioning workout",url:"https://www.breakthroughbasketball.com/fitness/home-conditioning-workout"},{label:"Neshaminy plyometric workout (skater jumps, mountain climbers)",url:"https://www.neshaminy.org//cms/lib/PA01000466/Centricity/Domain/129/PLYO Workout.pdf"}]},
  {id:"b_cool",mv:["walk","hamstr","hipflex","calfwall","quad"],skill:"h",body:true,rt:"cool",short:"Short stretch for what you just used.",name:"Cool-Down Stretch",role:"cool",unlock:1,mins:3,log:"timer",
   phases:[["Walk it off, breathe out slowly",30],["Hamstring stretch, each leg",40],["Hip flexor stretch, each side",40],["Calf stretch against the wall",30],["Quad stretch, each leg",30]],
   what:"Three easy minutes to bring your heart rate down and stretch what you just used: hamstrings, hips, calves and quads. It comes after Tired 3s, the last thing you shoot.",
@@ -3005,7 +3010,7 @@ function streaks(hist){if(hist.some(h=>h.chunk||h.sg))return null;let best=0,run
   return{best,by}}
 function ladderRungs(d,hist){const out=[];let a=0,m=0;for(const h of hist){if(h.chunk){a+=h.a;m+=h.m}else{a++;if(h.hit)m++}if(m>=d.stageN){out.push([a,m]);a=0;m=0}}if(a)out.push([a,m]);return out}
 const stageIdx=d=>d.gm==="streak"?Math.min(d.stages.length-1,sState(d).done):Math.min(d.stages.length-1,Math.floor((d.stageBy==="makes"?R.m:R.a)/d.stageN));
-const stageCall=(d,i)=>d.stageBy==="makes"||d.skill==="f"||!d.between?d.stages[i]:d.stages[i]+" · run first";
+const stageCall=(d,i)=>d.stageBy==="makes"||d.skill==="f"||!d.between?d.stages[i]:d.stages[i]+(d.id==="s_tired"&&courtHave()<2?` · ${ncMove(5+i)[1]} first`:" · run first");
 function drillPct(ids,days){const cut=cutOf(days);let m=0,a=0;for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items)if(ids.includes(it.id)&&it.a){m+=it.m;a+=it.a}}return{m,a,p:pct(m,a)}}
 function bestStreak(days){const cut=cutOf(days);let b=null;for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){if(it.st!=null&&D[it.id]&&D[it.id].log==="spots"&&(!b||it.st>b.n))b={n:it.st,d:se.d}}}return b}
 function spotStreaks(days){const cut=cutOf(days),out={};for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items)if(it.ss)for(const k in it.ss)out[k]=Math.max(out[k]||0,it.ss[k])}return out}
@@ -3036,7 +3041,7 @@ const NW_DEF={20:1,30:2,45:2},NW_ALL=99,NW_MAX=6;
 /* warm-up and cool-down routines: you pick one of each (Today's plan ⇄, or Drills → Conditioning) and every recommended workout uses it */
 const RTS=k=>DRILLS.filter(d=>d.rt===k),RT_DEF={warm:"b_body",cool:"b_cool"},RT_NAME={warm:"warm-up",cool:"cool-down"};
 function rtPick(k){const d=D[(S.settings.rt||{})[k]];return d&&d.rt===k?d:D[RT_DEF[k]]}
-const FIXED=new Set(["s_cold","s_tired",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
+const FIXED=new Set(["s_cold","s_tired","c_burn",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
 /* drills that load the legs: left out on a "Legs heavy" or "Game tonight" day */
 const JUMPY=new Set(["c_17s","c_ub","f_power","f_bump","f_contact","f_spots","f_chair","s_tired","h_zig","h_stop","s_sprint3","f_knee","f_tornado","f_eyes"]);
 /* where you're training (Today's setup): Full court / Half court / Just a hoop (a driveway) / No hoop.
@@ -3047,13 +3052,17 @@ const COURT_FULL=new Set(["c_ub","c_farmers","h_2full"]),COURT_HALF=new Set(["c_
 const courtNeed=d=>COURT_FULL.has(d.id)?3:COURT_HALF.has(d.id)?2:d.skill==="s"||d.skill==="f"?1:0;
 const courtHave=()=>COURT_N[S.settings.court]??3;
 /* balls you have today: two-ball drills need 2; conditioning and body routines need none (except the Hokie drill and the ball warm-ups) */
-const BALLS=[["2","2 balls"],["1","1 ball"],["0","No ball"]],TWO_BALL=/^(h_2|h_r_2|f_2)|^(h_two|s_2chair)$/;
+const BALLS=[["2","2 basketballs","Two"],["1","1 basketball","One"],["0","No basketball","None"]],TWO_BALL=/^(h_2|h_r_2|f_2)|^(h_two|s_2chair)$/;
 const ballNeed=d=>TWO_BALL.test(d.id)?2:(d.cond&&d.id!=="c_hokie")||(d.body&&d.id!=="b_game"&&d.id!=="b_club")?0:1;
 const ballHave=()=>{const b=S.settings.balls;return b==null?2:+b};
 const placeOk=d=>courtNeed(d)<=courtHave();
 const courtOk=d=>placeOk(d)&&ballNeed(d)<=ballHave();
+/* no-equipment moves for days without a court to run (Just a hoop, No hoop): the Burner draws five a day, and each Tired 3s round gets the next one */
+const NC_MOVES=[["Star jumps","star jumps"],["Push-ups","push-ups"],["Max jumps, stick each landing","max jumps, sticking each landing"],["Squat jumps","squat jumps"],["Skater jumps, side to side","skater jumps"],["Mountain climbers","mountain climbers"],["Burpees","burpees"],["High knees","high knees"],["Defensive slides in place","slides in place"],["Jumping jacks","jumping jacks"]];
+const ncMove=i=>NC_MOVES[(hash(today())+i)%NC_MOVES.length];
+if(D.c_burn)Object.defineProperty(D.c_burn,"phases",{get(){return [0,1,2,3,4].map(i=>[ncMove(i)[0],20])}});
 /* the run before each Tired 3s round fits the court you're on */
-if(D.s_tired)Object.defineProperty(D.s_tired,"between",{get(){const c=courtHave();return c>=3?"Run full court down and back at about 80 percent.":c===2?"Run baseline to half court and back twice at about 80 percent.":"30 seconds of jumping jacks or high knees, hard enough to breathe heavy."}});
+if(D.s_tired)Object.defineProperty(D.s_tired,"between",{get(){const c=courtHave();return c>=3?"Run full court down and back at about 80 percent.":c===2?"Run baseline to half court and back twice at about 80 percent.":(()=>{let i=0;try{if(R&&R.d===D.s_tired)i=stageIdx(D.s_tired)}catch(e){}return `30 seconds of ${ncMove(5+i)[1]}, hard enough to breathe heavy.`})()}});
 const FREQ_LABEL={auto:"Auto",every:"Every workout",weekly:"Weekly",custom:"Custom",never:"Never suggest"};
 const DOW=["Mo","Tu","We","Th","Fr","Sa","Su"],DOWL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const fq=id=>(S.rec.freq||{})[id]||{k:"auto"};
@@ -3081,7 +3090,7 @@ function needsWork(){const out=[],add=(id,t,why)=>{if(D[id]&&!out.some(x=>x.d.id
   let hd=null;const cut=cutOf(30);for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){const d=D[it.id];if(d&&d.skill==="h"&&!d.body&&it.lost>=3&&(!hd||it.lost>=hd.lost))hd={id:it.id,lost:it.lost}}}
   if(hd)add(hd.id,`Needs work: ${hd.lost} drops last time`,`You lost the ball ${hd.lost} times the last time you ran it. Clean reps here carry over to games.`);
   return out.filter(x=>!((S.rec.paused||{})[x.d.id]>today()))}
-function slotOf(d){if(d.id==="c_17s"||d.id==="c_ub")return"Tired shots";if(d.cond)return"Conditioning";if(d.id==="s_cold")return"Cold shots";if(d.rt==="warm")return"Body warm-up";if(d.rt==="cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
+function slotOf(d){if(d.id==="c_17s"||d.id==="c_ub"||d.id==="c_burn")return"Tired shots";if(d.cond)return"Conditioning";if(d.id==="s_cold")return"Cold shots";if(d.rt==="warm")return"Body warm-up";if(d.rt==="cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
   if(d.role==="warm")return"Warm-up";if(d.id==="h_live")return"Live";
   if(d.skill==="h")return d.read?"Handle · decisions":"Handle · mechanics";
   if(d.skill==="f")return"Finishing";
@@ -3113,7 +3122,7 @@ function plan0(){
   const tired=mins!==20&&!body&&courtOk(D.s_tired);if(mins!==20&&!body&&!tired)cut(D.s_tired);
   /* a run right before Tired 3s so the tired shots come on tired legs, not straight after more shooting (dropped below if no shooting comes first):
      Up-and-Backs on shorter days, 17s at 45 minutes. Each swaps for the other. */
-  const run=(mins<45?[D.c_ub,D.c_17s]:[D.c_17s,D.c_ub]).find(ok);if(tired&&run)add(run,{k:"fixed",t:"Gets you tired for Tired 3s"},"must");
+  const run=(mins<45?[D.c_ub,D.c_17s]:[D.c_17s,D.c_ub]).find(ok)||(courtHave()<2?D.c_burn:null);if(tired&&run)add(run,{k:"fixed",t:"Gets you tired for Tired 3s"},"must");
   if(tired)add(D.s_tired,{k:"fixed",t:"Always near the end"},"must");
   add(rtPick("cool"),null,"must");
   for(const id of S.rec.added)if(D[id]&&!D[id].body&&!courtOk(D[id]))cut(D[id]);else if(D[id]&&!D[id].body&&(!D[id].partner||S.settings.partner))add(D[id],{k:"you",t:"You added it"},"added");
@@ -3151,7 +3160,7 @@ function plan0(){
   let left=mins+2;const out=[],over=[];
   for(const x of cand){const m=realMins(x.d);if(x.prio==="must"||x.prio==="added"||x.sx||m<=left){out.push(x);left-=m}else if(x.prio!=="fav")over.push(x)}
   out.sort((a,b)=>ORDER.indexOf(a.slot)-ORDER.indexOf(b.slot));
-  {const i=out.findIndex(x=>x.d.id==="c_17s"||x.d.id==="c_ub");if(i>=0&&!(i>0&&out[i-1].d.skill==="s"&&out[i+1]&&out[i+1].d.id==="s_tired"))out.splice(i,1)}
+  {const i=out.findIndex(x=>x.d.id==="c_17s"||x.d.id==="c_ub"||x.d.id==="c_burn");if(i>=0&&!(i>0&&out[i-1].d.skill==="s"&&out[i+1]&&out[i+1].d.id==="s_tired"))out.splice(i,1)}
   out.over=over;out.courtOut=courtOut.filter(d=>!used.has(d.id));out.mins=mins;out.body=body;out.ml=ml;return out}
 
 /* alternatives for a swap: same slot (or same weakness for a needs-work drill), not already in today's plan */
@@ -3551,7 +3560,7 @@ function setupStrip(body,p){const k=S.rec.body&&S.rec.body.d===today()?S.rec.bod
   const bk=String(ballHave()),sum=[COURTS.find(c=>c[0]===ck)[1],BALLS.find(x=>x[0]===bk)[1],S.settings.partner?"With a partner":"Solo",S.settings.heavy?"Heavy ball":""].filter(Boolean).join(" · ");
   const head=`<div class="tsum"><div class="tx"><b>${esc(sum)}</b><small>${open?"These stay until you change them":"Stays until you change it"}</small></div>${open?"":`<button class="setup-btn" data-rec="setopen" aria-expanded="false">Change</button>`}</div>`;
   const edit=open?`<div class="tgrp"><span class="label">Where you train</span><div class="tseg" role="group" aria-label="Where you train" style="--n:${COURTS.length}">${COURTS.map(([v,t,sub])=>`<button data-rec="court:${v}" aria-pressed="${ck===v}">${t}<small>${sub}</small></button>`).join("")}</div>
-     <span class="label">Balls</span><div class="tseg" role="group" aria-label="Balls" style="--n:3">${BALLS.map(([v,t])=>`<button data-rec="balls:${v}" aria-pressed="${bk===v}">${t}</button>`).join("")}</div>
+     <span class="label">Basketballs</span><div class="tseg" role="group" aria-label="Basketballs" style="--n:3">${BALLS.map(([v,t,sh])=>`<button data-rec="balls:${v}" aria-pressed="${bk===v}" aria-label="${t}">${sh}</button>`).join("")}</div>
      <label class="tsw"><span>With a partner<small>Adds partner drills</small></span><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}></label>
      <label class="tsw"><span>Heavy ball<small>For the heavy-ball handling sets</small></span><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}></label>
      <button class="btn sec small done" data-rec="setopen">Done</button></div>`:"";
@@ -3564,15 +3573,15 @@ function todayLine(p,k){const bits=[],ck=S.settings.court||"full",n=(p.courtOut|
   if(k==="heavy")bits.push("Legs heavy: no Tired 3s, jump or contact drills, lighter footwork.");
   if(k==="game")bits.push(S.rec.body.only?"Game tonight: just the Pre-Game Warm-Up. Do it at the gym before tip-off.":"Game tonight: 20 minutes of form and touch, no volume shooting or jumps.");
   if(ck==="half"&&p.some(x=>x.d.id==="c_17s")&&(p.mins<45))bits.push("Half court: 17s instead of Up-and-Backs before Tired 3s.");
-  if(ck==="hoop"&&p.some(x=>x.d.id==="s_tired"))bits.push("Just a hoop: jumping jacks or high knees before each Tired 3s round.");
+  if(ck==="hoop"&&p.some(x=>x.d.id==="s_tired"))bits.push("Just a hoop: the No-Court Burner instead of a run before Tired 3s, and a different no-equipment move before each round.");
   if(ck==="none")bits.push("No hoop: warm-up, ball handling and the stretch.");
-  if(!ballHave())bits.push("No ball: warm-up, conditioning and the stretch.");else if(ballHave()===1&&n)bits.push("One ball: no two-ball drills.");
+  if(!ballHave())bits.push("No basketball: warm-up, conditioning and the stretch.");else if(ballHave()===1&&n)bits.push("One basketball: no two-ball drills.");
   if(n)bits.push(`<button class="linkbtn" data-rec="leftout">${n} drill${n===1?"":"s"} left out today ›</button>`);
   return bits.join(" ")}
 /* drills today's court ruled out, shown under the list so nothing disappears without a word */
 function leftOutCard(p){const out=p.courtOut||[];if(!out.length)return"";const ck=S.settings.court||"full";
-  const why=d=>placeOk(d)?(ballNeed(d)===2?"needs two balls":"needs a ball"):["","needs a hoop","needs court lines","needs a full court"][courtNeed(d)],
-    back=d=>placeOk(d)?(ballNeed(d)===2?"with two balls":"with a ball"):["","with a hoop","on a court","on a full court"][courtNeed(d)];
+  const why=d=>placeOk(d)?(ballNeed(d)===2?"needs two basketballs":"needs a basketball"):["","needs a hoop","needs court lines","needs a full court"][courtNeed(d)],
+    back=d=>placeOk(d)?(ballNeed(d)===2?"with two basketballs":"with a basketball"):["","with a hoop","on a court","on a full court"][courtNeed(d)];
   return `<div class="overcard" id="leftout"><div class="label">Left out today · ${COURTS.find(c=>c[0]===ck)[1]} · ${BALLS.find(x=>x[0]===String(ballHave()))[1]}</div>${out.map(d=>`<span><b>${esc(d.name)}</b> ${why(d)}. It's back when you train ${back(d)}.</span>`).join("")}<button class="linkbtn" data-rec="setopen">Change where you train</button></div>`}
 function addedCard(ids){const names=ids.map(id=>D[id].name);
   return `<div class="addedcard"><b>You added ${esc(names.length>2?names.length+" drills":names.join(" and "))}.</b> Put ${names.length>1?"them":"it"} in today's workout, or keep ${names.length>1?"them":"it"} for your next recommended one?<div class="psee-btns"><button class="btn sec small" data-rec="addin">Add ${names.length>1?"them":"it"} in</button><button class="btn sec small" data-rec="keepnext">Keep for next</button></div></div>`}
