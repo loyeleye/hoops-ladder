@@ -1149,7 +1149,7 @@ lined up at the release. Hold a chip to select several. *Send to coach…* (step
 
 **Cleanup.** A shot's numbers live in `S.bursts` and stay. Its video is deleted 14 days after filming unless it has
 ★, *Keep*, or was sent or saved for a coach (`shot.sent`, `shot.keep`), and never while a coach session still uses it
-(`sesUsesVid`). The Form tab's *Shot bursts* fold shows how much the videos use and *Free up space* lists bursts by
+(`sesUsesVid`). The Form tab's *Your sessions* fold shows how much the videos use and *Free up space* lists bursts by
 size with *Delete videos* (numbers stay). Burst videos no shot points at, from the app closing mid-burst, go after an
 hour.
 
@@ -1164,7 +1164,7 @@ jumped back to shot 1 on every tap. That's fixed (the strip keeps its scroll, an
 Delete act on all of them). The library is the bigger fix. A mockup went through the art panel first (art director,
 motion, UI artist, UX, and a shooting coach), and their shared fixes are built in.
 
-**Getting there.** The grid button on the viewer's top bar, or a burst on the Form tab's *Shot bursts* fold. Tap a
+**Getting there.** The grid button on the viewer's top bar, or a session on the Form tab's *Your sessions* fold (called *Shot bursts* before). Tap a
 tile to watch that shot. Back steps out in order: a confirm sheet, then Quick pick or the selection, then the library,
 and back to the viewer shot you came from.
 
@@ -1190,7 +1190,7 @@ Android's Back gesture. An optional *Make / Miss* tag per shot feeds the Make an
 undoes ("Undo keep #34"). The order can be shot order or worst/best on the focus cue. At the end it says how many are
 kept and when the rest go. Code: `burstLib`, `bl*`, `qp*`, `thMake`.
 
-**Coach pack (off by default).** A switch in the Form tab's *Shot bursts* fold trades space for information. When
+**Coach pack (off by default).** A switch in the Form tab's *Your sessions* fold trades space for information. When
 it's on, each burst keeps up to 5 shots past the 14-day cleanup, picked on the focus cue: the best, a typical one
 and the worst, plus a typical early and a typical late one, so a matched set survives every session. Tiles show
 *Pack* on them, and the library gets a *Coach pack* button. It shows the picks and a session summary (shots, camera,
@@ -1219,3 +1219,25 @@ green for 15 s if you walk up to the phone to tap Go.
 "Recording" at zero. Say "stop" or tap Cancel during it. *Start anyway* skips the check, and a training video has
 *Someone's filming me: record now*. The voice part uses the HoopsVoice plugin through `hooks.listen` and only acts on
 whole phrases, never while the app itself is talking. Code: `setupCheck`, `scJudge`, `scTick`, `scCount`, `liveCheck`.
+
+## Step 32. Theme tokens, and how you get to your sessions
+
+**The bug.** The Form tab's session rows used `var(--card,#fff)`. There is no `--card` token, so the fallback won: white
+rows in both themes, while the text followed the theme and turned near-white in dark mode. Every colour now comes from a
+theme token (`--surface-2`, `--line`, `--ink`, `--muted`, `--accent`, `--accent-ink`), and anything that sets a
+background also sets its text colour from the same family.
+
+**The check.** `node tools/check_tokens.mjs` fails when the page uses a `var(--name)` that nothing defines. It runs in
+CI after the film check. The few tokens that are optional on purpose (film-diagram rim and backboard, the recap plate)
+are listed at the top of the script, each with why. Try it: put `var(--card,#fff)` back and the build fails with the line.
+
+**Light-mode accent text.** White on the light theme's orange (#E2601A) is 3.5:1, which is too low for button labels.
+`--accent-ink` is now #1A0C03 in both themes (5.4:1 light, 6.9:1 dark).
+
+**Getting to the library.**
+- The Form tab fold is called *Your sessions*. The newest session is a card with *Review shots*; earlier ones are rows.
+- Ending Live form check opens the viewer with "N shots saved. Pick the ones to keep." and *Review in shot library*.
+- The viewer's *All shots* button opens the library on the shot you were on, ringed in orange.
+- The library slides in from the right (260 ms) and back out (200 ms); with Android's *Remove animations* it fades.
+- With music playing, the page keeps extra bottom padding (`body.mz-on main`) so *Free up space* can scroll clear of
+  the mini-player.

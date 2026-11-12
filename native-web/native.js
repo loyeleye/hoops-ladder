@@ -1082,7 +1082,7 @@
       if (!L) return;
       scClose();
       const shots = L.shots;
-      buLiveEnd().then(id => { if (id) burstOpen(id); }); // stops the shot recorders before the camera closes
+      buLiveEnd().then(id => { if (id) burstOpen(id, 0, true); }); // stops the shot recorders before the camera closes
       cancelAnimationFrame(L.raf);
       if (L.stream) L.stream.getTracks().forEach(t => t.stop());
       L.el.remove();
@@ -1349,7 +1349,7 @@
     el.className = "livefc buv";
     el.setAttribute("role", "dialog");
     el.setAttribute("aria-label", "Finding your shots");
-    el.innerHTML = `<div class="lf-top"><div class="lf-title">Shot burst</div><button class="btn sec small" data-bc="cancel">Cancel</button></div>
+    el.innerHTML = `<div class="lf-top"><div class="lf-title">Finding your shots</div><button class="btn sec small" data-bc="cancel">Cancel</button></div>
       <div class="bu-wait"><b>Finding your shots</b><p class="bu-prog" role="status">Loading the pose model…</p><p class="bu-sub">Keep the app open. Only the shots are kept, each as its own short video.</p></div>`;
     document.body.appendChild(el);
     BC = { el, stop: false };
@@ -1361,7 +1361,7 @@
     const done = id => { lockOff(); URL.revokeObjectURL(url); v.removeAttribute("src"); v.load(); el.remove(); BC = null; render(); if (id) burstOpen(id); };
     let pl = null;
     try { pl = await loadPose(); } catch (e) {}
-    if (!pl) { toast("Couldn't load the pose model", "Shot bursts need it to find your shots."); return done(null); }
+    if (!pl) { toast("Couldn't load the pose model", "It finds your shots in the clip."); return done(null); }
     await buOnce(v, "loadeddata", 8000);
     if (!v.videoWidth) { toast("Couldn't open that video", "Try a clip filmed with your camera app."); return done(null); }
     const sc = 480 / Math.max(v.videoWidth, v.videoHeight), cw = Math.round(v.videoWidth * sc), ch = Math.round(v.videoHeight * sc);
@@ -1450,21 +1450,22 @@
 
   let BV = null; // the open viewer: {bid, i, sel:Set, cmp, rate, el, raf}
   const buDay = t => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
-  function burstOpen(id, i) {
+  function burstOpen(id, i, fresh) {
     const f = burstFind(id);
     if (!f) return;
     if (BV) burstClose();
     const el = document.createElement("div");
     el.className = "livefc buv";
     el.setAttribute("role", "dialog");
-    el.setAttribute("aria-label", "Shot burst");
+    el.setAttribute("aria-label", "Shot viewer");
     document.body.appendChild(el);
-    BV = { bid: id, i: i || 0, sel: new Set(), cmp: null, pick: false, rate: .5, el, raf: 0, pf: {}, urls: {} };
+    BV = { bid: id, i: i || 0, fresh: !!fresh, sel: new Set(), cmp: null, pick: false, rate: .5, el, raf: 0, pf: {}, urls: {} };
     el.addEventListener("click", buClick);
     el.addEventListener("pointerdown", buPress);
     el.addEventListener("pointerdown", buSwipe);
     buDraw();
   }
+  window.burstOpen = burstOpen;
   window.burstBack = () => {
     if (BC) { BC.stop = true; return true; }
     if (!BV) return BL ? blBack() : false;
@@ -1503,6 +1504,7 @@
       <div class="bu-strip" role="listbox" aria-label="Shots">${S0.map((s, j) => `<button class="bu-chip ${worstOf(s)}${s.v ? "" : " nov"}${BV.sel.has(s.id) ? " sel" : ""}" data-bv="shot:${j}" aria-current="${j === BV.i}" aria-label="Shot ${s.n}${s.star ? ", starred" : ""}${s.v ? "" : ", no video"}">${s.n}${s.star ? '<span class="st">★</span>' : ""}</button>`).join("")}</div>
       ${BV.pick ? `<p class="bu-note"><b>Tap the shot to compare with.</b> They play lined up at the release.</p>`
         : nSel ? `<p class="bu-note"><b>${nSel} selected.</b> Tap shots to add or remove them. <button class="linkbtn" data-bv="selclear" style="color:inherit">Clear</button></p>`
+        : BV.fresh && S0.length > 1 ? `<div class="bu-fresh"><span><b>${S0.length} shots saved.</b> Pick the ones to keep.</span><button class="btn pri small" data-bv="lib">${BLI.grid}Review in shot library</button></div>`
         : `<p class="bu-note">${unkept && Date.now() < exp ? `Video for shots with no ★ or Keep is deleted on ${esc(buDay(exp))}. ` : ""}Swipe the video for the next shot. Hold a shot to select several.</p>`}
       <div class="bu-bar">${nSel ? `<button class="btn sec small" data-bv="sstar" aria-pressed="${!!allStar}">${allStar ? `★ Unstar ${nSel}` : `☆ Star ${nSel}`}</button>
         ${selV.length ? `<button class="btn sec small" data-bv="skeep" aria-pressed="${!!allKeep}">${allKeep ? `Unkeep ${selV.length}` : `Keep ${selV.length}`}</button>` : ""}
@@ -1697,6 +1699,13 @@
   const blst = document.createElement("style");
   blst.textContent = `
 .buv .bv-lib{display:flex;align-items:center;gap:6px;white-space:nowrap;min-height:44px}.buv .bv-lib svg{width:18px;height:18px;fill:currentColor}
+.buv .bu-fresh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 12px 0;padding:10px 12px;border-radius:12px;background:#162038;border:1px solid #2A3858;font-size:14px}.buv .bu-fresh span{flex:1;min-width:150px}
+.buv .bu-fresh .btn{display:flex;align-items:center;gap:6px;min-height:44px;white-space:nowrap}.buv .bu-fresh .btn svg{width:18px;height:18px;fill:currentColor}
+.bul.bl-in{animation:blIn 260ms cubic-bezier(.2,.8,.2,1)}.bul.bl-out{animation:blOut 200ms cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
+@keyframes blIn{from{transform:translateX(100%)}to{transform:none}}@keyframes blOut{from{transform:none}to{transform:translateX(100%)}}
+@keyframes blFadeIn{from{opacity:0}to{opacity:1}}@keyframes blFadeOut{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){.bul.bl-in{animation:blFadeIn 120ms linear}.bul.bl-out{animation:blFadeOut 120ms linear forwards}}
+.bl-t.here{box-shadow:0 0 0 3px #F07A35}
 .bul{gap:0}.bul .lf-top{justify-content:flex-start}.bul .lf-top .lf-title{flex:1;min-width:0}
 .bl-ib{flex:none;width:44px;height:44px;border-radius:12px;border:1px solid #2A3858;background:#1C2844;color:#F2F5FA;display:flex;align-items:center;justify-content:center;padding:0}
 .bl-ib svg{width:22px;height:22px;fill:currentColor}
@@ -1776,6 +1785,8 @@
     el.className = "livefc bul";
     el.setAttribute("role", "dialog");
     el.setAttribute("aria-label", "Shot library");
+    el.classList.add("bl-in");
+    el.addEventListener("animationend", () => el.classList.remove("bl-in"), { once: true });
     document.body.appendChild(el);
     BL = { bid: id, el, mode: "grid", f: "all", g: null, sort: "n", cue: null, sel: new Set(), selOn: false, from: from == null ? null : from, qi: 0, q: [], hist: [], pend: null, snack: null, ask: null, rate: .5 };
     el.addEventListener("click", blClick);
@@ -1792,7 +1803,11 @@
     blFlush(my);
     blStopQ(my);
     if (my.io) my.io.disconnect();
-    my.el.remove();
+    // slides back out to the right (a fade with reduced motion); whatever is under it is already drawn
+    const gone = my.el;
+    gone.classList.remove("bl-in"); gone.classList.add("bl-out");
+    gone.addEventListener("animationend", () => gone.remove(), { once: true });
+    setTimeout(() => gone.remove(), 320);
     BL = null;
     if (reopen && my.from != null) return burstOpen(my.bid, my.from);
     if (state.tab === "form") render();
@@ -1876,7 +1891,7 @@
   function blTile(s, cue, PK) {
     const st = blSt(s, cue) || worstOf(s), m = s.m.find(x => x.k === cue), sel = BL.sel.has(s.id);
     const lab = `Shot ${s.n}${s.star ? ", starred" : ""}${s.keep || s.sent ? ", kept" : ""}${s.mk === 1 ? ", make" : s.mk === 0 ? ", miss" : ""}, ${st}${m ? ": " + m.l + " " + m.v : ""}${s.v ? "" : ", no video"}${BL.selOn ? (sel ? ", selected" : ", not selected") : ""}`;
-    return `<button class="bl-t ${st}${s.v ? "" : " nov"}${sel ? " sel" : ""}" data-bl="t:${s.id}" data-shot-n="${s.n - 1}" aria-label="${esc(lab)}"${BL.selOn ? ` aria-pressed="${sel}"` : ""}>
+    return `<button class="bl-t ${st}${s.v ? "" : " nov"}${sel ? " sel" : ""}${BL.from != null && s.n - 1 === BL.from ? " here" : ""}" data-bl="t:${s.id}" data-shot-n="${s.n - 1}" aria-label="${esc(lab)}"${BL.selOn ? ` aria-pressed="${sel}"` : ""}>
       <span class="th"><img data-th="${s.id}" alt="">${s.v ? "" : `<span class="gone">${BLI.gone}${s.gone ? "Video deleted" : "No video"}</span>`}</span>
       <span class="no">${BL.selOn ? (sel ? BLI.check : "<i></i>") : ""}${s.n}</span>
       <span class="mk">${s.star ? BLI.star.replace("<svg", '<svg class="s"') : ""}${s.keep || s.sent ? BLI.keep.replace("<svg", '<svg class="k"') : ""}${PK && PK.has(s.id) && !s.keep && !s.star && !s.sent ? '<span class="pk">Pack</span>' : ""}</span>
@@ -2273,7 +2288,8 @@
   function buBytes(B, sz) { const seen = new Set(); let n = 0; for (const s of B.shots) if (s.v && !seen.has(s.v)) { seen.add(s.v); n += sz[s.v] || 0; } return n; }
   // the fold's rows use only theme tokens (surface-2, line, ink, muted), so they read in light and dark alike
   const bfst = document.createElement("style");
-  bfst.textContent = `
+  // light theme: dark text on the orange accent (white on #E2601A is 3.5:1, too low for button labels; this is 5.4:1, as in dark)
+  bfst.textContent = `:root{--accent-ink:#1A0C03}
 .bf-feat{display:flex;flex-direction:column;gap:10px;margin:2px 0 12px;padding:14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink)}
 .bf-feat .bf-top{display:flex;gap:12px;align-items:center}
 .bf-th{flex:none;width:56px;height:64px;border-radius:10px;overflow:hidden;background:var(--bg);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;color:var(--muted)}
@@ -2333,12 +2349,12 @@
       ${tot ? `<p class="small muted" style="margin:12px 0 0">Shot videos use ${fmtMB(tot)}${CO.usage ? ` of the ${fmtMB(CO.usage)} the app uses on this phone` : ""}. Video for shots with no ★ or Keep clears 14 days after filming. The numbers stay.</p>
       <button class="btn sec small" data-buf="free" style="margin-top:8px">${BF.free ? "Done" : "Free up space"}</button>` : ""}
       <button class="bf-sw" role="switch" data-buf="pack" aria-checked="${packOn()}"><div class="bf-tx"><b>Coach pack</b><span>Keep 5 clips from every session for your coach, even after the other videos clear.</span><span style="color:var(--ink);font-weight:600">${packOn() ? `On${per ? ` · about ${fmtMB(per)} a session` : ""}` : "Off · videos clear after 14 days"}</span></div><span class="k" aria-hidden="true"></span></button>
-      <details class="bf-how"><summary>How shot bursts work</summary>
+      <details class="bf-how"><summary>How your sessions work</summary>
         <p>Turn on <b>Keep video</b> in Live form check and each shot keeps its own few seconds of video, with its numbers. Only the shots are saved, never the time in between. A clip longer than ${BU.CLIP_MIN} s picked above is split into its shots the same way.</p>
         <p>At a Shoot360, prop the phone behind you in the lane, or straight in front of you under the basket. Live form check asks where before you start.</p>
         <p>Coach pack picks, on your focus cue: your best, a typical and your worst shot, plus a typical early and late one.</p></details>`;
     setTimeout(buFormThumbs, 0);
-    return `<section>${fold("bursts", "Shot bursts", L.length ? `${L.length} session${L.length > 1 ? "s" : ""}${tot ? " · " + fmtMB(tot) : ""}` : "None yet", body, !!L.length)}</section>`;
+    return `<section>${fold("bursts", "Your sessions", L.length ? `${L.length} session${L.length > 1 ? "s" : ""}${tot ? " · " + fmtMB(tot) : ""}` : "None yet", body, !!L.length)}</section>`;
   }
   async function buFormThumbs() {
     for (const img of document.querySelectorAll("img[data-fth]")) {
