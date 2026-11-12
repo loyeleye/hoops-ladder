@@ -453,7 +453,7 @@ section{display:flex;flex-direction:column;gap:10px}
 .tsum{display:flex;align-items:center;gap:10px;min-height:44px}.tsum .tx{flex:1;min-width:0}.tsum b{display:block;font-size:15px}.tsum small{display:block;color:var(--muted);font-size:12.5px}
 .tsum .setup-btn{flex:none}
 .tseg{display:grid;grid-template-columns:repeat(var(--n,3),1fr);background:var(--surface-2);border:1px solid var(--line-strong);border-radius:12px;padding:3px;gap:3px}
-.tseg button{border:0;background:none;min-height:42px;border-radius:9px;font-weight:700;font-size:14px;color:var(--ink);padding:4px 6px;line-height:1.15}
+.tseg button{border:0;background:none;min-height:44px;border-radius:9px;font-weight:700;font-size:13.5px;color:var(--ink);padding:4px 3px;line-height:1.15}
 .tseg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .tseg button small{display:block;font-weight:500;font-size:11.5px;opacity:.8}
 .tchips{display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:6px}
@@ -3039,15 +3039,16 @@ function rtPick(k){const d=D[(S.settings.rt||{})[k]];return d&&d.rt===k?d:D[RT_D
 const FIXED=new Set(["s_cold","s_tired",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
 /* drills that load the legs: left out on a "Legs heavy" or "Game tonight" day */
 const JUMPY=new Set(["c_17s","c_ub","f_power","f_bump","f_contact","f_spots","f_chair","s_tired","h_zig","h_stop","s_sprint3","f_knee","f_tornado","f_eyes"]);
-/* where you're training: Full court / Half court / No court (Today's setup). Shooting, finishing and runs that use the court's lines
-   need at least a half court; Up-and-Backs and other full-length drills need a full court; ball handling and the rest work anywhere. */
-const COURTS=[["full","Full court","Every drill"],["half","Half court","No full-length runs"],["none","No court","Handling only"]],COURT_N={full:2,half:1,none:0};
+/* where you're training (Today's setup): Full court / Half court / Just a hoop (a driveway) / No hoop.
+   Full-length runs need a full court; runs that use court lines (17s and the like) need at least a half court;
+   shooting and finishing need a hoop; ball handling and the rest work anywhere. */
+const COURTS=[["full","Full court","Everything"],["half","Half court","No long runs"],["hoop","Just a hoop","No line runs"],["none","No hoop","Handling"]],COURT_N={full:3,half:2,hoop:1,none:0},COURT_NAME={full:"a full court",half:"a half court",hoop:"just a hoop",none:"no hoop"};
 const COURT_FULL=new Set(["c_ub","c_farmers","h_2full"]),COURT_HALF=new Set(["c_17s","c_rsa","c_multi","c_hokie","c_pinky","c_help","c_called","h_walk","h_free"]);
-const courtNeed=d=>COURT_FULL.has(d.id)?2:d.skill==="s"||d.skill==="f"||COURT_HALF.has(d.id)?1:0;
-const courtHave=()=>COURT_N[S.settings.court]??2;
+const courtNeed=d=>COURT_FULL.has(d.id)?3:COURT_HALF.has(d.id)?2:d.skill==="s"||d.skill==="f"?1:0;
+const courtHave=()=>COURT_N[S.settings.court]??3;
 const courtOk=d=>courtNeed(d)<=courtHave();
 /* the run before each Tired 3s round fits the court you're on */
-if(D.s_tired)Object.defineProperty(D.s_tired,"between",{get(){return courtHave()<2?"Run baseline to half court and back twice at about 80 percent.":"Run full court down and back at about 80 percent."}});
+if(D.s_tired)Object.defineProperty(D.s_tired,"between",{get(){const c=courtHave();return c>=3?"Run full court down and back at about 80 percent.":c===2?"Run baseline to half court and back twice at about 80 percent.":"30 seconds of jumping jacks or high knees, hard enough to breathe heavy."}});
 const FREQ_LABEL={auto:"Auto",every:"Every workout",weekly:"Weekly",custom:"Custom",never:"Never suggest"};
 const DOW=["Mo","Tu","We","Th","Fr","Sa","Su"],DOWL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const fq=id=>(S.rec.freq||{})[id]||{k:"auto"};
@@ -3094,7 +3095,7 @@ function eligible(d,body){return d&&!d.body&&courtOk(d)&&!(d.cond&&(body&&(d.har
 function plan0(){
   const cw=customToday();if(cw){const ids=[...cw.items,...((S.rec.plan.extra)||[]).filter(id=>!cw.items.includes(id))];
     const out=ids.map(id=>D[id]).filter(Boolean).map(d=>({slot:"Your workout",d,skip:skipped(d.id),why:skipped(d.id)?{k:"skip",t:"Skipped today"}:cw.items.includes(d.id)?null:{k:"you",t:"You added it"}}));out.custom=cw;out.over=[];return out}
-  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")+(courtHave()<2?"c"+courtHave():"")));
+  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")+(courtHave()<3?"c"+courtHave():"")));
   const ml={s:maxLvl("s"),h:maxLvl("h"),f:maxLvl("f")},sw=swapMap(),baseline=S.sessions.length<3;let newUsed=0;
   const ok=d=>eligible(d,body),okAuto=d=>ok(d)&&lvlOf(d)<=ml[d.skill];
   const cand=[],used=new Set(),courtOut=[],cut=d=>{if(d&&!courtOk(d)&&!courtOut.includes(d))courtOut.push(d)};
@@ -3555,13 +3556,14 @@ function todayLine(p,k){const bits=[],ck=S.settings.court||"full",n=(p.courtOut|
   if(k==="heavy")bits.push("Legs heavy: no Tired 3s, jump or contact drills, lighter footwork.");
   if(k==="game")bits.push(S.rec.body.only?"Game tonight: just the Pre-Game Warm-Up. Do it at the gym before tip-off.":"Game tonight: 20 minutes of form and touch, no volume shooting or jumps.");
   if(ck==="half"&&p.some(x=>x.d.id==="c_17s")&&(p.mins<45))bits.push("Half court: 17s instead of Up-and-Backs before Tired 3s.");
-  if(ck==="none")bits.push("No court: warm-up, ball handling and the stretch.");
-  if(n)bits.push(`<button class="linkbtn" data-rec="leftout">${n} drill${n===1?"":"s"} left out for ${ck==="none"?"no court":"a half court"} ›</button>`);
+  if(ck==="hoop"&&p.some(x=>x.d.id==="s_tired"))bits.push("Just a hoop: jumping jacks or high knees before each Tired 3s round.");
+  if(ck==="none")bits.push("No hoop: warm-up, ball handling and the stretch.");
+  if(n)bits.push(`<button class="linkbtn" data-rec="leftout">${n} drill${n===1?"":"s"} left out for ${COURT_NAME[ck]} ›</button>`);
   return bits.join(" ")}
 /* drills today's court ruled out, shown under the list so nothing disappears without a word */
 function leftOutCard(p){const out=p.courtOut||[];if(!out.length)return"";const ck=S.settings.court||"full";
-  const why=d=>courtNeed(d)===2?"needs a full court":d.skill==="s"||d.skill==="f"?"needs a hoop":"needs court lines";
-  return `<div class="overcard" id="leftout"><div class="label">Left out · ${ck==="none"?"No court":"Half court"}</div>${out.map(d=>`<span><b>${esc(d.name)}</b> ${why(d)}. It's back when you train on ${courtNeed(d)===2?"a full court":"a court"}.</span>`).join("")}<button class="linkbtn" data-rec="setopen">Change where you train</button></div>`}
+  const why=d=>["","needs a hoop","needs court lines","needs a full court"][courtNeed(d)],back=d=>["","with a hoop","on a court","on a full court"][courtNeed(d)];
+  return `<div class="overcard" id="leftout"><div class="label">Left out · ${COURTS.find(c=>c[0]===ck)[1]}</div>${out.map(d=>`<span><b>${esc(d.name)}</b> ${why(d)}. It's back when you train ${back(d)}.</span>`).join("")}<button class="linkbtn" data-rec="setopen">Change where you train</button></div>`}
 function addedCard(ids){const names=ids.map(id=>D[id].name);
   return `<div class="addedcard"><b>You added ${esc(names.length>2?names.length+" drills":names.join(" and "))}.</b> Put ${names.length>1?"them":"it"} in today's workout, or keep ${names.length>1?"them":"it"} for your next recommended one?<div class="psee-btns"><button class="btn sec small" data-rec="addin">Add ${names.length>1?"them":"it"} in</button><button class="btn sec small" data-rec="keepnext">Keep for next</button></div></div>`}
 const SWAPICON=`<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11l-3-3M16 13H5l3 3"/></svg>`;
