@@ -3013,6 +3013,13 @@ function rtPick(k){const d=D[(S.settings.rt||{})[k]];return d&&d.rt===k?d:D[RT_D
 const FIXED=new Set(["s_cold","s_tired",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
 /* drills that load the legs: left out on a "Legs heavy" or "Game tonight" day */
 const JUMPY=new Set(["c_17s","c_ub","f_power","f_bump","f_contact","f_spots","f_chair","s_tired","h_zig","h_stop","s_sprint3","f_knee","f_tornado","f_eyes"]);
+/* where you're training: Full court / Half court / No court (Today's setup). Shooting, finishing and runs that use the court's lines
+   need at least a half court; Up-and-Backs and other full-length drills need a full court; ball handling and the rest work anywhere. */
+const COURTS=[["full","Full court"],["half","Half court"],["none","No court"]],COURT_N={full:2,half:1,none:0};
+const COURT_FULL=new Set(["c_ub","c_farmers","h_2full"]),COURT_HALF=new Set(["c_17s","c_rsa","c_multi","c_hokie","c_pinky","c_help","c_called","h_walk","h_free"]);
+const courtNeed=d=>COURT_FULL.has(d.id)?2:d.skill==="s"||d.skill==="f"||COURT_HALF.has(d.id)?1:0;
+const courtHave=()=>COURT_N[S.settings.court]??2;
+const courtOk=d=>courtNeed(d)<=courtHave();
 const FREQ_LABEL={auto:"Auto",every:"Every workout",weekly:"Weekly",custom:"Custom",never:"Never suggest"};
 const DOW=["Mo","Tu","We","Th","Fr","Sa","Su"],DOWL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const fq=id=>(S.rec.freq||{})[id]||{k:"auto"};
@@ -3055,11 +3062,11 @@ function customToday(){const p=S.rec.plan;if(!p||(p.d!==today()&&!p.stay))return
 /* a workout set to stay on carries over to the next day, with that day's skips and add-ins cleared */
 function planRoll(){const p=S.rec.plan;if(p&&p.stay&&p.d!==today()){S.rec.plan={...p,d:today(),extra:[],skip:[]};persist()}}
 const skipped=id=>{const p=S.rec.plan;return !!(p&&customToday()&&(p.skip||[]).includes(id))};
-function eligible(d,body){return d&&!d.body&&!(d.cond&&(body&&(d.hard||d.jc)||!condGate(d).ok))&&fq(d.id).k!=="never"&&!((S.rec.paused||{})[d.id]>today())&&(!d.partner||S.settings.partner)&&!(body&&(JUMPY.has(d.id)||(body==="game"&&d.role==="volume")))}
+function eligible(d,body){return d&&!d.body&&courtOk(d)&&!(d.cond&&(body&&(d.hard||d.jc)||!condGate(d).ok))&&fq(d.id).k!=="never"&&!((S.rec.paused||{})[d.id]>today())&&(!d.partner||S.settings.partner)&&!(body&&(JUMPY.has(d.id)||(body==="game"&&d.role==="volume")))}
 function plan0(){
   const cw=customToday();if(cw){const ids=[...cw.items,...((S.rec.plan.extra)||[]).filter(id=>!cw.items.includes(id))];
     const out=ids.map(id=>D[id]).filter(Boolean).map(d=>({slot:"Your workout",d,skip:skipped(d.id),why:skipped(d.id)?{k:"skip",t:"Skipped today"}:cw.items.includes(d.id)?null:{k:"you",t:"You added it"}}));out.custom=cw;out.over=[];return out}
-  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")));
+  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")+(courtHave()<2?"c"+courtHave():"")));
   const ml={s:maxLvl("s"),h:maxLvl("h"),f:maxLvl("f")},sw=swapMap(),baseline=S.sessions.length<3;let newUsed=0;
   const ok=d=>eligible(d,body),okAuto=d=>ok(d)&&lvlOf(d)<=ml[d.skill];
   const cand=[],used=new Set();
@@ -3068,11 +3075,11 @@ function plan0(){
   const light=body?{k:"light",t:"Lighter today"}:null;
   /* game tonight: the Pre-Game Warm-Up (with a ball) replaces the everyday one; "warm-up only" is just that */
   if(body==="game"&&S.rec.body.only){const o=[{slot:slotOf(D.b_game),d:D.b_game,why:{k:"fixed",t:"Before your game"},prio:"must"}];o.over=[];o.mins=D.b_game.mins;o.body=body;o.ml=ml;return o}
-  add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(body==="game"?D.b_game:rtPick("warm"),{k:"fixed",t:body==="game"?"Game tonight: warm up with a ball":"Always before handling"},"must");
-  const tired=mins!==20&&!body;
+  if(courtOk(D.s_cold))add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(body==="game"?D.b_game:rtPick("warm"),{k:"fixed",t:body==="game"?"Game tonight: warm up with a ball":"Always before handling"},"must");
+  const tired=mins!==20&&!body&&courtOk(D.s_tired);
   /* a run right before Tired 3s so the tired shots come on tired legs, not straight after more shooting (dropped below if no shooting comes first):
      Up-and-Backs on shorter days, 17s at 45 minutes. Each swaps for the other. */
-  const run=mins<45?D.c_ub:D.c_17s;if(tired&&ok(run))add(run,{k:"fixed",t:"Gets you tired for Tired 3s"},"must");
+  const run=(mins<45?[D.c_ub,D.c_17s]:[D.c_17s,D.c_ub]).find(ok);if(tired&&run)add(run,{k:"fixed",t:"Gets you tired for Tired 3s"},"must");
   if(tired)add(D.s_tired,{k:"fixed",t:"Always near the end"},"must");
   add(rtPick("cool"),null,"must");
   for(const id of S.rec.added)if(D[id]&&!D[id].body&&(!D[id].partner||S.settings.partner))add(D[id],{k:"you",t:"You added it"},"added");
@@ -3101,6 +3108,8 @@ function plan0(){
   fill(RH);fill(VOL.filter(d=>d.read));fill(VOL.filter(d=>!d.read));
   if(!tired&&ok(D.s_ft))add(D.s_ft,{k:"fixed",t:"Free throws to finish"},"fav");
   if(POOL[focus])fill(POOL[focus][1]);
+  /* no court: handling only, so give the minutes to more handling drills */
+  if(!courtHave()){fill(H);fill(RH);fill(H);fill(RH);fill(H)}
   fill(H);fill(F);fill(FORM);fill(RH);fill(VOL);if(!t3due&&ok(D.s_5spot))add(D.s_5spot,{k:"fixed",t:"Your 3-point test"},"fav");
   let left=mins+2;const out=[],over=[];
   for(const x of cand){const m=realMins(x.d);if(x.prio==="must"||x.prio==="added"||x.sx||m<=left){out.push(x);left-=m}else if(x.prio!=="fav")over.push(x)}
@@ -3501,7 +3510,9 @@ function planRow(p){const cw=p.custom,mins=cw?wMins(cw):p.mins;
 function setupStrip(body){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;
   const note=k==="heavy"?"Same minutes, but no Tired 3s runs, no two-foot jump or contact drills, and lighter footwork.":k==="game"?(S.rec.body.only?"Just the Pre-Game Warm-Up, about 10 minutes. Do it at the gym before tip-off.":"20 minutes of form and touch with the Pre-Game Warm-Up: no volume shooting, no jump or contact drills."):"";
   const gm=k==="game"?`<div class="chips" role="group" aria-label="Game tonight">${[["tune","Tune-up · 20 min"],["warm","At the gym now: warm-up only"]].map(([v,t])=>{const on=(v==="warm")===!!S.rec.body.only;return `<button class="chip" data-rec="gmode:${v}" aria-pressed="${on}">${on?"✓ ":""}${t}</button>`}).join("")}</div>`:"";
-  return `<div class="setup">${body?`<div class="label">How's the body today? <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">Optional</span></div><div class="chips" role="group" aria-label="How's the body today">${[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]].map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${k===v?"✓ ":""}${t}</button>`).join("")}</div>${gm}${note?`<p class="small muted" style="margin:0">${note}</p>`:""}`:""}
+  const ck=S.settings.court||"full",cnote=ck==="half"?"No Up-and-Backs or full-court drills. 17s replace Up-and-Backs before Tired 3s.":ck==="none"?"Ball handling and conditioning only: no shooting, finishing or runs that need court lines.":"";
+  const court=`<div class="label">Where are you training?</div><div class="chips" role="group" aria-label="Where are you training">${COURTS.map(([v,t])=>`<button class="chip" data-rec="court:${v}" aria-pressed="${ck===v}">${ck===v?"✓ ":""}${t}</button>`).join("")}</div>${cnote?`<p class="small muted" style="margin:0">${cnote}</p>`:""}`;
+  return `<div class="setup">${body?`${court}<div class="label">How's the body today? <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">Optional</span></div><div class="chips" role="group" aria-label="How's the body today">${[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]].map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${k===v?"✓ ":""}${t}</button>`).join("")}</div>${gm}${note?`<p class="small muted" style="margin:0">${note}</p>`:""}`:""}
    <div class="row"><label class="toggle"><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}> Partner today</label><label class="toggle"><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}> I have a heavy ball</label></div></div>`}
 function addedCard(ids){const names=ids.map(id=>D[id].name);
   return `<div class="addedcard"><b>You added ${esc(names.length>2?names.length+" drills":names.join(" and "))}.</b> Put ${names.length>1?"them":"it"} in today's workout, or keep ${names.length>1?"them":"it"} for your next recommended one?<div class="psee-btns"><button class="btn sec small" data-rec="addin">Add ${names.length>1?"them":"it"} in</button><button class="btn sec small" data-rec="keepnext">Keep for next</button></div></div>`}
@@ -3666,6 +3677,7 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "nwreset":S.rec.nw={...NW_DEF};persist();render();return bsSet(nwHTML());
   case "add":return toggleAdd(b);
   case "gmode":{if(S.rec.body&&S.rec.body.k==="game"){S.rec.body.only=b==="warm";persist()}return render()}
+  case "court":{S.settings.court=b;persist();return render()}
   case "body":{const cur=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;S.rec.body=cur===b?null:{d:today(),k:b};persist();return render()}
   case "lvl":state.start={...(state.start||{level:"regular",focus:"bal"}),level:b};return render();
   case "focus":state.start={...(state.start||{level:"regular",focus:"bal"}),focus:b};return render();
