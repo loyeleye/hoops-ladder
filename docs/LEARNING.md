@@ -1198,3 +1198,24 @@ Fix count early vs late, make % if tagged), asks what you want your coach to loo
 sheet with those clips labelled by role ("Worst · Shot 36") and the question and summary in the note. The focus cue
 you pick in the library is saved on the burst (`B.cue`), so the cleanup keeps the same shots you see. Code: `buPack`,
 `buPackSummary`, `buPackSend`, `S.settings.coachPack`.
+
+## Step 31. Get set: a setup check before recording
+
+Before any recording you start yourself, a full-screen **Get set** check now tells you where to stand. It runs the
+same pose model as the live form check on the camera picture, and it's used by the live form check (Place the phone
+› *Check my spot*), Film this rep, the move clip recorder and training videos. A mockup round went through the art
+panel (art director, motion, UI, UX, and a shooting coach) and their shared fixes are built in.
+
+**Where to move.** A big banner, said out loud once a problem lasts a second: *Step into the picture*, *Farther from
+the phone* (feet or head cut off, or no room above your hands for a jump shot's release, about half a body height),
+*Closer to the phone* (you're under about a fifth of the picture's height), *Slide to the middle* (with an arrow),
+and for the live form check's Side view, *Turn sideways*. The frame's edge and a wash over the picture are amber
+while you fix it, a green bar fills while you hold a good spot, and after 0.8 s the edge flashes green, it chimes,
+buzzes and says you're set. The edges loosen once you're set, so jitter at 20 ft doesn't flick it back, and it stays
+green for 15 s if you walk up to the phone to tap Go.
+
+**Starting.** Say "go" (voice on) or tap Go, then a countdown: 3, 5 or 10 s. With no pick saved it's 5 s with voice
+(you're already on your spot) or 10 s after a tap, so you can walk back. The last three are said out loud and
+"Recording" at zero. Say "stop" or tap Cancel during it. *Start anyway* skips the check, and a training video has
+*Someone's filming me: record now*. The voice part uses the HoopsVoice plugin through `hooks.listen` and only acts on
+whole phrases, never while the app itself is talking. Code: `setupCheck`, `scJudge`, `scTick`, `scCount`, `liveCheck`.
