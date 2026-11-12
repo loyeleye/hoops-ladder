@@ -1189,3 +1189,12 @@ or swipe the video right to keep and left to skip. A swipe that starts within 28
 Android's Back gesture. An optional *Make / Miss* tag per shot feeds the Make and Miss filters. Undo names what it
 undoes ("Undo keep #34"). The order can be shot order or worst/best on the focus cue. At the end it says how many are
 kept and when the rest go. Code: `burstLib`, `bl*`, `qp*`, `thMake`.
+
+**Coach pack (off by default).** A switch in the Form tab's *Shot bursts* fold trades space for information. When
+it's on, each burst keeps up to 5 shots past the 14-day cleanup, picked on the focus cue: the best, a typical one
+and the worst, plus a typical early and a typical late one, so a matched set survives every session. Tiles show
+*Pack* on them, and the library gets a *Coach pack* button. It shows the picks and a session summary (shots, camera,
+Fix count early vs late, make % if tagged), asks what you want your coach to look at, then opens the Send to coach
+sheet with those clips labelled by role ("Worst · Shot 36") and the question and summary in the note. The focus cue
+you pick in the library is saved on the burst (`B.cue`), so the cleanup keeps the same shots you see. Code: `buPack`,
+`buPackSummary`, `buPackSend`, `S.settings.coachPack`.

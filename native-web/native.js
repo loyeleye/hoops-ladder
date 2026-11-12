@@ -1370,7 +1370,7 @@
 .bl-t .no i{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(242,245,250,.75);display:block}
 .bl-t.sel .no{background:#F07A35;color:#1A0C03}.bl-t.sel .no i{border:0;background:none}.bl-t .no svg{width:14px;height:14px}
 .bl-t .mk{position:absolute;right:5px;top:5px;z-index:2;display:flex;gap:3px}.bl-t .mk svg{width:20px;height:20px;filter:drop-shadow(0 1px 2px #000)}
-.bl-t .mk .s{fill:#FFD34D}.bl-t .mk .k{fill:#F2F5FA}
+.bl-t .mk .pk{font:800 10px var(--body,inherit);text-transform:uppercase;background:#F2F5FA;color:#05080F;border-radius:6px;padding:2px 5px;align-self:center}.bl-t .mk .s{fill:#FFD34D}.bl-t .mk .k{fill:#F2F5FA}
 .bl-t .mm{position:absolute;right:5px;bottom:34px;z-index:2;font:800 12px var(--body,inherit);border-radius:6px;padding:1px 6px;background:rgba(5,8,15,.8)}
 .bl-t .mm.y{color:#7FE0AE}.bl-t .mm.n{color:#FF9A8A}
 .bl-t .bl-cue{display:flex;align-items:center;gap:6px;padding:6px 7px;font:600 12.5px var(--body,inherit);color:#D6DDEA;white-space:nowrap;overflow:hidden}
@@ -1423,6 +1423,7 @@
     BL = { bid: id, el, mode: "grid", f: "all", g: null, sort: "n", cue: null, sel: new Set(), selOn: false, from: from == null ? null : from, qi: 0, q: [], hist: [], pend: null, snack: null, ask: null, rate: .5 };
     el.addEventListener("click", blClick);
     el.addEventListener("change", blChange);
+    el.addEventListener("input", e => { if (BL && BL.pk && e.target.dataset.bl === "pkq") { BL.pk.q = e.target.value; const n = BL.el.querySelector("[data-bl='pknext']"); if (n) n.disabled = !BL.pk.q.trim(); } });
     el.addEventListener("pointerdown", blPress);
     blDraw();
     if (from != null) requestAnimationFrame(() => { const t = BL && BL.el.querySelector(`[data-shot-n="${from}"]`); if (t) t.scrollIntoView({ block: "center" }); });
@@ -1441,23 +1442,66 @@
   }
   function blBack() {
     if (!BL) return false;
-    if (BL.ask) { BL.ask = null; blDraw(); return true; }
+    if (BL.ask || BL.pk) { BL.ask = null; BL.pk = null; blDraw(); return true; }
     if (BL.mode === "pick") { blStopQ(BL); BL.mode = "grid"; BL.snack = null; blDraw(); return true; }
     if (BL.selOn) { BL.selOn = false; BL.sel.clear(); blDraw(); return true; }
     blClose(true);
     return true;
   }
   // the focus cue: the one picked, else the cue graded Fix most often in this burst
-  function blCue(B) {
+  const blCue = B => buFocus(B, BL.cue);
+  const blSt = (s, k) => (s.st && s.st[k]) || (s.m.find(m => m.k === k) || {}).st || null;
+  const RK = { fix: 2, watch: 1, good: 0 };
+  /* -- coach pack (a switch in the Form tab's Shot bursts fold, off by default) --
+     For each burst: up to 5 shots on the focus cue (best, typical, worst, and a typical early and late one), kept
+     past the 14-day cleanup so a matched set survives, and a Coach pack sheet in the library that sends them with
+     your question and a short session summary. Space for information: about 5 shots' video per session. */
+  const packOn = () => !!(S.settings && S.settings.coachPack);
+  function buFocus(B, want) {
     const ks = [];
     for (const s of B.shots) for (const m of s.m) if (!ks.includes(m.k)) ks.push(m.k);
-    if (BL.cue && ks.includes(BL.cue)) return BL.cue;
+    want = want || B.cue; // the focus picked in the library sticks to the burst
+    if (want && ks.includes(want)) return want;
     let best = ks[0], n = -1;
     for (const k of ks) { const c = B.shots.filter(s => s.st && s.st[k] === "fix").length * 2 + B.shots.filter(s => s.st && s.st[k] === "watch").length; if (c > n) { n = c; best = k; } }
     return best;
   }
-  const blSt = (s, k) => (s.st && s.st[k]) || (s.m.find(m => m.k === k) || {}).st || null;
-  const RK = { fix: 2, watch: 1, good: 0 };
+  function buScore(B, cue) { // higher is worse: grade first, then distance from the good shots' median
+    const good = B.shots.filter(s => blSt(s, cue) === "good").map(s => s.vals && s.vals[cue]).filter(x => typeof x === "number");
+    const mid = good.length ? med(good) : 0;
+    return s => { const st = blSt(s, cue); if (!st) return -1; const x = s.vals && s.vals[cue]; return RK[st] * 1e6 + (typeof x === "number" ? Math.min(999999, Math.abs(x - mid) * 1000) : 0); };
+  }
+  function buPack(B, cue) {
+    cue = cue || buFocus(B);
+    const sc = buScore(B, cue), V = B.shots.filter(s => s.v && sc(s) >= 0);
+    if (!V.length) return [];
+    const by = V.slice().sort((a, b) => sc(a) - sc(b) || a.n - b.n), mid = sc(by[Math.floor(by.length / 2)]);
+    const near = L => L.slice().sort((a, b) => Math.abs(sc(a) - mid) - Math.abs(sc(b) - mid) || a.n - b.n)[0];
+    const q = Math.max(1, Math.round(V.length / 4)), byN = V.slice().sort((a, b) => a.n - b.n);
+    const out = [], add = (role, s) => { if (s && !out.some(x => x.s === s)) out.push({ role, s }); };
+    add("Best", by[0]); add("Typical", by[Math.floor(by.length / 2)]); add("Worst", by[by.length - 1]);
+    if (V.length >= 8) { add("Early", near(byN.slice(0, q))); add("Late", near(byN.slice(-q))); }
+    return out;
+  }
+  function buPackSummary(B, cue) {
+    const S0 = B.shots, lab = ((S0.find(s => s.m.some(m => m.k === cue)) || { m: [] }).m.find(m => m.k === cue) || {}).l || cue;
+    const q = Math.max(1, Math.round(S0.length / 4)), fixIn = L => L.filter(s => blSt(s, cue) === "fix").length;
+    const tg = S0.filter(s => s.mk === 0 || s.mk === 1), mk = tg.filter(s => s.mk === 1).length;
+    const where = B.src === "clip" ? "from a clip" : B.view === "behind" ? (B.front ? "filmed from the front" : "filmed from behind") : "filmed from the side";
+    return [`Session ${buDay(B.t)}: ${S0.length} shots, ${where}.`,
+      `Focus: ${lab}. Fix on ${fixIn(S0)} of ${S0.length}${S0.length >= 8 ? `; ${fixIn(S0.slice(0, q))} of the first ${q}, ${fixIn(S0.slice(-q))} of the last ${q}` : ""}.`,
+      tg.length ? `Makes tagged: ${mk} of ${tg.length} (${Math.round(mk / tg.length * 100)}%).` : ""].filter(Boolean).join("\n");
+  }
+  async function buPackSend(B, cue, picks, question) {
+    await sendShots(B, picks.map(p => p.s));
+    try { // label each clip by its role and put the question and summary in the note
+      if (typeof SND === "undefined" || !SND) return;
+      for (const x of SND.segs) { const p = picks.find(y => y.s === x.ref); if (p) x.label = `${p.role} · Shot ${p.s.n}`; }
+      SND.note = [question.trim(), "", buPackSummary(B, cue), "", sndAutoNote()].join("\n");
+      SND.edited = true;
+      sndDraw();
+    } catch (e) {}
+  }
   function blList(B, cue, noGrade) {
     let L = B.shots.slice();
     const f = BL.f;
@@ -1467,20 +1511,18 @@
     else if (f === "miss") L = L.filter(s => s.mk === 0);
     if (BL.g && !noGrade) L = L.filter(s => blSt(s, cue) === BL.g);
     if (BL.sort !== "n") {
-      const good = B.shots.filter(s => blSt(s, cue) === "good").map(s => s.vals && s.vals[cue]).filter(x => typeof x === "number");
-      const mid = good.length ? med(good) : 0;
-      const score = s => { const st = blSt(s, cue); if (!st) return -1; const x = s.vals && s.vals[cue]; return RK[st] * 1e6 + (typeof x === "number" ? Math.min(999999, Math.abs(x - mid) * 1000) : 0); };
+      const score = buScore(B, cue);
       L.sort((a, b) => (BL.sort === "worst" ? score(b) - score(a) : (score(a) < 0) - (score(b) < 0) || score(a) - score(b)) || a.n - b.n);
     }
     return L;
   }
-  function blTile(s, cue) {
+  function blTile(s, cue, PK) {
     const st = blSt(s, cue) || worstOf(s), m = s.m.find(x => x.k === cue), sel = BL.sel.has(s.id);
     const lab = `Shot ${s.n}${s.star ? ", starred" : ""}${s.keep || s.sent ? ", kept" : ""}${s.mk === 1 ? ", make" : s.mk === 0 ? ", miss" : ""}, ${st}${m ? ": " + m.l + " " + m.v : ""}${s.v ? "" : ", no video"}${BL.selOn ? (sel ? ", selected" : ", not selected") : ""}`;
     return `<button class="bl-t ${st}${s.v ? "" : " nov"}${sel ? " sel" : ""}" data-bl="t:${s.id}" data-shot-n="${s.n - 1}" aria-label="${esc(lab)}"${BL.selOn ? ` aria-pressed="${sel}"` : ""}>
       <span class="th"><img data-th="${s.id}" alt="">${s.v ? "" : `<span class="gone">${BLI.gone}${s.gone ? "Video deleted" : "No video"}</span>`}</span>
       <span class="no">${BL.selOn ? (sel ? BLI.check : "<i></i>") : ""}${s.n}</span>
-      <span class="mk">${s.star ? BLI.star.replace("<svg", '<svg class="s"') : ""}${s.keep || s.sent ? BLI.keep.replace("<svg", '<svg class="k"') : ""}</span>
+      <span class="mk">${s.star ? BLI.star.replace("<svg", '<svg class="s"') : ""}${s.keep || s.sent ? BLI.keep.replace("<svg", '<svg class="k"') : ""}${PK && PK.has(s.id) && !s.keep && !s.star && !s.sent ? '<span class="pk">Pack</span>' : ""}</span>
       ${s.mk === 1 ? '<span class="mm y">Make</span>' : s.mk === 0 ? '<span class="mm n">Miss</span>' : ""}
       <span class="bl-cue">${buGlyph(st)}${esc(m ? m.v : "No reading")}</span></button>`;
   }
@@ -1495,7 +1537,8 @@
     for (const s of base) { const st = blSt(s, cue); if (st) gc[st]++; }
     const nStar = S0.filter(s => s.star).length, nKept = S0.filter(blKept).length, nMk = S0.filter(s => s.mk === 1).length, nMs = S0.filter(s => s.mk === 0).length;
     const sz = buSizes(), mb = buBytes(B, sz), exp = B.t + BU.KEEP_DAYS * 864e5;
-    const unk = S0.filter(s => s.v && !blKept(s)), unkB = buBytes({ shots: unk }, sz);
+    const PK = packOn() ? new Set(buPack(B, cue).map(p => p.s.id)) : null;
+    const unk = S0.filter(s => s.v && !blKept(s) && !(PK && PK.has(s.id))), unkB = buBytes({ shots: unk }, sz);
     const sel = S0.filter(s => BL.sel.has(s.id)), nSel = sel.length;
     const chip = (f, lab, n, cls) => `<button class="bl-chip${cls ? " " + cls : ""}" data-bl="f:${f}" aria-pressed="${BL.f === f}">${lab}${n != null ? ` <span class="c">${n}</span>` : ""}</button>`;
     const top = BL.selOn
@@ -1503,7 +1546,7 @@
       : `<div class="lf-top"><button class="bl-ib" data-bl="back" aria-label="Back">${BLI.back}</button><div class="lf-title">Shot library<span class="bl-sub">${esc(buDay(B.t))} · ${S0.length} shot${S0.length > 1 ? "s" : ""}${mb ? " · " + fmtMB(mb) : ""}</span></div></div>`;
     const note = BL.selOn
       ? `<p class="bl-note"><button class="linkbtn" data-bl="all">Select all ${list.length} shown</button>${nSel ? ` · <button class="linkbtn" data-bl="none">Clear</button>` : ""}${nSel && sel.some(s => !list.includes(s)) ? ` · ${sel.filter(s => !list.includes(s)).length} not shown` : ""}</p>`
-      : unk.length && Date.now() < exp ? `<p class="bl-note">${unk.length} unkept video${unk.length > 1 ? "s" : ""} delete on ${esc(buDay(exp))}. ★ or Keep the ones you want. ${unkB ? `<button class="linkbtn" data-bl="free">Free ${fmtMB(unkB)} now</button>` : ""}</p>`
+      : unk.length && Date.now() < exp ? `<p class="bl-note">${unk.length} unkept video${unk.length > 1 ? "s" : ""} delete on ${esc(buDay(exp))}. ★ or Keep the ones you want.${PK && PK.size ? ` Coach pack keeps ${PK.size}.` : ""} ${unkB ? `<button class="linkbtn" data-bl="free">Free ${fmtMB(unkB)} now</button>` : ""}</p>`
       : `<p class="bl-note">Tap a shot to watch it. Hold one to select several.</p>`;
     const allStar = nSel && sel.every(s => s.star), sendN = sel.filter(s => s.v).length;
     const bar = BL.selOn
@@ -1511,16 +1554,17 @@
           <button class="btn sec small st" data-bl="star"${nSel ? "" : " disabled"} aria-pressed="${!!allStar}">${BLI.star}${allStar ? "Unstar" : "Star"}</button>
           ${typeof sendShots === "function" ? `<button class="btn sec small" data-bl="send"${sendN ? "" : " disabled"}>Coach${sendN ? " · " + sendN : ""}</button>` : ""}
           <button class="btn sec small danger" data-bl="del" aria-label="Delete video"${nSel ? "" : " disabled"}>${BLI.trash}</button></div>`
-      : `<div class="bl-bar"><button class="btn sec small" data-bl="select">Select</button><button class="btn pri small" data-bl="pick">Quick pick ▸</button></div>`;
+      : `<div class="bl-bar"><button class="btn sec small" data-bl="select">Select</button>${packOn() && typeof sendShots === "function" && PK && PK.size ? `<button class="btn sec small" data-bl="pack">Coach pack</button>` : ""}<button class="btn pri small" data-bl="pick">Quick pick ▸</button></div>`;
     BL.el.innerHTML = `${top}
       <div class="bl-chips">${chip("all", "All", S0.length)}${chip("star", BLI.star + "Starred", nStar, "st")}${chip("kept", BLI.keep + "Kept", nKept)}${nMk || nMs ? chip("make", "Make", nMk) + chip("miss", "Miss", nMs) : ""}</div>
       <div class="bl-row"><select class="bl-sel" data-bl="cue" aria-label="Focus cue">${cues.map(c => `<option value="${esc(c.k)}"${c.k === cue ? " selected" : ""}>Focus: ${esc(c.l)}</option>`).join("")}</select>
         <select class="bl-sel" data-bl="sort" aria-label="Sort" style="flex:0 0 auto">${[["n", "Shot order"], ["worst", "Worst first"], ["best", "Best first"]].map(([v, l]) => `<option value="${v}"${BL.sort === v ? " selected" : ""}>${l}</option>`).join("")}</select></div>
       <div class="bl-gb" role="group" aria-label="Grade on the focus cue">${["fix", "watch", "good"].map(st => `<button class="${st}" data-bl="g:${st}" aria-pressed="${BL.g === st}" style="flex:${Math.max(gc[st], 1) + base.length * .12}">${buGlyph(st)}${st === "fix" ? "Fix" : st === "watch" ? "Watch" : "Good"} ${gc[st]}</button>`).join("")}</div>
       ${note}
-      <div class="bl-grid" role="list">${list.length ? list.map(s => blTile(s, cue)).join("") : `<div class="bl-empty">${BL.f === "kept" ? "No kept shots yet. Quick pick goes through them one at a time." : BL.f === "star" ? "No starred shots yet." : BL.g === "fix" ? "No Fix shots on this cue. Nice work." : "No shots match."}</div>`}</div>
+      <div class="bl-grid" role="list">${list.length ? list.map(s => blTile(s, cue, PK)).join("") : `<div class="bl-empty">${BL.f === "kept" ? "No kept shots yet. Quick pick goes through them one at a time." : BL.f === "star" ? "No starred shots yet." : BL.g === "fix" ? "No Fix shots on this cue. Nice work." : "No shots match."}</div>`}</div>
       ${bar}
       ${BL.snack ? `<div class="bl-snack" role="status"><span>${esc(BL.snack)}</span><button data-bl="undo">Undo</button></div>` : ""}
+      ${BL.pk ? (() => { const P = buPack(B, cue); return `<div class="bl-ask" data-bl="pkbg"><div role="dialog" aria-label="Coach pack"><b>Coach pack</b><p>${P.map(p => `${p.role}: shot ${p.s.n} (${esc((p.s.m.find(m => m.k === cue) || {}).v || "")})`).join(" · ")}</p><p style="white-space:pre-line;font-size:13px;opacity:.75;margin-top:-6px">${esc(buPackSummary(B, cue))}</p><label class="bl-sub" for="blPkQ" style="opacity:.9;margin-bottom:6px">What do you want your coach to look at?</label><textarea id="blPkQ" class="bl-sel" data-bl="pkq" rows="3" style="width:100%;padding:8px;min-height:80px;margin-bottom:12px" placeholder="e.g. My elbow drifts out late in sessions. Legs or set point?">${esc(BL.pk.q)}</textarea><div class="bl-bar"><button class="btn sec small" data-bl="pkno">Cancel</button><button class="btn pri small" data-bl="pknext"${BL.pk.q.trim() ? "" : " disabled"}>Next: send</button></div></div></div>`; })() : ""}
       ${BL.ask ? `<div class="bl-ask" data-bl="askbg"><div role="alertdialog" aria-label="${esc(BL.ask.t)}"><b>${esc(BL.ask.t)}</b><p>${esc(BL.ask.p)}</p><div class="bl-bar"><button class="btn sec small" data-bl="askno">Cancel</button><button class="btn small danger" data-bl="askyes">Delete video</button></div></div></div>` : ""}`;
     const g = BL.el.querySelector(".bl-grid");
     if (g && sy != null) g.scrollTop = sy;
@@ -1630,8 +1674,8 @@
   }
   function blChange(e) {
     const s = e.target.closest("[data-bl]");
-    if (!s || !BL) return;
-    if (s.dataset.bl === "cue") { BL.cue = s.value; BL.g = null; }
+    if (!s || !BL || (s.dataset.bl !== "cue" && s.dataset.bl !== "sort")) return;
+    if (s.dataset.bl === "cue") { BL.cue = s.value; BL.g = null; const B = blCur(); if (B) { B.cue = s.value; persist(); } }
     if (s.dataset.bl === "sort") BL.sort = s.value;
     const g = BL.el.querySelector(".bl-grid");
     if (g) g.scrollTop = 0;
@@ -1695,12 +1739,15 @@
       return blDraw();
     }
     if (k === "free") {
-      const T = B.shots.filter(s => s.v && !blKept(s)), nk = B.shots.filter(s => s.v && blKept(s)).length;
+      const PK = packOn() ? new Set(buPack(B).map(p => p.s.id)) : null, T = B.shots.filter(s => s.v && !blKept(s) && !(PK && PK.has(s.id))), nk = B.shots.filter(s => s.v && blKept(s)).length;
       if (!T.length) return;
       BL.ask = { t: `Free ${fmtMB(buBytes({ shots: T }, buSizes()))} now?`, p: `This deletes the video of the ${T.length} shot${T.length > 1 ? "s" : ""} with no ★ or Keep.${nk ? ` Your ${nk} kept shot${nk > 1 ? "s" : ""} stay.` : ""} Their numbers and form readings stay. You can undo for a few seconds.`, shots: T };
       return blDraw();
     }
     if (k === "askno" || (k === "askbg" && e.target === b)) { BL.ask = null; return blDraw(); }
+    if (k === "pack") { BL.pk = { q: "" }; blDraw(); const t = BL.el.querySelector("#blPkQ"); if (t) t.focus(); return; }
+    if (k === "pkno" || (k === "pkbg" && e.target === b)) { BL.pk = null; return blDraw(); }
+    if (k === "pknext") { const q = BL.pk.q, cue = blCue(B), P = buPack(B, cue); BL.pk = null; blDraw(); if (P.length) await buPackSend(B, cue, P, q); return BL && blDraw(); }
     if (k === "askyes") { const T = BL.ask.shots; BL.ask = null; return blSoftDel(B, T, `Video deleted for ${T.length} shot${T.length > 1 ? "s" : ""}`); }
     if (k === "undo") {
       const p = BL.pend;
@@ -1849,7 +1896,8 @@
     const now = Date.now(), vids = [], ids = [];
     for (const B of buList()) {
       if (now - B.t < BU.KEEP_DAYS * 864e5) continue;
-      for (const s of B.shots) if (s.v && !s.star && !s.keep && !s.sent && !buSesUses(s.v)) { vids.push(s.v); ids.push(s.id); s.v = null; s.gone = 1; }
+      const pk = packOn() ? new Set(buPack(B).map(p => p.s.id)) : null; // the coach pack's shots stay
+      for (const s of B.shots) if (s.v && !s.star && !s.keep && !s.sent && !(pk && pk.has(s.id)) && !buSesUses(s.v)) { vids.push(s.v); ids.push(s.id); s.v = null; s.gone = 1; }
     }
     let n = 0;
     if (vids.length) { persist(); n += await buDrop(vids, ids); }
@@ -1877,6 +1925,7 @@
     const list = BF.free ? L.slice().sort((a, b) => buBytes(b, sz) - buBytes(a, sz)) : L.slice(0, 10);
     const body = `<p class="small" style="margin:0">Turn on <b>Keep video</b> in Live form check and each shot keeps its own few seconds of video, with its numbers. Only the shots are saved, never the time in between. A clip longer than ${BU.CLIP_MIN} s picked above is split into its shots the same way.</p>
       <p class="small muted" style="margin:6px 0 0">At a Shoot360, prop the phone behind you in the lane, or straight in front of you under the basket. Live form check asks where before you start.</p>
+      <button class="bu-item" data-buf="pack" aria-pressed="${packOn()}"><b>Coach pack: ${packOn() ? "on" : "off"}</b><span class="muted">${packOn() ? "Keeps" : "Turn on to keep"} up to 5 shots of each session past cleanup (best, typical and worst on your focus cue, plus an early and a late one), and adds Coach pack to the shot library: those shots with your question and a session summary. More information, about 5 shots' video per session.</span></button>
       ${list.length ? `<div class="bu-list">${list.map(row).join("")}</div>` : ""}
       ${tot ? `<p class="small muted" style="margin:0">Shot videos use ${fmtMB(tot)}${CO.usage ? ` of the ${fmtMB(CO.usage)} the app uses on this phone` : ""}. Video for shots with no ★ or Keep is deleted 14 days after filming. The numbers stay.</p>
       <button class="btn sec small" data-buf="free" style="margin-top:6px">${BF.free ? "Done" : "Free up space"}</button>` : ""}`;
@@ -1893,6 +1942,7 @@
     const [k, id] = b.dataset.buf.split(":");
     if (k === "open") return burstLib(id);
     if (k === "free") { BF.free = !BF.free; BF.ask = null; return render(); }
+    if (k === "pack") { S.settings.coachPack = !packOn(); persist(); return render(); }
     if (k === "del") {
       if (BF.ask !== id) { BF.ask = id; return render(); }
       BF.ask = null;
