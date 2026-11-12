@@ -1269,11 +1269,47 @@ const DRILLS=[
   what:"D2 Rep Count, but the phone picks the move. It calls a new move at random moments, and every call gets its own random tempo inside the range you set, so you can't settle into a rhythm or guess what's next. You read the call, switch on the next tick and keep every rep clean. You pick the number of rounds, how long each one lasts and how long you rest (1 minute on, 30 seconds off to start), and the last round is the burnout: the top half of your range.",
   steps:["Prop the phone at eye level, 6 to 10 feet away, and keep your eyes on it, not the ball. The calls are Cross, Between right (right leg forward), Between left (left leg forward), Behind and Kobes. One move per tick.","When a new move is called, switch on the next tick and stay with it at the new tempo. The phone never calls the same move twice in a row, and it gives you at least 3 reps of a move (6 for Kobes) before the next call.","Set your tempo range before you start. The bottom should feel easy and the top should be the fastest you can still keep clean. When a whole session feels clean, raise the top by 5. If you keep losing it, drop the top by 5.","Lost the ball? Tap anywhere, grab it, tap again and you get a countdown back in. Clean reps at speed are the goal, not sloppy ones at speed. To make it harder, add a round or shorten the rest before you speed up the tempo."],
   cue:"Read it, switch it, keep it clean.",src:[{label:"Built on your D2 training session",url:""}]},
- {id:"h_tennis",skill:"h",name:"Tennis Ball Wall Drills",role:"handle",unlock:3,mins:6,log:"timer",
+ {id:"h_tennis",skill:"h",name:"Tennis Ball Wall Drills",role:"handle",tb:true,unlock:3,mins:6,log:"timer",
   phases:[["Pound right, toss and catch with your left",45],["Pound left, toss and catch with your right",45],["Walk forward to the wall, toss and catch",60],["Walk backward away from the wall, toss and catch",60],["Toss, crossover, catch",45],["Toss, between the legs, catch",45],["Toss, behind the back, catch",45]],
   what:"Dribble a basketball with one hand while you throw a tennis ball off a wall and catch it with the other. Your eyes have to stay on the tennis ball, so the dribble has to run on feel.",
   steps:["Stand 6 to 8 feet from a wall. Keep the basketball pounding the whole time.","Moving parts: walk toward the wall, then back away from it, still throwing and catching.","Move parts: throw the tennis ball, hit the move while it's in the air, then catch it.","If you drop the tennis ball, keep the dribble alive while you pick it up."],
   cue:"Eyes on the tennis ball. The basketball runs on feel.",src:[{label:"From your D2 training session",url:""}]},
+ // ---------- HANDLING: tennis ball work, from YouTube, Nov 2026 (tb: needs a tennis ball) ----------
+ {id:"h_tb_snatch",skill:"h",name:"Tennis Ball Toss and Snatch",role:"handle",tb:true,unlock:1,mins:3,log:"timer",
+  phases:[["Pound right, toss and catch underhand with your left",30],["Pound left, toss and catch underhand with your right",30],["Pound right, overhand snatch with your left",30],["Pound left, overhand snatch with your right",30]],
+  what:"The first tennis ball drill. One hand pounds the basketball while the other tosses a tennis ball just above your head and catches it. Your eyes go to the tennis ball, so the dribble has to run on feel. Then the snatch: catch it out of the air from above, palm down.",
+  steps:["Low stance. Pound the basketball hard at knee height in one hand. The tennis ball is in the other.","Underhand: a soft toss straight up to just above your head, out in front of you, then catch it palm up. It shouldn't come back toward your face.","Overhand snatch: toss it up, then grab it out of the air palm down as it comes down.","Keep the basketball pounding the whole time. Drop the tennis ball? Keep dribbling while you pick it up.","It's an accuracy drill, not a speed drill. Clean catches first, then more catches in the 30 seconds."],
+  cue:"Pound hard. Eyes on the tennis ball.",src:[YTT("c0bSiDb-WhE",168,"One Up Basketball: underhand toss and overhand snatch"),YTT("nozHTvLyL0o",28,"Pro Training Basketball: snatch pound dribbles")]},
+ {id:"h_tb_swap",skill:"h",name:"Tennis Ball Exchange",role:"handle",tb:true,unlock:2,mins:3,log:"timer",
+  phases:[["Two dribbles, then exchange",40],["One dribble, then exchange",40],["Continuous: exchange on every dribble",30]],
+  what:"Basketball in one hand, tennis ball in the other. After a set number of dribbles, cross the basketball over and pass the tennis ball across up top at the same time, so the two balls swap hands. Start with two dribbles between swaps, then one, then every dribble.",
+  steps:["Athletic stance. Basketball in your right hand, tennis ball in your left, eyes up.","Two hard dribbles, then cross the basketball over while the tennis ball goes across up top into your right hand. Same moment.","Keep the dribbles at knee height. Low dribbles are quicker, waist-high ones are too slow for this.","Cut it to one dribble between swaps, then swap on every dribble. Slow it down until it's clean, then speed up."],
+  cue:"Cross low, swap up top, same moment.",src:[YTT("c0bSiDb-WhE",38,"One Up Basketball: tennis ball cross")]},
+ {id:"h_tb_bounce",skill:"h",name:"Toss, Cross, One Bounce",role:"handle",tb:true,unlock:2,mins:4,log:"timer",
+  phases:[["Pound right, toss with your left, double cross, catch",40],["Pound left, toss with your right, double cross, catch",40],["Walking up the floor: toss, cross, catch",60],["Walking: toss, between the legs, catch",60]],
+  what:"A forgiving way to start doing moves under the tennis ball. Toss it a little out in front, hit a double crossover while it bounces once, and catch it after the one bounce. Then do it walking up the floor.",
+  steps:["Dribble with one hand, tennis ball in the other.","Toss the tennis ball up a little out in front of you so it comes down and bounces once.","While it's up, hit a quick crossover and cross back. Catch it after one bounce. Two bounces is fine while you learn it.","A good, firm toss gives you the time. Keep the crossovers low and still sell them with your body.","Walking: same rhythm going up the floor. Toss, cross, catch, then the same with a between-the-legs move. Turn around and come back."],
+  cue:"Toss, cross, catch it on one.",src:[YTT("c0bSiDb-WhE",290,"One Up Basketball: toss and cross, catch on one bounce"),YTT("c0bSiDb-WhE",384,"One Up Basketball: moving cross and between")]},
+ {id:"h_tb_toss",skill:"h",name:"Toss, Move, Catch",role:"handle",tb:true,unlock:4,mins:5,log:"timer",
+  phases:[["Toss, V dribble, catch",30],["Toss, in-and-out, catch",30],["Toss, crossover, catch with the other hand",40],["Toss, between the legs, catch with the other hand",40],["Toss, behind the back, catch with the other hand",40],["Toss, double move, catch",40],["Toss, combo move, catch",40]],
+  what:"Stationary tennis ball series. Toss the tennis ball up, make a move before it comes down, and catch it. One-hand moves first (V dribble, in-and-out), then the change-of-direction moves where you catch with the other hand, then doubles and combos.",
+  steps:["Stay low in your stance the whole time. Basketball in one hand, tennis ball in the other.","One-hand moves: toss, V dribble or in-and-out, then catch with the same hand before it comes down.","Change of direction: toss, crossover, and catch with the other hand, the one that just let go of the basketball. Then between the legs, then behind the back.","Doubles: toss, double cross (or double between, double behind), catch.","Combos: any two moves you like, like between and behind, or between and cross. A few reps of each so they feel easy."],
+  cue:"Move before it comes down.",src:[YTT("nozHTvLyL0o",40,"Pro Training Basketball: toss-ups with moves"),YTT("dKnuyOJ2SUM",34,"Thrive3: tennis ball series, stationary")]},
+ {id:"h_tb_partner",skill:"h",name:"Partner Tennis Ball Catch",role:"handle",tb:true,partner:true,unlock:3,mins:5,log:"timer",
+  phases:[["Pound right, partner tosses to your left: catch, toss back",40],["Pound left, partner tosses to your right: catch, toss back",40],["Toss at your dribbling hand: cross over, catch",45],["Either hand: switch only when it's coming to your dribbling hand",45],["Toss at your dribbling hand: between the legs, catch",45],["Moving: follow your partner as they back up, still catching",60]],
+  what:"Your partner stands a few feet away with a tennis ball and tosses it to you while you dribble. Catch it, toss it back, and keep the basketball going. When it comes to your dribbling hand, you have to get the basketball out of the way first. React to the toss; don't guess.",
+  steps:["Partner a few feet in front of you with a tennis ball. You pound the basketball, eyes on your partner.","Toss to your free hand: catch it overhand and toss it right back. Slow at first, then faster.","Toss to your dribbling hand: cross the basketball over, catch the tennis ball with that hand, toss it back.","Your partner picks either hand. Only switch when it's coming to your dribbling hand. React, don't predict.","Then between the legs instead of a crossover, and then on the move: your partner backs up and you follow, still catching."],
+  cue:"React, don't predict.",src:[YTT("Ge6HzvDLncI",29,"Coach P. Basketball: partner tennis ball drills")]},
+ {id:"h_tb_drop",skill:"h",name:"Drop, Move, Catch",role:"handle",tb:true,unlock:5,mins:4,log:"timer",
+  phases:[["Drop it, one hard pound, catch before it lands",30],["Drop it, crossover, catch with the other hand",40],["Drop it, between the legs, catch with the other hand",40],["Drop it, behind the back, catch with the other hand",40],["Drop it from chest height, any move, catch",40]],
+  what:"No toss this time, so there's no time to spare. Hold the tennis ball out at shoulder height, let it go, hit a move with the basketball and catch the tennis ball before it reaches the floor. Hands have to be quick and the dribble has to be low.",
+  steps:["Low stance, basketball pounding. Hold the tennis ball out in front at shoulder height.","Let it go (don't throw it), hit one move with the basketball, and catch the tennis ball before it lands.","Crossover, between or behind: catch with the hand that just let go of the basketball.","Catch it lower and lower, below your knees if you can. Then drop it from chest height so you have even less time.","Missing it every time? Go back to Toss, Cross, One Bounce for a few days."],
+  cue:"Let go, move, snatch it low.",src:[{label:"UTA Basketball camp: tennis ball drop drill",url:"https://www.youtube.com/watch?v=FTxgDucsLSw"},{label:"Hume Basketball: drop it and catch it before it passes your knees",url:"https://www.youtube.com/watch?v=lBDeljNJkWs"}]},
+ {id:"h_tb_move",skill:"h",name:"Tennis Ball Combos on the Move",role:"handle",tb:true,unlock:6,mins:5,log:"timer",
+  phases:[["Walking: toss, crossover, catch with the other hand",45],["Walking: toss, between the legs, catch with the other hand",45],["Walking: toss, behind the back, catch with the other hand",45],["Jogging: toss, combo move, catch",60],["Jogging: toss, double move, catch",60]],
+  what:"The stationary toss series, up and down the floor. Walk first, then jog, keeping the rhythm the same: dribble, toss, move, catch. Turn around at the end and come back the other way.",
+  steps:["Start at the baseline with the basketball in one hand and the tennis ball in the other.","Walking: toss, crossover, catch with the other hand. Then between the legs, then behind the back.","Find a rhythm with your steps: dribble, toss, move, catch.","Jogging: toss and hit a combo (between and behind, or between and cross), or a double move, and catch it.","Lose the tennis ball? Keep dribbling, get it, and pick up where you lost it."],
+  cue:"Same rhythm, now moving.",src:[YTT("c0bSiDb-WhE",384,"One Up Basketball: tossing on the move"),YTT("Ge6HzvDLncI",150,"Coach P. Basketball: tennis ball drills in motion")]},
  {id:"h_cones",skill:"h",name:"Cone Weave",role:"handle",unlock:2,mins:5,log:"timer",
   phases:[["Crossover at each cone",60],["Between the legs at each cone",60],["Behind the back at each cone",60],["In-and-out, then cross at each cone",60],["Retreat from the last cone, then re-attack",60]],
   what:"Set 5 cones (or shoes) in a line about two steps apart. Each cone is a defender, so make your move at the cone, not before it.",
@@ -1629,7 +1665,14 @@ const CLIPS={
  h_2walk:[[["uGQN1qe-sDE",11,19]],[["uGQN1qe-sDE",18,26]],[["uGQN1qe-sDE",26,35]]],
  h_2release:[[["msA1iRF88qk",297,340]],[["msA1iRF88qk",444,480]],[["msA1iRF88qk",500,535]]],
  h_r_2cones:[[["RBLFasw6WRM",0,76]]],
- h_2pass:[[["Wskw-FifPGE",0,33]]]
+ h_2pass:[[["Wskw-FifPGE",0,33]]],
+ h_tb_snatch:[[["c0bSiDb-WhE",168,230,"Underhand tosses"]],[["c0bSiDb-WhE",168,230]],[["c0bSiDb-WhE",230,286,"Overhand snatch"],["nozHTvLyL0o",28,40]],[["c0bSiDb-WhE",230,286]]],
+ h_tb_swap:[[["c0bSiDb-WhE",38,111,"Two dribbles, exchange"]],[["c0bSiDb-WhE",111,148,"One dribble, exchange"]],[["c0bSiDb-WhE",148,166,"Continuous"]]],
+ h_tb_bounce:[[["c0bSiDb-WhE",290,384,"Catch it off one bounce"]],[["c0bSiDb-WhE",384,390]],[["c0bSiDb-WhE",389,448,"Moving up the floor"]],[["c0bSiDb-WhE",427,448,"Through the leg"]]],
+ h_tb_toss:[[["nozHTvLyL0o",40,67,"One-hand moves"]],[["nozHTvLyL0o",40,67],["dKnuyOJ2SUM",51,72,"Inside out"]],[["nozHTvLyL0o",67,86,"Catch with the other hand"],["dKnuyOJ2SUM",72,84]],[["nozHTvLyL0o",67,86]],[["nozHTvLyL0o",67,86]],[["dKnuyOJ2SUM",84,147,"Double moves"]],[["nozHTvLyL0o",86,116,"Combo moves"],["dKnuyOJ2SUM",147,200]]],
+ h_tb_drop:[[["FTxgDucsLSw",0,12]],[["FTxgDucsLSw",0,12]],null,null,[["lBDeljNJkWs",0,76,"Catch it before your knees"]]],
+ h_tb_move:[[["c0bSiDb-WhE",389,448,"Moving up the floor"]],[["c0bSiDb-WhE",427,448]],null,[["Ge6HzvDLncI",150,203,"In motion"]],[["Ge6HzvDLncI",203,280]]],
+ h_tb_partner:[[["Ge6HzvDLncI",29,70]],[["Ge6HzvDLncI",70,99]],[["Ge6HzvDLncI",99,148,"Cross, catch"]],[["Ge6HzvDLncI",203,280,"React, don't predict"]],[["Ge6HzvDLncI",286,308]],[["Ge6HzvDLncI",150,203,"On the move"],["Ge6HzvDLncI",308,336]]]
 };
 /* SeeMikeDunn form demos: one entry per step, [videoId,start,end,label] */
 const LINE="ylkakvH03Uc",ROLL="8lkDKSxLOvo",ELB="0wAcGEwTBUo",FT="Yr1OWS_Zsgw",GUIDE="AulCgque6pw",LONG="iTwkhWAa_P4",LEGS="5_6ujYdbv5E",DROP1="856CyuXGMhQ";
@@ -2614,6 +2657,112 @@ const steps={
 /* the timed parts of the new two-ball drills reuse their step animations */
 {const P=(d,...ix)=>{steps[d+"p"]=ix.map(i=>steps[d][i])};
  P("h_2drum",1,2,3,3);P("h_2v",1,2,3);P("h_2shapes",0,1,2,3,3,0);P("h_2around",1,3,4,4);steps.h_2aroundp[3]=[front([rep(3,()=>[.4,"path",1,{pts:[[3,30,0],[16,33,0],[30,30,0],[30,25,1],[16,22,1],[3,25,1],[3,30,0]]}]),rep(2,()=>pd(.6))],[1,-1],FP({hy:100,w:16}),{label:"Faster around, same pound",hl:[0]}),"The left ball goes around the left leg at a quicker rhythm than the steady pound."];P("h_2xladder",0,1,2,3,4);P("h_2full",0,1,2,3,4,5);P("h_2juggle",1,2,4);steps.h_2fig8p=[[fig8two({label:"Slow and low"},.75),""],[fig8two({label:"Game speed"}),""],[fig8two({label:"As fast as you can"},1.35),""]]}
+/* ---------- tennis ball drills ----------
+   tbs(segs) drives the tennis ball for front(): each seg is [dur, kind, a, b, opt]; a and b are [side, spot], spot "rest" (free hand at the chest) or "hi" (reaching up).
+   hold: in hand a. move: hand a carries it to b. fly: thrown from a, caught at b (opt.h: how high above the higher hand).
+   bounce: thrown from a, one bounce out in front at opt.x, caught at b. in: tossed by a partner in front of you (from opt.from), caught at b.
+   out: tossed back from a to opt.to. gone: with the partner, off screen. */
+const TBP=(s,[side,k])=>k==="hi"?{x:s.cx+side*14,y:s.hy-56}:k==="sh"?{x:s.cx+side*4,y:s.hy-36}:k==="low"?{x:s.cx+side*4,y:s.hy+20}:{x:s.cx+side*13,y:s.hy-22};
+const PARTNER={x:75,y:162};
+const tbs=segs=>{const L=segs.reduce((a,x)=>a+x[0],0);return(t,s)=>{t=((t%L)+L)%L;let t0=0,g=segs[segs.length-1];for(const x of segs){if(t<t0+x[0]){g=x;break}t0+=x[0]}
+  const[d,kind,a,b,o={}]=g,u=clamp((t-t0)/d,0,1);if(kind==="gone")return null;
+  const A=kind==="in"?(o.from||PARTNER):TBP(s,a),B=kind==="out"?(o.to||PARTNER):b?TBP(s,b):A;
+  if(kind==="hold")return{x:A.x,y:A.y,hand:a[0]};
+  if(kind==="move"){const e=ease(u);return{x:lerp(A.x,B.x,e),y:lerp(A.y,B.y,e),hand:a[0]}}
+  if(kind==="drop"){/* let go, falls straight, snatched low by hand b */return{x:lerp(A.x,B.x,u*u*.3),y:lerp(A.y,B.y,u*u),hand:u<.04?a[0]:u>.9?b[0]:null}}
+  if(kind==="bounce"){const fx=s.cx+(o.x||0),fy=G-3,k=.45;
+    if(u<k){const q=u/k;return{x:lerp(A.x,fx,q),y:lerp(A.y,fy,q*q)-(o.up||14)*Math.sin(PI*q),hand:u<.05?a[0]:null}}
+    const q=(u-k)/(1-k);return{x:lerp(fx,B.x,q),y:fy-(fy-B.y)*(1-(1-q)*(1-q))-(o.up2||10)*Math.sin(PI*q),hand:u>.95?b[0]:null}}
+  const H=(o.h||30)+Math.abs(A.y-B.y)/2,y=lerp(A.y,B.y,u)-4*H*u*(1-u),x=lerp(A.x,B.x,u);
+  const hand=kind==="in"?(u>.92?b[0]:null):kind==="out"?(u<.1?a[0]:null):u<.08?a[0]:u>.92?b[0]:null;
+  return{x,y,hand}}};
+const TBST=FP({hy:100,w:20});
+/* Toss and Snatch: bb is the dribbling hand, the tennis ball goes up from the other one */
+const tbUnder=(bb,o={})=>front(rep(6,()=>pd(o.d||.45)),bb,o.pose||TBST,{label:o.label||"Underhand, just over your head",tennis:tbs([[.5,"hold",[-bb,"rest"]],[1.5,"fly",[-bb,"rest"],[-bb,"rest"],{h:40}],[(o.d||.45)*6-2,"hold",[-bb,"rest"]]])});
+const tbSnatch=(bb,o={})=>front(rep(6,()=>pd(.45)),bb,TBST,{label:o.label||"Snatch it palm down",tennis:tbs([[.5,"hold",[-bb,"rest"]],[1.1,"fly",[-bb,"rest"],[-bb,"hi"],{h:16}],[.5,"move",[-bb,"hi"],[-bb,"rest"]],[.6,"hold",[-bb,"rest"]]])});
+/* Exchange: n dribbles, then the basketball crosses low while the tennis ball goes across up top (n=0: every dribble) */
+const tbSwap=(n,o={})=>{const d=o.d||.45,c=.5,half=sd=>[...rep(n,()=>pd(d)),cr(-sd,c)],tn=sd=>[...(n?[[n*d,"hold",[-sd,"rest"]]]:[]),[c,"fly",[-sd,"rest"],[sd,"rest"],{h:14}]];
+  return front([...half(-1),...half(1)],-1,TBST,{label:o.label||(n?`${n===1?"One dribble":"Two dribbles"}, swap`:"Swap every dribble"),over:o.over,tennis:tbs([...tn(-1),...tn(1)])})};
+/* Toss, Cross, One Bounce: toss out front, double cross while it bounces once, catch it with the same hand */
+const tbBounce=(bb,o={})=>{const mv=o.mv||((to,d)=>cr(to,d));
+  return front([pd(.45),pd(.45),mv(-bb,o.md||.45),mv(bb,o.md||.45),pd(.45)],bb,o.pose||TBST,{label:o.label||"Double cross, catch on one",over:o.over,tennis:tbs([[.45,"hold",[-bb,"rest"]],[.45*4+(o.md?(o.md-.45)*2:0)-.3,"bounce",[-bb,"rest"],[-bb,"rest"],{x:-bb*6}],[.3,"hold",[-bb,"rest"]]])})};
+/* Toss, Move, Catch: change-of-direction moves catch with the hand that let go of the basketball */
+const tbChange=(mk,lab,pre=[.45,.45],pose=TBST)=>{const half=sd=>[...pre.map(d=>pd(d)),mk(sd)],h=pre.reduce((a,x)=>a+x,0)+mk(-1)[0],tn=sd=>[[h/2,"hold",[sd,"rest"]],[h/2,"fly",[sd,"rest"],[-sd,"rest"],{h:30}]];
+  return front([...half(1),...half(-1)],-1,pose,{label:lab,tennis:tbs([...tn(1),...tn(-1)])})};
+/* Drop, Move, Catch: hold it out, let go, one move, snatch it low with the hand that let go of the basketball (same hand for a pound) */
+const tbDrop=(mk,lab,o={})=>{const half=sd=>[pd(.5),pd(.5),mk?mk(-sd):pd(.5),pd(.5)],m=mk?mk(-1)[0]:.5,catcher=sd=>mk?sd:-sd,
+  tn=sd=>[[.5,"move",[-sd,"rest"],[-sd,o.from||"sh"]],[.5,"hold",[-sd,o.from||"sh"]],[m,"drop",[-sd,o.from||"sh"],[catcher(sd),"low"]],[.5,"move",[catcher(sd),"low"],[catcher(sd),"rest"]]];
+  const seq=mk?[...half(-1),...half(1)]:[...half(-1),...half(-1)];
+  return front(seq,-1,TBST,{label:lab,over:o.over,tennis:tbs(mk?[...tn(-1),...tn(1)]:[...tn(-1),...tn(-1)])})};
+const TBW=FP({hy:98,w:18,walk:1});
+const tbSame=(beats,lab,h=44)=>{const L=beats.reduce((a,x)=>a+x[0],0);return front(beats,-1,TBST,{label:lab,tennis:tbs([[.3,"hold",[1,"rest"]],[L-.4,"fly",[1,"rest"],[1,"rest"],{h}],[.1,"hold",[1,"rest"]]])})};
+const vdr=(sd,i)=>pd(.4,{bx:sd<0?(i?40:62):(i?110:88)});
+/* Partner Tennis Ball Catch: the partner stands in front of you (where you're watching from) */
+const PSUB="partner in front of you";
+const tbFree=(bb,o={})=>front(rep(4,()=>pd(.55)),bb,o.pose||TBST,{label:o.label||"Catch it, toss it back",sub:PSUB,tennis:tbs([[.3,"gone"],[.7,"in",null,[-bb,"rest"]],[.4,"hold",[-bb,"rest"]],[.5,"out",[-bb,"rest"]],[.3,"gone"]])});
+const tbAtHand=(mk,lab)=>front([pd(.5),mk(1),pd(.5),pd(.5),mk(-1),pd(.5)],-1,TBST,{label:lab,sub:PSUB,tennis:tbs([[.2,"gone"],[.8,"in",null,[-1,"rest"]],[.3,"hold",[-1,"rest"]],[.4,"out",[-1,"rest"]],[.1,"gone"],[.8,"in",null,[1,"rest"]],[.2,"hold",[1,"rest"]],[.2,"out",[1,"rest"]]])});
+const tbReact=()=>front([pd(.5),pd(.5),pd(.5),cr(1,.5),pd(.5),pd(.5),pd(.5),pd(.5),pd(.5),cr(-1,.5),pd(.5),pd(.5)],-1,[[0,TBST,{label:"Free hand: just catch"}],[1.4,TBST,{label:"Dribbling hand: switch"}],[3,TBST,{label:"Free hand: just catch"}],[4.4,TBST,{label:"Dribbling hand: switch"}],[6,TBST]],{sub:PSUB,
+  tennis:tbs([[.1,"gone"],[.7,"in",null,[1,"rest"]],[.2,"hold",[1,"rest"]],[.4,"out",[1,"rest"]],[.6,"in",null,[-1,"rest"]],[.3,"hold",[-1,"rest"]],[.4,"out",[-1,"rest"]],[.3,"gone"],
+    [.1,"gone"],[.7,"in",null,[-1,"rest"]],[.2,"hold",[-1,"rest"]],[.4,"out",[-1,"rest"]],[.6,"in",null,[1,"rest"]],[.3,"hold",[1,"rest"]],[.4,"out",[1,"rest"]],[.3,"gone"]])});
+Object.assign(steps,{
+ h_tb_snatch:[
+  [front(rep(4,()=>pd(.45)),-1,TBST,{label:"Pound at knee height",over:kneeLine,tennis:tbs([[1.8,"hold",[1,"rest"]]])}),"Low stance. The basketball pounds at knee height in one hand; the tennis ball waits in the other."],
+  [tbUnder(-1),"Underhand: a soft toss to just above your head, out in front, and catch it palm up."],
+  [tbSnatch(-1),"Overhand snatch: toss it up and grab it out of the air palm down."],
+  [steps.h_tennis[3][0],"Dropped it? Get low, pick it up, and keep the basketball going."],
+  [tbUnder(1,{d:.38,label:"Clean catches, then more"}),"Clean catches first. Then fit more of them into the 30 seconds."]],
+ h_tb_swap:[
+  [front(rep(4,()=>pd(.45)),-1,TBST,{label:"Basketball right, tennis left",tennis:tbs([[1.8,"hold",[1,"rest"]]])}),"Basketball in your right hand, tennis ball in your left, eyes up."],
+  [tbSwap(2),"Two dribbles, then the basketball crosses low while the tennis ball goes across up top."],
+  [tbSwap(2,{d:.38,label:"Knee-height dribbles",over:kneeLine}),"Dribbles at knee height. They're quicker than waist-high ones."],
+  [tbSwap(0),"Down to one dribble between swaps, then a swap on every dribble."]],
+ h_tb_bounce:[
+  [front(rep(4,()=>pd(.45)),-1,TBST,{label:"One hand each",tennis:tbs([[1.8,"hold",[1,"rest"]]])}),"Dribble with one hand, tennis ball in the other."],
+  [front(rep(5,()=>pd(.45)),-1,TBST,{label:"Toss it out front",tennis:tbs([[.45,"hold",[1,"rest"]],[1.5,"bounce",[1,"rest"],[1,"rest"],{x:6}],[.3,"hold",[1,"rest"]]])}),"Toss it up a little out in front so it comes down and bounces once."],
+  [tbBounce(-1),"While it's up, cross over and cross back. Catch it after the one bounce."],
+  [tbBounce(-1,{label:"Firm toss, low crosses",over:kneeLine}),"A firm toss buys the time. Keep the crossovers low."],
+  [tbBounce(-1,{pose:FP({hy:98,w:18,walk:1}),label:"Walk up the floor"}),"Same rhythm walking up the floor, then with between the legs."]],
+ h_tb_toss:[
+  [front(rep(4,()=>pd(.45)),-1,TBST,{label:"Low the whole time",over:hipLine,tennis:tbs([[1.8,"hold",[1,"rest"]]])}),"Stay low in your stance the whole time."],
+  [tbSame([pd(.45),vdr(-1,1),vdr(-1,0),vdr(-1,1),vdr(-1,0),pd(.45)],"Toss, V dribble, catch"),"One-hand moves: toss, V dribble (or in-and-out), catch with the same hand."],
+  [tbChange(sd=>cr(-sd,.6),"Cross, catch with the other"),"Toss, cross over, and catch with the hand that just let go of the basketball."],
+  [tbSame([pd(.4),cr(1,.5),cr(-1,.5),pd(.4)],"Toss, double cross, catch"),"Doubles: toss, double cross, catch."],
+  [tbSame([pd(.4),bt(1,.7),bh(-1,.85)],"Toss, between + behind",50),"Combos: two moves under one toss, like between and behind."]],
+ h_tb_partner:[
+  [front(rep(4,()=>pd(.55)),-1,TBST,{label:"Eyes on your partner",sub:PSUB,tennis:tbs([[2.2,"gone"]])}),"Your partner stands a few feet in front of you with the tennis ball. You pound, eyes on them."],
+  [tbFree(-1),"Tossed to your free hand: catch it overhand and toss it right back."],
+  [tbAtHand(sd=>cr(sd,.5),"Cross it, then catch"),"Tossed to your dribbling hand: cross the basketball over, catch with that hand, toss it back."],
+  [tbReact(),"Either hand. Only switch when it's coming to your dribbling hand."],
+  [tbFree(-1,{pose:FP({hy:98,w:18,walk:1}),label:"Follow as they back up"}),"On the move: your partner backs up and you follow, still catching."]]
+});
+Object.assign(steps,{
+ h_tb_drop:[
+  [front(rep(4,()=>pd(.45)),-1,TBST,{label:"Hold it at shoulder height",tennis:tbs([[1.8,"hold",[1,"sh"]]])}),"Low stance, basketball pounding, tennis ball held out at shoulder height."],
+  [tbDrop(null,"Let go, pound, catch"),"Let go of it (no toss), pound, and catch it before it lands."],
+  [tbDrop(sd=>cr(sd,.5),"Drop, cross, catch"),"Crossover while it falls, then catch with the hand that let go of the basketball."],
+  [tbDrop(sd=>cr(sd,.5),"Catch below the knees",{over:kneeLine}),"Catch it lower each time, below your knees if you can."],
+  [tbBounce(-1,{label:"Too hard? One bounce"}),"Missing it every time? Go back to Toss, Cross, One Bounce for a few days."]],
+ h_tb_move:[
+  [front(rep(4,()=>pd(.45)),-1,TBW,{label:"Baseline, one in each hand",tennis:tbs([[1.8,"hold",[1,"rest"]]])}),"Start at the baseline, basketball in one hand and tennis ball in the other."],
+  [tbChange(sd=>cr(-sd,.6),"Walk: cross, catch",[.45,.45],TBW),"Walking: toss, crossover, catch with the other hand."],
+  [tbChange(sd=>cr(-sd,.6),"Dribble, toss, move, catch",[.45,.45],TBW),"Find a rhythm with your steps: dribble, toss, move, catch."],
+  [tbChange(sd=>bt(-sd,.7),"Jog: between, catch",[.35,.35],FP({hy:98,w:18,walk:1.6})),"Jogging: toss and hit a combo or a double move, then catch it."],
+  [steps.h_tennis[3][0],"Lose it? Keep dribbling, get it, and pick up where you left off."]]
+});
+Object.assign(steps,{
+ h_tb_dropp:[steps.h_tb_drop[1],steps.h_tb_drop[2],[tbDrop(sd=>bt(sd,.6),"Drop, between, catch"),"Between the legs while it falls, catch with the other hand."],[tbDrop(sd=>bh(sd,.6),"Drop, behind, catch"),"Behind the back while it falls, catch with the other hand."],[tbDrop(sd=>cr(sd,.45),"From chest height",{from:"rest"}),"Drop it from chest height: even less time."]],
+ h_tb_movep:[steps.h_tb_move[1],[tbChange(sd=>bt(-sd,.7),"Walk: between, catch",[.4,.4],TBW),"Walking: toss, between the legs, catch with the other hand."],[tbChange(sd=>bh(-sd,.85),"Walk: behind, catch",[.35,.3],TBW),"Walking: toss, behind the back, catch with the other hand."],
+  [front([pd(.35),bt(1,.6),bh(-1,.75),pd(.35)],-1,FP({hy:98,w:18,walk:1.6}),{label:"Jog: between + behind",tennis:tbs([[.25,"hold",[1,"rest"]],[1.7,"fly",[1,"rest"],[1,"rest"],{h:50}],[.1,"hold",[1,"rest"]]])}),"Jogging: toss, combo move, catch."],
+  [front([pd(.35),cr(1,.45),cr(-1,.45),pd(.35)],-1,FP({hy:98,w:18,walk:1.6}),{label:"Jog: double cross",tennis:tbs([[.25,"hold",[1,"rest"]],[1.25,"fly",[1,"rest"],[1,"rest"],{h:40}],[.1,"hold",[1,"rest"]]])}),"Jogging: toss, double move, catch."]],
+ h_tb_snatchp:[steps.h_tb_snatch[1],[tbUnder(1),"Left hand pounds, right hand tosses."],steps.h_tb_snatch[2],[tbSnatch(1),"Left hand pounds, right hand snatches."]],
+ h_tb_swapp:[steps.h_tb_swap[1],[tbSwap(1),"One dribble, then swap."],steps.h_tb_swap[3]],
+ h_tb_bouncep:[steps.h_tb_bounce[2],[tbBounce(1),"Left hand dribbles, right hand tosses."],steps.h_tb_bounce[4],[tbBounce(-1,{mv:(to,d)=>bt(to,d),md:.65,pose:FP({hy:98,w:20,walk:1}),label:"Walk: between, catch"}),"Walking, with a between-the-legs move and back while it bounces."]],
+ h_tb_tossp:[steps.h_tb_toss[1],[tbSame([pd(.45),io(.6,{in:14}),io(.6,{in:14}),pd(.45)],"Toss, in-and-out, catch"),"Toss, in-and-out, catch with the same hand."],steps.h_tb_toss[2],
+  [tbChange(sd=>bt(-sd,.7),"Between, catch with other",[.4,.4]),"Toss, between the legs, catch with the other hand."],
+  [tbChange(sd=>bh(-sd,.85),"Behind, catch with other",[.35,.3]),"Toss, behind the back, catch with the other hand."],steps.h_tb_toss[3],steps.h_tb_toss[4]],
+ h_tb_partnerp:[steps.h_tb_partner[1],[tbFree(1),"Left hand pounds, catch with your right."],steps.h_tb_partner[2],steps.h_tb_partner[3],
+  [tbAtHand(sd=>bt(sd,.6),"Between, then catch"),"Tossed to your dribbling hand: between the legs, then catch."],steps.h_tb_partner[4]]
+});
 const get=id=>{const[d,i]=String(id).split(":");return(steps[d]||[])[+i]};
 const cache=new WeakMap();
 function render(svg,id,t){const s=get(id);if(!s)return;let c=cache.get(svg);if(!c||c.id!==id){c={id,tick:s[0](svg)};cache.set(svg,c)}c.tick(t)}
@@ -3064,7 +3213,9 @@ const ballIcons=v=>`<span class="bi-row" aria-hidden="true">${v==="0"?NOBALL_SVG
 const ballNeed=d=>TWO_BALL.test(d.id)?2:(d.cond&&d.id!=="c_hokie")||(d.body&&d.id!=="b_game"&&d.id!=="b_club")?0:1;
 const ballHave=()=>{const b=S.settings.balls;return b==null?2:+b};
 const placeOk=d=>courtNeed(d)<=courtHave();
-const courtOk=d=>placeOk(d)&&ballNeed(d)<=ballHave();
+/* tennis ball drills (tb) need one; on until you turn it off in Today's setup */
+const tbHave=()=>S.settings.tennis!==false;
+const courtOk=d=>placeOk(d)&&ballNeed(d)<=ballHave()&&(!d.tb||tbHave());
 /* no-equipment moves for days without a court to run (Just a hoop, No hoop): the Burner draws five a day, and each Tired 3s round gets the next one */
 const NC_MOVES=[["Star jumps","star jumps"],["Push-ups","push-ups"],["Max jumps, stick each landing","max jumps, sticking each landing"],["Squat jumps","squat jumps"],["Skater jumps, side to side","skater jumps"],["Mountain climbers","mountain climbers"],["Burpees","burpees"],["High knees","high knees"],["Defensive slides in place","slides in place"],["Jumping jacks","jumping jacks"]];
 const ncMove=i=>NC_MOVES[(hash(today())+i)%NC_MOVES.length];
@@ -3117,7 +3268,7 @@ function eligible(d,body){return d&&!d.body&&courtOk(d)&&!(d.cond&&(body&&(d.har
 function plan0(){
   const cw=customToday();if(cw){const ids=[...cw.items,...((S.rec.plan.extra)||[]).filter(id=>!cw.items.includes(id))];
     const out=ids.map(id=>D[id]).filter(Boolean).map(d=>({slot:"Your workout",d,skip:skipped(d.id),why:skipped(d.id)?{k:"skip",t:"Skipped today"}:cw.items.includes(d.id)?null:{k:"you",t:"You added it"}}));out.custom=cw;out.over=[];return out}
-  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")+(courtHave()<3?"c"+courtHave():"")+(ballHave()<2?"b"+ballHave():"")));
+  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")+(courtHave()<3?"c"+courtHave():"")+(ballHave()<2?"b"+ballHave():"")+(tbHave()?"":"t")));
   const ml={s:maxLvl("s"),h:maxLvl("h"),f:maxLvl("f")},sw=swapMap(),baseline=S.sessions.length<3;let newUsed=0;
   const ok=d=>eligible(d,body),okAuto=d=>ok(d)&&lvlOf(d)<=ml[d.skill];
   const cand=[],used=new Set(),courtOut=[],cut=d=>{if(d&&!courtOk(d)&&!courtOut.includes(d))courtOut.push(d)};
@@ -3255,7 +3406,7 @@ function drillRow(d,i,opts={}){
   const w=opts.why, lib=opts.lib&&!d.body, f=lib?fq(d.id).k:"auto";
   return `<button class="drill ${done?"done":""} ${opts.next?"next":""}" data-open="${d.id}">
    <span class="ix">${done?"✓":i}</span>
-   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}${lib&&d.cond?condTop2(d,f):d.cond?condTags(d,opts.lib):`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${lib&&d.cond?"":`${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}`}<span>${tgt}</span></span></span>
+   <span><span class="nm">${esc(nm)}</span>${w?`<span class="rwhy ${w.k}">${esc(w.t)}</span>`:""}<span class="meta">${lib?pipsHTML(d):""}${lib&&d.cond?condTop2(d,f):d.cond?condTags(d,opts.lib):`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${lib&&d.cond?"":`${d.read?'<span class="tag rd">Decision</span>':""}${d.partner?'<span class="tag p">Partner</span>':""}${d.tb?'<span class="tag p">Tennis ball</span>':""}${lib&&inNext(d.id)?'<span class="tag nx">In next workout</span>':""}${lib&&f!=="auto"?`<span class="tag fq">${esc(fqText(d.id))}</span>`:""}`}<span>${tgt}</span></span></span>
    <span class="go">${done?"Again":"Go"}</span></button>`}
 
 function weekDots(){
@@ -3488,7 +3639,8 @@ document.addEventListener("click",e=>{
 document.addEventListener("change",e=>{
   if(e.target.id==="optPartner"){S.settings.partner=e.target.checked;persist();render();const f=$("#optPartner");if(f)f.focus({preventScroll:true})}
   if(e.target.id==="fcFile"&&e.target.files[0]){analyze(e.target.files[0]);return}
-  if(e.target.id==="optHeavy"){S.settings.heavy=e.target.checked;persist();render();const f=$("#optHeavy");if(f)f.focus({preventScroll:true})}});
+  if(e.target.id==="optHeavy"){S.settings.heavy=e.target.checked;persist();render();const f=$("#optHeavy");if(f)f.focus({preventScroll:true})}
+  if(e.target.id==="optTennis"){S.settings.tennis=e.target.checked;persist();render();const f=$("#optTennis");if(f)f.focus({preventScroll:true})}});
 document.addEventListener("click",e=>{const a=e.target.closest("[data-check]");if(!a)return;FC.focus=a.dataset.check;const v=CHECK_VIEW[FC.focus]||"side";if(S.settings.fcView!==v){S.settings.fcView=v;persist();reView()}closeRunner(true)},true);
 window.addEventListener("hashchange",route);
 let scrubBusy=false;document.addEventListener("input",async e=>{if(e.target.id!=="fcScrub")return;FC.idx=+e.target.value;if(scrubBusy)return;scrubBusy=true;let last=-1;while(last!==FC.idx){last=FC.idx;await drawFrame(last,$("#fcCanvas"))}scrubBusy=false});
@@ -3539,6 +3691,7 @@ const STARTERS=[
  {id:"st_shoot",name:"Shooting day",note:"Form, then volume",items:["s_cold","b_body","s_line","s_rollup","s_elbow","s_5spot","s_ladder","s_atw","s_rimline","s_ft","b_cool"]},
  {id:"st_fin",name:"Finishing day",note:"Layups, floaters, footwork",items:["b_body","h_lab","f_mikan","f_corner","f_weak","f_foot5","f_float","f_reverse","f_called","s_ft","b_cool"]},
  {id:"st_handles",name:"Handles, no hoop",note:"Driveway, garage or a wall",items:["b_body","h_lab","h_pound","h_five","h_fig8","h_place","h_d2","h_tennis","b_cool"]},
+ {id:"st_tennis",name:"Tennis ball handles",note:"A basketball, a tennis ball and a wall",items:["b_body","h_tb_snatch","h_tb_swap","h_tb_bounce","h_tb_toss","h_tb_drop","h_tennis","b_cool"]},
  {id:"st_game",name:"Game-day tune-up",note:"Touch and rhythm, no jumping",items:["b_game","f_mikan","s_line","s_ft","b_cool"]},
  {id:"st_warm",name:"Warm-up only",note:"Before pickup, a run or a game",items:["b_body"]},
  {id:"st_cool",name:"Cool-down only",note:"After a game or a hard run",items:["b_cool2"]}];
@@ -3565,12 +3718,13 @@ function planRow(p){const cw=p.custom,mins=cw?wMins(cw):p.mins;
    is the one question asked each day (before the first drill only); one "Today:" line says what those choices did to the plan. */
 const BODY_OPTS=[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]];
 function setupStrip(body,p){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null,ck=S.settings.court||"full",open=!!state.setOpen;
-  const bk=String(ballHave()),sum=[COURTS.find(c=>c[0]===ck)[1],BALLS.find(x=>x[0]===bk)[1],S.settings.partner?"With a partner":"Solo",S.settings.heavy?"Heavy ball":""].filter(Boolean).join(" · ");
+  const bk=String(ballHave()),sum=[COURTS.find(c=>c[0]===ck)[1],BALLS.find(x=>x[0]===bk)[1],S.settings.partner?"With a partner":"Solo",S.settings.heavy?"Heavy ball":"",tbHave()?"":"No tennis ball"].filter(Boolean).join(" · ");
   const head=`<div class="tsum"><div class="tx"><b>${esc(sum)}</b><small>${open?"These stay until you change them":"Stays until you change it"}</small></div>${open?"":`<button class="setup-btn" data-rec="setopen" aria-expanded="false">Change</button>`}</div>`;
   const edit=open?`<div class="tgrp"><span class="label">Where you train</span><div class="tseg" role="group" aria-label="Where you train" style="--n:${COURTS.length}">${COURTS.map(([v,t,sub])=>`<button data-rec="court:${v}" aria-pressed="${ck===v}">${t}<small>${sub}</small></button>`).join("")}</div>
      <span class="label">Basketballs</span><div class="tseg balls" role="group" aria-label="Basketballs" style="--n:3">${BALLS.map(([v,t,sh])=>`<button data-rec="balls:${v}" aria-pressed="${bk===v}" aria-label="${t}">${ballIcons(v)}${sh}</button>`).join("")}</div>
      <label class="tsw"><span>With a partner<small>Adds partner drills</small></span><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}></label>
      <label class="tsw"><span>Heavy ball<small>For the heavy-ball handling sets</small></span><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}></label>
+     <label class="tsw"><span>Tennis ball<small>For the tennis ball handling drills</small></span><input type="checkbox" id="optTennis" ${tbHave()?"checked":""}></label>
      <button class="btn sec small done" data-rec="setopen">Done</button></div>`:"";
   const gm=k==="game"?`<div class="tchips" role="group" aria-label="Game tonight" style="--n:2">${[["tune","Tune-up · 20 min"],["warm","Warm-up only · 10 min"]].map(([v,t])=>{const on=(v==="warm")===!!S.rec.body.only;return `<button class="chip" data-rec="gmode:${v}" aria-pressed="${on}">${t}</button>`}).join("")}</div>`:"";
   const bq=body?`<div class="tgrp"><span class="label">How's the body today?</span><div class="tchips" role="group" aria-label="How's the body today">${BODY_OPTS.map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${t}</button>`).join("")}</div>${gm}</div>`:"";
@@ -3584,12 +3738,13 @@ function todayLine(p,k){const bits=[],ck=S.settings.court||"full",n=(p.courtOut|
   if(ck==="hoop"&&p.some(x=>x.d.id==="s_tired"))bits.push("Just a hoop: the No-Court Burner instead of a run before Tired 3s, and a different no-equipment move before each round.");
   if(ck==="none")bits.push("No hoop: warm-up, ball handling and the stretch.");
   if(!ballHave())bits.push("No basketball: warm-up, conditioning and the stretch.");else if(ballHave()===1&&n)bits.push("One basketball: no two-ball drills.");
+  if(!tbHave()&&(p.courtOut||[]).some(d=>d.tb))bits.push("No tennis ball: no tennis ball drills.");
   if(n)bits.push(`<button class="linkbtn" data-rec="leftout">${n} drill${n===1?"":"s"} left out today ›</button>`);
   return bits.join(" ")}
 /* drills today's court ruled out, shown under the list so nothing disappears without a word */
 function leftOutCard(p){const out=p.courtOut||[];if(!out.length)return"";const ck=S.settings.court||"full";
-  const why=d=>placeOk(d)?(ballNeed(d)===2?"needs two basketballs":"needs a basketball"):["","needs a hoop","needs court lines","needs a full court"][courtNeed(d)],
-    back=d=>placeOk(d)?(ballNeed(d)===2?"with two basketballs":"with a basketball"):["","with a hoop","on a court","on a full court"][courtNeed(d)];
+  const why=d=>placeOk(d)?(ballNeed(d)>ballHave()?(ballNeed(d)===2?"needs two basketballs":"needs a basketball"):"needs a tennis ball"):["","needs a hoop","needs court lines","needs a full court"][courtNeed(d)],
+    back=d=>placeOk(d)?(ballNeed(d)>ballHave()?(ballNeed(d)===2?"with two basketballs":"with a basketball"):"with a tennis ball"):["","with a hoop","on a court","on a full court"][courtNeed(d)];
   return `<div class="overcard" id="leftout"><div class="label">Left out today · ${COURTS.find(c=>c[0]===ck)[1]} · ${BALLS.find(x=>x[0]===String(ballHave()))[1]}</div>${out.map(d=>`<span><b>${esc(d.name)}</b> ${why(d)}. It's back when you train ${back(d)}.</span>`).join("")}<button class="linkbtn" data-rec="setopen">Change where you train</button></div>`}
 function addedCard(ids){const names=ids.map(id=>D[id].name);
   return `<div class="addedcard"><b>You added ${esc(names.length>2?names.length+" drills":names.join(" and "))}.</b> Put ${names.length>1?"them":"it"} in today's workout, or keep ${names.length>1?"them":"it"} for your next recommended one?<div class="psee-btns"><button class="btn sec small" data-rec="addin">Add ${names.length>1?"them":"it"} in</button><button class="btn sec small" data-rec="keepnext">Keep for next</button></div></div>`}
@@ -3850,7 +4005,7 @@ function drawRunner(){
   const bl=baseline(d),tgt=d.gm?gmTip(d):(d.log==="makes"||d.log==="spots")?`<div class="tip">Your goal: <b class="num">${targetPct(d)}%</b>${d.goal?` · finish at ${d.goal} makes`:""}. ${bl?`Your average over your last ${bl.n>1?bl.n+" sessions":"session"} is ${bl.p}%, so the goal is ${GOAL_UP} points above it. It moves when your numbers move.`:`A starter goal. After your first session it becomes your own average plus ${GOAL_UP} points.`}</div>`:"";
   $("#sheet").innerHTML=`<header><div class="wrap"><h2 id="sheetTitle">${esc(d.dynamic&&weakSpot()?d.name+": "+SPOT[weakSpot().id].name:d.name)}</h2><button class="x hx dk" aria-label="Close drill">×</button></div></header>
   <div class="sbody"><div class="wrap">
-   <div class="row">${d.clips==="read"?'<span class="tag rd">Film</span>':`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}${d.cond?`${d.clips==="read"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard · counts toward leg load</span>':""}`:""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
+   <div class="row">${d.clips==="read"?'<span class="tag rd">Film</span>':`<span class="tag ${d.body?"p":d.skill}">${d.body?"Conditioning":SK[d.skill]}</span>`}${d.read?'<span class="tag rd">Decision reps</span>':""}${d.partner?'<span class="tag p">Needs a partner</span>':""}${d.tb?'<span class="tag p">Needs a tennis ball</span>':""}${d.cond?`${d.clips==="read"?"":`<span class="tag c">${CGR[d.cond]}</span>`}<span class="tag ev-${d.ev}">${CEV[d.ev]}</span>${d.hard?'<span class="tag hard">Hard · counts toward leg load</span>':""}`:""}<span class="muted small">~${d.mins} min</span>${d.body?"":`<span class="muted small" style="display:inline-flex;gap:6px;align-items:center">${pipsHTML(d)} ${LVL_NAME[lvlOf(d)]}</span>`}</div>
    <p style="margin:0">${esc(d.what)}</p>
    ${d.read?`<div class="why">Why decision reps: drills where you already know the next move look clean but don't show up in games. Here the choice comes late, so your hands react instead of recite. Do these after your mechanics work.</div>`:""}
    ${hasParts(d)?`<h3 class="partshead">The parts · ${fmt(totalOf(d))}</h3><ol class="steps">${d.phases.map((p,i)=>`<li><div class="srow">${partAnim(d,i)}<div><b>${esc(p[0])}</b> · ${p[1]}s<div class="small muted">${esc(d.mv?BV.note(d.id+":"+i):HV.note(d.id+"p:"+i))}</div>${clipLinks(d,i)}</div></div></li>`).join("")}</ol><h3 class="partshead">Coaching points</h3>`:""}
