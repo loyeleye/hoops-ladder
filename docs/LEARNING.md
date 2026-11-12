@@ -1156,3 +1156,36 @@ hour.
 **Back.** Android's back button (step 11's `hoopsBack`) asks `burstBack()` and `liveBack()` first. In the viewer it
 leaves compare or a selection, then closes. While a clip is being read it cancels. On the live camera it does what
 the × does: saves the session's form entry and opens the shots it kept. Code: `bu*`, `burstOpen`, `buSweep`, and `burstFind`, `burstShotUrl`, `burstShotFrames` on `window` for the page.
+
+## Step 30. The shot library: pick what to keep
+
+The first real test was a 165-shot session, and picking shots in the viewer's chip strip was slow. The strip also
+jumped back to shot 1 on every tap. That's fixed (the strip keeps its scroll, and with shots selected, Star, Keep and
+Delete act on all of them). The library is the bigger fix. A mockup went through the art panel first (art director,
+motion, UI artist, UX, and a shooting coach), and their shared fixes are built in.
+
+**Getting there.** The grid button on the viewer's top bar, or a burst on the Form tab's *Shot bursts* fold. Tap a
+tile to watch that shot. Back steps out in order: a confirm sheet, then Quick pick or the selection, then the library,
+and back to the viewer shot you came from.
+
+**The grid.** One tile per shot: a thumbnail cropped to the shooter at the release, with the skeleton baked in, the
+shot number coloured by grade, and the focus cue's reading under it with its grade as a shape (Fix square, Watch
+triangle, Good circle, so it doesn't rely on colour). ★ and a white bookmark (kept) sit top right. The *focus cue*
+is the cue graded Fix most often, or the one picked, so every tile shows the same thing and shots compare. Sort by
+shot order or worst/best on it; filter by Starred, Kept, Make, Miss, or the Fix/Watch/Good bar.
+
+**Thumbnails.** Made once, one shot at a time with a hidden video, nearest the screen first, and saved as a small JPEG
+at `blobs[shotId+":th"]`. They stay after the video is deleted, dimmed with "Video deleted".
+
+**Select several.** *Select*, or hold a tile. *Keep N*, *Star*, *Coach · N* (the Send to coach sheet with all of them),
+and Delete video. Deleting asks first with counts, skips kept shots, and has 6 seconds of Undo; the videos are only
+removed when that note goes. *Free X MB now* in the storage note works the same way for every unkept shot.
+
+**★ always keeps.** Starring a shot keeps it too, and unkeeping a starred shot unstars it. So there is one meaning of
+"stays": ★ or the bookmark.
+
+**Quick pick.** One shot at a time at ½× with its skeleton and all its cues, focus cue first. *Skip*, *★* or *Keep*,
+or swipe the video right to keep and left to skip. A swipe that starts within 28 px of the screen edge is left to
+Android's Back gesture. An optional *Make / Miss* tag per shot feeds the Make and Miss filters. Undo names what it
+undoes ("Undo keep #34"). The order can be shot order or worst/best on the focus cue. At the end it says how many are
+kept and when the rest go. Code: `burstLib`, `bl*`, `qp*`, `thMake`.
