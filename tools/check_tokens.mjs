@@ -1,7 +1,7 @@
 // Fails if www/index.html uses a CSS custom property (var(--name)) that nothing defines.
 // An undefined token silently falls back, and a fallback colour doesn't follow the theme: that is how
 // the Form tab's session rows came out white with white text in dark mode (var(--card,#fff); there is no --card).
-// Usage: node tools/check_tokens.mjs   (CI runs it on every build; docs/LEARNING.md, step 31)
+// Usage: node tools/check_tokens.mjs   (CI runs it on every build; docs/LEARNING.md, step 32)
 import fs from "node:fs";
 import path from "node:path";
 

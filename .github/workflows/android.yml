@@ -40,7 +40,7 @@ jobs:
       - run: npm ci
       # Fails if a film study set is malformed or wasn't built into www/index.html (docs/LEARNING.md, step 26).
       - run: node tools/build_film.mjs --check
-      # Fails if the page uses a CSS colour token nothing defines; a missing token falls back and ignores the theme (docs/LEARNING.md, step 31).
+      # Fails if the page uses a CSS colour token nothing defines; a missing token falls back and ignores the theme (docs/LEARNING.md, step 32).
       - run: node tools/check_tokens.mjs
       - run: npx cap sync android
 

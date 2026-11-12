@@ -6569,6 +6569,8 @@ route();
       const clip = document.querySelector(".ytsheet");
       if (clip) { if (!press(clip, '[data-yt="close"]')) clip.remove(); return true; }
       // Coach session mode (step 27) sits over the player and the tabs: back steps out of its current screen.
+      // The setup check before recording (step 31) sits over every camera screen: back cancels a countdown, then closes it.
+      if (window.scBack && window.scBack()) return true;
       if (window.sesBack && window.sesBack()) return true;
       // Shot bursts (step 29): the viewer steps out of compare or a selection, then closes; reading a clip cancels;
       // the live form check does what Done does (saves and opens the shots it kept).
@@ -6894,6 +6896,17 @@ route();
       },
     };
     Voice.addListener("heard", e => { if (e && who === "ses" && sesCb) try { sesCb(e.text || "", e.alts || [], !!e.final) } catch (x) {} });
+
+    // The setup check before recording (step 31) listens for "go" the same way, then gives the mic back.
+    let lsCb = null, lsResume = null;
+    hooks.listen = (words, cb) => {
+      if (!lsResume) lsResume = hooks.voicePause();
+      vStop();
+      lsCb = cb; who = "ls"; fired = false;
+      const p = Voice.start({ words }).then(() => true, e => { if (who === "ls") who = null; lsCb = null; throw e; });
+      return { p, stop() { lsCb = null; if (who === "ls") vStop(); const r = lsResume; lsResume = null; if (r) r(); } };
+    };
+    Voice.addListener("heard", e => { if (e && who === "ls" && lsCb && !talking()) try { lsCb(e.text || "", e.alts || [], !!e.final) } catch (x) {} });
   }
 
   /* ---------- 3b. Coach session transcripts ----------
@@ -7058,8 +7071,8 @@ route();
           : B
           ? "<li>Behind you, on the straight line from you to the rim. That shows left and right: your elbow, the ball's line, your guide hand.</li><li>On the line, 10 to 15 ft back (farther on the floor). At a Shoot360, prop it at the back of your lane, out of the way of the machine's passes and the net.</li>"
           : "<li>Level with where you shoot, off to your shooting-hand side, so your shooting arm faces the phone. That shows balance, timing, set point and arc.</li><li>10 to 15 ft away (farther on the floor), out of the way of the ball and the rebound.</li>"}
-        <li>Your whole body in the picture, feet included, with room above your hands at the release. Check the skeleton sits on you, then tap Ready.</li></ul>
-        <button class="btn pri" data-lf="ready" style="width:100%">Ready</button>`;
+        <li>Your whole body in the picture, feet included, with room above your hands at the release. Then tap Check my spot: it tells you where to stand, turns green when you're set, and starts on "go" or a tap after a short countdown.</li></ul>
+        <button class="btn pri" data-lf="ready" style="width:100%">Check my spot</button>`;
     }
     function showShot(res) {
       const box = L.el.querySelector(".lf-shot");
@@ -7087,7 +7100,7 @@ route();
         else if (b.dataset.lf === "talk") { L.talk = { say: "buzz", buzz: "off", off: "say" }[L.talk] || "say"; S.settings.lfCue = L.talk; persist(); drawTop(); }
         else if (b.dataset.lf === "keep") buLiveKeep(L);
         else if (b.dataset.lf === "height") { S.settings.lfLow = b.dataset.v === "low"; persist(); if (K && !K.burst.shots.length) K.burst.low = !!S.settings.lfLow; drawPlace(); }
-        else if (b.dataset.lf === "ready") { L.ready = true; drawPlace(); }
+        else if (b.dataset.lf === "ready") liveCheck();
         else if (b.dataset.lf === "view") { const v = b.dataset.v; S.settings.fcView = v === "front" ? "behind" : v; S.settings.fcFront = v === "front"; persist(); L.buf = []; L.up = 0;
           if (K && !K.burst.shots.length) { K.burst.view = fcView(); K.burst.front = !!S.settings.fcFront && fcView() === "behind"; }
           if (!L.shots.length) L.el.querySelector(".lf-shot").innerHTML = `<span>${filmTip()} Shoot when you're ready.</span>`; drawPlace(); }
@@ -7139,6 +7152,7 @@ route();
       let r = null;
       try { r = L.pl.detectForVideo(v, now); } catch (e) { return; }
       const raw = r && r.landmarks && r.landmarks[0];
+      L.raw = raw || null; // the setup check reads these (4c)
       const lm = raw ? raw.map(p => ({ x: p.x * cw, y: p.y * ch, v: p.visibility ?? 1 })) : null;
       const t = now / 1000;
       L.buf.push({ t, lm });
@@ -7229,9 +7243,353 @@ route();
       else if (L.talk === "buzz") try { navigator.vibrate?.(worst ? [60, 80, 60] : 40); } catch (e) {}
     }
 
+    /* ---------- 4c. Setup check: where to stand, a green light, then "go" and a countdown ----------
+       Before a recording starts (live form check, Film this rep, the move clip recorder, a training video), a
+       full-screen check runs the same pose model on the camera picture and tells you, on screen and out loud, where
+       to move: farther from the phone, closer, or to the middle. Shooting leaves room above your hands for the
+       release. Once you've been in a good spot for most of a second the picture's edge flashes green, the phone
+       chimes and buzzes, and it says you're set. Then say "go" (with voice on) or tap Go, and recording starts after
+       a 3, 5 or 10 s countdown. "Start anyway" skips the check, for when the tracker can't see you well. The live
+       form check passes its own pose landmarks in, so the model never runs twice on a frame. See docs/LEARNING.md,
+       step 31. */
+    let SC = null; // the open setup check
+    const scStyle = document.createElement("style");
+    scStyle.textContent = `
+.scx{position:fixed;inset:0;z-index:120;background:#05080F;color:#F2F5FA;display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.scx .sc-top{display:flex;align-items:center;gap:8px;padding:10px 16px}
+.scx .sc-title{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--display);font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:.03em}
+.scx .sc-title span{opacity:.7}
+.scx .btn.sec{background:#1C2844;border-color:#2A3858;color:#F2F5FA}
+.scx .sc-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px}
+.scx .sc-frame{position:relative;border-radius:12px;overflow:hidden}
+.scx .sc-frame::after{content:"";position:absolute;inset:0;border-radius:12px;border:6px solid #2A3858;pointer-events:none;transition:background .2s,border-color .2s}
+.scx .sc-frame video,.scx .sc-frame canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
+.scx .sc-frame.mir video,.scx .sc-frame.mir canvas{transform:scaleX(-1)}
+.scx.fix .sc-frame::after{border:12px solid #FFC23D;background:rgba(255,194,61,.16)}
+.scx.hold .sc-frame::after{border:12px solid rgba(43,209,126,.55);background:rgba(43,209,126,.1)}
+.scx.ok .sc-frame::after{border:16px solid #2BD17E;background:rgba(43,209,126,.24);animation:scflash .35s steps(1,end) 3}
+@keyframes scflash{0%{opacity:1}50%{opacity:.25}100%{opacity:1}}
+.scx .sc-hold{position:absolute;left:0;bottom:0;height:12px;width:0;background:#2BD17E;z-index:1}
+.scx .sc-msg{position:absolute;left:16px;right:16px;top:16px;text-align:center;background:rgba(5,8,15,.8);border-radius:14px;padding:10px 12px;transition:background .25s}
+.scx .sc-msg b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(38px,11vw,52px);line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.scx .sc-msg span{display:block;font-size:16px;font-weight:600;margin-top:4px}.scx .sc-msg span:empty{display:none}
+.scx.fix .sc-msg b{color:#FFC23D}
+.scx.ok .sc-msg{background:#1E8657}
+.scx.count .sc-frame::after{animation:none}
+.scx .sc-big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;font-family:var(--display);font-weight:800;font-size:min(62vw,270px);line-height:1;color:#2BD17E;-webkit-text-stroke:6px #05080F;paint-order:stroke fill;text-shadow:0 0 50px rgba(5,8,15,.8)}
+.scx .sc-big.pop{animation:scpop .3s ease-out}
+@keyframes scpop{0%{transform:scale(1.5);opacity:.4}100%{transform:scale(1);opacity:1}}
+.scx .sc-big:empty{display:none}
+.scx .sc-low{padding:10px 16px 16px;display:flex;flex-direction:column;gap:10px}
+.scx .sc-row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.scx .sc-seg{display:flex;gap:4px}.scx .sc-seg button,.scx .sc-chip{min-height:44px;min-width:52px;border-radius:999px;border:1px solid #2A3858;background:#1C2844;color:#F2F5FA;padding:8px 14px;font:inherit;font-size:15px;font-weight:600}
+.scx .sc-seg button[aria-pressed="true"],.scx .sc-chip[aria-pressed="true"]{background:#F2F5FA;color:#05080F}
+.scx .sc-go{width:100%;font-size:20px;padding:14px}
+.scx.ok:not(.count) .sc-go{background:#2BD17E;border-color:#2BD17E;color:#05080F}
+.scx .sc-go.wait{opacity:.45}
+.scx .sc-go.stop{background:transparent;border:2px solid #FF5A46;color:#FF8A7A}
+.scx .sc-note{text-align:center;font-size:13.5px;opacity:.8;margin:0}
+.scx .linkbtn{color:#F2F5FA;align-self:center}`;
+    document.head.appendChild(scStyle);
+
+    // Where you are in the picture, from the pose landmarks (0 to 1 across and down). "shot" also wants room above
+    // your head for your hands at the release; "body" only wants all of you in, head to feet.
+    function scJudge(lm, kind, loose, view, ar) {
+      if (!lm || lm.length < 33) return { k: "none" };
+      const V = i => (lm[i].visibility ?? 1) > .5 && lm[i].x > -.05 && lm[i].x < 1.05;
+      const sh = [11, 12].filter(V), hp = [23, 24].filter(V);
+      if (!sh.length || !hp.length) return { k: "none" };
+      const avg = (ids, f) => ids.reduce((s, i) => s + lm[i][f], 0) / ids.length;
+      const shY = avg(sh, "y"), hipY = avg(hp, "y"), hipX = avg(hp, "x");
+      const torso = Math.max(.03, hipY - shY);
+      // Top of the head: about 0.6 of a torso above the shoulders (the nose is hidden from behind).
+      let top = shY - .62 * torso;
+      if (V(0)) top = Math.min(top, lm[0].y - .3 * torso);
+      const ft = [27, 28, 29, 30, 31, 32].filter(V); // ankles, heels, toes
+      const feet = ft.length ? Math.max(...ft.map(i => lm[i].y)) : null;
+      const bottom = feet != null ? feet : hipY + 1.6 * torso, H = bottom - top;
+      const xs = [11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28].filter(V).map(i => lm[i].x);
+      const box = { x0: Math.min(...xs) - .04, x1: Math.max(...xs) + .04, top, bottom, H, hipX };
+      // Once you're set the edges loosen, so a jittery landmark at 20 ft doesn't flick you back to amber.
+      const e = loose ? .02 : 0;
+      if (feet == null || feet > .955 + e * 1.5) return { k: "feet", box };
+      if (top < .015 - e) return { k: "head", box };
+      // A jump shot's release: standing reach plus the jump and the ball, about half a body height above your head.
+      if (kind === "shot" && top - (.5 - e * 2) * H < 0) return { k: "room", box };
+      if (H < (kind === "shot" ? .2 : .22) - e) return { k: "far", box };
+      if (hipX < .22 - e * 3 || hipX > .78 + e * 3) return { k: "mid", box, dir: hipX < .5 ? 1 : -1 };
+      // Side view: shoulders square to the phone throw off the elbow and follow-through numbers.
+      if (view === "side" && sh.length === 2 && Math.abs(lm[11].x - lm[12].x) * ar > (.38 + e * 5) * torso) return { k: "turn", box };
+      return { k: "ok", box };
+    }
+    // [on screen, under it, said out loud]
+    const SC_MSG = {
+      none: ["Step into the picture", "Stand where the phone can see all of you.", "Step into the picture."],
+      feet: ["Farther from the phone", "Your feet are cut off.", "Move farther from the phone. Your feet are cut off."],
+      head: ["Farther from the phone", "Your head is cut off.", "Move farther from the phone. Your head is cut off."],
+      room: ["Farther from the phone", "Leave room above your hands for the release.", "Move a little farther from the phone, so your hands stay in at the release."],
+      far: ["Closer to the phone", "You're small in the picture, so the tracking gets shaky.", "Come a few steps closer to the phone."],
+      turn: ["Turn sideways", "Shooting arm toward the phone.", "Turn sideways, with your shooting arm toward the phone."],
+      mid: ["Slide to the middle", "Follow the arrow to the middle of the picture.", "Slide over to the middle of the picture."],
+      hold: ["Hold there", "", ""],
+      nopose: ["Get in the picture", "The body tracker didn't load on this phone, so check the picture yourself.", ""]
+    };
+    // Countdown: your pick, else 5 s with voice (you're already on your spot) or 10 s to walk back after a tap.
+    const scCd = o => { const v = +S.settings[o.cdKey] || (scVoiceOn() ? 5 : 10); return o.cdOpts.includes(v) ? v : o.cdOpts[o.cdOpts.length - 1]; };
+    const scVoiceOn = () => !!hooks.listen && S.settings.scVoice !== false;
+
+    // o: { stream, mirror, kind: "shot" | "body", view?, title, getLm?, cdKey?, cdOpts?, now?, onGo, onClose? }
+    function setupCheck(o) {
+      scClose();
+      o = Object.assign({ kind: "body", cdKey: "scCd", cdOpts: [3, 5, 10] }, o);
+      const el = document.createElement("div");
+      el.className = "scx";
+      el.setAttribute("role", "dialog");
+      el.setAttribute("aria-label", "Get set");
+      el.innerHTML = `<div class="sc-top"><div class="sc-title">Get set <span>· ${esc(o.title || "")}</span></div><button class="btn sec small" data-sc="close">Back</button></div>
+        <div class="sc-stage"><div class="sc-frame${o.mirror ? " mir" : ""}"><video playsinline muted autoplay></video><canvas></canvas><div class="sc-hold"></div></div>
+          <div class="sc-msg" role="status" aria-live="polite"><b></b><span></span></div><div class="sc-big num" aria-live="assertive"></div></div>
+        <div class="sc-low"></div>`;
+      document.body.appendChild(el);
+      const s = SC = { o, el, video: el.querySelector("video"), cv: el.querySelector("canvas"), frame: el.querySelector(".sc-frame"),
+        state: "check", ready: false, okAt: 0, badAt: 0, setAt: 0, tapped: false, j: { k: "none" }, key: "", keyAt: 0, saidAt: 0, saidKey: "", lastT: 0, raf: 0,
+        pl: null, noPose: false, n: 0, timer: 0, ls: null, voice: false };
+      s.video.setAttribute("playsinline", "");
+      s.video.srcObject = o.stream;
+      s.video.play().catch(() => {});
+      el.addEventListener("click", e => {
+        const b = e.target.closest("[data-sc]");
+        if (!b || SC !== s) return;
+        const a = b.dataset.sc;
+        if (a === "close") { scClose(); if (o.onClose) o.onClose(); }
+        else if (a === "go") { if (s.ready || s.noPose) { s.tapped = true; scCount(s); } }
+        else if (a === "anyway") { s.tapped = true; scCount(s); }
+        else if (a === "now") scDone(s, true);
+        else if (a === "cancel") scStop(s);
+        else if (a.startsWith("cd:")) { S.settings[o.cdKey] = +a.slice(3); persist(); scLow(s); }
+        else if (a === "voice") { S.settings.scVoice = !scVoiceOn(); persist(); scListen(s); scLow(s); }
+      });
+      if (!o.getLm) loadLivePose().then(pl => { if (SC === s) s.pl = pl; }).catch(() => { if (SC === s) { s.noPose = true; scLow(s); } });
+      scListen(s);
+      scLow(s);
+      s.raf = requestAnimationFrame(() => scTick(s));
+      return s;
+    }
+
+    // "go" while you're set (or "go anyway" any time) starts the countdown; "stop" or "wait" during it cancels.
+    function scListen(s) {
+      if (s.ls) { s.ls.stop(); s.ls = null; }
+      s.voice = false;
+      if (!scVoiceOn() || SC !== s || s.state === "done") return;
+      const ls = s.ls = hooks.listen(["go", "go anyway", "start anyway", "ready", "start", "stop", "wait", "cancel"], (text, alts, fin) => {
+        if (SC !== s || s.ls !== ls) return;
+        for (const x of [text].concat(alts || [])) {
+          const t = " " + String(x || "").toLowerCase().replace(/[^a-z ]/g, " ").replace(/\s+/g, " ") + " ";
+          if (s.state === "count" && / (stop|wait|cancel|hold on) /.test(t)) { scStop(s); return; }
+          if (s.state !== "check") return;
+          if (!fin) return; // whole phrases only, so a stray syllable (or the phone's own voice) doesn't start it
+          if (/ (go anyway|start anyway) /.test(t) || ((s.ready || s.noPose) && / (go|let s go|start|ready|record) /.test(t))) { scCount(s); return; }
+          if (fin && / go /.test(t) && Date.now() - s.saidAt > 2500) { s.saidAt = Date.now(); say("Not set yet. " + SC_MSG[s.j.k === "ok" ? "hold" : s.j.k][2] + ' Or say "go anyway".'); return; }
+        }
+      });
+      ls.p.then(() => { if (SC === s && s.ls === ls) { s.voice = true; scLow(s); } }, () => { if (s.ls === ls) s.ls = null; if (SC === s) scLow(s); });
+    }
+
+    function scLow(s) {
+      const o = s.o, low = s.el.querySelector(".sc-low"), cd = scCd(o);
+      if (s.state === "count") {
+        low.innerHTML = `<p class="sc-note">${s.tapped ? "Walk back to your spot. " : ""}Recording starts at zero.${s.voice ? ' Say "stop" to cancel.' : ""}</p><button class="btn sec sc-go stop" data-sc="cancel">Cancel</button>`;
+        return;
+      }
+      const set = s.ready || s.noPose;
+      low.innerHTML = `<div class="sc-row"><span class="small">Countdown</span><div class="sc-seg" role="group" aria-label="Countdown before recording">${o.cdOpts.map(v => `<button data-sc="cd:${v}" aria-pressed="${v === cd}">${v} s</button>`).join("")}</div>
+          ${hooks.listen ? `<button class="sc-chip" data-sc="voice" aria-pressed="${scVoiceOn()}">${scVoiceOn() ? (s.voice ? "Voice on" : "Voice…") : "Voice off"}</button>` : ""}</div>
+        <button class="btn ${set ? "pri" : "sec wait"} sc-go" data-sc="go" ${set ? "" : 'aria-disabled="true"'}>Go</button>
+        <p class="sc-note">${set ? (s.voice ? `Say "go" or tap Go. Recording starts after ${cd} s.` : `Tap Go, then walk back. Recording starts after ${cd} s.`) : s.voice ? 'When the picture turns green, say "go".' : "When the picture turns green, tap Go."}</p>
+        <div class="sc-row"><button class="linkbtn small" data-sc="anyway" ${set ? 'style="visibility:hidden" tabindex="-1"' : ""}>Start anyway</button>${o.now ? `<button class="linkbtn small" data-sc="now">Someone's filming me: record now</button>` : ""}</div>`;
+    }
+
+    function scSetReady(s, on) {
+      s.ready = on;
+      s.el.classList.toggle("ok", on);
+      if (on) {
+        beep(880, 110); setTimeout(() => beep(1320, 170), 130);
+        try { navigator.vibrate?.([70, 60, 70]); } catch (e) {}
+        s.setAt = performance.now();
+        say(s.voice ? "You're set. Say go when ready." : "You're set. Tap go, then walk back.");
+      }
+      scLow(s);
+    }
+
+    function scTick(s) {
+      if (SC !== s) return;
+      s.raf = requestAnimationFrame(() => scTick(s));
+      const v = s.video, now = performance.now();
+      if (!v.videoWidth || now - s.lastT < (s.ready ? 200 : 90)) return; // slower once set: a cooler phone, steadier beeps
+      s.lastT = now;
+      // Fit the picture in the stage; the canvas sits exactly on it.
+      const st = s.el.querySelector(".sc-stage"), k = Math.min((st.clientWidth - 16) / v.videoWidth, (st.clientHeight - 16) / v.videoHeight);
+      const w = Math.round(v.videoWidth * k), h = Math.round(v.videoHeight * k);
+      if (s.frame.style.width !== w + "px") { s.frame.style.width = w + "px"; s.frame.style.height = h + "px"; }
+      if (s.state !== "check") return;
+      let lm = null;
+      if (s.o.getLm) lm = s.o.getLm();
+      else if (s.pl && v.readyState >= 2) { try { const r = s.pl.detectForVideo(v, now); lm = r && r.landmarks && r.landmarks[0]; } catch (e) {} }
+      const j = s.j = lm ? scJudge(lm, s.o.kind, s.ready || s.okAt > 0, s.o.view, v.videoWidth / v.videoHeight) : { k: "none" };
+      // Green after 0.8 s in a good spot. It stays green for 15 s even if you walk up to tap Go, then needs you back.
+      if (j.k === "ok") { s.badAt = 0; s.setAt = s.ready ? now : s.setAt; s.okAt = s.okAt || now; if (!s.ready && now - s.okAt > 800) scSetReady(s, true); }
+      else { s.badAt = s.badAt || now; if (now - s.badAt > 300) s.okAt = 0; if (s.ready && now - s.setAt > 15000) scSetReady(s, false); }
+      const hb = s.el.querySelector(".sc-hold"), hw = !s.ready && s.okAt ? Math.min(100, (now - s.okAt) / 8) + "%" : "0";
+      if (hb.style.width !== hw) hb.style.width = hw;
+      // Words on screen now; said out loud once the same problem has lasted a second, and not too often.
+      const key = s.ready ? "ready" : s.noPose && !s.o.getLm ? "nopose" : s.okAt ? "hold" : j.k;
+      if (key !== s.key) { s.key = key; s.keyAt = now; }
+      const m = key === "ready" ? ["You're set", s.voice ? 'Say "go" or tap Go' : "Tap Go"] : SC_MSG[key];
+      const bb = s.el.querySelector(".sc-msg b"), ss = s.el.querySelector(".sc-msg span");
+      if (bb.textContent !== m[0]) bb.textContent = m[0];
+      if (ss.textContent !== m[1]) ss.textContent = m[1];
+      s.el.classList.toggle("fix", !s.ready && key !== "none" && key !== "nopose" && key !== "hold");
+      s.el.classList.toggle("hold", key === "hold");
+      if (!s.ready && m[2] && now - s.keyAt > 1100 && (s.saidKey !== key || now - s.saidAt > 4500) && now - s.saidAt > 3500 && !(window.speechSynthesis && speechSynthesis.speaking)) {
+        s.saidKey = key; s.saidAt = now; say(m[2]);
+      }
+      scDraw(s, j, w, h);
+    }
+
+    // The zone to stand in (corner marks), a box around you (amber to fix, green when set) and an arrow to the middle.
+    function scDraw(s, j, w, h) {
+      const cv = s.cv, dpr = Math.min(2, window.devicePixelRatio || 1);
+      if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+      const c = cv.getContext("2d");
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      c.clearRect(0, 0, w, h);
+      const ok = s.ready, col = ok || s.okAt ? "#2BD17E" : "#FFC23D";
+      // corner marks of the zone
+      const zx0 = .2 * w, zx1 = .8 * w, zy0 = .03 * h, zy1 = .965 * h, L = Math.min(w, h) * .08;
+      c.strokeStyle = ok ? "#2BD17E" : "#F2F5FA"; c.lineWidth = 6; c.lineCap = "round";
+      c.beginPath();
+      for (const [x, y, dx, dy] of [[zx0, zy0, 1, 1], [zx1, zy0, -1, 1], [zx0, zy1, 1, -1], [zx1, zy1, -1, -1]]) { c.moveTo(x + dx * L, y); c.lineTo(x, y); c.lineTo(x, y + dy * L); }
+      c.stroke();
+      if (s.o.kind === "shot") { // the release room above your head
+        c.setLineDash([6, 6]); c.strokeStyle = "rgba(242,245,250,.35)"; c.lineWidth = 2;
+        c.beginPath(); c.moveTo(zx0, zy0 + .02 * h); c.lineTo(zx1, zy0 + .02 * h); c.stroke(); c.setLineDash([]);
+      }
+      const b = j.box;
+      if (!b) return;
+      const x0 = Math.max(2, b.x0 * w), x1 = Math.min(w - 2, b.x1 * w), y0 = Math.max(2, b.top * h), y1 = Math.min(h - 2, b.bottom * h);
+      c.strokeStyle = col; c.lineWidth = ok ? 5 : 3;
+      c.beginPath(); c.roundRect ? c.roundRect(x0, y0, x1 - x0, y1 - y0, 12) : c.rect(x0, y0, x1 - x0, y1 - y0); c.stroke();
+      if (s.o.kind === "shot" && !ok) { // where your hands go at the release
+        const ry = (b.top - .5 * b.H) * h;
+        c.setLineDash([5, 6]); c.beginPath(); c.moveTo(x0, Math.max(2, ry)); c.lineTo(x1, Math.max(2, ry)); c.stroke(); c.setLineDash([]);
+      }
+      // red edge where you're cut off
+      c.fillStyle = "rgba(255,90,70,.75)";
+      if (j.k === "feet") c.fillRect(0, h - 8, w, 8);
+      if (j.k === "head" || j.k === "room") c.fillRect(0, 0, w, 8);
+      if (j.k === "mid") { // arrow toward the middle, drawn in the picture's own direction (the frame mirrors it with the video)
+        const ax = b.hipX * w, ay = (b.top + b.bottom) / 2 * h, d = j.dir, tx = ax + d * w * .22;
+        c.strokeStyle = c.fillStyle = "#FFC23D"; c.lineWidth = 14;
+        c.beginPath(); c.moveTo(ax + d * 30, ay); c.lineTo(tx, ay); c.stroke();
+        c.beginPath(); c.moveTo(tx + d * 34, ay); c.lineTo(tx - d * 6, ay - 32); c.lineTo(tx - d * 6, ay + 32); c.closePath(); c.fill();
+      }
+    }
+
+    function scCount(s) {
+      if (SC !== s || s.state !== "check") return;
+      s.state = "count";
+      s.n = scCd(s.o);
+      s.el.classList.remove("fix", "hold");
+      s.el.classList.add("count", "ok");
+      s.el.querySelector(".sc-hold").style.width = "0";
+      const bb = s.el.querySelector(".sc-msg b"), ss = s.el.querySelector(".sc-msg span");
+      ss.textContent = "";
+      if (s.tapped) say("Walk back to your spot.");
+      const big = s.el.querySelector(".sc-big");
+      const clr = () => { const c = s.cv.getContext("2d"); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, s.cv.width, s.cv.height); };
+      clr();
+      const step = () => {
+        if (SC !== s || s.state !== "count") return;
+        if (s.n <= 0) { scDone(s, false); return; }
+        big.textContent = s.n; bb.textContent = "Recording in " + s.n;
+        big.classList.remove("pop"); void big.offsetWidth; big.classList.add("pop");
+        beep(s.n <= 3 ? 780 : 660, 100);
+        if (s.n <= 3) setTimeout(() => { if (SC === s) say(String(s.n + 1)); }, 120);
+        s.n--;
+        s.timer = setTimeout(step, 1000);
+      };
+      scLow(s);
+      step();
+    }
+    function scStop(s) {
+      if (SC !== s || s.state !== "count") return;
+      clearTimeout(s.timer);
+      s.state = "check";
+      s.el.classList.remove("count");
+      s.el.querySelector(".sc-big").textContent = "";
+      s.okAt = 0; s.key = ""; s.tapped = false;
+      s.el.classList.toggle("ok", s.ready);
+      say("Stopped.");
+      scLow(s);
+    }
+    function scDone(s, now) {
+      if (SC !== s) return;
+      s.state = "done";
+      if (!now) { beep(1046, 450); say("Recording."); }
+      try { navigator.vibrate?.(120); } catch (e) {}
+      const go = s.o.onGo;
+      scClose();
+      go();
+    }
+    function scClose() {
+      const s = SC;
+      if (!s) return;
+      SC = null;
+      cancelAnimationFrame(s.raf);
+      clearTimeout(s.timer);
+      if (s.ls) { s.ls.stop(); s.ls = null; }
+      s.video.srcObject = null;
+      s.el.remove();
+    }
+    window.scBack = () => { if (!SC) return false; const s = SC; if (s.state === "count") scStop(s); else { scClose(); if (s.o.onClose) s.o.onClose(); } return true; };
+
+    // Live form check: "Check my spot" under Place the phone runs the check with the live loop's own landmarks.
+    function liveCheck() {
+      if (!L) return;
+      if (!L.stream) { L.ready = true; drawPlace(); return; }
+      const me = L;
+      setupCheck({ stream: L.stream, mirror: L.face === "user", kind: "shot", view: behind() ? "behind" : "side", title: "Live form check", getLm: () => (L === me ? L.raw : null),
+        onGo: () => { if (L !== me) return; L.ready = true; L.buf = []; L.up = 0; drawPlace(); say("Go. Shoot when you're ready."); } });
+    }
+
+    // Film this rep: the check replaces the old plain countdown, then records as before.
+    const origCmpGo = cmpGo;
+    cmpGo = function () {
+      const C = CMP;
+      if (!C || !C.stream || C.state !== "cam") return origCmpGo.apply(this, arguments);
+      setupCheck({ stream: C.stream, mirror: CO.facing === "user", kind: C.d && C.d.skill === "s" ? "shot" : "body", title: C.d ? C.d.name : "Film this rep",
+        cdKey: "cmpDelay", cdOpts: [5, 10], onGo: () => { if (CMP === C && C.stream && C.state === "cam") cmpRec(); } });
+    };
+    // The move clip recorder: check first, then its own takes.
+    const origCrRun = crRun;
+    crRun = function () {
+      const C = CR;
+      if (!C || !C.stream || C.state !== "idle") return origCrRun.apply(this, arguments);
+      setupCheck({ stream: C.stream, mirror: crFace === "user", kind: "body", title: C.m.n, onGo: () => { if (CR === C) origCrRun(); } });
+    };
+    // A training video: check first, unless someone else is filming.
+    const origRecGo = recGo;
+    recGo = function () {
+      const R2 = CO.rec;
+      if (!R2 || !R2.stream || (R2.mr && R2.mr.state === "recording")) return origRecGo.apply(this, arguments);
+      setupCheck({ stream: R2.stream, mirror: CO.facing === "user", kind: "body", title: "Training video", now: true, onGo: () => { if (CO.rec === R2) origRecGo(); } });
+    };
+
     window.liveBack = () => { if (!L) return false; closeLive(); return true; };
     function closeLive() {
       if (!L) return;
+      scClose();
       const shots = L.shots;
       buLiveEnd().then(id => { if (id) burstOpen(id, 0, true); }); // stops the shot recorders before the camera closes
       cancelAnimationFrame(L.raf);
