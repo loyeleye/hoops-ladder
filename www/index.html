@@ -7620,7 +7620,7 @@ route();
   }
   window.burstBack = () => {
     if (BC) { BC.stop = true; return true; }
-    if (!BV) return false;
+    if (!BV) return BL ? blBack() : false;
     if (BV.pick || BV.cmp != null) { BV.pick = false; BV.cmp = null; buDraw(); return true; }
     if (BV.sel.size) { BV.sel.clear(); buDraw(); return true; }
     burstClose();
@@ -7632,6 +7632,7 @@ route();
     BV.el.querySelectorAll("video").forEach(v => { v.pause(); v.removeAttribute("src"); v.load(); });
     BV.el.remove();
     BV = null;
+    if (BL) return blDraw();
     if (state.tab === "form") render();
   }
   const buCur = () => { const f = BV && burstFind(BV.bid); return f ? f.burst : null; };
@@ -7647,9 +7648,9 @@ route();
     if (oldPanes) oldPanes.remove();
     const nSel = BV.sel.size, selS = S0.filter(s => BV.sel.has(s.id)), allStar = nSel && selS.every(s => s.star), selV = selS.filter(s => s.v), allKeep = selV.length && selV.every(s => s.keep);
     BV.el.innerHTML = `<div class="lf-top"><div class="lf-title">Shot ${cur.n} <span style="opacity:.7">of ${S0.length} · ${esc(buDay(B.t))}</span></div>
-      <button class="btn sec small" data-bv="close">Done</button></div>
+      ${S0.length > 1 ? `<button class="bl-ib" data-bv="lib" aria-label="All shots">${BLI.grid}</button>` : ""}<button class="btn sec small" data-bv="close">Done</button></div>
       <div class="bu-panes" data-swipe="1">${pane(cur, other ? `Shot ${cur.n}` : "")}${other ? pane(other, `Shot ${other.n}`) : ""}</div>
-      <div class="bu-m">${cur.m.map(m => `<span class="${m.st}">${esc(m.l)} · ${esc(m.v)}</span>`).join("")}</div>
+      <div class="bu-m">${cur.m.map(m => `<span class="${m.st}">${buGlyph(m.st)}${esc(m.l)} · ${esc(m.v)}</span>`).join("")}</div>
       <div class="bu-row">${[[1, "1×"], [.5, "½×"], [.25, "¼×"]].map(([r, l]) => `<button class="btn sec small" data-bv="rate:${r}" aria-pressed="${BV.rate === r}">${l}</button>`).join("")}
         ${cur.at ? `<button class="btn sec small" data-bv="jump:p">Dip</button><button class="btn sec small" data-bv="jump:sp">Set point</button><button class="btn sec small" data-bv="jump:r">Release</button>` : ""}<button class="btn sec small" data-bv="play">Pause</button></div>
       <div class="bu-strip" role="listbox" aria-label="Shots">${S0.map((s, j) => `<button class="bu-chip ${worstOf(s)}${s.v ? "" : " nov"}${BV.sel.has(s.id) ? " sel" : ""}" data-bv="shot:${j}" aria-current="${j === BV.i}" aria-label="Shot ${s.n}${s.star ? ", starred" : ""}${s.v ? "" : ", no video"}">${s.n}${s.star ? '<span class="st">★</span>' : ""}</button>`).join("")}</div>
@@ -7774,6 +7775,7 @@ route();
     const [k, x] = b.dataset.bv.split(/:(.*)/), B = buCur(), cur = B.shots[BV.i];
     if (k !== "del" && k !== "sdel") BV.delAsk = false;
     if (k === "close") return burstClose();
+    if (k === "lib") { const id = BV.bid, i = BV.i, under = BL && BL.bid === id; burstClose(); return under ? undefined : burstLib(id, i); }
     if (k === "shot") {
       if (BV.held) { BV.held = false; return; }
       const j = +x;
@@ -7790,7 +7792,7 @@ route();
     if (k === "selstart") { BV.sel.add(cur.id); BV.cmp = null; BV.pick = false; return buDraw(); }
     if (k === "sstar" || k === "skeep") {
       const sel = B.shots.filter(s => BV.sel.has(s.id) && (k === "sstar" || s.v));
-      if (k === "sstar") { const on = !sel.every(s => s.star); sel.forEach(s => (s.star = on)); }
+      if (k === "sstar") { const on = !sel.every(s => s.star); sel.forEach(s => { s.star = on; if (on) s.keep = true; }); }
       else { const on = !sel.every(s => s.keep); sel.forEach(s => (s.keep = on)); }
       persist(); return buDraw();
     }
@@ -7804,7 +7806,7 @@ route();
       await loadVids();
       return BV && buDraw();
     }
-    if (k === "star") { cur.star = !cur.star; persist(); return buDraw(); }
+    if (k === "star") { cur.star = !cur.star; if (cur.star) cur.keep = true; persist(); return buDraw(); } // a star always keeps the shot too
     if (k === "keep") { cur.keep = !cur.keep; persist(); return buDraw(); }
     if (k === "cmp") {
       if (BV.cmp != null || BV.pick) { BV.cmp = null; BV.pick = false; return buDraw(); }
@@ -7823,6 +7825,532 @@ route();
       return buDraw();
     }
     if (k === "act") { const a = BURST_ACTIONS.find(y => y.id === x); if (a) try { await a.run(B, BV.sel.size ? B.shots.filter(s => BV.sel.has(s.id)) : [cur]); } catch (er) {} return BV && buDraw(); }
+  }
+
+  /* -- the shot library: every shot of a burst in a grid, to pick what to keep, send to a coach or delete --
+     Each tile shows the focus cue (the cue with the most Fix grades, or the one picked) in colour and shape, so a
+     whole session reads at a glance and shots compare on the same thing. Filters: ★, Kept, Make/Miss and grade on
+     the focus cue; sort by shot order or worst/best on it. Select several (Select, or hold a tile) to Keep, ★, Send to
+     coach or Delete video. Deleting asks first, with counts, never touches kept shots, and can be undone for a few
+     seconds. Quick pick plays one shot at a time: Skip, ★ or Keep (or swipe the video), and an optional Make/Miss.
+     ★ always keeps the shot too. Thumbnails are made once from each shot's video at the release, cropped to the
+     shooter, and stay at blobs[shotId+":th"] after the video goes. See docs/LEARNING.md, step 30. */
+  function buGlyph(st) {
+    return `<svg class="bl-gl ${st}" viewBox="0 0 12 12" aria-hidden="true">${st === "fix" ? '<rect x="1" y="1" width="10" height="10" rx="2"/>' : st === "watch" ? '<path d="M6 .8 11.4 10.8H.6Z"/>' : '<circle cx="6" cy="6" r="5.2"/>'}</svg>`;
+  }
+  const BLI = {
+    star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.5L12 17.2l-5.9 3.2 1.3-6.5L2.5 9.3l6.6-.8z"/></svg>',
+    keep: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.5h12a1 1 0 0 1 1 1v18l-7-4.6-7 4.6v-18a1 1 0 0 1 1-1z"/></svg>',
+    back: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    grid: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>',
+    trash: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    gone: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h12v10H3zM15 10l5-3v10l-5-3M2 3l20 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  const blst = document.createElement("style");
+  blst.textContent = `
+.bul{gap:0}.bul .lf-top{justify-content:flex-start}.bul .lf-top .lf-title{flex:1;min-width:0}
+.bl-ib{flex:none;width:44px;height:44px;border-radius:12px;border:1px solid #2A3858;background:#1C2844;color:#F2F5FA;display:flex;align-items:center;justify-content:center;padding:0}
+.bl-ib svg{width:22px;height:22px;fill:currentColor}
+.bl-sub{display:block;font-family:var(--body,inherit);font-size:13px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-chips{display:flex;gap:6px;overflow-x:auto;padding:4px 12px;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+.bl-chip{flex:none;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid #2A3858;background:#1C2844;color:#F2F5FA;font:600 14px var(--body,inherit);display:flex;align-items:center;gap:6px}
+.bl-chip[aria-pressed="true"]{background:#F2F5FA;color:#05080F;border-color:#F2F5FA}.bl-chip svg{width:15px;height:15px;fill:currentColor}.bl-chip .c{opacity:.7}
+.bl-chip.st svg{fill:#FFD34D}.bl-chip.st[aria-pressed="true"] svg{fill:#9a6a00}
+.bl-row{display:flex;gap:6px;padding:4px 12px;align-items:center}
+.bl-sel{flex:1;min-width:0;min-height:40px;border-radius:10px;border:1px solid #2A3858;background:#1C2844;color:#F2F5FA;font:600 14px var(--body,inherit);padding:0 8px}
+.bl-gb{display:flex;gap:4px;padding:4px 12px}
+.bl-gb button{min-width:0;min-height:40px;border-radius:10px;border:1px solid #2A3858;background:#111a2c;color:#F2F5FA;font:700 14px var(--body,inherit);display:flex;align-items:center;justify-content:center;gap:6px;padding:0 6px;white-space:nowrap;overflow:hidden}
+.bl-gb button.fix{border-bottom:4px solid #E0533F}.bl-gb button.watch{border-bottom:4px solid #E8A317}.bl-gb button.good{border-bottom:4px solid #2FB377}
+.bl-gb button[aria-pressed="true"]{background:#F2F5FA;color:#05080F}
+.bl-gl{width:12px;height:12px;flex:none}.bl-gl.fix{fill:#E0533F}.bl-gl.watch{fill:#E8A317}.bl-gl.good{fill:#2FB377}
+.bl-note{font-size:13px;opacity:.8;padding:4px 16px 6px;margin:0}.bl-note .linkbtn{color:#F07A35;font-weight:700;opacity:1;min-height:32px}
+.bl-grid{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:2px 12px 12px;align-content:start;grid-auto-rows:max-content}
+.bl-t{position:relative;display:block;padding:0;border:0;border-radius:10px;overflow:hidden;background:#111a2c;color:#F2F5FA;text-align:left;font:inherit}
+.bl-t::after{content:"";position:absolute;inset:0;border-radius:10px;border:1px solid #2A3858;pointer-events:none}
+.bl-t.sel::after{border:3px solid #F07A35}
+.bl-t .th{display:block;aspect-ratio:3/3.4;background:#141c2e;position:relative}
+.bl-t .th img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .15s}.bl-t .th img.on{opacity:1}
+.bl-t .th::before{content:"";position:absolute;inset:0 0 auto;height:40px;background:linear-gradient(rgba(5,8,15,.6),transparent);z-index:1}
+.bl-t.nov .th img{opacity:.35;filter:grayscale(1)}
+.bl-t .gone{position:absolute;inset:auto 0 8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;font-weight:600;color:#AEB8CC;z-index:1}.bl-t .gone svg{width:22px;height:22px}
+.bl-t .no{position:absolute;left:5px;top:5px;z-index:2;display:flex;align-items:center;gap:4px;min-width:26px;height:24px;padding:0 6px;border-radius:7px;font:700 16px var(--display);justify-content:center}
+.bl-t.fix .no{background:#7A2318}.bl-t.watch .no{background:#5A3F06}.bl-t.good .no{background:#145C3C}
+.bl-t .no i{width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(242,245,250,.75);display:block}
+.bl-t.sel .no{background:#F07A35;color:#1A0C03}.bl-t.sel .no i{border:0;background:none}.bl-t .no svg{width:14px;height:14px}
+.bl-t .mk{position:absolute;right:5px;top:5px;z-index:2;display:flex;gap:3px}.bl-t .mk svg{width:20px;height:20px;filter:drop-shadow(0 1px 2px #000)}
+.bl-t .mk .s{fill:#FFD34D}.bl-t .mk .k{fill:#F2F5FA}
+.bl-t .mm{position:absolute;right:5px;bottom:34px;z-index:2;font:800 12px var(--body,inherit);border-radius:6px;padding:1px 6px;background:rgba(5,8,15,.8)}
+.bl-t .mm.y{color:#7FE0AE}.bl-t .mm.n{color:#FF9A8A}
+.bl-t .bl-cue{display:flex;align-items:center;gap:6px;padding:6px 7px;font:600 12.5px var(--body,inherit);color:#D6DDEA;white-space:nowrap;overflow:hidden}
+.bl-empty{grid-column:1/-1;text-align:center;opacity:.8;padding:36px 12px;font-size:14px}
+.bl-bar{display:flex;gap:6px;padding:10px 12px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid #1C2844;background:#070b14}
+.bl-bar .btn{flex:1;min-width:0;min-height:48px;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px}
+.bl-bar .btn svg{width:18px;height:18px;fill:currentColor;flex:none}.bl-bar .btn.st svg{fill:#FFD34D}
+.bl-bar .btn.danger{flex:0 0 52px;background:transparent;border:1px solid #6E2A22;color:#FF8A78}
+.bl-bar .btn.pri,.bl-bar .btn:not(.sec){background:#F07A35;color:#1A0C03;border:0}
+.bl-snack{position:absolute;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;align-items:center;gap:10px;background:#F2F5FA;color:#05080F;border-radius:12px;padding:6px 6px 6px 14px;font-weight:600;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.bl-snack span{flex:1}.bl-snack button{min-height:40px;border:0;background:none;color:#B4470F;font:700 15px var(--display);text-transform:uppercase;padding:0 12px}
+.bl-ask{position:absolute;inset:0;z-index:6;background:rgba(5,8,15,.6);display:flex;align-items:flex-end}
+.bl-ask>div{width:100%;background:#0E1526;border-top:1px solid #2A3858;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.bl-ask b{font-family:var(--display);font-size:22px;text-transform:uppercase;display:block}.bl-ask p{margin:8px 0 14px;font-size:14.5px;opacity:.85}
+.bl-ask .bl-bar{border:0;background:none;padding:0}
+.bl-ask .btn.danger{flex:1;background:#C13C2A;color:#fff;border:0}
+.qp-card{position:relative;flex:1;min-height:0;margin:2px 12px 0;border-radius:14px;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center;touch-action:pan-y;will-change:transform}
+.qp-card video,.qp-card canvas{position:absolute}
+.qp-card .qp-no{position:absolute;left:10px;top:10px;z-index:2;font:700 20px var(--display);border-radius:8px;padding:2px 10px}
+.qp-card .qp-no.fix{background:#7A2318}.qp-card .qp-no.watch{background:#5A3F06}.qp-card .qp-no.good{background:#145C3C}
+.qp-card .qp-rate{position:absolute;right:10px;top:10px;z-index:2;min-height:36px;border-radius:999px;border:0;background:rgba(5,8,15,.75);color:#F2F5FA;font-weight:700;padding:0 12px}
+.qp-stamp{position:absolute;top:40%;z-index:3;font:700 34px var(--display);text-transform:uppercase;border:4px solid;border-radius:12px;padding:2px 14px;opacity:0;pointer-events:none}
+.qp-stamp.k{left:18px;color:#F07A35;transform:rotate(-12deg)}.qp-stamp.s{right:18px;color:#AEB8CC;transform:rotate(12deg)}
+.qp-mm{display:flex;align-items:center;gap:6px;justify-content:center;padding:8px 12px 0;font-size:13.5px}
+.qp-mm .bl-chip{min-height:40px}
+.qp-act{display:flex;gap:8px;padding:8px 12px 0}.qp-act .btn{flex:1;min-height:60px;font-size:20px;display:flex;align-items:center;justify-content:center;gap:6px}
+.qp-act .btn.st{flex:.6;background:#1C2844;border:1px solid #FFD34D;color:#FFD34D}.qp-act .btn.st svg{width:26px;height:26px;fill:#FFD34D}
+.qp-act .btn.st[aria-pressed="true"]{background:#FFD34D;color:#1A0C03}.qp-act .btn.st[aria-pressed="true"] svg{fill:#1A0C03}
+.qp-end{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px;gap:8px}
+.qp-end b{font-family:var(--display);font-size:28px;text-transform:uppercase}
+.bul .bu-m{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:6px 12px 0}.bul .bu-m span{font-size:12.5px;border-radius:999px;padding:4px 10px;background:#1C2844}
+.bul .bu-m span.fix{background:#C13C2A}.bul .bu-m span.watch{background:#6b4a05}.bul .bu-m span.good{background:#17704A}.bul .bu-none{opacity:.8;font-size:14px;padding:16px;text-align:center}
+.bul .bu-m span .bl-gl,.buv .bu-m span .bl-gl{margin-right:5px;vertical-align:-1px}.buv .bu-m span.good{background:#17704A}
+.bu-m span .bl-gl.fix,.bu-m span .bl-gl.watch,.bu-m span .bl-gl.good{fill:#fff}
+@media (prefers-reduced-motion:reduce){.bl-t .th img{transition:none}.qp-card{transition:none!important}}`;
+  document.head.appendChild(blst);
+
+  let BL = null; // the open library: {bid, el, mode:"grid"|"pick", f, g, sort, cue, sel:Set, selOn, from, qi, q, hist, pend, snack, ask, rate}
+  const blKept = s => !!(s.keep || s.star || s.sent);
+  const blCur = () => { const f = BL && burstFind(BL.bid); return f ? f.burst : null; };
+  const blRM = (typeof matchMedia === "function") && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function burstLib(id, from) {
+    if (!burstFind(id)) return;
+    if (BL) blClose();
+    const el = document.createElement("div");
+    el.className = "livefc bul";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-label", "Shot library");
+    document.body.appendChild(el);
+    BL = { bid: id, el, mode: "grid", f: "all", g: null, sort: "n", cue: null, sel: new Set(), selOn: false, from: from == null ? null : from, qi: 0, q: [], hist: [], pend: null, snack: null, ask: null, rate: .5 };
+    el.addEventListener("click", blClick);
+    el.addEventListener("change", blChange);
+    el.addEventListener("pointerdown", blPress);
+    blDraw();
+    if (from != null) requestAnimationFrame(() => { const t = BL && BL.el.querySelector(`[data-shot-n="${from}"]`); if (t) t.scrollIntoView({ block: "center" }); });
+  }
+  window.burstLib = burstLib;
+  function blClose(reopen) {
+    if (!BL) return;
+    const my = BL;
+    blFlush(my);
+    blStopQ(my);
+    if (my.io) my.io.disconnect();
+    my.el.remove();
+    BL = null;
+    if (reopen && my.from != null) return burstOpen(my.bid, my.from);
+    if (state.tab === "form") render();
+  }
+  function blBack() {
+    if (!BL) return false;
+    if (BL.ask) { BL.ask = null; blDraw(); return true; }
+    if (BL.mode === "pick") { blStopQ(BL); BL.mode = "grid"; BL.snack = null; blDraw(); return true; }
+    if (BL.selOn) { BL.selOn = false; BL.sel.clear(); blDraw(); return true; }
+    blClose(true);
+    return true;
+  }
+  // the focus cue: the one picked, else the cue graded Fix most often in this burst
+  function blCue(B) {
+    const ks = [];
+    for (const s of B.shots) for (const m of s.m) if (!ks.includes(m.k)) ks.push(m.k);
+    if (BL.cue && ks.includes(BL.cue)) return BL.cue;
+    let best = ks[0], n = -1;
+    for (const k of ks) { const c = B.shots.filter(s => s.st && s.st[k] === "fix").length * 2 + B.shots.filter(s => s.st && s.st[k] === "watch").length; if (c > n) { n = c; best = k; } }
+    return best;
+  }
+  const blSt = (s, k) => (s.st && s.st[k]) || (s.m.find(m => m.k === k) || {}).st || null;
+  const RK = { fix: 2, watch: 1, good: 0 };
+  function blList(B, cue, noGrade) {
+    let L = B.shots.slice();
+    const f = BL.f;
+    if (f === "star") L = L.filter(s => s.star);
+    else if (f === "kept") L = L.filter(blKept);
+    else if (f === "make") L = L.filter(s => s.mk === 1);
+    else if (f === "miss") L = L.filter(s => s.mk === 0);
+    if (BL.g && !noGrade) L = L.filter(s => blSt(s, cue) === BL.g);
+    if (BL.sort !== "n") {
+      const good = B.shots.filter(s => blSt(s, cue) === "good").map(s => s.vals && s.vals[cue]).filter(x => typeof x === "number");
+      const mid = good.length ? med(good) : 0;
+      const score = s => { const st = blSt(s, cue); if (!st) return -1; const x = s.vals && s.vals[cue]; return RK[st] * 1e6 + (typeof x === "number" ? Math.min(999999, Math.abs(x - mid) * 1000) : 0); };
+      L.sort((a, b) => (BL.sort === "worst" ? score(b) - score(a) : (score(a) < 0) - (score(b) < 0) || score(a) - score(b)) || a.n - b.n);
+    }
+    return L;
+  }
+  function blTile(s, cue) {
+    const st = blSt(s, cue) || worstOf(s), m = s.m.find(x => x.k === cue), sel = BL.sel.has(s.id);
+    const lab = `Shot ${s.n}${s.star ? ", starred" : ""}${s.keep || s.sent ? ", kept" : ""}${s.mk === 1 ? ", make" : s.mk === 0 ? ", miss" : ""}, ${st}${m ? ": " + m.l + " " + m.v : ""}${s.v ? "" : ", no video"}${BL.selOn ? (sel ? ", selected" : ", not selected") : ""}`;
+    return `<button class="bl-t ${st}${s.v ? "" : " nov"}${sel ? " sel" : ""}" data-bl="t:${s.id}" data-shot-n="${s.n - 1}" aria-label="${esc(lab)}"${BL.selOn ? ` aria-pressed="${sel}"` : ""}>
+      <span class="th"><img data-th="${s.id}" alt="">${s.v ? "" : `<span class="gone">${BLI.gone}${s.gone ? "Video deleted" : "No video"}</span>`}</span>
+      <span class="no">${BL.selOn ? (sel ? BLI.check : "<i></i>") : ""}${s.n}</span>
+      <span class="mk">${s.star ? BLI.star.replace("<svg", '<svg class="s"') : ""}${s.keep || s.sent ? BLI.keep.replace("<svg", '<svg class="k"') : ""}</span>
+      ${s.mk === 1 ? '<span class="mm y">Make</span>' : s.mk === 0 ? '<span class="mm n">Miss</span>' : ""}
+      <span class="bl-cue">${buGlyph(st)}${esc(m ? m.v : "No reading")}</span></button>`;
+  }
+  function blDraw() {
+    const B = blCur();
+    if (!B) return blClose();
+    if (BL.mode === "pick") return qpDraw(B);
+    const g0 = BL.el.querySelector(".bl-grid"), sy = g0 ? g0.scrollTop : null;
+    const S0 = B.shots, cue = blCue(B), list = blList(B, cue), cues = [];
+    for (const s of S0) for (const m of s.m) if (!cues.find(c => c.k === m.k)) cues.push(m);
+    const base = blList(B, cue, true), gc = { fix: 0, watch: 0, good: 0 };
+    for (const s of base) { const st = blSt(s, cue); if (st) gc[st]++; }
+    const nStar = S0.filter(s => s.star).length, nKept = S0.filter(blKept).length, nMk = S0.filter(s => s.mk === 1).length, nMs = S0.filter(s => s.mk === 0).length;
+    const sz = buSizes(), mb = buBytes(B, sz), exp = B.t + BU.KEEP_DAYS * 864e5;
+    const unk = S0.filter(s => s.v && !blKept(s)), unkB = buBytes({ shots: unk }, sz);
+    const sel = S0.filter(s => BL.sel.has(s.id)), nSel = sel.length;
+    const chip = (f, lab, n, cls) => `<button class="bl-chip${cls ? " " + cls : ""}" data-bl="f:${f}" aria-pressed="${BL.f === f}">${lab}${n != null ? ` <span class="c">${n}</span>` : ""}</button>`;
+    const top = BL.selOn
+      ? `<div class="lf-top"><button class="bl-ib" data-bl="back" aria-label="Stop selecting">${BLI.back}</button><div class="lf-title">${nSel} selected<span class="bl-sub">Tap shots to add or remove them</span></div></div>`
+      : `<div class="lf-top"><button class="bl-ib" data-bl="back" aria-label="Back">${BLI.back}</button><div class="lf-title">Shot library<span class="bl-sub">${esc(buDay(B.t))} · ${S0.length} shot${S0.length > 1 ? "s" : ""}${mb ? " · " + fmtMB(mb) : ""}</span></div></div>`;
+    const note = BL.selOn
+      ? `<p class="bl-note"><button class="linkbtn" data-bl="all">Select all ${list.length} shown</button>${nSel ? ` · <button class="linkbtn" data-bl="none">Clear</button>` : ""}${nSel && sel.some(s => !list.includes(s)) ? ` · ${sel.filter(s => !list.includes(s)).length} not shown` : ""}</p>`
+      : unk.length && Date.now() < exp ? `<p class="bl-note">${unk.length} unkept video${unk.length > 1 ? "s" : ""} delete on ${esc(buDay(exp))}. ★ or Keep the ones you want. ${unkB ? `<button class="linkbtn" data-bl="free">Free ${fmtMB(unkB)} now</button>` : ""}</p>`
+      : `<p class="bl-note">Tap a shot to watch it. Hold one to select several.</p>`;
+    const allStar = nSel && sel.every(s => s.star), sendN = sel.filter(s => s.v).length;
+    const bar = BL.selOn
+      ? `<div class="bl-bar"><button class="btn pri small" data-bl="keep"${nSel ? "" : " disabled"}>${BLI.keep}${nSel && sel.every(s => s.keep || s.star) ? `Unkeep ${nSel}` : `Keep ${sel.filter(s => !s.keep && !s.star).length}`}</button>
+          <button class="btn sec small st" data-bl="star"${nSel ? "" : " disabled"} aria-pressed="${!!allStar}">${BLI.star}${allStar ? "Unstar" : "Star"}</button>
+          ${typeof sendShots === "function" ? `<button class="btn sec small" data-bl="send"${sendN ? "" : " disabled"}>Coach${sendN ? " · " + sendN : ""}</button>` : ""}
+          <button class="btn sec small danger" data-bl="del" aria-label="Delete video"${nSel ? "" : " disabled"}>${BLI.trash}</button></div>`
+      : `<div class="bl-bar"><button class="btn sec small" data-bl="select">Select</button><button class="btn pri small" data-bl="pick">Quick pick ▸</button></div>`;
+    BL.el.innerHTML = `${top}
+      <div class="bl-chips">${chip("all", "All", S0.length)}${chip("star", BLI.star + "Starred", nStar, "st")}${chip("kept", BLI.keep + "Kept", nKept)}${nMk || nMs ? chip("make", "Make", nMk) + chip("miss", "Miss", nMs) : ""}</div>
+      <div class="bl-row"><select class="bl-sel" data-bl="cue" aria-label="Focus cue">${cues.map(c => `<option value="${esc(c.k)}"${c.k === cue ? " selected" : ""}>Focus: ${esc(c.l)}</option>`).join("")}</select>
+        <select class="bl-sel" data-bl="sort" aria-label="Sort" style="flex:0 0 auto">${[["n", "Shot order"], ["worst", "Worst first"], ["best", "Best first"]].map(([v, l]) => `<option value="${v}"${BL.sort === v ? " selected" : ""}>${l}</option>`).join("")}</select></div>
+      <div class="bl-gb" role="group" aria-label="Grade on the focus cue">${["fix", "watch", "good"].map(st => `<button class="${st}" data-bl="g:${st}" aria-pressed="${BL.g === st}" style="flex:${Math.max(gc[st], 1) + base.length * .12}">${buGlyph(st)}${st === "fix" ? "Fix" : st === "watch" ? "Watch" : "Good"} ${gc[st]}</button>`).join("")}</div>
+      ${note}
+      <div class="bl-grid" role="list">${list.length ? list.map(s => blTile(s, cue)).join("") : `<div class="bl-empty">${BL.f === "kept" ? "No kept shots yet. Quick pick goes through them one at a time." : BL.f === "star" ? "No starred shots yet." : BL.g === "fix" ? "No Fix shots on this cue. Nice work." : "No shots match."}</div>`}</div>
+      ${bar}
+      ${BL.snack ? `<div class="bl-snack" role="status"><span>${esc(BL.snack)}</span><button data-bl="undo">Undo</button></div>` : ""}
+      ${BL.ask ? `<div class="bl-ask" data-bl="askbg"><div role="alertdialog" aria-label="${esc(BL.ask.t)}"><b>${esc(BL.ask.t)}</b><p>${esc(BL.ask.p)}</p><div class="bl-bar"><button class="btn sec small" data-bl="askno">Cancel</button><button class="btn small danger" data-bl="askyes">Delete video</button></div></div></div>` : ""}`;
+    const g = BL.el.querySelector(".bl-grid");
+    if (g && sy != null) g.scrollTop = sy;
+    blThumbs();
+  }
+
+  /* thumbnails: one hidden video, one shot at a time, nearest the screen first */
+  const TH = {};
+  let thQ = [], thBusy = false, thVid = null;
+  function blThumbs() {
+    if (!BL) return;
+    if (BL.io) BL.io.disconnect();
+    const B = blCur(), by = {};
+    for (const s of B.shots) by[s.id] = s;
+    const io = BL.io = new IntersectionObserver(es => {
+      for (const e of es) {
+        if (!e.isIntersecting) continue;
+        io.unobserve(e.target);
+        const s = by[e.target.dataset.th];
+        if (s) thWant(s, e.target);
+      }
+    }, { root: BL.el.querySelector(".bl-grid"), rootMargin: "300px 0px" });
+    BL.el.querySelectorAll("img[data-th]").forEach(img => { const u = TH[img.dataset.th]; if (u) { img.src = u; img.classList.add("on"); } else io.observe(img); });
+  }
+  function thWant(s, img) {
+    if (TH[s.id]) { img.src = TH[s.id]; img.classList.add("on"); return; }
+    thQ.push([s, img]);
+    thRun();
+  }
+  async function thRun() {
+    if (thBusy) return;
+    thBusy = true;
+    while (thQ.length && BL && BL.mode === "grid") {
+      const [s, img] = thQ.pop();
+      if (!img.isConnected && !TH[s.id]) continue;
+      if (!TH[s.id]) {
+        try {
+          let b = await vtx("readonly", (m, bl) => rq(bl.get(s.id + ":th")));
+          if (!b && s.v) { b = await thMake(s); if (b) await vtx("readwrite", (m, bl) => { bl.put(b, s.id + ":th"); }).catch(() => {}); }
+          if (b && !TH[s.id]) TH[s.id] = URL.createObjectURL(b);
+        } catch (e) {}
+      }
+      const live = TH[s.id] && BL && BL.el.querySelector(`img[data-th="${s.id}"]`);
+      if (live) { live.onload = () => live.classList.add("on"); live.src = TH[s.id]; }
+    }
+    thBusy = false;
+  }
+  async function thMake(s) {
+    const url = await burstShotUrl(s);
+    if (!url) return null;
+    const v = thVid || (thVid = Object.assign(document.createElement("video"), { muted: true, playsInline: true, preload: "auto" }));
+    v.src = url;
+    if (v.readyState < 2) await buOnce(v, "loadeddata", 3000);
+    const t = Math.max(s.a || 0, Math.min(s.r || 0, (s.b || 1) - .05));
+    await buSeekTo(v, t);
+    const vw = v.videoWidth, vh = v.videoHeight;
+    if (!vw) return null;
+    const W = 180, H = 204, c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    let ch = vh, cw = ch * W / H;
+    if (cw > vw) { cw = vw; ch = cw * H / W; }
+    let cx = (vw - cw) / 2, cy = (vh - ch) / 2, lm = null, k = 1;
+    const pf = await burstShotFrames(s);
+    if (pf && pf.f && pf.cw) {
+      k = vw / pf.cw;
+      const i = Math.round((t - pf.t0) * pf.fps);
+      for (let d = 0; d < 4 && !lm; d++) lm = unpack(pf.f[i - d] || null) || unpack(pf.f[i + d] || null);
+      const P = lm ? lm.filter(p => p && p.v > .3) : [];
+      if (P.length > 4) { // crop to the shooter, with room around
+        const xs = P.map(p => p.x * k), ys = P.map(p => p.y * k);
+        const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+        ch = Math.min(vh, Math.max((y1 - y0) * 1.3, (x1 - x0) * 1.3 * H / W, vh * .3)); cw = ch * W / H;
+        if (cw > vw) { cw = vw; ch = cw * H / W; }
+        cx = Math.max(0, Math.min(vw - cw, (x0 + x1) / 2 - cw / 2)); cy = Math.max(0, Math.min(vh - ch, (y0 + y1) / 2 - ch / 2));
+      }
+    }
+    const g = c.getContext("2d");
+    g.drawImage(v, cx, cy, cw, ch, 0, 0, W, H);
+    if (lm) {
+      g.lineCap = "round"; g.lineWidth = 2; g.strokeStyle = "rgba(255,255,255,.8)";
+      const X = p => (p.x * k - cx) * W / cw, Y = p => (p.y * k - cy) * H / ch;
+      for (const [a, b] of BONES) { const A = lm[a], Z = lm[b]; if (!A || !Z || A.v < .3 || Z.v < .3) continue; g.beginPath(); g.moveTo(X(A), Y(A)); g.lineTo(X(Z), Y(Z)); g.stroke(); }
+    }
+    return new Promise(r => c.toBlob(r, "image/jpeg", .72));
+  }
+
+  /* hold a tile to start selecting */
+  function blPress(e) {
+    const t = e.target.closest("[data-bl^='t:']");
+    if (t && BL && BL.mode === "grid") {
+      clearTimeout(BL.hold);
+      BL.held = false;
+      const up = () => { clearTimeout(BL && BL.hold); t.removeEventListener("pointerup", up); t.removeEventListener("pointerleave", up); t.removeEventListener("pointercancel", up); };
+      t.addEventListener("pointerup", up); t.addEventListener("pointerleave", up); t.addEventListener("pointercancel", up);
+      BL.hold = setTimeout(() => {
+        if (!BL) return;
+        BL.held = true;
+        const id = t.dataset.bl.slice(2);
+        if (!BL.selOn) { BL.selOn = true; BL.sel.clear(); }
+        if (BL.sel.has(id)) BL.sel.delete(id); else BL.sel.add(id);
+        try { navigator.vibrate?.(15); } catch (er) {}
+        blDraw();
+      }, 500);
+      return;
+    }
+    if (BL && BL.mode === "pick" && e.target.closest(".qp-card")) qpDrag(e);
+  }
+  function blChange(e) {
+    const s = e.target.closest("[data-bl]");
+    if (!s || !BL) return;
+    if (s.dataset.bl === "cue") { BL.cue = s.value; BL.g = null; }
+    if (s.dataset.bl === "sort") BL.sort = s.value;
+    const g = BL.el.querySelector(".bl-grid");
+    if (g) g.scrollTop = 0;
+    blDraw();
+  }
+  // soft delete: the videos go when the Undo note closes (or the library does)
+  function blSoftDel(B, shots, what) {
+    if (BL.pend) blFlush(BL);
+    const P = shots.map(s => [s, s.v]);
+    for (const s of shots) { s.v = null; s.gone = 1; }
+    persist();
+    BL.sel.clear(); BL.selOn = false;
+    BL.pend = { P, timer: setTimeout(() => blFlush(BL && BL.pend && BL.pend.P === P ? BL : null), 6000) };
+    BL.snack = what;
+    blDraw();
+  }
+  function blFlush(my) {
+    const p = my && my.pend;
+    if (!p) return;
+    clearTimeout(p.timer);
+    my.pend = null; my.snack = null;
+    buDrop(p.P.map(x => x[1]), []).then(() => loadVids());
+    if (BL === my) blDraw();
+  }
+  async function blClick(e) {
+    const b = e.target.closest("[data-bl]");
+    if (!b || !BL || b.tagName === "SELECT") return;
+    const [k, x] = b.dataset.bl.split(/:(.*)/), B = blCur();
+    if (!B) return;
+    if (BL.mode === "pick") return qpClick(k, x, B, b);
+    const sel = () => B.shots.filter(s => BL.sel.has(s.id));
+    if (k === "back") return blBack();
+    if (k === "t") {
+      if (BL.held) { BL.held = false; return; }
+      if (BL.selOn) { if (BL.sel.has(x)) BL.sel.delete(x); else BL.sel.add(x); return blDraw(); }
+      const j = B.shots.findIndex(s => s.id === x);
+      BL.from = null;
+      blFlush(BL);
+      return burstOpen(B.id, j);
+    }
+    if (k === "f") { BL.f = BL.f === x && x !== "all" ? "all" : x; return blDraw(); }
+    if (k === "g") { BL.g = BL.g === x ? null : x; return blDraw(); }
+    if (k === "select") { BL.selOn = true; return blDraw(); }
+    if (k === "all") { for (const s of blList(B, blCue(B))) BL.sel.add(s.id); return blDraw(); }
+    if (k === "none") { BL.sel.clear(); return blDraw(); }
+    if (k === "keep") {
+      const S = sel(), on = !S.every(s => s.keep || s.star);
+      for (const s of S) { s.keep = on; if (!on) s.star = false; } // unkeeping a starred shot unstars it: a star always keeps
+      persist(); BL.snack = null; return blDraw();
+    }
+    if (k === "star") {
+      const S = sel(), on = !S.every(s => s.star);
+      for (const s of S) { s.star = on; if (on) s.keep = true; }
+      persist(); return blDraw();
+    }
+    if (k === "send") { const S = sel().filter(s => s.v); if (S.length) { try { await sendShots(B, S); } catch (er) {} } return BL && blDraw(); }
+    if (k === "del") {
+      const S = sel().filter(s => s.v), T = S.filter(s => !s.keep && !s.star), kept = S.length - T.length;
+      if (!T.length) { toast("Nothing deleted", kept ? "Every selected shot is kept. Unkeep them first." : "These shots have no video."); return; }
+      BL.ask = { t: `Delete video for ${T.length} shot${T.length > 1 ? "s" : ""}?`, p: `${kept ? `${kept} kept shot${kept > 1 ? "s" : ""} won't be touched. ` : ""}Their numbers and form readings stay. You can undo for a few seconds.`, shots: T };
+      return blDraw();
+    }
+    if (k === "free") {
+      const T = B.shots.filter(s => s.v && !blKept(s)), nk = B.shots.filter(s => s.v && blKept(s)).length;
+      if (!T.length) return;
+      BL.ask = { t: `Free ${fmtMB(buBytes({ shots: T }, buSizes()))} now?`, p: `This deletes the video of the ${T.length} shot${T.length > 1 ? "s" : ""} with no ★ or Keep.${nk ? ` Your ${nk} kept shot${nk > 1 ? "s" : ""} stay.` : ""} Their numbers and form readings stay. You can undo for a few seconds.`, shots: T };
+      return blDraw();
+    }
+    if (k === "askno" || (k === "askbg" && e.target === b)) { BL.ask = null; return blDraw(); }
+    if (k === "askyes") { const T = BL.ask.shots; BL.ask = null; return blSoftDel(B, T, `Video deleted for ${T.length} shot${T.length > 1 ? "s" : ""}`); }
+    if (k === "undo") {
+      const p = BL.pend;
+      if (p) { clearTimeout(p.timer); for (const [s, v] of p.P) { s.v = v; delete s.gone; } persist(); BL.pend = null; }
+      BL.snack = null; return blDraw();
+    }
+    if (k === "pick") { BL.mode = "pick"; BL.q = blList(B, blCue(B)).map(s => s.id); BL.qi = 0; BL.hist = []; BL.snack = null; blFlush(BL); return blDraw(); }
+  }
+
+  /* -- Quick pick: one shot at a time -- */
+  function blStopQ(my) {
+    if (!my) return;
+    cancelAnimationFrame(my.raf);
+    const v = my.el.querySelector(".qp-card video");
+    if (v) { v.pause(); v.removeAttribute("src"); v.load(); }
+  }
+  function qpDraw(B) {
+    blStopQ(BL);
+    const ids = BL.q.filter(id => B.shots.some(s => s.id === id)), N = ids.length, cue = blCue(B);
+    const nKept = B.shots.filter(blKept).length;
+    const last = BL.hist[BL.hist.length - 1];
+    const undo = last ? `<button class="btn sec small" data-bl="qundo">↶ Undo ${last.act} #${last.n}</button>` : `<button class="btn sec small" data-bl="qundo" disabled>↶ Undo</button>`;
+    const order = `<select class="bl-sel" data-bl="qord" aria-label="Order" style="flex:0 0 auto;min-height:48px"><option value="n"${BL.sort === "n" ? " selected" : ""}>In order</option><option value="worst"${BL.sort === "worst" ? " selected" : ""}>Worst first</option><option value="best"${BL.sort === "best" ? " selected" : ""}>Best first</option></select>`;
+    if (BL.qi >= N) {
+      const exp = B.t + BU.KEEP_DAYS * 864e5, unk = B.shots.filter(s => s.v && !blKept(s)).length;
+      BL.el.innerHTML = `<div class="lf-top"><button class="bl-ib" data-bl="qback" aria-label="Back to the library">${BLI.back}</button><div class="lf-title">Quick pick</div></div>
+        <div class="qp-end"><b>That's all ${N}</b><p>${nKept} kept.${unk && Date.now() < exp ? ` The other ${unk} videos delete on ${esc(buDay(exp))}; their numbers stay.` : ""}</p></div>
+        <div class="bl-bar">${undo}<button class="btn pri small" data-bl="qback">Back to library</button></div>`;
+      return;
+    }
+    const s = B.shots.find(y => y.id === ids[BL.qi]), st = blSt(s, cue) || worstOf(s);
+    const ms = s.m.slice().sort((a, b) => (b.k === cue) - (a.k === cue));
+    BL.el.innerHTML = `<div class="lf-top"><button class="bl-ib" data-bl="qback" aria-label="Back to the library">${BLI.back}</button><div class="lf-title">Shot ${s.n} <span style="opacity:.7">· ${BL.qi + 1} of ${N}</span><span class="bl-sub">${nKept} kept${s.star ? " · ★ starred" : s.keep ? " · kept" : ""}</span></div>${order}</div>
+      <div class="qp-card" data-swipe="1"><span class="qp-no ${st}">${s.n}</span><button class="qp-rate" data-bl="qrate">${BL.rate === 1 ? "1×" : BL.rate === .5 ? "½×" : "¼×"}</button>
+        ${s.v ? `<video playsinline muted loop=""></video><canvas></canvas>` : `<div class="bu-none">${BLI.gone.replace("<svg", '<svg style="width:36px;height:36px;display:block;margin:0 auto 6px"')}${s.gone ? "This shot's video was deleted." : "No video for this shot."} Its numbers are below.</div>`}
+        <span class="qp-stamp k">Keep</span><span class="qp-stamp s">Skip</span></div>
+      <div class="bu-m" style="padding-top:8px">${ms.map(m => `<span class="${m.st}">${buGlyph(m.st)}${esc(m.l)} · ${esc(m.v)}</span>`).join("")}</div>
+      <div class="qp-mm"><span style="opacity:.75">Did it go in?</span><button class="bl-chip" data-bl="mk:1" aria-pressed="${s.mk === 1}">✓ Make</button><button class="bl-chip" data-bl="mk:0" aria-pressed="${s.mk === 0}">✗ Miss</button></div>
+      <div class="qp-act"><button class="btn sec" data-bl="qskip">✕ Skip</button><button class="btn st" data-bl="qstar" aria-pressed="${!!s.star}" aria-label="Star">${BLI.star}</button><button class="btn pri" data-bl="qkeep">Keep ✓</button></div>
+      <div class="bl-bar" style="border:0">${undo}</div>
+      ${BL.snack ? `<div class="bl-snack" role="status" style="bottom:calc(150px + env(safe-area-inset-bottom,0px))"><span>${esc(BL.snack)}</span><button data-bl="qundo">Undo</button></div>` : ""}`;
+    BL.qs = s;
+    if (s.v) qpPlay(s);
+    clearTimeout(BL.snT);
+    if (BL.snack) BL.snT = setTimeout(() => { if (BL && BL.snack) { BL.snack = null; const n = BL.el.querySelector(".bl-snack"); if (n) n.remove(); } }, 2500);
+  }
+  async function qpPlay(s) {
+    const my = BL, box = my.el.querySelector(".qp-card"), v = box && box.querySelector("video");
+    if (!v) return;
+    const url = await burstShotUrl(s), pf = await burstShotFrames(s);
+    if (BL !== my || my.qs !== s || !v.isConnected) return;
+    if (!url) { box.querySelector("canvas").remove(); v.remove(); return; }
+    v.src = url;
+    if (v.readyState < 1) await buOnce(v, "loadedmetadata", 4000);
+    if (BL !== my || my.qs !== s) return;
+    try { v.currentTime = s.a || 0; } catch (e) {}
+    v.playbackRate = my.rate;
+    v.play().catch(() => {});
+    const p = { s, v, cv: box.querySelector("canvas"), box, pf };
+    const tick = () => {
+      if (BL !== my || my.qs !== s || !v.isConnected) return;
+      my.raf = requestAnimationFrame(tick);
+      if (v.currentTime >= s.b - .02 || v.currentTime < s.a - .3) v.currentTime = s.a;
+      buSkel(p, v.currentTime);
+    };
+    tick();
+  }
+  function qpDo(act) {
+    const B = blCur(), s = BL.qs;
+    if (!B || !s) return;
+    BL.hist.push({ id: s.id, n: s.n, act: act === "keep" ? "keep" : act === "star" ? "star" : "skip", was: { keep: s.keep, star: s.star }, qi: BL.qi });
+    if (act === "keep") s.keep = true;
+    if (act === "star") { s.star = true; s.keep = true; }
+    persist();
+    try { if (act !== "skip") navigator.vibrate?.(12); } catch (e) {}
+    BL.snack = act === "skip" ? null : `${act === "star" ? "Starred" : "Kept"} #${s.n}`;
+    const card = BL.el.querySelector(".qp-card");
+    BL.qi++;
+    if (card && !blRM) {
+      const dir = act === "skip" ? -1 : 1;
+      card.style.transition = "transform .18s cubic-bezier(.4,0,.2,1), opacity .18s";
+      card.style.transform = `translateX(${dir * 120}%) rotate(${dir * 8}deg)`;
+      card.style.opacity = "0";
+      setTimeout(() => BL && BL.mode === "pick" && blDraw(), 170);
+    } else blDraw();
+  }
+  function qpClick(k, x, B, b) {
+    const s = BL.qs;
+    if (k === "qback") { blStopQ(BL); BL.mode = "grid"; BL.snack = null; return blDraw(); }
+    if (k === "qskip") return qpDo("skip");
+    if (k === "qkeep") return qpDo("keep");
+    if (k === "qstar") { if (s && s.star) { s.star = false; persist(); return blDraw(); } return qpDo("star"); }
+    if (k === "mk" && s) { const m = +x; s.mk = s.mk === m ? undefined : m; if (s.mk === undefined) delete s.mk; persist(); b.parentNode.querySelectorAll(".bl-chip").forEach(c => c.setAttribute("aria-pressed", c === b && s.mk === m)); return; }
+    if (k === "qrate") { BL.rate = BL.rate === .5 ? .25 : BL.rate === .25 ? 1 : .5; const v = BL.el.querySelector(".qp-card video"); if (v) v.playbackRate = BL.rate; b.textContent = BL.rate === 1 ? "1×" : BL.rate === .5 ? "½×" : "¼×"; return; }
+    if (k === "qundo") {
+      const h = BL.hist.pop();
+      if (!h) return;
+      const t = B.shots.find(y => y.id === h.id);
+      if (t) { t.keep = h.was.keep; t.star = h.was.star; persist(); }
+      BL.qi = h.qi; BL.snack = null;
+      return blDraw();
+    }
+  }
+  // the order picker in Quick pick re-sorts what's left, from the current shot on
+  document.addEventListener("change", e => {
+    if (!BL || BL.mode !== "pick" || !e.target.matches || !e.target.matches("[data-bl='qord']")) return;
+    e.stopPropagation();
+    const B = blCur(), done = BL.q.slice(0, BL.qi);
+    BL.sort = e.target.value;
+    BL.q = done.concat(blList(B, blCue(B)).map(s => s.id).filter(id => !done.includes(id)));
+    blDraw();
+  }, true);
+  // swipe the video right to keep, left to skip; not from the screen edges, which Android keeps for Back
+  function qpDrag(e) {
+    const card = e.target.closest(".qp-card");
+    if (!card || e.target.closest("button") || e.clientX < 28 || e.clientX > innerWidth - 28) return;
+    const x0 = e.clientX, y0 = e.clientY, W = card.clientWidth, K = card.querySelector(".qp-stamp.k"), Sk = card.querySelector(".qp-stamp.s");
+    let dx = 0, lock = null, buzz = false;
+    try { card.setPointerCapture(e.pointerId); } catch (er) {}
+    const mv = ev => {
+      dx = ev.clientX - x0;
+      const dy = ev.clientY - y0;
+      if (!lock && Math.hypot(dx, dy) > 10) lock = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      if (lock !== "x") return;
+      card.style.transition = "none";
+      card.style.transform = blRM ? "" : `translateX(${dx}px) rotate(${Math.max(-8, Math.min(8, dx / 20))}deg)`;
+      const f = Math.min(1, Math.abs(dx) / (W * .3));
+      if (K) K.style.opacity = dx > 0 ? f : 0;
+      if (Sk) Sk.style.opacity = dx < 0 ? f : 0;
+      if (f >= 1 && !buzz) { buzz = true; try { navigator.vibrate?.(8); } catch (er) {} }
+      if (f < 1) buzz = false;
+    };
+    const up = ev => {
+      card.removeEventListener("pointermove", mv); card.removeEventListener("pointerup", up); card.removeEventListener("pointercancel", up);
+      if (lock === "x" && ev.type === "pointerup" && Math.abs(dx) >= W * .3) { BL.held = true; return qpDo(dx > 0 ? "keep" : "skip"); }
+      card.style.transition = blRM ? "none" : "transform .24s cubic-bezier(.2,.9,.3,1.2)";
+      card.style.transform = "";
+      if (K) K.style.opacity = 0;
+      if (Sk) Sk.style.opacity = 0;
+    };
+    card.addEventListener("pointermove", mv); card.addEventListener("pointerup", up); card.addEventListener("pointercancel", up);
   }
 
   /* -- cleanup: unkept shot video goes 14 days after filming; burst videos no shot points at go too -- */
@@ -7872,7 +8400,7 @@ route();
     if (!b) return;
     e.preventDefault();
     const [k, id] = b.dataset.buf.split(":");
-    if (k === "open") return burstOpen(id);
+    if (k === "open") return burstLib(id);
     if (k === "free") { BF.free = !BF.free; BF.ask = null; return render(); }
     if (k === "del") {
       if (BF.ask !== id) { BF.ask = id; return render(); }
