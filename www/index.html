@@ -449,7 +449,7 @@ section{display:flex;flex-direction:column;gap:10px}
 .tset{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:0}
 .tset .tgrp{display:flex;flex-direction:column;gap:6px}.tset :is(.tsum,.tgrp)+.tgrp{border-top:1px solid var(--line);margin-top:10px;padding-top:12px}
 .tset button:focus:not(:focus-visible){outline:none}
-.tset .label{margin:0}
+.tset .label{margin:0}.tset .tseg+.label{margin-top:8px}
 .tsum{display:flex;align-items:center;gap:10px;min-height:44px}.tsum .tx{flex:1;min-width:0}.tsum b{display:block;font-size:15px}.tsum small{display:block;color:var(--muted);font-size:12.5px}
 .tsum .setup-btn{flex:none}
 .tseg{display:grid;grid-template-columns:repeat(var(--n,3),1fr);background:var(--surface-2);border:1px solid var(--line-strong);border-radius:12px;padding:3px;gap:3px}
@@ -3046,7 +3046,12 @@ const COURTS=[["full","Full court","Everything"],["half","Half court","No long r
 const COURT_FULL=new Set(["c_ub","c_farmers","h_2full"]),COURT_HALF=new Set(["c_17s","c_rsa","c_multi","c_hokie","c_pinky","c_help","c_called","h_walk","h_free"]);
 const courtNeed=d=>COURT_FULL.has(d.id)?3:COURT_HALF.has(d.id)?2:d.skill==="s"||d.skill==="f"?1:0;
 const courtHave=()=>COURT_N[S.settings.court]??3;
-const courtOk=d=>courtNeed(d)<=courtHave();
+/* balls you have today: two-ball drills need 2; conditioning and body routines need none (except the Hokie drill and the ball warm-ups) */
+const BALLS=[["2","2 balls"],["1","1 ball"],["0","No ball"]],TWO_BALL=/^(h_2|h_r_2|f_2)|^(h_two|s_2chair)$/;
+const ballNeed=d=>TWO_BALL.test(d.id)?2:(d.cond&&d.id!=="c_hokie")||(d.body&&d.id!=="b_game"&&d.id!=="b_club")?0:1;
+const ballHave=()=>{const b=S.settings.balls;return b==null?2:+b};
+const placeOk=d=>courtNeed(d)<=courtHave();
+const courtOk=d=>placeOk(d)&&ballNeed(d)<=ballHave();
 /* the run before each Tired 3s round fits the court you're on */
 if(D.s_tired)Object.defineProperty(D.s_tired,"between",{get(){const c=courtHave();return c>=3?"Run full court down and back at about 80 percent.":c===2?"Run baseline to half court and back twice at about 80 percent.":"30 seconds of jumping jacks or high knees, hard enough to breathe heavy."}});
 const FREQ_LABEL={auto:"Auto",every:"Every workout",weekly:"Weekly",custom:"Custom",never:"Never suggest"};
@@ -3095,7 +3100,7 @@ function eligible(d,body){return d&&!d.body&&courtOk(d)&&!(d.cond&&(body&&(d.har
 function plan0(){
   const cw=customToday();if(cw){const ids=[...cw.items,...((S.rec.plan.extra)||[]).filter(id=>!cw.items.includes(id))];
     const out=ids.map(id=>D[id]).filter(Boolean).map(d=>({slot:"Your workout",d,skip:skipped(d.id),why:skipped(d.id)?{k:"skip",t:"Skipped today"}:cw.items.includes(d.id)?null:{k:"you",t:"You added it"}}));out.custom=cw;out.over=[];return out}
-  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")+(courtHave()<3?"c"+courtHave():"")));
+  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")+(courtHave()<3?"c"+courtHave():"")+(ballHave()<2?"b"+ballHave():"")));
   const ml={s:maxLvl("s"),h:maxLvl("h"),f:maxLvl("f")},sw=swapMap(),baseline=S.sessions.length<3;let newUsed=0;
   const ok=d=>eligible(d,body),okAuto=d=>ok(d)&&lvlOf(d)<=ml[d.skill];
   const cand=[],used=new Set(),courtOut=[],cut=d=>{if(d&&!courtOk(d)&&!courtOut.includes(d))courtOut.push(d)};
@@ -3104,7 +3109,7 @@ function plan0(){
   const light=body?{k:"light",t:"Lighter today"}:null;
   /* game tonight: the Pre-Game Warm-Up (with a ball) replaces the everyday one; "warm-up only" is just that */
   if(body==="game"&&S.rec.body.only){const o=[{slot:slotOf(D.b_game),d:D.b_game,why:{k:"fixed",t:"Before your game"},prio:"must"}];o.over=[];o.mins=D.b_game.mins;o.body=body;o.ml=ml;return o}
-  if(courtOk(D.s_cold))add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");else cut(D.s_cold);add(body==="game"?D.b_game:rtPick("warm"),{k:"fixed",t:body==="game"?"Game tonight: warm up with a ball":"Always before handling"},"must");
+  if(courtOk(D.s_cold))add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");else cut(D.s_cold);add(body==="game"?D.b_game:courtOk(rtPick("warm"))?rtPick("warm"):D.b_body,{k:"fixed",t:body==="game"?"Game tonight: warm up with a ball":"Always before handling"},"must");
   const tired=mins!==20&&!body&&courtOk(D.s_tired);if(mins!==20&&!body&&!tired)cut(D.s_tired);
   /* a run right before Tired 3s so the tired shots come on tired legs, not straight after more shooting (dropped below if no shooting comes first):
      Up-and-Backs on shorter days, 17s at 45 minutes. Each swaps for the other. */
@@ -3139,7 +3144,9 @@ function plan0(){
   if(!tired&&ok(D.s_ft))add(D.s_ft,{k:"fixed",t:"Free throws to finish"},"fav");
   if(POOL[focus])fill(POOL[focus][1]);
   /* no court: handling only, so give the minutes to more handling drills */
-  if(!courtHave()){fill(H);fill(RH);fill(H);fill(RH);fill(H)}
+  /* no ball: the minutes go to conditioning (Starter-level ones until you've moved up) */
+  if(!ballHave()){const CD=DRILLS.filter(d=>d.cond&&!d.clips&&!RUNS.includes(d.id)&&ok(d)&&!used.has(d.id)&&lvlOf(d)<=Math.max(ml.s,ml.h,ml.f));CD.forEach(d=>d._s=favScore(d.id)+Math.min(2,daysAgo(lastDone(d.id))/7)+r()*.6);CD.sort((a,b)=>b._s-a._s);CD.slice(0,8).forEach(d=>add(d,whyOf(d),"fav"))}
+  else if(!courtHave()){fill(H);fill(RH);fill(H);fill(RH);fill(H)}
   fill(H);fill(F);fill(FORM);fill(RH);fill(VOL);if(!t3due&&ok(D.s_5spot))add(D.s_5spot,{k:"fixed",t:"Your 3-point test"},"fav");
   let left=mins+2;const out=[],over=[];
   for(const x of cand){const m=realMins(x.d);if(x.prio==="must"||x.prio==="added"||x.sx||m<=left){out.push(x);left-=m}else if(x.prio!=="fav")over.push(x)}
@@ -3541,9 +3548,10 @@ function planRow(p){const cw=p.custom,mins=cw?wMins(cw):p.mins;
    is the one question asked each day (before the first drill only); one "Today:" line says what those choices did to the plan. */
 const BODY_OPTS=[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]];
 function setupStrip(body,p){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null,ck=S.settings.court||"full",open=!!state.setOpen;
-  const sum=[COURTS.find(c=>c[0]===ck)[1],S.settings.partner?"With a partner":"Solo",S.settings.heavy?"Heavy ball":""].filter(Boolean).join(" · ");
+  const bk=String(ballHave()),sum=[COURTS.find(c=>c[0]===ck)[1],BALLS.find(x=>x[0]===bk)[1],S.settings.partner?"With a partner":"Solo",S.settings.heavy?"Heavy ball":""].filter(Boolean).join(" · ");
   const head=`<div class="tsum"><div class="tx"><b>${esc(sum)}</b><small>${open?"These stay until you change them":"Stays until you change it"}</small></div>${open?"":`<button class="setup-btn" data-rec="setopen" aria-expanded="false">Change</button>`}</div>`;
   const edit=open?`<div class="tgrp"><span class="label">Where you train</span><div class="tseg" role="group" aria-label="Where you train" style="--n:${COURTS.length}">${COURTS.map(([v,t,sub])=>`<button data-rec="court:${v}" aria-pressed="${ck===v}">${t}<small>${sub}</small></button>`).join("")}</div>
+     <span class="label">Balls</span><div class="tseg" role="group" aria-label="Balls" style="--n:3">${BALLS.map(([v,t])=>`<button data-rec="balls:${v}" aria-pressed="${bk===v}">${t}</button>`).join("")}</div>
      <label class="tsw"><span>With a partner<small>Adds partner drills</small></span><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}></label>
      <label class="tsw"><span>Heavy ball<small>For the heavy-ball handling sets</small></span><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}></label>
      <button class="btn sec small done" data-rec="setopen">Done</button></div>`:"";
@@ -3558,12 +3566,14 @@ function todayLine(p,k){const bits=[],ck=S.settings.court||"full",n=(p.courtOut|
   if(ck==="half"&&p.some(x=>x.d.id==="c_17s")&&(p.mins<45))bits.push("Half court: 17s instead of Up-and-Backs before Tired 3s.");
   if(ck==="hoop"&&p.some(x=>x.d.id==="s_tired"))bits.push("Just a hoop: jumping jacks or high knees before each Tired 3s round.");
   if(ck==="none")bits.push("No hoop: warm-up, ball handling and the stretch.");
-  if(n)bits.push(`<button class="linkbtn" data-rec="leftout">${n} drill${n===1?"":"s"} left out for ${COURT_NAME[ck]} ›</button>`);
+  if(!ballHave())bits.push("No ball: warm-up, conditioning and the stretch.");else if(ballHave()===1&&n)bits.push("One ball: no two-ball drills.");
+  if(n)bits.push(`<button class="linkbtn" data-rec="leftout">${n} drill${n===1?"":"s"} left out today ›</button>`);
   return bits.join(" ")}
 /* drills today's court ruled out, shown under the list so nothing disappears without a word */
 function leftOutCard(p){const out=p.courtOut||[];if(!out.length)return"";const ck=S.settings.court||"full";
-  const why=d=>["","needs a hoop","needs court lines","needs a full court"][courtNeed(d)],back=d=>["","with a hoop","on a court","on a full court"][courtNeed(d)];
-  return `<div class="overcard" id="leftout"><div class="label">Left out · ${COURTS.find(c=>c[0]===ck)[1]}</div>${out.map(d=>`<span><b>${esc(d.name)}</b> ${why(d)}. It's back when you train ${back(d)}.</span>`).join("")}<button class="linkbtn" data-rec="setopen">Change where you train</button></div>`}
+  const why=d=>placeOk(d)?(ballNeed(d)===2?"needs two balls":"needs a ball"):["","needs a hoop","needs court lines","needs a full court"][courtNeed(d)],
+    back=d=>placeOk(d)?(ballNeed(d)===2?"with two balls":"with a ball"):["","with a hoop","on a court","on a full court"][courtNeed(d)];
+  return `<div class="overcard" id="leftout"><div class="label">Left out today · ${COURTS.find(c=>c[0]===ck)[1]} · ${BALLS.find(x=>x[0]===String(ballHave()))[1]}</div>${out.map(d=>`<span><b>${esc(d.name)}</b> ${why(d)}. It's back when you train ${back(d)}.</span>`).join("")}<button class="linkbtn" data-rec="setopen">Change where you train</button></div>`}
 function addedCard(ids){const names=ids.map(id=>D[id].name);
   return `<div class="addedcard"><b>You added ${esc(names.length>2?names.length+" drills":names.join(" and "))}.</b> Put ${names.length>1?"them":"it"} in today's workout, or keep ${names.length>1?"them":"it"} for your next recommended one?<div class="psee-btns"><button class="btn sec small" data-rec="addin">Add ${names.length>1?"them":"it"} in</button><button class="btn sec small" data-rec="keepnext">Keep for next</button></div></div>`}
 const SWAPICON=`<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11l-3-3M16 13H5l3 3"/></svg>`;
@@ -3728,6 +3738,7 @@ function recAct(k,el){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.
   case "add":return toggleAdd(b);
   case "gmode":{if(S.rec.body&&S.rec.body.k==="game"){S.rec.body.only=b==="warm";persist()}return render()}
   case "court":{S.settings.court=b;persist();state.refocus=`court:${b}`;return render()}
+  case "balls":{S.settings.balls=b;persist();state.refocus=`balls:${b}`;return render()}
   case "setopen":{const fromCard=!!(el&&el.closest(".overcard"));state.setOpen=fromCard?true:!state.setOpen;state.refocus=state.setOpen?`court:${S.settings.court||"full"}`:"setopen";render();if(fromCard){const t=document.querySelector(".tset");if(t)t.scrollIntoView({block:"center"})}return}
   case "leftout":{const c=document.getElementById("leftout");if(c)c.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});return}
   case "body":{const cur=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;S.rec.body=cur===b?null:{d:today(),k:b};persist();state.refocus=`body:${b}`;return render()}
