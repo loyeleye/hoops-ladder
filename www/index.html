@@ -379,6 +379,7 @@ section{display:flex;flex-direction:column;gap:10px}
 .phases{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
 .phases .on{color:var(--ink);font-weight:700}
 .phases .ok{text-decoration:line-through}
+.phases .pseg{display:block;font-size:12px;font-weight:400;color:var(--muted)}
 .prow2{display:flex;flex-direction:column;gap:4px;padding:4px 0}
 .clips{display:flex;flex-wrap:wrap;gap:6px}
 .steps li .clips{margin:6px 0 2px}
@@ -2443,7 +2444,7 @@ const steps={b_body:[
  [anim([[0,J1,{cap:"Easy jog"}],[.34,J2,{cap:"Easy jog"}],[.68,J1]],{scroll:60}),"An easy jog: relaxed arms, light feet."],
  [anim([[0,HOP0,{cap:"Small, quick hops"}],[.17,HOP1,{cap:"Small, quick hops"}],[.34,HOP0]]),"Ankle hops: small quick bounces from the ankles and calves, knees almost straight, landing softly on the balls of your feet."],
  [anim([[0,STAND,{cap:"Step long"}],[.8,LUNGE("n"),{cap:"Reach up"}],[1.6,LUNGE("n"),{cap:"Reach up"}],[2.2,STAND,{cap:"Other leg"}],[3,LUNGE("f"),{cap:"Reach up"}],[3.8,LUNGE("f")],[4.4,STAND]]),"Walking lunge with a reach: long step, front knee over the foot, back knee toward the floor, both arms reach up."],
- [anim([[0,SW(-35),{cap:"Swing front to back"}],[.75,SW(60),{cap:"Swing front to back"}],[1.5,SW(-35)]],{wall:96}),"Leg swings: hold a wall, swing one leg front to back, relaxed. Then turn and swing it side to side. Switch legs."],
+ [anim([[0,SW(-35),{cap:"Swing front to back"}],[.75,SW(60),{cap:"Swing front to back"}],[1.5,SW(-35)]],{wall:96}),"Leg swings: hold a wall, swing your right leg front to back, relaxed. Turn to face the wall and swing it side to side, then switch to your left leg side to side, and turn to finish it front to back. The app calls each one."],
  [anim([[0,CALF(0),{cap:"Up slowly"}],[1.1,CALF(1),{cap:"Hold"}],[1.7,CALF(1),{cap:"Down slowly"}],[2.8,CALF(0)],[3.1,CALF(0)]]),"Calf raises: rise onto the balls of your feet slowly, hold, lower slowly."],
  [anim([[0,SL(48,30,30),{cap:"Slide, don't cross"}],[.22,SL(56,40,22)],[.44,SL(64,30,30)],[.66,SL(72,40,22)],[.88,SL(80,30,30)],[1.1,SL(88,40,22)],[1.32,SL(96,30,30),{cap:"Back the other way"}],[1.54,SL(88,22,40)],[1.76,SL(80,30,30)],[1.98,SL(72,22,40)],[2.2,SL(64,30,30)],[2.42,SL(56,22,40)],[2.64,SL(48,30,30)]]),"Defensive slides: low and wide, push off the trail foot, feet never cross or click together."],
  [anim([[0,J1,{cap:"Half speed"}],[.34,J2,{cap:"Half speed"}],[.68,J1,{cap:"Half speed"}],[1.02,J2,{cap:"Half speed"}],[1.36,B1,{cap:"Three-quarter speed"}],[1.6,B2,{cap:"Three-quarter speed"}],[1.84,B1,{cap:"Three-quarter speed"}],[2.08,B2,{cap:"Three-quarter speed"}],[2.32,J1]],{scroll:90}),"Build-up runs: start at about half speed, then three-quarter. Only go faster when your legs feel ready."]
@@ -3565,7 +3566,7 @@ function drawDock(){
      ${d.hard||d.jc?`<div class="tip">${g.ok?`<b>Leg load:</b> ${[d.jc?`${d.jc} jump contacts`:"",d.hard?`${d.set[1]} hard seconds`:""].filter(Boolean).join(" and ")} a ${u}.${g.trim?` <b>Cut to ${g.n} ${u}s</b> to stay under today's cap.`:""}${g.any?" Over today's cap: you chose to start anyway.":""}`:`<b>${g.rest?"Rest day.":"Cap reached."}</b> ${esc(g.why)}`}</div><div class="card legcard">${legBars(legLoad(today()),legCaps())}</div>`:""}
      ${g.ok?`<button class="btn pri" data-k="play">Start · ${fmt(totalOf(d))}</button>`:`<button class="btn sec" data-k="anyway">Start anyway</button>`}<span class="small muted" style="text-align:center">5-second countdown, then each ${u} starts on a beep. Prop the phone where you can see and hear it.</span>`;return bind()}
   if(d.log==="timer"||d.log==="react"){const ph=phasesOf(d);
-    el.innerHTML=`${hasParts(d)?"":`<div class="phases">${ph.map((p,i)=>`<span class="prow2"><span>${esc(p[0])} · ${p[1]}s</span>${clipLinks(d,i)}</span>`).join("")}</div>`}
+    el.innerHTML=`${hasParts(d)?"":`<div class="phases">${ph.map((p,i)=>{const sg=d.log==="timer"&&partSegs(p);return `<span class="prow2"><span>${esc(p[0])} · ${p[1]}s${sg?`<small class="pseg">${sg.map(x=>esc(x)).join(" · ")}, ${segLen(p,sg)}s each</small>`:""}</span>${clipLinks(d,i)}</span>`}).join("")}</div>`}
      ${d.volume?(R.dockSet?`<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Set</span><div class="seg">${[[0,"Regular · 100"],[1,"Full D2 · 500"]].map(([v,l])=>`<button data-k="vol:${v}" aria-pressed="${volBig()===!!v}">${l}</button>`).join("")}</div></div><div class="dbeat">${beatSlider()}</div><div class="row" style="justify-content:center">${cdCtl("data-k")}</div><button class="linkbtn" data-k="dockset" style="align-self:center">Done</button>`:`<button class="linkbtn" data-k="dockset" style="align-self:center">${volBig()?"Full D2 · 500":"Regular · 100"} · beat and countdown ›</button>`):""}${d.tempoCalls?d2rCtl():""}
      ${goalEdit(d)}<button class="btn pri" data-k="play">Start · ${fmt(totalOf(d))}</button>${CLIPS[d.id]?`<span class="small muted" style="text-align:center">▶ opens a short demo of that part on YouTube at the right moment.</span>`:""}<span class="small muted" style="text-align:center">5-second countdown, then the phone calls each part out loud. Prop it up where you can see it.</span>`;return bind()}
   const modeSeg=setupBlock(d);
@@ -3873,7 +3874,7 @@ function gapNext(){const [a,b]=R.d.gap;return a+Math.random()*(b-a)}
 function pickCall(){const c=R.d.calls;let x;do{x=c[Math.floor(Math.random()*c.length)]}while(c.length>2&&x===R.call&&Math.random()<.6);return x}
 function nextPhase(auto){const ph=R.d.phases;R.phase++;
   if(R.phase>=ph.length){R.left=0;R.running=false;clearInterval(tick);tick=null;lockOff();beep(520,400);R.finished=true}
-  else{R.left=ph[R.phase][1];beep(880,180);say(ph[R.phase][0])}
+  else{R.left=ph[R.phase][1];beep(880,180);say(R.d.log==="timer"?partSay(ph[R.phase]):ph[R.phase][0])}
   if(auto)drawDock()}
 
 function drawRate(){
@@ -3989,15 +3990,48 @@ function togglePlay(){const cur=P.stage==="work"&&phasesOf(P.items[P.i])[P.pi];
   if(!P.running&&cur&&(cur[3]||(P.items[P.i].tempoCalls&&!isRestPart()))&&cdSecs()>0){P.running=true;P.cd=cdSecs();P.beat=0;beep(660,120);try{speechSynthesis.cancel()}catch(e){}say(String(P.cd));return drawPlayer()}
   if(P.running&&P.cd>0){P.cd=0;P.running=false;beep(440,120);try{speechSynthesis.cancel()}catch(e){}say("Paused");return drawPlayer()}
   P.running=!P.running;P.lost=false;P.beat=0;beep(P.running?660:440,120);if(!P.running){try{speechSynthesis.cancel()}catch(e){}say("Paused")}drawPlayer()}
-/* halfway through a two-sided part ("each leg", "both directions") the timer calls the switch */
-function halfCall(name){const n=String(name).toLowerCase();return /\beach (leg|side|foot|arm)\b/.test(n)?"Switch sides":/both directions|one way, then the other/.test(n)?"Other way":null}
-function halfway(ph,left,dt){if(!ph||ph[3])return;const h=ph[1]/2,c=halfCall(ph[0]);if(c&&left<=h&&left+dt>h){beep(988,160);say(c)}}
+/* two-sided parts ("each leg", "both directions", leg swings) split into equal timed segments.
+   The timer calls each one by name ("Left leg, side to side") and the tip shows it, so you always know which side and which way.
+   The order keeps turns to a minimum: leg swings stay facing the wall to switch legs on side to side. */
+const SIDE_SEGS=[
+ [/^leg swings/,["Right leg, front to back","Right leg, side to side","Left leg, side to side","Left leg, front to back"]],
+ [/^ankle circles/,["Right foot, clockwise","Right foot, counterclockwise","Left foot, clockwise","Left foot, counterclockwise"]],
+ [/^hip circles/,["Clockwise","Counterclockwise"]],
+ [/^front and reverse pivots/,["Right pivot foot, front pivots","Right pivot foot, reverse pivots","Left pivot foot, front pivots","Left pivot foot, reverse pivots"]],
+ [/^layups, right hand/,["Right hand, from the right","Left hand, from the left"]],
+ [/^high knees and butt kicks/,["High knees","Butt kicks"]],
+ [/^walk on your toes/,["On your toes","On your heels"]],
+ [/^defensive slides/,["Slide to your right","Slide to your left"]],
+ [/^carioca/,["Moving to your right","Moving to your left"]],
+ [/^world's greatest stretch/,["Right leg forward","Left leg forward"]],
+ [/single-leg balance|^balance, each leg/,["On your right leg","On your left leg"]],
+ [/^calf stretch against the wall/,["Right calf","Left calf"]],
+ [/hamstring stretch/,["Right hamstring","Left hamstring"]],
+ [/^quad stretch/,["Right quad","Left quad"]],
+ [/^hip flexor stretch/,["Right knee down","Left knee down"]],
+ [/^figure-four/,["Right ankle over left knee","Left ankle over right knee"]],
+ [/^lying twist/,["Knees to your right","Knees to your left"]]];
+function segsOf(name){const n=String(name||"").toLowerCase(),m=SIDE_SEGS.find(([re])=>re.test(n));if(m)return m[1];
+  const e=n.match(/\beach (leg|side|foot|arm)\b/);if(e)return["Right "+e[1],"Left "+e[1]];
+  return /both directions|one way, then the other/.test(n)?["One way","Other way"]:null}
+const partSegs=ph=>ph&&!ph[3]?segsOf(ph[0]):null;
+const segLen=(ph,sg)=>{const x=ph[1]/sg.length;return Number.isInteger(x)?String(x):x.toFixed(1)};
+function segAt(ph,left){const sg=partSegs(ph);return sg?Math.min(sg.length-1,Math.max(0,Math.floor((ph[1]-left)/(ph[1]/sg.length)))):-1}
+/* what the timer says as a part starts: its name, then the first side and how long each one lasts */
+function partSay(ph){const sg=partSegs(ph);return sg?`${ph[0]}. ${segLen(ph,sg)} seconds each. ${sg[0]}`:ph[0]}
+/* the line under the tip: where you are in the part and what comes next */
+function segMeta(ph,left){const sg=partSegs(ph);if(!sg)return"";const k=segAt(ph,left);return `${k+1} of ${sg.length} · ${segLen(ph,sg)} s each${k+1<sg.length?` · Then: ${sg[k+1]}`:""}`}
+/* a new part: show its first side, or clear a side left over from the part before */
+function segTip(sg){if(sg){P.tip=sg[0];P.segTip=true;P.tipFlash=Date.now()}else if(P.segTip){P.tip="";P.segTip=false}}
+function halfway(ph,left,dt){const sg=partSegs(ph);if(!sg)return;const len=ph[1]/sg.length;
+  for(let k=1;k<sg.length;k++){const b=ph[1]-k*len;if(left<=b&&left+dt>b){beep(988,160);say(sg[k])}}}
 function stepPlayer(dt){
   if(P.cd>0){const b=Math.ceil(P.cd);P.cd-=dt;const a=Math.ceil(P.cd);if(P.cd<=0){P.cd=0;P.lost=false;P.beat=0;beep(988,200);say("Go");return drawPlayer()}if(a!==b){beep(660,90);say(String(a))}return updPlayer()}
   const b=Math.ceil(P.left);P.left-=dt;const a=Math.ceil(P.left);if(a!==b&&a>=1&&a<=3)beep(a===1?880:660,90);
   const d=P.items[P.i];
-  if(P.stage==="work"){P.el[P.i]+=dt;if(d.log==="timer")halfway(phasesOf(d)[P.pi],P.left,dt);
-    if(d.log!=="react"&&!(d.cond&&(d.calls||d.set[1]<20))&&!partCalls(d,P.pi)&&!/^rest\b/i.test(phasesOf(d)[P.pi][0])){P.tipAt=(P.tipAt==null?7:P.tipAt)-dt;if(P.tipAt<=0){P.tip=pickTip(phasesOf(d)[P.pi][0],d);P.tipAt=12+Math.random()*6;if(!d.silent)say(P.tip);P.tipFlash=Date.now()}}
+  if(P.stage==="work"){P.el[P.i]+=dt;const sg=d.log==="timer"&&partSegs(phasesOf(d)[P.pi]);
+    if(sg){halfway(phasesOf(d)[P.pi],P.left,dt);const lb=sg[segAt(phasesOf(d)[P.pi],P.left)];if(P.tip!==lb){P.tip=lb;P.segTip=true;P.tipFlash=Date.now()}}
+    if(!sg&&d.log!=="react"&&!(d.cond&&(d.calls||d.set[1]<20))&&!partCalls(d,P.pi)&&!/^rest\b/i.test(phasesOf(d)[P.pi][0])){P.tipAt=(P.tipAt==null?7:P.tipAt)-dt;if(P.tipAt<=0){P.tip=pickTip(phasesOf(d)[P.pi][0],d);P.tipAt=12+Math.random()*6;if(!d.silent)say(P.tip);P.tipFlash=Date.now()}}
     const cur=phasesOf(d)[P.pi];if(cur&&cur[3]){P.beat=(P.beat||0)+dt;const iv=60/cur[3];while(P.beat>=iv&&P.rep<cur[2]){P.beat-=iv;P.rep++;beep(P.rep%10===0?1320:1100,35);if(P.rep%50===0&&P.rep<cur[2])say(String(P.rep))}}
     if(d.log==="react"&&d.tempoCalls){if(!isRestPart())tempoCallStep(d,dt)}
     else if(d.log==="react"||(d.cond&&d.calls&&!isRestPart())||partCalls(d,P.pi)){const cc=partCalls(d,P.pi)||d;P.nextAt-=dt;if(P.nextAt<=0){const c=cc.calls;let x;do{x=c[Math.floor(Math.random()*c.length)]}while(c.length>2&&x===P.call&&Math.random()<.6);P.call=x;P.nextAt=cc.gap[0]+Math.random()*(cc.gap[1]-cc.gap[0]);beep(x.toLowerCase().startsWith("l")?740:988,160);if(!d.silent)say(x);P.flashAt=Date.now()}}}
@@ -4011,9 +4045,9 @@ function tempoCallStep(d,dt){const cur=phasesOf(d)[P.pi],c=D2R();P.nextAt-=dt;
   if(P.call&&P.bpm){P.beat=(P.beat||0)+dt;const iv=60/P.bpm;while(P.beat>=iv){P.beat-=iv;P.rep=(P.rep||0)+1;beep(P.rep%10===0?1320:1100,35)}}}
 function advance(){
   const d=P.items[P.i],ph=phasesOf(d);
-  if(P.stage==="ready"||P.stage==="rest"){if(P.stage==="rest")P.i++;const n=P.items[P.i];P.stage="work";P.pi=0;P.rep=0;P.beat=0;P.left=phasesOf(n)[0][1];P.call=null;P.nextAt=n.log==="react"||n.cond&&n.calls?2:0;beep(988,200);say(phasesOf(n)[0][0]);return drawPlayer()}
+  if(P.stage==="ready"||P.stage==="rest"){if(P.stage==="rest")P.i++;const n=P.items[P.i];P.stage="work";P.pi=0;P.rep=0;P.beat=0;P.left=phasesOf(n)[0][1];P.call=null;P.nextAt=n.log==="react"||n.cond&&n.calls?2:0;beep(988,200);segTip(n.log==="timer"&&partSegs(phasesOf(n)[0]));say(n.log==="timer"?partSay(phasesOf(n)[0]):phasesOf(n)[0][0]);return drawPlayer()}
   if(P.stage==="work"){condEndPart();P.pi++;
-    if(P.pi<ph.length){P.rep=0;P.beat=0;if(d.tempoCalls){P.call=null;P.bpm=0;P.nextAt=1.5}if(d.cond&&d.calls||partCalls(d,P.pi)){P.call=null;P.nextAt=1.5}P.left=ph[P.pi][1];beep(988,200);say(ph[P.pi][0]);return drawPlayer()}
+    if(P.pi<ph.length){P.rep=0;P.beat=0;if(d.tempoCalls){P.call=null;P.bpm=0;P.nextAt=1.5}if(d.cond&&d.calls||partCalls(d,P.pi)){P.call=null;P.nextAt=1.5}P.left=ph[P.pi][1];beep(988,200);segTip(d.log==="timer"&&partSegs(ph[P.pi]));say(d.log==="timer"?partSay(ph[P.pi]):ph[P.pi][0]);return drawPlayer()}
     if(P.i+1<P.items.length){P.stage="rest";P.left=10;beep(520,300);say(`Rest. Next: ${P.items[P.i+1].name}`);return drawPlayer()}
     return toRate()}}
 function toRate(){condEndPart();P.items.forEach((d,i)=>{if(d.cond){P.ratings[i]=condRating(d,i);return}const m=P.el[i]/60;if(m>0){const dpm=P.drops[i]/m;P.ratings[i]=dpm<=.5?2:dpm<=3?1:0}});P.stage="rate";P.running=false;lockOff();beep(784,120);setTimeout(()=>beep(1046,220),130);say("Done. How did it go?");drawPlayer()}
@@ -4066,7 +4100,7 @@ function drawPlayer(){
       ${(d.log==="react"||d.cond&&d.calls||P.stage==="work"&&partCalls(d,P.pi))&&P.stage==="work"&&!isRestPart()?`<div class="pcall${d.silent?" sig":""}" id="pCall">${esc(P.call||"Ready…")}</div>`:""}${d.tempoCalls&&P.stage==="work"&&!isRestPart()?`<div class="pmeta" id="pBpm">${P.bpm?`${P.bpm} per min · ${P.rep||0} reps`:"Get set…"}</div>`:""}
       ${P.stage==="work"&&phasesOf(d)[P.pi][3]?`<div class="pcall" id="pRep">${P.rep||0} <span>/ ${phasesOf(d)[P.pi][2]}</span></div>`:""}
       <div class="bt-count num" id="pClock">${P.cd>0?Math.ceil(P.cd):fmt(P.left)}</div>${condRest()}
-      ${P.stage==="work"&&d.log!=="react"&&!(d.cond&&isRestPart())?`<div class="ptip" id="pTip">${esc(P.tip||"")}</div>`:""}${P.cd>0?`<div class="pmeta">Dribbling starts at zero</div>`:""}${P.running?"":`${P.lost?`<div class="pmeta">Tap when you have it${P.stage==="work"&&phasesOf(d)[P.pi][3]&&cdSecs()?`, then a ${cdSecs()}-second countdown`:""}</div>`:""}${P.stage==="work"&&phasesOf(d)[P.pi][3]?cdCtl("data-p"):""}${P.lost&&P.back?`<div class="pmeta">Took back ${P.back} reps for the time it took to tap</div>`:""}<div style="display:none"></div>`}${P.stage==="work"&&P.drops[P.i]?`<div class="pmeta">${P.drops[P.i]} drop${P.drops[P.i]===1?"":"s"}</div>`:""}</div>
+      ${P.stage==="work"&&d.log!=="react"&&!(d.cond&&isRestPart())?`<div class="ptip" id="pTip">${esc(P.tip||"")}</div>${d.log==="timer"&&partSegs(ph[P.pi])?`<div class="pmeta" id="pSeg">${esc(segMeta(ph[P.pi],P.left))}</div>`:""}`:""}${P.cd>0?`<div class="pmeta">Dribbling starts at zero</div>`:""}${P.running?"":`${P.lost?`<div class="pmeta">Tap when you have it${P.stage==="work"&&phasesOf(d)[P.pi][3]&&cdSecs()?`, then a ${cdSecs()}-second countdown`:""}</div>`:""}${P.stage==="work"&&phasesOf(d)[P.pi][3]?cdCtl("data-p"):""}${P.lost&&P.back?`<div class="pmeta">Took back ${P.back} reps for the time it took to tap</div>`:""}<div style="display:none"></div>`}${P.stage==="work"&&P.drops[P.i]?`<div class="pmeta">${P.drops[P.i]} drop${P.drops[P.i]===1?"":"s"}</div>`:""}</div>
      ${P.stage==="work"&&phasesOf(d)[P.pi][3]?`<div class="pbeat">${beatSlider(Math.round(phasesOf(d)[P.pi][3]/(S.settings.beat||1)))}</div>`:""}
      ${(()=>{const di=P.stage==="rest"?P.i+1:P.i,dpi=P.stage==="work"?P.pi:0,cl=clipLinks(P.items[di],dpi),sa=isRestPart()?0:seeIds(P.items[di],dpi).length;return cl||sa?`<div class="pdemo"><span>${cl?(P.stage==="work"?"Demo":"Watch first"):"Not sure how?"}</span>${sa?`<button class="clip" data-p="see">Show the move</button>`:""}${cl}</div>`:""})()}<div class="bt-bot"><button class="btn go" data-p="toggle" aria-label="${P.running?"Pause":"Resume"}">${P.running?IC_PAUSE:IC_PLAY}</button><button class="btn" data-p="skip" aria-label="${P.stage==="work"?"Skip":P.stage==="ready"?"Start now":"Skip rest"}">${IC_SKIP}${P.stage==="work"?"":`<span>${P.stage==="ready"?"Start now":"Skip rest"}</span>`}</button></div><div class="bt-hint"><b>Next:</b> ${esc(nextLabel)}<br>${!P.running?"Tap anywhere to go":P.cd>0?"Tap anywhere to pause":P.stage==="work"?(d.cond&&d.tapEnd&&!isRestPart()?"Tap anywhere as you finish":d.body||d.cond||isRestPart()?"Tap anywhere to pause":"Lost the ball? Tap anywhere"):"Tap anywhere to pause"}</div>`}
   pEl.querySelectorAll("[data-clip]").forEach(a=>a.onclick=e=>{e.stopPropagation();if(P.running)togglePlay()});
@@ -4074,7 +4108,7 @@ function drawPlayer(){
     if(k.startsWith("ans:")){const [,a,v]=k.split(":").map(Number);P.ans[P.i][a]=v;beep(880,80);drawPlayer()}else if(k.startsWith("cd:"))setCd(+k.slice(3));else if(k==="see")openSee();else if(k==="coach"){if(P.running)togglePlay();const cd=P.items[P.stage==="rest"?Math.min(P.i+1,P.items.length-1):P.i];sesOpen({from:{drill:cd.id,name:cd.name}})}else if(k==="toggle")togglePlay();else if(k==="skip"){advance()}else if(k==="end"){P.el.some(x=>x>0)?toRate():(closePlayer())}
     else if(k==="discard"){const fr=P.fromRunner;closePlayer();if(fr)closeRunner(true)}else if(k==="save")savePlayer()});
   pEl.querySelectorAll("[data-rate]").forEach(b=>b.onclick=e=>{e.stopPropagation();const [i,r]=b.dataset.rate.split(":").map(Number);P.ratings[i]=r;drawPlayer()})}
-function updPlayer(){const c=$("#pClock");if(c)c.textContent=P.cd>0?String(Math.ceil(P.cd)):fmt(P.left);const tp=$("#pTip");if(tp){if(tp.textContent!==(P.tip||""))tp.textContent=P.tip||"";tp.classList.toggle("flash",Date.now()-(P.tipFlash||0)<1500)}const rp=$("#pRep");if(rp&&rp.firstChild)rp.firstChild.nodeValue=(P.rep||0)+" ";const bp=$("#pBpm");if(bp&&P.bpm)bp.textContent=`${P.bpm} per min · ${P.rep||0} reps`;const k=$("#pCall");if(k){if(k.textContent!==(P.call||"Ready…"))k.textContent=P.call||"Ready…";k.classList.toggle("flash",Date.now()-(P.flashAt||0)<400)}}
+function updPlayer(){const c=$("#pClock");if(c)c.textContent=P.cd>0?String(Math.ceil(P.cd)):fmt(P.left);const tp=$("#pTip");if(tp){if(tp.textContent!==(P.tip||""))tp.textContent=P.tip||"";tp.classList.toggle("flash",Date.now()-(P.tipFlash||0)<1500)}const sm=$("#pSeg");if(sm&&P.stage==="work"){const t=segMeta(phasesOf(P.items[P.i])[P.pi],P.left);if(sm.textContent!==t)sm.textContent=t}const rp=$("#pRep");if(rp&&rp.firstChild)rp.firstChild.nodeValue=(P.rep||0)+" ";const bp=$("#pBpm");if(bp&&P.bpm)bp.textContent=`${P.bpm} per min · ${P.rep||0} reps`;const k=$("#pCall");if(k){if(k.textContent!==(P.call||"Ready…"))k.textContent=P.call||"Ready…";k.classList.toggle("flash",Date.now()-(P.flashAt||0)<400)}}
 function savePlayer(){
   const before=[sL(),hL(),oL(),fL(),cL()];let se=todaySession();if(!se){se={d:today(),items:[]};S.sessions.push(se)}let tot=0;const sks=new Set();
   P.items.forEach((d,i)=>{const xp=pxp(d,i);if(!xp)return;const it={id:d.id,t:Date.now(),xp,r:P.ratings[i]};
