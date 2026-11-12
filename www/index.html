@@ -12,7 +12,7 @@
   --accent:#E2601A; --accent-ink:#FFFFFF; --accent-soft:#FBE3D3;
   --wood:#E7C79C; --wood-line:#B9875A; --paint:#F2D7B4;
   --good:#1E8657; --good-soft:#D6F0E2; --warn:#B87908; --bad:#C13C2A; --bad-soft:#F8DCD6;
-  --read:#3557C9; --read-soft:#DCE4FA;
+  --read:#3557C9; --read-soft:#DCE4FA; --line-strong:#8592AA;
   --display:"Saira Condensed","Arial Narrow",Impact,sans-serif;
   --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
   --r:14px;
@@ -22,9 +22,9 @@
   --accent:#F07A35; --accent-ink:#1A0C03; --accent-soft:#3A2416;
   --wood:#5B4027; --wood-line:#8A6440; --paint:#4A3320;
   --good:#46C489; --good-soft:#163A2C; --warn:#E3A93A; --bad:#EE6A55; --bad-soft:#3E1F1C;
-  --read:#8FA8FF; --read-soft:#1F2A52; color-scheme:dark}}
+  --read:#8FA8FF; --read-soft:#1F2A52; --line-strong:#63769F; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0D1524; --surface:#162038; --surface-2:#1C2844; --ink:#E9EEF7; --muted:#9AA6BF; --line:#2A3858;
+  --bg:#0D1524; --surface:#162038; --surface-2:#1C2844; --ink:#E9EEF7; --muted:#9AA6BF; --line:#2A3858; --line-strong:#63769F;
   --accent:#F07A35; --accent-ink:#1A0C03; --accent-soft:#3A2416;
   --wood:#5B4027; --wood-line:#8A6440; --paint:#4A3320;
   --good:#46C489; --good-soft:#163A2C; --warn:#E3A93A; --bad:#EE6A55; --bad-soft:#3E1F1C;
@@ -445,6 +445,37 @@ section{display:flex;flex-direction:column;gap:10px}
 .mbar b{text-align:right}
 .cuecard .cuebig{display:block;font-family:var(--display);font-size:22px;margin:2px 0}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+/* Today's setup card: saved settings as one summary line (opens to a court control and switches), the body check as the one daily question, one "Today:" line */
+.tset{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:0}
+.tset .tgrp{display:flex;flex-direction:column;gap:6px}.tset :is(.tsum,.tgrp)+.tgrp{border-top:1px solid var(--line);margin-top:10px;padding-top:12px}
+.tset button:focus:not(:focus-visible){outline:none}
+.tset .label{margin:0}.tset .tseg+.label{margin-top:8px}
+.tsum{display:flex;align-items:center;gap:10px;min-height:44px}.tsum .tx{flex:1;min-width:0}.tsum b{display:block;font-size:15px}.tsum small{display:block;color:var(--muted);font-size:12.5px}
+.tsum .setup-btn{flex:none}
+.tseg{display:grid;grid-template-columns:repeat(var(--n,3),1fr);background:var(--surface-2);border:1px solid var(--line-strong);border-radius:12px;padding:3px;gap:3px}
+.tseg button{border:0;background:none;min-height:44px;border-radius:9px;font-weight:700;font-size:13.5px;color:var(--ink);padding:4px 3px;line-height:1.15}
+.tseg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.tseg button small{display:block;font-weight:500;font-size:11.5px;opacity:.8}
+.tchips{display:grid;grid-template-columns:repeat(var(--n,3),1fr);gap:6px}
+.tchips .chip{min-height:44px;background:var(--surface);border-color:var(--line-strong);font-size:14px;padding:6px 8px;position:relative;line-height:1.15}
+.tchips .chip[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink);border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tchips .chip[aria-pressed="true"]::after{content:"✓";position:absolute;top:3px;right:7px;font-size:11px;color:var(--accent);font-weight:800}
+.tsw{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;font-size:15px;font-weight:600}
+.tsw small{display:block;font-weight:500;color:var(--muted);font-size:12.5px}
+.tsw input{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line-strong);position:relative;transition:background .12s}
+.tsw input::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:var(--muted);transition:transform .12s,background .12s}
+.tsw input:checked{background:var(--accent);border-color:var(--accent)}.tsw input:checked::after{transform:translateX(18px);background:var(--accent-ink)}
+.tsw input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tnow{margin-top:12px;border-left:3px solid var(--accent);padding:2px 0 2px 10px;font-size:14px;line-height:1.4;min-height:20px}
+.tnow .linkbtn{padding:0;font-size:14px}
+.tset .done{align-self:flex-end;margin-top:8px}
+@media (prefers-reduced-motion:reduce){.tsw input,.tsw input::after{transition:none}}
+.tseg.balls button{display:inline-flex;align-items:center;justify-content:center;gap:5px;--seg-bg:var(--surface-2)}
+.tseg.balls button[aria-pressed="true"]{--seg-bg:var(--ink)}
+.bi{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.bi .cut{stroke:var(--seg-bg);stroke-width:4}
+.bi-row{display:inline-flex;gap:2px}
+.lenfixed{font-size:13px;color:var(--muted);font-weight:600}
 .chip{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:6px 10px;font-size:13px;font-weight:600}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .metric.arc .btn{margin-top:8px}
@@ -1033,10 +1064,15 @@ const DRILLS=[
 
  // ---------- HANDLING: mechanics ----------
  {id:"b_body",mv:["jog","hops","lunge","swing","calf","slide","build"],skill:"h",body:true,rt:"warm",short:"Quick and general. Good most days.",name:"Body Warm-Up",role:"body",unlock:1,mins:4,log:"timer",
-  phases:[["Easy jog or skips, baseline to baseline",40],["Ankle hops in place, small and quick",20],["Walking lunges with a reach",40],["Leg swings, front to back, then side to side",40],["Slow calf raises",20],["Defensive slides, both directions",30],["Build-up runs at about half, then three-quarter speed",40]],
+  phases:[["Easy jog or skips, about 20 meters and back",40],["Ankle hops in place, small and quick",20],["Walking lunges with a reach",40],["Leg swings, front to back, then side to side",40],["Slow calf raises",20],["Defensive slides, both directions",30],["Build-up runs at about half, then three-quarter speed",40]],
   what:"Four minutes to get your ankles, calves, hamstrings and hips ready before you jump, sprint or finish at the rim. It comes right after Cold 3s, which you shoot with no warm-up at all.",
   steps:["Start easy. You should feel warm and a little loose by the end, not tired.","Keep the hops small and quick, landing softly on the balls of your feet.","On lunges, step long and keep your front knee over your foot.","Build-up runs: start easy and only go faster when your legs feel ready. Skip the last round if anything feels tight."],
   cue:"Warm, not tired.",src:[{label:"Standard dynamic warm-up"}]},
+ {id:"c_burn",skill:"h",body:true,name:"No-Court Burner",role:"body",short:"Gets you tired for Tired 3s when there's no court to run.",unlock:1,mins:2,log:"timer",
+  phases:[["Star jumps",20],["Push-ups",20],["Max jumps, stick each landing",20],["Mountain climbers",20],["Squat jumps",20]],
+  what:"The 17s for a driveway: about two minutes of no-equipment moves back to back, so the Tired 3s that follow are shot on tired legs. Four or five moves from a basketball bodyweight circuit, a different mix each day.",
+  steps:["No rest between moves: the app calls the next one.","Jumps: land soft with your knees over your toes. Push-ups: knees down is fine.","Hard enough to breathe heavy, not a max-effort sprint.","Go straight into Tired 3s."],
+  cue:"Move fast, land soft.",src:[{label:"UH Life: 30-second bodyweight circuit for basketball shape",url:"https://www.uhlife.com/stories/effective-at-home-workout-to-get-into-basketball-shape"},{label:"Breakthrough Basketball: at-home conditioning workout",url:"https://www.breakthroughbasketball.com/fitness/home-conditioning-workout"},{label:"Neshaminy plyometric workout (skater jumps, mountain climbers)",url:"https://www.neshaminy.org//cms/lib/PA01000466/Centricity/Domain/129/PLYO Workout.pdf"}]},
  {id:"b_cool",mv:["walk","hamstr","hipflex","calfwall","quad"],skill:"h",body:true,rt:"cool",short:"Short stretch for what you just used.",name:"Cool-Down Stretch",role:"cool",unlock:1,mins:3,log:"timer",
   phases:[["Walk it off, breathe out slowly",30],["Hamstring stretch, each leg",40],["Hip flexor stretch, each side",40],["Calf stretch against the wall",30],["Quad stretch, each leg",30]],
   what:"Three easy minutes to bring your heart rate down and stretch what you just used: hamstrings, hips, calves and quads. It comes after Tired 3s, the last thing you shoot.",
@@ -2979,7 +3015,7 @@ function streaks(hist){if(hist.some(h=>h.chunk||h.sg))return null;let best=0,run
   return{best,by}}
 function ladderRungs(d,hist){const out=[];let a=0,m=0;for(const h of hist){if(h.chunk){a+=h.a;m+=h.m}else{a++;if(h.hit)m++}if(m>=d.stageN){out.push([a,m]);a=0;m=0}}if(a)out.push([a,m]);return out}
 const stageIdx=d=>d.gm==="streak"?Math.min(d.stages.length-1,sState(d).done):Math.min(d.stages.length-1,Math.floor((d.stageBy==="makes"?R.m:R.a)/d.stageN));
-const stageCall=(d,i)=>d.stageBy==="makes"||d.skill==="f"||!d.between?d.stages[i]:d.stages[i]+" · run first";
+const stageCall=(d,i)=>d.stageBy==="makes"||d.skill==="f"||!d.between?d.stages[i]:d.stages[i]+(d.id==="s_tired"&&courtHave()<2?` · ${ncMove(5+i)[1]} first`:" · run first");
 function drillPct(ids,days){const cut=cutOf(days);let m=0,a=0;for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items)if(ids.includes(it.id)&&it.a){m+=it.m;a+=it.a}}return{m,a,p:pct(m,a)}}
 function bestStreak(days){const cut=cutOf(days);let b=null;for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){if(it.st!=null&&D[it.id]&&D[it.id].log==="spots"&&(!b||it.st>b.n))b={n:it.st,d:se.d}}}return b}
 function spotStreaks(days){const cut=cutOf(days),out={};for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items)if(it.ss)for(const k in it.ss)out[k]=Math.max(out[k]||0,it.ss[k])}return out}
@@ -3010,9 +3046,31 @@ const NW_DEF={20:1,30:2,45:2},NW_ALL=99,NW_MAX=6;
 /* warm-up and cool-down routines: you pick one of each (Today's plan ⇄, or Drills → Conditioning) and every recommended workout uses it */
 const RTS=k=>DRILLS.filter(d=>d.rt===k),RT_DEF={warm:"b_body",cool:"b_cool"},RT_NAME={warm:"warm-up",cool:"cool-down"};
 function rtPick(k){const d=D[(S.settings.rt||{})[k]];return d&&d.rt===k?d:D[RT_DEF[k]]}
-const FIXED=new Set(["s_cold","s_tired",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
+const FIXED=new Set(["s_cold","s_tired","c_burn",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
 /* drills that load the legs: left out on a "Legs heavy" or "Game tonight" day */
 const JUMPY=new Set(["c_17s","c_ub","f_power","f_bump","f_contact","f_spots","f_chair","s_tired","h_zig","h_stop","s_sprint3","f_knee","f_tornado","f_eyes"]);
+/* where you're training (Today's setup): Full court / Half court / Just a hoop (a driveway) / No hoop.
+   Full-length runs need a full court; runs that use court lines (17s and the like) need at least a half court;
+   shooting and finishing need a hoop; ball handling and the rest work anywhere. */
+const COURTS=[["full","Full court","Everything"],["half","Half court","No long runs"],["hoop","Just a hoop","No line runs"],["none","No hoop","Handling"]],COURT_N={full:3,half:2,hoop:1,none:0},COURT_NAME={full:"a full court",half:"a half court",hoop:"just a hoop",none:"no hoop"};
+const COURT_FULL=new Set(["c_ub","c_farmers","h_2full"]),COURT_HALF=new Set(["c_17s","c_rsa","c_multi","c_hokie","c_pinky","c_help","c_called","h_walk","h_free"]);
+const courtNeed=d=>COURT_FULL.has(d.id)?3:COURT_HALF.has(d.id)?2:d.skill==="s"||d.skill==="f"?1:0;
+const courtHave=()=>COURT_N[S.settings.court]??3;
+/* balls you have today: two-ball drills need 2; conditioning and body routines need none (except the Hokie drill and the ball warm-ups) */
+const BALLS=[["2","2 basketballs","Two"],["1","1 basketball","One"],["0","No basketball","None"]],TWO_BALL=/^(h_2|h_r_2|f_2)|^(h_two|s_2chair)$/;
+const BALL_P=`<circle cx="8" cy="8" r="6.4"/><path d="M1.6 8h12.8M8 1.6v12.8M3.8 3.6c2.2 2 2.2 6.8 0 8.8M12.2 3.6c-2.2 2-2.2 6.8 0 8.8"/>`;
+const BALL_SVG=`<svg class="bi" viewBox="0 0 16 16" aria-hidden="true">${BALL_P}</svg>`,NOBALL_SVG=`<svg class="bi" viewBox="0 0 16 16" aria-hidden="true"><g opacity=".5">${BALL_P}</g><path class="cut" d="M2.5 13.5l11-11"/><path d="M2.5 13.5l11-11"/></svg>`;
+const ballIcons=v=>`<span class="bi-row" aria-hidden="true">${v==="0"?NOBALL_SVG:BALL_SVG.repeat(+v)}</span>`;
+const ballNeed=d=>TWO_BALL.test(d.id)?2:(d.cond&&d.id!=="c_hokie")||(d.body&&d.id!=="b_game"&&d.id!=="b_club")?0:1;
+const ballHave=()=>{const b=S.settings.balls;return b==null?2:+b};
+const placeOk=d=>courtNeed(d)<=courtHave();
+const courtOk=d=>placeOk(d)&&ballNeed(d)<=ballHave();
+/* no-equipment moves for days without a court to run (Just a hoop, No hoop): the Burner draws five a day, and each Tired 3s round gets the next one */
+const NC_MOVES=[["Star jumps","star jumps"],["Push-ups","push-ups"],["Max jumps, stick each landing","max jumps, sticking each landing"],["Squat jumps","squat jumps"],["Skater jumps, side to side","skater jumps"],["Mountain climbers","mountain climbers"],["Burpees","burpees"],["High knees","high knees"],["Defensive slides in place","slides in place"],["Jumping jacks","jumping jacks"]];
+const ncMove=i=>NC_MOVES[(hash(today())+i)%NC_MOVES.length];
+if(D.c_burn)Object.defineProperty(D.c_burn,"phases",{get(){return [0,1,2,3,4].map(i=>[ncMove(i)[0],20])}});
+/* the run before each Tired 3s round fits the court you're on */
+if(D.s_tired)Object.defineProperty(D.s_tired,"between",{get(){const c=courtHave();return c>=3?"Run full court down and back at about 80 percent.":c===2?"Run baseline to half court and back twice at about 80 percent.":(()=>{let i=0;try{if(R&&R.d===D.s_tired)i=stageIdx(D.s_tired)}catch(e){}return `30 seconds of ${ncMove(5+i)[1]}, hard enough to breathe heavy.`})()}});
 const FREQ_LABEL={auto:"Auto",every:"Every workout",weekly:"Weekly",custom:"Custom",never:"Never suggest"};
 const DOW=["Mo","Tu","We","Th","Fr","Sa","Su"],DOWL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const fq=id=>(S.rec.freq||{})[id]||{k:"auto"};
@@ -3040,7 +3098,7 @@ function needsWork(){const out=[],add=(id,t,why)=>{if(D[id]&&!out.some(x=>x.d.id
   let hd=null;const cut=cutOf(30);for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){const d=D[it.id];if(d&&d.skill==="h"&&!d.body&&it.lost>=3&&(!hd||it.lost>=hd.lost))hd={id:it.id,lost:it.lost}}}
   if(hd)add(hd.id,`Needs work: ${hd.lost} drops last time`,`You lost the ball ${hd.lost} times the last time you ran it. Clean reps here carry over to games.`);
   return out.filter(x=>!((S.rec.paused||{})[x.d.id]>today()))}
-function slotOf(d){if(d.id==="c_17s"||d.id==="c_ub")return"Tired shots";if(d.cond)return"Conditioning";if(d.id==="s_cold")return"Cold shots";if(d.rt==="warm")return"Body warm-up";if(d.rt==="cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
+function slotOf(d){if(d.id==="c_17s"||d.id==="c_ub"||d.id==="c_burn")return"Tired shots";if(d.cond)return"Conditioning";if(d.id==="s_cold")return"Cold shots";if(d.rt==="warm")return"Body warm-up";if(d.rt==="cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
   if(d.role==="warm")return"Warm-up";if(d.id==="h_live")return"Live";
   if(d.skill==="h")return d.read?"Handle · decisions":"Handle · mechanics";
   if(d.skill==="f")return"Finishing";
@@ -3055,30 +3113,30 @@ function customToday(){const p=S.rec.plan;if(!p||(p.d!==today()&&!p.stay))return
 /* a workout set to stay on carries over to the next day, with that day's skips and add-ins cleared */
 function planRoll(){const p=S.rec.plan;if(p&&p.stay&&p.d!==today()){S.rec.plan={...p,d:today(),extra:[],skip:[]};persist()}}
 const skipped=id=>{const p=S.rec.plan;return !!(p&&customToday()&&(p.skip||[]).includes(id))};
-function eligible(d,body){return d&&!d.body&&!(d.cond&&(body&&(d.hard||d.jc)||!condGate(d).ok))&&fq(d.id).k!=="never"&&!((S.rec.paused||{})[d.id]>today())&&(!d.partner||S.settings.partner)&&!(body&&(JUMPY.has(d.id)||(body==="game"&&d.role==="volume")))}
+function eligible(d,body){return d&&!d.body&&courtOk(d)&&!(d.cond&&(body&&(d.hard||d.jc)||!condGate(d).ok))&&fq(d.id).k!=="never"&&!((S.rec.paused||{})[d.id]>today())&&(!d.partner||S.settings.partner)&&!(body&&(JUMPY.has(d.id)||(body==="game"&&d.role==="volume")))}
 function plan0(){
   const cw=customToday();if(cw){const ids=[...cw.items,...((S.rec.plan.extra)||[]).filter(id=>!cw.items.includes(id))];
     const out=ids.map(id=>D[id]).filter(Boolean).map(d=>({slot:"Your workout",d,skip:skipped(d.id),why:skipped(d.id)?{k:"skip",t:"Skipped today"}:cw.items.includes(d.id)?null:{k:"you",t:"You added it"}}));out.custom=cw;out.over=[];return out}
-  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")));
+  const day=today(),body=bodyToday(),mins=planMins(),r=rng(hash(day+mins+(S.settings.partner?"p":"")+(body||"")+(courtHave()<3?"c"+courtHave():"")+(ballHave()<2?"b"+ballHave():"")));
   const ml={s:maxLvl("s"),h:maxLvl("h"),f:maxLvl("f")},sw=swapMap(),baseline=S.sessions.length<3;let newUsed=0;
   const ok=d=>eligible(d,body),okAuto=d=>ok(d)&&lvlOf(d)<=ml[d.skill];
-  const cand=[],used=new Set();
+  const cand=[],used=new Set(),courtOut=[],cut=d=>{if(d&&!courtOk(d)&&!courtOut.includes(d))courtOut.push(d)};
   const add=(d,why,prio)=>{if(!d||used.has(d.id))return;const to=sw[d.id];let sx=false;if(to&&D[to]&&!used.has(to)&&!FIXED.has(d.id)){used.add(d.id);d=D[to];sx=true;why=why&&why.k==="need"?why:{k:"swap",t:"Swapped in"}}
     if(used.has(d.id))return;cand.push({slot:slotOf(d),d,why,prio,sx});used.add(d.id)};
   const light=body?{k:"light",t:"Lighter today"}:null;
   /* game tonight: the Pre-Game Warm-Up (with a ball) replaces the everyday one; "warm-up only" is just that */
   if(body==="game"&&S.rec.body.only){const o=[{slot:slotOf(D.b_game),d:D.b_game,why:{k:"fixed",t:"Before your game"},prio:"must"}];o.over=[];o.mins=D.b_game.mins;o.body=body;o.ml=ml;return o}
-  add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(body==="game"?D.b_game:rtPick("warm"),{k:"fixed",t:body==="game"?"Game tonight: warm up with a ball":"Always before handling"},"must");
-  const tired=mins!==20&&!body;
+  if(courtOk(D.s_cold))add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");else cut(D.s_cold);add(body==="game"?D.b_game:courtOk(rtPick("warm"))?rtPick("warm"):D.b_body,{k:"fixed",t:body==="game"?"Game tonight: warm up with a ball":"Always before handling"},"must");
+  const tired=mins!==20&&!body&&courtOk(D.s_tired);if(mins!==20&&!body&&!tired)cut(D.s_tired);
   /* a run right before Tired 3s so the tired shots come on tired legs, not straight after more shooting (dropped below if no shooting comes first):
      Up-and-Backs on shorter days, 17s at 45 minutes. Each swaps for the other. */
-  const run=mins<45?D.c_ub:D.c_17s;if(tired&&ok(run))add(run,{k:"fixed",t:"Gets you tired for Tired 3s"},"must");
+  const run=(mins<45?[D.c_ub,D.c_17s]:[D.c_17s,D.c_ub]).find(ok)||(courtHave()<2?D.c_burn:null);if(tired&&run)add(run,{k:"fixed",t:"Gets you tired for Tired 3s"},"must");
   if(tired)add(D.s_tired,{k:"fixed",t:"Always near the end"},"must");
   add(rtPick("cool"),null,"must");
-  for(const id of S.rec.added)if(D[id]&&!D[id].body&&(!D[id].partner||S.settings.partner))add(D[id],{k:"you",t:"You added it"},"added");
-  let nNW=0;const nwN=nwCount(mins);for(const x of needsWork()){if(nNW>=nwN)break;if(!ok(x.d)||used.has(x.d.id))continue;add(x.d,{k:"need",t:x.t},"need");nNW++}
-  for(const id in S.rec.freq){if(fq(id).k==="every"&&ok(D[id]))add(D[id],{k:"every",t:"Every workout"},"every")}
-  for(const id in S.rec.freq){const k=fq(id).k;if((k==="weekly"||k==="custom")&&ok(D[id])&&due(id))add(D[id],{k:"sched",t:fqText(id)},"sched")}
+  for(const id of S.rec.added)if(D[id]&&!D[id].body&&!courtOk(D[id]))cut(D[id]);else if(D[id]&&!D[id].body&&(!D[id].partner||S.settings.partner))add(D[id],{k:"you",t:"You added it"},"added");
+  let nNW=0;const nwN=nwCount(mins);for(const x of needsWork()){if(nNW>=nwN)break;if(!courtOk(x.d)){cut(x.d);continue}if(!ok(x.d)||used.has(x.d.id))continue;add(x.d,{k:"need",t:x.t},"need");nNW++}
+  for(const id in S.rec.freq){if(fq(id).k==="every"){if(ok(D[id]))add(D[id],{k:"every",t:"Every workout"},"every");else if(D[id]&&!courtOk(D[id]))cut(D[id])}}
+  for(const id in S.rec.freq){const k=fq(id).k;if((k==="weekly"||k==="custom")&&due(id)){if(ok(D[id]))add(D[id],{k:"sched",t:fqText(id)},"sched");else if(D[id]&&!courtOk(D[id]))cut(D[id])}}
   const isNew=d=>daysAgo(lastDone(d.id))>=21;
   const whyOf=d=>light?light:baseline?{k:"new",t:"Baseline week: sets your first goal"}:isNew(d)?{k:"new",t:lastDone(d.id)?`Not done in ${daysAgo(lastDone(d.id))} days`:"New to try"}:isFav(d.id)?{k:"fav",t:"Favorite"}:{k:"note",t:`Last done ${daysAgo(lastDone(d.id))===1?"yesterday":daysAgo(lastDone(d.id))+" days ago"}`};
   const pick=pool=>{const p=pool.filter(okAuto).filter(d=>!used.has(d.id)&&!(newUsed&&!baseline&&isNew(d)));
@@ -3091,6 +3149,7 @@ function plan0(){
   /* 3s are the main goal. Under 45 minutes the test is the short 5-Spot (6 per spot, about 7 min), reserved before the other picks
      so it fits; at 45 it's the full 10 per spot. Both feed the same 3-point numbers. */
   const t3=lastDone("s_5spot"),t3due=mins===45||!t3||t3===day||daysAgo(t3)>=2,sh=mins<45;SHORT5=null;
+  if(t3due&&!body&&!courtOk(D.s_5spot))cut(D.s_5spot);
   if(t3due&&ok(D.s_5spot)&&!body){if(sh){SHORT5=day;add({...D.s_5spot,per:6},{k:"fixed",t:"Your 3-point test, short: 6 per spot"},"fav")}else add(D.s_5spot,{k:"fixed",t:"Your 3-point test, every other session"},"fav")}
   fill(H);fill(F);
   if(t3due&&body&&ok(D.s_5spot))add(D.s_5spot,{k:"fixed",t:"Your 3-point test, every other session"},"fav");
@@ -3101,12 +3160,16 @@ function plan0(){
   fill(RH);fill(VOL.filter(d=>d.read));fill(VOL.filter(d=>!d.read));
   if(!tired&&ok(D.s_ft))add(D.s_ft,{k:"fixed",t:"Free throws to finish"},"fav");
   if(POOL[focus])fill(POOL[focus][1]);
+  /* no court: handling only, so give the minutes to more handling drills */
+  /* no ball: the minutes go to conditioning (Starter-level ones until you've moved up) */
+  if(!ballHave()){const CD=DRILLS.filter(d=>d.cond&&!d.clips&&!RUNS.includes(d.id)&&ok(d)&&!used.has(d.id)&&lvlOf(d)<=Math.max(ml.s,ml.h,ml.f));CD.forEach(d=>d._s=favScore(d.id)+Math.min(2,daysAgo(lastDone(d.id))/7)+r()*.6);CD.sort((a,b)=>b._s-a._s);CD.slice(0,8).forEach(d=>add(d,whyOf(d),"fav"))}
+  else if(!courtHave()){fill(H);fill(RH);fill(H);fill(RH);fill(H)}
   fill(H);fill(F);fill(FORM);fill(RH);fill(VOL);if(!t3due&&ok(D.s_5spot))add(D.s_5spot,{k:"fixed",t:"Your 3-point test"},"fav");
   let left=mins+2;const out=[],over=[];
   for(const x of cand){const m=realMins(x.d);if(x.prio==="must"||x.prio==="added"||x.sx||m<=left){out.push(x);left-=m}else if(x.prio!=="fav")over.push(x)}
   out.sort((a,b)=>ORDER.indexOf(a.slot)-ORDER.indexOf(b.slot));
-  {const i=out.findIndex(x=>x.d.id==="c_17s"||x.d.id==="c_ub");if(i>=0&&!(i>0&&out[i-1].d.skill==="s"&&out[i+1]&&out[i+1].d.id==="s_tired"))out.splice(i,1)}
-  out.over=over;out.mins=mins;out.body=body;out.ml=ml;return out}
+  {const i=out.findIndex(x=>x.d.id==="c_17s"||x.d.id==="c_ub"||x.d.id==="c_burn");if(i>=0&&!(i>0&&out[i-1].d.skill==="s"&&out[i+1]&&out[i+1].d.id==="s_tired"))out.splice(i,1)}
+  out.over=over;out.courtOut=courtOut.filter(d=>!used.has(d.id));out.mins=mins;out.body=body;out.ml=ml;return out}
 
 /* alternatives for a swap: same slot (or same weakness for a needs-work drill), not already in today's plan */
 function swapOptions(x,p){const inPlan=new Set(p.map(y=>y.d.id)),body=bodyToday(),ml={s:maxLvl("s"),h:maxLvl("h"),f:maxLvl("f")};
@@ -3210,20 +3273,20 @@ function viewToday(){
   const rate=!up.length&&recapIds().length&&!(S.rec.recap&&S.rec.recap.d===today());
   return `${startCard()}${switchCard()}<section class="weekrow" aria-label="This week"><span class="label">This week</span><div class="week">${w.html}</div><span class="muted small"><b class="num" style="font-size:16px;color:var(--ink)">${w.cnt}</b> of 3</span></section>
   <section><div class="sechead"><h2>Today's workout</h2>
-   ${cw?"":`<div class="seg" role="group" aria-label="Workout length">${[20,30,45].map(m=>`<button data-mins="${m}" aria-pressed="${m===mins}">${m} min</button>`).join("")}</div>`}</div>
+   ${cw?"":p.body==="game"?`<span class="lenfixed">${p.mins} min · set by Game tonight</span>`:`<div class="seg" role="group" aria-label="Workout length">${[20,30,45].map(m=>`<button data-mins="${m}" aria-pressed="${m===mins}">${m} min</button>`).join("")}</div>`}</div>
    ${shelf(p)}
-   ${setupStrip(!started&&!cw)}
+   ${setupStrip(!started&&!cw,cw?null:p)}
    ${waiting.length?addedCard(waiting):""}
    ${nowPlaying(p,ts)}
    ${(()=>{if(!S.sessions.length&&!S.rec.start)return"";if(!up.length)return rate?`<button class="btn pri" data-rec="recap">Rate today's drills<small style="display:block;font-family:var(--body);font-size:13px;text-transform:none;font-weight:600">Easy, Right or Hard · 10 seconds</small></button>`:`<button class="btn pri" disabled>Today's workout is done</button>`;const timed=x=>x.d.log==="timer"||x.d.log==="react";
      if(timed(up[0])){const secs=up.reduce((a,x)=>a+totalOf(x.d),0)+10*(up.length-1);return `<button class="btn pri upnext" data-play="${up.map(x=>x.d.id).join(",")}">Up next: ${esc(up[0].d.name)}${up.length>1?` + ${up.length-1} more`:""}<small>Timed · plays back to back · ${Math.round(secs/60)} min</small></button>`}
      return `<button class="btn pri upnext" data-open="${up[0].d.id}">Up next: ${esc(up[0].d.name)}<small>Opens the drill and its logger</small></button>`})()}
-   ${cueCard()}
+   ${p.some(x=>x.d.skill==="s")?cueCard():""}
    ${ws?`<div class="card focus">${courtSVG({data:spotTotals(30),size:96})}<div class="small"><div class="label">Focus spot</div><b>${SPOT[ws.id].name}</b> is your coldest spot over 30 days at <b class="num">${Math.round(ws.p*100)}%</b>. Weak Spot Reps will target it.</div></div>`:""}
-   <div class="plantotal"><span>${p.length} drill${p.length===1?"":"s"}${nNeed?` · ${nNeed} for what needs work`:""}</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min on the court</b></div>
+   <div class="plantotal"><span>${p.length} drill${p.length===1?"":"s"}${nNeed?` · ${nNeed} for what needs work`:""}${(p.courtOut||[]).length?` · <button class="linkbtn" data-rec="leftout" style="padding:0">${p.courtOut.length} left out ›</button>`:""}</span><b>About ${Math.round(p.reduce((a,x)=>a+realMins(x.d),0))} min</b></div>
    <div class="list">${p.map((x,i)=>`${i===0||p[i-1].slot!==x.slot?`<div class="slot">${x.slot}</div>`:""}<div class="planline${x.skip?" skipped":""}">${drillRow(x.d,i+1,{next:upIds.has(x.d.id),why:x.why})}${cw?`<button class="optb" data-rec="wopt:${x.d.id}" aria-label="${esc(x.d.name)}: skip today or remove">${MOREICON}</button>`:x.d.rt?`<button class="optb" data-rec="rt:${x.d.rt}" aria-label="${esc(x.d.name)}: pick your ${RT_NAME[x.d.rt]}">${SWAPICON}</button>`:!FIXED.has(x.d.id)?`<button class="optb" data-rec="opt:${x.d.id}" aria-label="${esc(x.d.name)}: why it's here, swap or how often">${SWAPICON}</button>`:`<span class="optb ph" aria-hidden="true"></span>`}</div>`).join("")}</div>
    ${cw&&ts?(()=>{const other=[...new Set(ts.items.map(it=>it.id))].filter(id=>D[id]&&!p.some(x=>x.d.id===id));return other.length?`<p class="muted small" style="margin:0">Also done today: ${other.map(id=>esc(D[id].name)).join(", ")}.</p>`:""})():""}
-   ${cw?"":overflowCard(p)}
+   ${cw?"":overflowCard(p)}${cw?"":leftOutCard(p)}
    <p class="muted small" style="margin:0">${cw?`${esc(cw.name)} runs in the order you saved it${S.rec.plan&&S.rec.plan.stay?" and stays on until you switch":", today only. Tomorrow goes back to the recommended plan"}. Switch to another workout any time: drills you've done today stay done. Tap ⋯ to skip a drill today. `:`Each drill says why it's here. Tap ⇄ to swap it or set how often it comes back. `}You can tap any drill to do it out of order. <button class="linkbtn" data-rec="how" style="padding:0">How today is built ›</button></p></section>
   ${coachTodayCard()}`}
 
@@ -3365,7 +3428,8 @@ function route(){const h=location.hash.slice(1);state.tab=["today","drills","pro
 if(window.ResizeObserver)new ResizeObserver(([e])=>document.documentElement.style.setProperty("--plate-h",Math.ceil(e.target.getBoundingClientRect().height)+"px")).observe(document.getElementById("plate"));
 function render(){planRoll();renderPlate();
   $("#view").innerHTML=state.tab==="today"?viewToday():state.tab==="drills"?viewDrills():state.tab==="form"?viewForm():state.tab==="coach"?viewCoach():viewProgress();afterFormRender();afterCoachRender();
-  document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));wkBar();sesPill()}
+  document.querySelectorAll(".tabs a").forEach(a=>a.dataset.tab===state.tab?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));wkBar();sesPill();
+  if(state.refocus){const f=document.querySelector(`[data-rec="${state.refocus}"]`);state.refocus=null;if(f)f.focus({preventScroll:true})}}
 /* Workout bar: once a workout is under way, the next drill stays one tap away on every tab, docked above the tab bar.
    It shares that dock with the music controls (Android app): workout row on top in orange, music row under it in white,
    drawn as one card. "Playing" is kept for music only. Hidden on Today while the Up next button is on screen,
@@ -3422,9 +3486,9 @@ document.addEventListener("click",e=>{
   else if(t.dataset.dtab)setDrillTab(t.dataset.dtab)
   else if(t.dataset.range){state.range=t.dataset.range;render()}});
 document.addEventListener("change",e=>{
-  if(e.target.id==="optPartner"){S.settings.partner=e.target.checked;persist();render()}
+  if(e.target.id==="optPartner"){S.settings.partner=e.target.checked;persist();render();const f=$("#optPartner");if(f)f.focus({preventScroll:true})}
   if(e.target.id==="fcFile"&&e.target.files[0]){analyze(e.target.files[0]);return}
-  if(e.target.id==="optHeavy"){S.settings.heavy=e.target.checked;persist();render()}});
+  if(e.target.id==="optHeavy"){S.settings.heavy=e.target.checked;persist();render();const f=$("#optHeavy");if(f)f.focus({preventScroll:true})}});
 document.addEventListener("click",e=>{const a=e.target.closest("[data-check]");if(!a)return;FC.focus=a.dataset.check;const v=CHECK_VIEW[FC.focus]||"side";if(S.settings.fcView!==v){S.settings.fcView=v;persist();reView()}closeRunner(true)},true);
 window.addEventListener("hashchange",route);
 let scrubBusy=false;document.addEventListener("input",async e=>{if(e.target.id!=="fcScrub")return;FC.idx=+e.target.value;if(scrubBusy)return;scrubBusy=true;let last=-1;while(last!==FC.idx){last=FC.idx;await drawFrame(last,$("#fcCanvas"))}scrubBusy=false});
@@ -3497,12 +3561,36 @@ function wSaveHTML(id){const d=D[id],ws=S.rec.workouts;
 const wHas=id=>S.rec.workouts.filter(w=>w.items.includes(id));
 function planRow(p){const cw=p.custom,mins=cw?wMins(cw):p.mins;
   return `<button class="planrow" data-rec="plan"><span><span class="label">${cw?"Plan · yours, today only":p.body?"Plan · lightened":"Plan"}</span><b>${cw?esc(cw.name):"Recommended"} · ${mins} min</b></span><span class="v">Change ▾</span></button>`}
-/* Today's setup in one strip: the optional body check (before the first drill only), then the partner and heavy-ball switches */
-function setupStrip(body){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;
-  const note=k==="heavy"?"Same minutes, but no Tired 3s runs, no two-foot jump or contact drills, and lighter footwork.":k==="game"?(S.rec.body.only?"Just the Pre-Game Warm-Up, about 10 minutes. Do it at the gym before tip-off.":"20 minutes of form and touch with the Pre-Game Warm-Up: no volume shooting, no jump or contact drills."):"";
-  const gm=k==="game"?`<div class="chips" role="group" aria-label="Game tonight">${[["tune","Tune-up · 20 min"],["warm","At the gym now: warm-up only"]].map(([v,t])=>{const on=(v==="warm")===!!S.rec.body.only;return `<button class="chip" data-rec="gmode:${v}" aria-pressed="${on}">${on?"✓ ":""}${t}</button>`}).join("")}</div>`:"";
-  return `<div class="setup">${body?`<div class="label">How's the body today? <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:500">Optional</span></div><div class="chips" role="group" aria-label="How's the body today">${[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]].map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${k===v?"✓ ":""}${t}</button>`).join("")}</div>${gm}${note?`<p class="small muted" style="margin:0">${note}</p>`:""}`:""}
-   <div class="row"><label class="toggle"><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}> Partner today</label><label class="toggle"><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}> I have a heavy ball</label></div></div>`}
+/* Today's setup card. Saved settings (court, partner, heavy ball) stay folded into one summary line with Change; the body check
+   is the one question asked each day (before the first drill only); one "Today:" line says what those choices did to the plan. */
+const BODY_OPTS=[["good","Feeling good"],["heavy","Legs heavy"],["game","Game tonight"]];
+function setupStrip(body,p){const k=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null,ck=S.settings.court||"full",open=!!state.setOpen;
+  const bk=String(ballHave()),sum=[COURTS.find(c=>c[0]===ck)[1],BALLS.find(x=>x[0]===bk)[1],S.settings.partner?"With a partner":"Solo",S.settings.heavy?"Heavy ball":""].filter(Boolean).join(" · ");
+  const head=`<div class="tsum"><div class="tx"><b>${esc(sum)}</b><small>${open?"These stay until you change them":"Stays until you change it"}</small></div>${open?"":`<button class="setup-btn" data-rec="setopen" aria-expanded="false">Change</button>`}</div>`;
+  const edit=open?`<div class="tgrp"><span class="label">Where you train</span><div class="tseg" role="group" aria-label="Where you train" style="--n:${COURTS.length}">${COURTS.map(([v,t,sub])=>`<button data-rec="court:${v}" aria-pressed="${ck===v}">${t}<small>${sub}</small></button>`).join("")}</div>
+     <span class="label">Basketballs</span><div class="tseg balls" role="group" aria-label="Basketballs" style="--n:3">${BALLS.map(([v,t,sh])=>`<button data-rec="balls:${v}" aria-pressed="${bk===v}" aria-label="${t}">${ballIcons(v)}${sh}</button>`).join("")}</div>
+     <label class="tsw"><span>With a partner<small>Adds partner drills</small></span><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}></label>
+     <label class="tsw"><span>Heavy ball<small>For the heavy-ball handling sets</small></span><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}></label>
+     <button class="btn sec small done" data-rec="setopen">Done</button></div>`:"";
+  const gm=k==="game"?`<div class="tchips" role="group" aria-label="Game tonight" style="--n:2">${[["tune","Tune-up · 20 min"],["warm","Warm-up only · 10 min"]].map(([v,t])=>{const on=(v==="warm")===!!S.rec.body.only;return `<button class="chip" data-rec="gmode:${v}" aria-pressed="${on}">${t}</button>`}).join("")}</div>`:"";
+  const bq=body?`<div class="tgrp"><span class="label">How's the body today?</span><div class="tchips" role="group" aria-label="How's the body today">${BODY_OPTS.map(([v,t])=>`<button class="chip" data-rec="body:${v}" aria-pressed="${k===v}">${t}</button>`).join("")}</div>${gm}</div>`:"";
+  const line=p?todayLine(p,k):"";
+  return `<div class="tset">${head}${edit}${bq}${line?`<div class="tnow" role="status">${line}</div>`:""}</div>`}
+/* one sentence about what today's choices did, built from the plan you actually got */
+function todayLine(p,k){const bits=[],ck=S.settings.court||"full",n=(p.courtOut||[]).length;
+  if(k==="heavy")bits.push("Legs heavy: no Tired 3s, jump or contact drills, lighter footwork.");
+  if(k==="game")bits.push(S.rec.body.only?"Game tonight: just the Pre-Game Warm-Up. Do it at the gym before tip-off.":"Game tonight: 20 minutes of form and touch, no volume shooting or jumps.");
+  if(ck==="half"&&p.some(x=>x.d.id==="c_17s")&&(p.mins<45))bits.push("Half court: 17s instead of Up-and-Backs before Tired 3s.");
+  if(ck==="hoop"&&p.some(x=>x.d.id==="s_tired"))bits.push("Just a hoop: the No-Court Burner instead of a run before Tired 3s, and a different no-equipment move before each round.");
+  if(ck==="none")bits.push("No hoop: warm-up, ball handling and the stretch.");
+  if(!ballHave())bits.push("No basketball: warm-up, conditioning and the stretch.");else if(ballHave()===1&&n)bits.push("One basketball: no two-ball drills.");
+  if(n)bits.push(`<button class="linkbtn" data-rec="leftout">${n} drill${n===1?"":"s"} left out today ›</button>`);
+  return bits.join(" ")}
+/* drills today's court ruled out, shown under the list so nothing disappears without a word */
+function leftOutCard(p){const out=p.courtOut||[];if(!out.length)return"";const ck=S.settings.court||"full";
+  const why=d=>placeOk(d)?(ballNeed(d)===2?"needs two basketballs":"needs a basketball"):["","needs a hoop","needs court lines","needs a full court"][courtNeed(d)],
+    back=d=>placeOk(d)?(ballNeed(d)===2?"with two basketballs":"with a basketball"):["","with a hoop","on a court","on a full court"][courtNeed(d)];
+  return `<div class="overcard" id="leftout"><div class="label">Left out today · ${COURTS.find(c=>c[0]===ck)[1]} · ${BALLS.find(x=>x[0]===String(ballHave()))[1]}</div>${out.map(d=>`<span><b>${esc(d.name)}</b> ${why(d)}. It's back when you train ${back(d)}.</span>`).join("")}<button class="linkbtn" data-rec="setopen">Change where you train</button></div>`}
 function addedCard(ids){const names=ids.map(id=>D[id].name);
   return `<div class="addedcard"><b>You added ${esc(names.length>2?names.length+" drills":names.join(" and "))}.</b> Put ${names.length>1?"them":"it"} in today's workout, or keep ${names.length>1?"them":"it"} for your next recommended one?<div class="psee-btns"><button class="btn sec small" data-rec="addin">Add ${names.length>1?"them":"it"} in</button><button class="btn sec small" data-rec="keepnext">Keep for next</button></div></div>`}
 const SWAPICON=`<svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11l-3-3M16 13H5l3 3"/></svg>`;
@@ -3624,8 +3712,8 @@ function toggleAdd(id){const on=inNext(id),prev=[...S.rec.added];S.rec.added=on?
   if(on)toast("Removed",`${D[id].name} is out of your next workout.`);else toastU("Added","In your next workout, whenever you train.",()=>{S.rec.added=prev;persist();if(R){const c=$("#sheet .reccard");if(c)c.outerHTML=recCard(R.d)}render()})}
 function doneWith(id){if(S.rec.added.includes(id)){S.rec.addedDone=S.rec.addedDone||{};S.rec.addedDone[id]=today()}}
 
-document.addEventListener("click",e=>{const t=e.target.closest("[data-rec]");if(!t)return;e.preventDefault();recAct(t.dataset.rec)});
-function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.slice(i+1),[b,c]=rest.split(":");
+document.addEventListener("click",e=>{const t=e.target.closest("[data-rec]");if(!t)return;e.preventDefault();recAct(t.dataset.rec,t)});
+function recAct(k,el){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.slice(i+1),[b,c]=rest.split(":");
   switch(a){
   case "close":return bsClose();
   case "undo":{const f=toastU.fn;toastU.fn=null;$("#toastHost").innerHTML="";if(f)f();return}
@@ -3666,7 +3754,11 @@ function recAct(k){const i=k.indexOf(":"),a=i<0?k:k.slice(0,i),rest=i<0?"":k.sli
   case "nwreset":S.rec.nw={...NW_DEF};persist();render();return bsSet(nwHTML());
   case "add":return toggleAdd(b);
   case "gmode":{if(S.rec.body&&S.rec.body.k==="game"){S.rec.body.only=b==="warm";persist()}return render()}
-  case "body":{const cur=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;S.rec.body=cur===b?null:{d:today(),k:b};persist();return render()}
+  case "court":{S.settings.court=b;persist();state.refocus=`court:${b}`;return render()}
+  case "balls":{S.settings.balls=b;persist();state.refocus=`balls:${b}`;return render()}
+  case "setopen":{const fromCard=!!(el&&el.closest(".overcard"));state.setOpen=fromCard?true:!state.setOpen;state.refocus=state.setOpen?`court:${S.settings.court||"full"}`:"setopen";render();if(fromCard){const t=document.querySelector(".tset");if(t)t.scrollIntoView({block:"center"})}return}
+  case "leftout":{const c=document.getElementById("leftout");if(c)c.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});return}
+  case "body":{const cur=S.rec.body&&S.rec.body.d===today()?S.rec.body.k:null;S.rec.body=cur===b?null:{d:today(),k:b};persist();state.refocus=`body:${b}`;return render()}
   case "lvl":state.start={...(state.start||{level:"regular",focus:"bal"}),level:b};return render();
   case "focus":state.start={...(state.start||{level:"regular",focus:"bal"}),focus:b};return render();
   case "start":case "startskip":S.rec.start=a==="start"&&state.start||{level:"regular",focus:"bal"};persist();render();
