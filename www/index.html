@@ -2242,17 +2242,22 @@ function ballAt(s,tr){const{b,u:u0}=tr,op=b.op;const bx=s.cx+s.sway*.7;
   if(b.kind==="hold"){const p=op.at?{x:s.cx+op.at.dx,y:s.hy+op.at.dy}:Ap;return{x:p.x,y:p.y,back:false,A:p,C:p,held:1}}
   if(b.kind==="path"||b.kind==="fig8"){const pts=(op.pts||fig8(s)).map(q=>({x:s.cx+q[0],y:s.hy+q[1],back:!!q[2]}));const n=pts.length-1,f=u*n,i=Math.min(n-1,Math.floor(f)),p=f-i;
     return{x:lerp(pts[i].x,pts[i+1].x,p),y:lerp(pts[i].y,pts[i+1].y,p),back:pts[i].back&&pts[i+1].back||(p<.5?pts[i].back:pts[i+1].back),A:Ap,C:Cp,held:1}}
-  if(b.kind==="float"){const H=op.h||46;if(u<.18){const q=u/.18;return{x:Ap.x,y:lerp(Ap.y,FY,q*q),back:false,loose:1}}
-    const q=(u-.18)/.82;return{x:lerp(Ap.x,Cp.x,q),y:lerp(FY,Cp.y,q)-H*Math.sin(PI*q),back:false,loose:1}}
+  if(b.kind==="float"){/* the hand pushes it down, lets go, and the to hand catches it on the way down */const H=op.h||46;if(u<.18){const q=u/.18;return{x:Ap.x,y:lerp(Ap.y,FY,q*q),back:false,loose:q>.35?1:0,A:Ap,C:Cp,u:q*.5}}
+    const q=(u-.18)/.82;return{x:lerp(Ap.x,Cp.x,q),y:lerp(FY,Cp.y,q)-H*Math.sin(PI*q),back:false,loose:q<.9?1:0,A:Ap,C:Cp,u:.5+q*.5}}
   if(b.kind==="away"){const to=op.to;return{x:lerp(Ap.x,to.x,u),y:FY-Math.abs(Math.sin(u*3*PI))*(FY-Ap.y)*(1-u)*.9,back:false,loose:1}}
   if(b.kind==="loose")return{x:op.at.x,y:FY,back:false,loose:1};
   if(b.kind==="fetch"){const fr=op.from;return{x:lerp(fr.x,Cp.x,u),y:u<.4?FY:lerp(FY,Cp.y,(u-.4)/.6),back:false,held:u>.4?1:0,A:Cp,C:Cp,fetch:1}}
+  if(b.kind==="around"){/* behind the leg on the from side, one bounce outside that foot, back up in front */const sd=b.from,P0=top(sd),Bp={x:s.cx+sd*(s.w+15),y:FY};
+    if(u<.5){const p=u*2;return{x:lerp(P0.x,Bp.x,p),y:lerp(P0.y,Bp.y,p*p*.4+p*.6),back:u<.3,A:P0,C:P0,B:Bp,u}}
+    const p=(u-.5)*2;return{x:lerp(Bp.x,P0.x,p),y:lerp(Bp.y,P0.y,1-(1-p)*(1-p)),back:false,A:P0,C:P0,B:Bp,u}}
+  if(b.kind==="pound"&&op.still){/* straight down and up under whichever hand has it */const H={x:op.bx,y:s.top},B={x:op.bx,y:FY};let y;
+    if(u<.5){const p=u*2;y=lerp(H.y,FY,p*p*.4+p*.6)}else{const p=(u-.5)*2;y=lerp(FY,H.y,1-(1-p)*(1-p))}return{x:op.bx,y,back:false,A:H,C:H,B,u}}
   let Bx;if(b.kind==="pound")Bx=op.bx!=null?op.bx:Ap.x+(op.out||0)*b.from;else if(b.kind==="inout"){Bx=Ap.x-b.from*(op.in||11)}else Bx=bx+(op.off||0);
   if(b.kind==="pick"){const front={x:bx,y:s.hy+4},back={x:bx,y:s.hy+12};const a=op.dir==="bf"?back:front,c=op.dir==="bf"?front:back;
     const p=u<.5?u*2:(u-.5)*2;const x=u<.5?lerp(a.x,bx,p):lerp(bx,c.x,p),y=u<.5?lerp(a.y,FY,p*p):lerp(FY,c.y,1-(1-p)*(1-p));return{x,y,back:op.dir==="bf"?u<.5:u>.5,A:a,C:c,pick:1}}
   const B={x:Bx,y:FY},C2=b.kind==="inout"?Ap:Cp;let x,y;
   if(u<.5){const p=u*2;x=lerp(Ap.x,B.x,p);y=lerp(Ap.y,B.y,p*p*.4+p*.6)}else{const p=(u-.5)*2;x=lerp(B.x,C2.x,p);y=lerp(B.y,C2.y,1-(1-p)*(1-p))}
-  const back=b.kind==="between"?(u>.5&&u<.92):b.kind==="behind"?(u>.06&&u<.94):false;
+  const back=b.kind==="between"?(u>.5&&(op.stay||u<.92)):b.kind==="behind"?(u>.06&&u<.94):false;
   return{x,y,back,A:Ap,C:C2,B,u}}
 function fig8(s){const w=s.w+9,y=(G-s.hy)*.55;return[[-w,y],[0,y+1],[0,y+1,1],[w,y,1],[w,y],[0,y+1],[0,y+1,1],[-w,y,1],[-w,y]]}
 function handsFor(s,tr,ball,side){const b=tr.b,u=tr.u,bx=s.cx+s.sway*.7;
@@ -2265,7 +2270,7 @@ function handsFor(s,tr,ball,side){const b=tr.b,u=tr.u,bx=s.cx+s.sway*.7;
   if(ball.held&&side===b.from)return{x:ball.x,y:ball.y-BR};
   if(side===b.from&&u<.5)return{x:ball.x,y:Math.min(ball.y,ball.A.y+12)-BR};
   if(side===b.to&&u>=.5)return{x:ball.x,y:Math.min(ball.y,ball.C.y+12)-BR};
-  if(side===b.to||side===b.from&&b.to===b.from)return{x:bx+side*s.hw,y:s.top-BR-1};
+  if(side===b.to||side===b.from&&b.to===b.from)return{x:bx+side*s.hw,y:s.top-BR-1,wait:1};
   return null}
 function drawBall(b,hl){const r=BR;let o="";if(hl)o+=`<circle cx="${b.x}" cy="${b.y}" r="${r+3.5}" fill="none" stroke="${C.hl}" stroke-width="2"/>`;
   return o+(b.back?`<circle cx="${b.x}" cy="${b.y}" r="${r}" fill="${C.ball}" fill-opacity=".3" stroke="${C.ball}" stroke-width="1.6" stroke-dasharray="3 2"/>`:
@@ -2276,7 +2281,7 @@ function front(beatSets,start,poses,o={}){
   return svg=>{const sets=(Array.isArray(beatSets[0]&&beatSets[0][0])?beatSets:[beatSets]).map((bs,i)=>track(bs,Array.isArray(start)?start[i]:start));
    const tl=Array.isArray(poses)?TL(poses):TL([[0,poses],[60,poses]]);
    return t=>{const s=tl(t);const sx=s.cx+s.sway,sy=s.hy-33*Math.cos(s.lean*PI/180),hx=s.cx+s.sway*.4;
-    const trs=sets.map(f=>f(t)),balls=trs.map(tr=>ballAt(s,tr));
+    const trs=sets.map((f,i)=>f(t+((o.shift||[])[i]||0))),balls=trs.map(tr=>ballAt(s,tr));
     let out=`<rect width="150" height="150" fill="${C.floor}"/>`;
     if(Math.abs(s.walk)>.05){const sp=-26*Math.sign(s.walk);/* walking forward: floor lines slide up the screen */for(let i=0;i<5;i++){const y=((i*34+t*sp)%170+170)%170-10;out+=`<line x1="0" y1="${y}" x2="150" y2="${y}" stroke="${C.line}" stroke-opacity=".35"/>`}}
     out+=`<line x1="0" y1="${G+1.5}" x2="150" y2="${G+1.5}" stroke="${C.line}" stroke-width="1.2"/>`;
@@ -2295,7 +2300,7 @@ function front(beatSets,start,poses,o={}){
     out+=HL.hair("f",hd.x,hd.y,9,0,C.hair)+`<rect x="${hd.x-2.5}" y="${sy-5}" width="5" height="6" fill="${C.skin}"/><circle cx="${hd.x}" cy="${hd.y}" r="9" fill="${C.skin}"/><path d="M${hd.x-9.2} ${hd.y-1} a9.2 9.2 0 0 1 18.4 0 q-9 -5 -18.4 0z" fill="${C.hair}"/><circle cx="${hd.x-3.2}" cy="${hd.y+1}" r="1.1" fill="${C.hair}"/><circle cx="${hd.x+3.2}" cy="${hd.y+1}" r="1.1" fill="${C.hair}"/>`;
     /* arms */
     const extra=o.tennis?o.tennis(t,s):null;
-    for(const side of[-1,1]){const shp={x:sx+side*13,y:sy+3};let h=null;for(let i=0;i<balls.length&&!h;i++)h=handsFor(s,trs[i],balls[i],side);
+    for(const side of[-1,1]){const shp={x:sx+side*13,y:sy+3};const hs=balls.map((b,i)=>handsFor(s,trs[i],b,side));let h=hs.find(x=>x&&!x.wait)||hs.find(Boolean)||null;
       if(extra&&extra.hand===side)h={x:extra.x,y:extra.y+2};
       const f=side<0?s.fL:s.fR;if(!h&&f)h={x:s.cx+f.dx,y:s.hy+f.dy};
       if(!h)h={x:s.cx+s.sway*.7+side*10,y:s.hy-14};
@@ -2320,6 +2325,11 @@ const all=(...f)=>(s,t,b,tr)=>f.map(g=>g(s,t,b,tr)).join("");
 /* beat helpers */
 const pd=(d=.5,o)=>[d,"pound",null,o||{}],cr=(to,d=.6,o)=>[d,"cross",to,o||{}],bt=(to,d=.75,o)=>[d,"between",to,o||{}],bh=(to,d=.85,o)=>[d,"behind",to,o||{}],io=(d=.6,o)=>[d,"inout",null,o||{}];
 const rep=(n,f)=>Array.from({length:n},(_,i)=>f(i));
+/* two-ball figure 8: ball 0 goes between the legs (front to back), around the outside of that leg (one bounce), and back through.
+   Ball 1 pounds straight down in front; the hand that just let go of ball 0 takes it, so the hands trade it twice per loop.
+   The pound runs .2s ahead so the two balls never hit the floor at the same spot at once. */
+const fig8two=(st,o)=>{const P=(to)=>[.8,"pound",to,{bx:75,still:1}];
+  return front([[bt(-st,.8,{stay:1}),[.8,"around",null],bt(st,.8,{stay:1}),[.8,"around",null]],[P(st),P(null),P(-st),P(null)]],[st,-st],FP({hy:104,w:22,lean:20}),Object.assign({shift:[0,.2]},o))};
 const keysFromBeats=(beats,poseFor)=>{let t=0;const k=[];beats.forEach((b,i)=>{k.push([t,poseFor(i,b)]);t+=b[0]});k.push([t,poseFor(0,beats[0])]);return k};
 
 /* ---------- top view ---------- */
@@ -2526,9 +2536,9 @@ const steps={
   [front([[pd(.35),[.7,"float",1],pd(.35),[.7,"float",-1]],[pd(.35),pd(.2),cr(-1,.4,{off:4}),pd(.1),pd(.35),pd(.2),cr(1,.4,{off:4}),pd(.1)]],[-1,1],FP({hy:98,w:20}),{label:"Find the rhythm, then speed up"}),"Slow until it's a rhythm, then faster."]],
  h_2fig8:[
   [front([rep(4,()=>pd(.55)),rep(4,()=>pd(.55))],[-1,1],FP({hy:104,w:22,lean:20}),{label:"Wide and low",over:feetLines()}),"Wide stance, low, both balls going."],
-  [front([[[3.2,"fig8",1]],rep(6,()=>pd(.533,{bx:75}))],[1,-1],FP({hy:104,w:22,lean:20}),{label:"Figure 8 through the legs",sub:"dashed = behind",hl:[0]}),"One ball weaves around and between the legs. Dashed means behind the legs."],
-  [front([[[3.2,"fig8",1]],rep(6,()=>pd(.533,{bx:75}))],[1,-1],FP({hy:104,w:22,lean:20}),{label:"Front ball never stops",hl:[1]}),"The other ball keeps pounding out in front the whole time."],
-  [front([[[3.2,"fig8",-1]],rep(6,()=>pd(.533,{bx:75}))],[-1,1],FP({hy:104,w:22,lean:20}),{label:"Switch: other ball pounds",hl:[0]}),"Switch which ball pounds and which one runs the figure 8."]],
+  [fig8two(1,{label:"Figure 8 through the legs",sub:"dashed = behind",hl:[0]}),"One ball weaves around and between the legs. Dashed means behind the legs."],
+  [fig8two(1,{label:"Front ball never stops",hl:[1]}),"The other ball keeps pounding in front. Whichever hand is free takes it, so the hands trade it every time the figure 8 ball goes through."],
+  [fig8two(-1,{label:"Switch: other ball pounds",hl:[0]}),"Switch which ball pounds and which one runs the figure 8."]],
  h_r_2yoyo:[
   [front([rep(4,()=>pd()),rep(4,()=>pd())],[-1,1],A,{label:"Room in front and behind",ph:()=>"●"}),"Both balls going, eyes up on the phone."],
   [front([rep(4,()=>pd(.4)),rep(4,()=>pd(.4))],[-1,1],FP({walk:1,hy:92}),{label:"Attack forward",ph:()=>"Forward"}),"On \"Forward\", attack with both balls. The floor lines show you're moving forward."],
