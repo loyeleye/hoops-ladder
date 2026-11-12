@@ -8006,7 +8006,7 @@ route();
     try { // label each clip by its role and put the question and summary in the note
       if (typeof SND === "undefined" || !SND) return;
       for (const x of SND.segs) { const p = picks.find(y => y.s === x.ref); if (p) x.label = `${p.role} · Shot ${p.s.n}`; }
-      SND.note = [question.trim(), "", buPackSummary(B, cue), "", sndAutoNote()].join("\n");
+      SND.note = [question.trim(), "", buPackSummary(B, cue), "", "The clip has a title card for each shot (best, typical, worst, early, late)."].join("\n"); // no shot times, so unpicking a clip can't leave them stale
       SND.edited = true;
       sndDraw();
     } catch (e) {}
