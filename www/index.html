@@ -1453,6 +1453,10 @@ const COND=[
   what:"Two quick hops over a line, then straight into one max jump. Land soft. Five in a set.",
   steps:["Two fast hops over a line.","Straight into one max vertical jump.","Land on two feet, hips back.","Walk back between jumps. Full rest between sets."],
   cue:"Quick, quick, high.",evn:"Plyometric. Each set is 15 jump contacts toward today's cap.",src:[]},
+ {id:"c_17s",cond:"sp",unlock:1,ev:"co",name:"17s",meta:"Sideline to sideline × 17 · beat 70 s",unit:"Run",set:["17 sideline-to-sideline runs. Tap the phone as you finish",90],nsets:1,rest:0,tapEnd:{target:70},
+  what:"The classic basketball conditioning run: sideline to sideline across the width of the court 17 times, touching each line, in about a minute. The app puts it right before Tired 3s when you've just been shooting, so those 3s are actually shot tired.",
+  steps:["Start on one sideline with the phone at your feet.","On the beep, run across the court and touch the far sideline. That's 1. Touch and come back: 2.","Keep going to 17. You finish on the far sideline, so jog back and tap the phone as you pass it.","Beat 70 seconds. Once that's easy, aim for 60. Go straight into Tired 3s with no rest."],
+  cue:"Touch every line. Low on the turns.",evn:"A standard team conditioning test. Coaches set the target anywhere from 60 to 70 seconds; 70 is the looser common one.",src:[{label:"Red Bull: 17s in 70 seconds",url:"https://www.redbull.com/ca-en/basketball-training-tips"},{label:"STACK: 17s in 60 seconds",url:"https://www.stack.com/?p=101146"}]},
  {id:"c_farmers",cond:"sp",unlock:7,hard:true,ev:"co",name:"Farmers",meta:"Full and half court in 17 s",unit:"Run",set:["Full court and back, half court and back. Tap the phone at the end",30],nsets:4,rest:60,tapEnd:{target:17},
   what:"Smart's high school conditioning: baseline to baseline and back, then to half court and back, all inside 17 seconds.",
   steps:["Baseline to baseline and back.","Then to half court and back.","Tap the phone as you finish. Beat 17 seconds. Rest 60.","Start with 4. Never more than 8."],
@@ -2982,9 +2986,9 @@ const NW_DEF={20:1,30:2,45:2},NW_ALL=99,NW_MAX=6;
 /* warm-up and cool-down routines: you pick one of each (Today's plan ⇄, or Drills → Conditioning) and every recommended workout uses it */
 const RTS=k=>DRILLS.filter(d=>d.rt===k),RT_DEF={warm:"b_body",cool:"b_cool"},RT_NAME={warm:"warm-up",cool:"cool-down"};
 function rtPick(k){const d=D[(S.settings.rt||{})[k]];return d&&d.rt===k?d:D[RT_DEF[k]]}
-const FIXED=new Set(["s_cold","s_tired",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
+const FIXED=new Set(["s_cold","s_tired","c_17s",...DRILLS.filter(d=>d.rt).map(d=>d.id)]);
 /* drills that load the legs: left out on a "Legs heavy" or "Game tonight" day */
-const JUMPY=new Set(["f_power","f_bump","f_contact","f_spots","f_chair","s_tired","h_zig","h_stop","s_sprint3","f_knee","f_tornado","f_eyes"]);
+const JUMPY=new Set(["c_17s","f_power","f_bump","f_contact","f_spots","f_chair","s_tired","h_zig","h_stop","s_sprint3","f_knee","f_tornado","f_eyes"]);
 const FREQ_LABEL={auto:"Auto",every:"Every workout",weekly:"Weekly",custom:"Custom",never:"Never suggest"};
 const DOW=["Mo","Tu","We","Th","Fr","Sa","Su"],DOWL=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const fq=id=>(S.rec.freq||{})[id]||{k:"auto"};
@@ -3012,7 +3016,7 @@ function needsWork(){const out=[],add=(id,t,why)=>{if(D[id]&&!out.some(x=>x.d.id
   let hd=null;const cut=cutOf(30);for(const se of S.sessions){if(se.d<cut)continue;for(const it of se.items){const d=D[it.id];if(d&&d.skill==="h"&&!d.body&&it.lost>=3&&(!hd||it.lost>=hd.lost))hd={id:it.id,lost:it.lost}}}
   if(hd)add(hd.id,`Needs work: ${hd.lost} drops last time`,`You lost the ball ${hd.lost} times the last time you ran it. Clean reps here carry over to games.`);
   return out.filter(x=>!((S.rec.paused||{})[x.d.id]>today()))}
-function slotOf(d){if(d.cond)return"Conditioning";if(d.id==="s_cold")return"Cold shots";if(d.rt==="warm")return"Body warm-up";if(d.rt==="cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
+function slotOf(d){if(d.id==="c_17s")return"Tired shots";if(d.cond)return"Conditioning";if(d.id==="s_cold")return"Cold shots";if(d.rt==="warm")return"Body warm-up";if(d.rt==="cool")return"Cool-down";if(d.id==="s_tired")return"Tired shots";
   if(d.role==="warm")return"Warm-up";if(d.id==="h_live")return"Live";
   if(d.skill==="h")return d.read?"Handle · decisions":"Handle · mechanics";
   if(d.skill==="f")return"Finishing";
@@ -3041,7 +3045,10 @@ function plan0(){
   /* game tonight: the Pre-Game Warm-Up (with a ball) replaces the everyday one; "warm-up only" is just that */
   if(body==="game"&&S.rec.body.only){const o=[{slot:slotOf(D.b_game),d:D.b_game,why:{k:"fixed",t:"Before your game"},prio:"must"}];o.over=[];o.mins=D.b_game.mins;o.body=body;o.ml=ml;return o}
   add(D.s_cold,{k:"fixed",t:"First, with no warm-up"},"must");add(body==="game"?D.b_game:rtPick("warm"),{k:"fixed",t:body==="game"?"Game tonight: warm up with a ball":"Always before handling"},"must");
-  const tired=mins!==20&&!body;if(tired)add(D.s_tired,{k:"fixed",t:"Always near the end"},"must");
+  const tired=mins!==20&&!body;
+  /* 17s go right before Tired 3s so the tired shots come on tired legs, not straight after more shooting (dropped below if no shooting comes first) */
+  if(tired&&ok(D.c_17s))add(D.c_17s,{k:"fixed",t:"Gets you tired for Tired 3s"},"must");
+  if(tired)add(D.s_tired,{k:"fixed",t:"Always near the end"},"must");
   add(rtPick("cool"),null,"must");
   for(const id of S.rec.added)if(D[id]&&!D[id].body&&(!D[id].partner||S.settings.partner))add(D[id],{k:"you",t:"You added it"},"added");
   let nNW=0;const nwN=nwCount(mins);for(const x of needsWork()){if(nNW>=nwN)break;if(!ok(x.d)||used.has(x.d.id))continue;add(x.d,{k:"need",t:x.t},"need");nNW++}
@@ -3072,7 +3079,9 @@ function plan0(){
   fill(H);fill(F);fill(FORM);fill(RH);fill(VOL);if(!t3due&&ok(D.s_5spot))add(D.s_5spot,{k:"fixed",t:"Your 3-point test"},"fav");
   let left=mins+2;const out=[],over=[];
   for(const x of cand){const m=realMins(x.d);if(x.prio==="must"||x.prio==="added"||x.sx||m<=left){out.push(x);left-=m}else if(x.prio!=="fav")over.push(x)}
-  out.sort((a,b)=>ORDER.indexOf(a.slot)-ORDER.indexOf(b.slot));out.over=over;out.mins=mins;out.body=body;out.ml=ml;return out}
+  out.sort((a,b)=>ORDER.indexOf(a.slot)-ORDER.indexOf(b.slot));
+  {const i=out.findIndex(x=>x.d.id==="c_17s");if(i>=0&&!(i>0&&out[i-1].d.skill==="s"&&out[i+1]&&out[i+1].d.id==="s_tired"))out.splice(i,1)}
+  out.over=over;out.mins=mins;out.body=body;out.ml=ml;return out}
 
 /* alternatives for a swap: same slot (or same weakness for a needs-work drill), not already in today's plan */
 function swapOptions(x,p){const inPlan=new Set(p.map(y=>y.d.id)),body=bodyToday(),ml={s:maxLvl("s"),h:maxLvl("h"),f:maxLvl("f")};
@@ -3436,7 +3445,7 @@ function toastNext(head,msg){return toast(head,msg)}
 /* starter workouts: copied into My workouts, so they can be edited like your own */
 const STARTERS=[
  {id:"st_quick",name:"Quick 30",note:"A bit of everything",items:["s_cold","b_body","h_lab","f_mikan","s_line","s_ft","b_cool"]},
- {id:"st_gym",name:"Full gym day",note:"Long day. Keep the next one light",items:["s_cold","b_full","h_lab","h_pound","h_jolt","h_r_cross","f_mikan","f_weak","f_float","s_line","s_rollup","s_5spot","s_atw","s_pullup","s_ft","s_tired","b_cool2"]},
+ {id:"st_gym",name:"Full gym day",note:"Long day. Keep the next one light",items:["s_cold","b_full","h_lab","h_pound","h_jolt","h_r_cross","f_mikan","f_weak","f_float","s_line","s_rollup","s_5spot","s_atw","s_pullup","s_ft","c_17s","s_tired","b_cool2"]},
  {id:"st_shoot",name:"Shooting day",note:"Form, then volume",items:["s_cold","b_body","s_line","s_rollup","s_elbow","s_5spot","s_ladder","s_atw","s_rimline","s_ft","b_cool"]},
  {id:"st_fin",name:"Finishing day",note:"Layups, floaters, footwork",items:["b_body","h_lab","f_mikan","f_corner","f_weak","f_foot5","f_float","f_reverse","f_called","s_ft","b_cool"]},
  {id:"st_handles",name:"Handles, no hoop",note:"Driveway, garage or a wall",items:["b_body","h_lab","h_pound","h_five","h_fig8","h_place","h_d2","h_tennis","b_cool"]},
@@ -3669,7 +3678,7 @@ function progClimb(){const c30=cutOf(30),c60=cutOf(60);
    ${tt?`<div class="card"><div class="label">Time by skill, 4 weeks</div><div class="balbar">${["s","h","f"].map(k=>`<i class="${k}" style="width:${100*t[k]/tt}%"></i>`).join("")}</div><div class="small muted" style="margin-top:6px">Shooting ${Math.round(100*t.s/tt)}% · Handling ${Math.round(100*t.h/tt)}% · Finishing ${Math.round(100*t.f/tt)}%</div></div>`:""}</section>`}
 function howHTML(){const favs=DRILLS.filter(d=>!d.body&&isFav(d.id)).sort((a,b)=>favScore(b.id)-favScore(a.id)).slice(0,5),sched=Object.keys(S.rec.freq).filter(id=>D[id]&&!["auto","never"].includes(fq(id).k)),hidden=Object.keys(S.rec.freq).filter(id=>D[id]&&fq(id).k==="never"),
    quiet=DRILLS.filter(d=>!d.body&&favScore(d.id)>=2&&daysAgo(lastDone(d.id))>=14&&daysAgo(lastDone(d.id))<Infinity).slice(0,3),paused=Object.keys(S.rec.paused||{}).filter(id=>D[id]&&S.rec.paused[id]>today());
-  return `${bsTop("Today's plan","How today is built")}<p class="small" style="margin:0 0 10px">Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with Tired 3s and a stretch at the very end. The Up next button always starts the next drill, and timed drills in a row play back to back.</p><div class="card hist">
+  return `${bsTop("Today's plan","How today is built")}<p class="small" style="margin:0 0 10px">Cold 3s first with no warm-up at all, then the body warm-up, handling, finishing at the rim and shooting, with 17s, Tired 3s and a stretch at the very end. The Up next button always starts the next drill, and timed drills in a row play back to back.</p><div class="card hist">
    <div><span>Needs-work drills per workout</span><span></span><button class="linkbtn" data-rec="nw" style="padding:0">${[20,30,45].map(m=>nwLabel(nwCount(m))).join(" / ")} ›</button></div>
    ${favs.length?`<div><span>Favorites</span><span></span><span class="small">${favs.map(d=>esc(d.name)).join(", ")}</span></div>`:""}
    ${sched.map(id=>`<div><span>${esc(D[id].name)}</span><span></span><button class="linkbtn" data-rec="freq:${id}" style="padding:0">${fqText(id)} ›</button></div>`).join("")}
