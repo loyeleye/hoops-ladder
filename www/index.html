@@ -994,7 +994,7 @@ const DRILLS=[
   what:"Shooting and conditioning together, with no rebounder needed. Shoot a corner 3, sprint after your own shot, then sprint to the other corner for the next one. A good way to end a workout.",
   steps:["Start in a corner. Spin the ball out to yourself and shoot a catch-and-shoot 3.","As soon as it leaves your hand, sprint after it and catch it as early as you can.","Sprint out to the opposite corner, set your feet and shoot fast. Don't take your time setting up.","Long rebound? Shoot from the 3-point line wherever it took you, then go back to the corners."],
   cue:"Fast feet, quick target, same shot.",src:[YTT("LDScIl0O1Ps",383,"ShotMechanics: baseline sprint 3s")]},
- {id:"s_2chair",skill:"s",name:"Chair Cross Pull-Up",role:"volume",unlock:5,mins:6,log:"makes",att:20,t0:35,tstep:1,tmax:55,coachClips:true,
+ {id:"s_2chair",skill:"s",name:"Chair Cross Pull-Up",role:"volume",fv:true,unlock:5,mins:6,log:"makes",att:20,t0:35,tstep:1,tmax:55,coachClips:true,
   what:"Two-ball handling into a jump shot. Dribble two balls to a chair, set one ball on it, cross over and shoot. Then come back, scoop the ball off the chair and shoot again.",
   steps:["Put a chair at the elbow or the wing. Start a few steps out with two balls going.","At the chair, set one ball on it and keep the other dribble alive.","Crossover, then a jump shot off your inside foot.","Get your rebound, come back to the chair, scoop the ball off it and shoot again. Switch which hand sets the ball down."],
   cue:"Set it, cross, inside foot, shoot.",src:[YTT("wJK-BT1GBIc",122,"BreakthroughBBall: two-ball chair shooting")]},
@@ -1690,7 +1690,7 @@ class B{
  catchHigh(dt=.35){this.key(this.P(128,2,"high"),dt);const b=this.ball;b.length&&b.push({t:this.t-.1,p:[RIMX-2,RIMY+22]},{t:this.t,at:"B"});this.after=null;return this}
  label(text,t0,t1){this.labels.push({text,t0,t1});return this}
  defender(keys){this.def=keys;return this}
- build(pause=.6){const dur=Math.max(this.t,this.end||0)+pause;return{dur,k:this.k,ball:this.ball,def:this.def,labels:this.labels,inset:this.inset,props:this.props}}
+ build(pause=.6){const dur=Math.max(this.t,this.end||0)+pause;return{dur,k:this.k,ball:this.ball,ball2:this.ball2,def:this.def,labels:this.labels,inset:this.inset,props:this.props}}
 }
 
 /* ----- drawing ----- */
@@ -1729,7 +1729,7 @@ function draw(a,tm){const p=sample(a.k,tm),b=ballAt(a,tm);let s=court(a.props);
   if(dp&&a.def[0].behindPlayer)s+=figure(dp,{def:true,ghost:a.def[0].ghost});
   s+=figure(p);if(dp&&!a.def[0].behindPlayer)s+=figure(dp,{def:true,ghost:a.def[0].ghost});
   if(dp&&a.def[0].pad){const h=dp.hR;s+=`<rect x="${(h[0]-6).toFixed(1)}" y="${(h[1]-9).toFixed(1)}" width="5" height="16" rx="1.5" fill="${C("jersey2")}" opacity=".85"/>`}
-  s+=`<circle cx="${b[0].toFixed(1)}" cy="${b[1].toFixed(1)}" r="${BR}" fill="${C("ball")}"/><path d="M${(b[0]-BR).toFixed(1)} ${b[1].toFixed(1)} h${2*BR}" stroke="rgba(0,0,0,.35)" stroke-width=".6"/>`+rim();
+  s+=`<circle cx="${b[0].toFixed(1)}" cy="${b[1].toFixed(1)}" r="${BR}" fill="${C("ball")}"/><path d="M${(b[0]-BR).toFixed(1)} ${b[1].toFixed(1)} h${2*BR}" stroke="rgba(0,0,0,.35)" stroke-width=".6"/>`+(a.ball2?(b2=>`<circle cx="${b2[0].toFixed(1)}" cy="${b2[1].toFixed(1)}" r="${BR}" fill="${C("ball")}"/><path d="M${(b2[0]-BR).toFixed(1)} ${b2[1].toFixed(1)} h${2*BR}" stroke="rgba(0,0,0,.35)" stroke-width=".6"/>`)(ballAt({...a,ball:a.ball2},tm)):"")+rim();
   for(const l of a.labels.filter(l=>tm>=l.t0&&tm<l.t1).slice(-1)){const cx=a.inset?128:100,w=l.text.length*5.4+12;s+=`<g><rect x="${cx-w/2}" y="7" width="${w}" height="16" rx="8" fill="${C("ink")}"/><text x="${cx}" y="18.6" text-anchor="middle" font-family="Saira Condensed,Arial Narrow,sans-serif" font-weight="700" font-size="11" fill="${C("floor")}">${l.text}</text></g>`}
   s+=inset(a.inset,Math.min(1,tm/Math.max(.01,a.dur-.6)));return s}
 
@@ -1738,10 +1738,10 @@ function topDraw(a,tm){const u=Math.min(1,tm/Math.max(.01,a.dur-.6));let s=`<rec
   for(const m of a.marks)s+=m.t==="chair"?`<rect x="${m.x-6}" y="${m.y-6}" width="12" height="12" rx="2" fill="none" stroke="${C("ink")}" stroke-width="2"/><line x1="${m.x-6}" y1="${m.y+(m.back||6)}" x2="${m.x+6}" y2="${m.y+(m.back||6)}" stroke="${C("ink")}" stroke-width="3"/>`:"";
   for(const m of a.marks)if(m.t==="arc3")s+=`<path d="M18 0 V30 A88 88 0 0 0 182 30 V0" fill="none" stroke="${C("line")}"/>`;else if(m.t==="cone")s+=`<path d="M${m.x-6} ${m.y+6} L${m.x} ${m.y-7} L${m.x+6} ${m.y+6} Z" fill="${C("ball")}" stroke="${C("ink")}" stroke-width=".8"/>`;
   const at=(path,uu)=>{const n=path.length-1,seg=Math.min(n-1e-6,Math.max(0,uu)*n),i=Math.floor(seg);return L2(path[i],path[i+1],seg-i)};
-  for(const r of a.runners){const q=Math.max(0,Math.min(1,(u-(r.start||0))/((r.end||1)-(r.start||0))));const pt=at(r.path,q);
+  for(const r of a.runners){const q=Math.max(0,Math.min(1,(u-(r.start||0))/((r.end||1)-(r.start||0))));const pt=at(r.path,q);if(r.onlyBall){if(q>0&&q<1)s+=`<circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="3.6" fill="${C("ball")}"/>`;continue}
     s+=`<path d="M${r.path.map(p=>p.join(" ")).join(" L")}" stroke="${r.def?C("def"):C("jersey")}" stroke-dasharray="3 3" fill="none" opacity=".6"/>`+
      (r.def?"":`<circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="11" fill="none" stroke="#E2601A" stroke-width="2"/>`)+`<circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="8" fill="${r.def?C("def"):C("jersey")}"/><circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="4" fill="${r.def?C("floor"):C("skin")}"/>`+
-     (r.ball?`<circle cx="${(pt[0]+7).toFixed(1)}" cy="${(pt[1]-5).toFixed(1)}" r="3.6" fill="${C("ball")}"/>`:"")+`<text x="${pt[0].toFixed(1)}" y="${(pt[1]+19).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="${r.def?400:700}" fill="${r.def?C("ink"):"#E2601A"}" font-family="Barlow,sans-serif">${r.name}</text>`}
+     (r.ball?`<circle cx="${(pt[0]+7).toFixed(1)}" cy="${(pt[1]-5).toFixed(1)}" r="3.6" fill="${C("ball")}"/>`:"")+(r.ball2?`<circle cx="${(pt[0]-7).toFixed(1)}" cy="${(pt[1]-5).toFixed(1)}" r="3.6" fill="${C("ball")}"/>`:"")+`<text x="${pt[0].toFixed(1)}" y="${(pt[1]+19).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="${r.def?400:700}" fill="${r.def?C("ink"):"#E2601A"}" font-family="Barlow,sans-serif">${r.name}</text>`}
   for(const l of a.labels||[])if(tm>=l.t0&&tm<l.t1)s+=`<text x="100" y="152" text-anchor="middle" font-family="Saira Condensed,Arial Narrow,sans-serif" font-weight="700" font-size="13" fill="${C("ink")}">${l.text}</text>`;
   return s}
 
@@ -1818,7 +1818,34 @@ function coneFin(hand,rev,text){let a;
   if(rev){a=reverse(hand,BLOOP_REV);a.inset.marks=[CONE_IN,CONE_IN_L]}
   else a=layup({hand,h:5,inset:ins(BLOOP,[CONE_IN,CONE_IN_L])});
   a.labels=[{text,t0:0,t1:1.1},...(a.labels||[])];return a}
+
+/* ----- two-ball scenes (Nov 2026): ball2 is the second ball ----- */
+/* copy the dribbles into a second ball in the other hand, a little behind the first */
+function twoBall(b,n){const o=b.hand==="R"?"L":"R";b.ball2=b.ball.slice(0,1+2*n).map(e=>e.at?{t:e.t,at:o}:{t:e.t,p:[e.p[0]-6,e.p[1]]});return b}
+/* the second ball is let go and keeps bouncing on its own, a little lower each time */
+function loose2(b,t0,x){const F=FL-BR;b.ball2.push({t:t0,p:[x,F]},{t:t0+.42,p:[x+9,F],c:[x+4.5,FL-52]},{t:t0+.76,p:[x+15,F],c:[x+12,FL-36]},{t:t0+1.02,p:[x+19,F],c:[x+17,FL-22]},{t:t0+1.2,p:[x+21,F],c:[x+20,FL-12]});return b}
+function hammer(hand,text){const b=new B(30,hand,{inset:ins(MID)});b.dribble(3,22,.28);twoBall(b,3);loose2(b,b.t+.02,b.x+8);
+  const take=hand==="R"?"L":"R";b.label(text,0,1.1).gather(hand,14).jump(take,"reach"+hand,8,10).label(hand==="R"?"Never carry the other ball":"Left hand, right ball keeps going",b.t-.1,b.t+.8).shot("glass",.55).land();return b.build()}
+const hammerTop=()=>({top:true,marks:[],runners:[{name:"you",ball:true,ball2:true,path:[[100,24],[100,108],[100,24]]}],dur:3.4,labels:[{text:"Out to the top, turn, straight back",t0:0,t1:3.4}]});
+const CHX=96,CHP=[CHX,FL-11-BR];
+function chairShot(stage){const props=[{t:"chair",x:CHX}];let b;
+  if(stage===0){b=new B(20,"R",{props});b.dribble(3,20,.3);twoBall(b,3);b.label("Two balls to the chair",0,1.2);return b.build(.4)}
+  if(stage===1){b=new B(24,"R",{props});b.dribble(3,20,.3);twoBall(b,3);b.dribble(1,0,.32);b.ball2.push({t:b.t+.05,p:CHP,c:[CHX-6,FL-34]});b.dribble(1,0,.32);b.label("Set one ball on the chair",.6,b.t+.4);return b.build(.5)}
+  if(stage===2){b=new B(80,"R",{props});b.ball2=[{t:0,p:CHP}];b.dribble(1,8,.3).label("Crossover",0,.5).gather("R",6,.2).jump("both","high",10,2,.3).label("Inside foot, shoot",.4,1.4).shot("float",.6).land();return b.build()}
+  b=new B(66,"R",{props});b.step("L",12,.3,"ready").step("R",8,.25,"lowR");b.ball=[{t:0,p:CHP},{t:.5,p:CHP},{t:.64,at:"B"}];b.hold(.18,"chest").label("Scoop it off the chair, shoot",0,1.2).jump("both","high",10,0,.3).shot("float",.6).land();return b.build()}
+const ELB=[130,80],WG=[176,58],BLK=[127,46];
+function postStep(stage){
+  if(stage===0){const b=new B(30,"R",{inset:ins(FTOP)});b.dribble(3,22,.3);twoBall(b,3);b.dribble(1,0,.3);b.ball2.push({t:b.t-.15,p:[b.x+6,FL-BR]},{t:b.t,at:"L"});b.label("Pound both balls to the elbow",0,1.4);return b.build(.4)}
+  const partner={name:"partner",def:true,path:[WG,WG]};
+  if(stage===1)return{top:true,marks:[],runners:[partner,{name:"you",ball:true,ball2:true,path:[[100,150],[118,112],ELB,ELB]}],dur:2.6,labels:[{text:"Jump stop at the elbow, dribbles alive",t0:0,t1:2.6}]};
+  if(stage===2)return{top:true,marks:[],runners:[partner,{onlyBall:true,path:[[ELB[0]+4,ELB[1]-4],WG],start:.2,end:.45},{name:"you",ball:true,path:[ELB,ELB,ELB,[114,44],[104,20]]}],dur:2.8,labels:[{text:"Pivot, pass, finish the other ball",t0:0,t1:2.8}]};
+  if(stage===3)return{top:true,marks:[],runners:[partner,{onlyBall:true,path:[WG,BLK],start:.6,end:.85},{name:"you",path:[[104,22],[118,36],BLK,BLK]}],dur:2.8,labels:[{text:"Post up above the block, hands up",t0:0,t1:2.8}]};
+  const b=new B(120,"R");b.k[0].p=pose(120,128,4,[123,FL],[117,FL],"arms");b.ball=[{t:0,p:[40,96]},{t:.4,at:"B"}];
+  b.hold(.4,"chin").label("Catch, chin it, look inside",0,.9).step("L",8,.25,"chin",131).label("Drop step",.8,1.3).jump("both","powerB",6,6).shot("far",.55).land();return b.build()}
 const A={
+ f_2hammer:[hammerTop(),hammer("R","Full speed, straight line"),hammer("R","Right-hand layup"),hammer("L","Left side")],
+ s_2chair:[chairShot(0),chairShot(1),chairShot(2),chairShot(3)],
+ f_2post:[postStep(0),postStep(1),postStep(2),postStep(3),postStep(4)],
  f_mikan:[mikan("R"),mikan("R",{catchIt:true}),mikan("L"),mikan("R",{both:true})],
  f_corner:[layup({inset:ins(BASE),labels:[["Baseline",0,.9]]}),layup({inset:ins(WING),labels:[["The 45",0,.9]]}),layup({inset:ins(MID),labels:[["Middle",0,.9]]}),layup({hand:"L",inset:ins(WINGL),labels:[["Other side, other hand",0,1.2]]})],
  f_power:[power(0),power(1),power(2),power(3)],
@@ -2497,6 +2524,11 @@ const steps={
   [front([[pd(),pd(),[1,"float",1],pd(),pd(),[1,"float",-1]],[pd(),pd(),pd(.3),cr(-1,.6,{off:4,label:"Cross it over"}),pd(.1),pd(),pd(),pd(.3),cr(1,.6,{off:4,label:"Cross it over"}),pd(.1)]],[-1,1],FP({hy:98,w:20}),{hl:[1]}),"The other ball crosses into the hand that let go."],
   [front([[pd(),pd(),[1,"float",1,{label:"Pick it up"}],pd(),pd(),[1,"float",-1,{label:"Pick it up"}]],[pd(),pd(),pd(.3),cr(-1,.6,{off:4}),pd(.1),pd(),pd(),pd(.3),cr(1,.6,{off:4}),pd(.1)]],[-1,1],FP({hy:98,w:20}),{hl:[0]}),"The free hand picks up the first ball as it comes down, and you keep going."],
   [front([[pd(.35),[.7,"float",1],pd(.35),[.7,"float",-1]],[pd(.35),pd(.2),cr(-1,.4,{off:4}),pd(.1),pd(.35),pd(.2),cr(1,.4,{off:4}),pd(.1)]],[-1,1],FP({hy:98,w:20}),{label:"Find the rhythm, then speed up"}),"Slow until it's a rhythm, then faster."]],
+ h_2fig8:[
+  [front([rep(4,()=>pd(.55)),rep(4,()=>pd(.55))],[-1,1],FP({hy:104,w:22,lean:20}),{label:"Wide and low",over:feetLines()}),"Wide stance, low, both balls going."],
+  [front([[[3.2,"fig8",1]],rep(6,()=>pd(.533,{bx:75}))],[1,-1],FP({hy:104,w:22,lean:20}),{label:"Figure 8 through the legs",sub:"dashed = behind",hl:[0]}),"One ball weaves around and between the legs. Dashed means behind the legs."],
+  [front([[[3.2,"fig8",1]],rep(6,()=>pd(.533,{bx:75}))],[1,-1],FP({hy:104,w:22,lean:20}),{label:"Front ball never stops",hl:[1]}),"The other ball keeps pounding out in front the whole time."],
+  [front([[[3.2,"fig8",-1]],rep(6,()=>pd(.533,{bx:75}))],[-1,1],FP({hy:104,w:22,lean:20}),{label:"Switch: other ball pounds",hl:[0]}),"Switch which ball pounds and which one runs the figure 8."]],
  h_r_2yoyo:[
   [front([rep(4,()=>pd()),rep(4,()=>pd())],[-1,1],A,{label:"Room in front and behind",ph:()=>"●"}),"Both balls going, eyes up on the phone."],
   [front([rep(4,()=>pd(.4)),rep(4,()=>pd(.4))],[-1,1],FP({walk:1,hy:92}),{label:"Attack forward",ph:()=>"Forward"}),"On \"Forward\", attack with both balls. The floor lines show you're moving forward."],
@@ -2505,7 +2537,7 @@ const steps={
 };
 /* the timed parts of the new two-ball drills reuse their step animations */
 {const P=(d,...ix)=>{steps[d+"p"]=ix.map(i=>steps[d][i])};
- P("h_2drum",1,2,3,3);P("h_2v",1,2,3);P("h_2shapes",0,1,2,3,3,0);P("h_2around",1,3,4,4);steps.h_2aroundp[3]=[front([rep(3,()=>[.4,"path",1,{pts:[[3,30,0],[16,33,0],[30,30,0],[30,25,1],[16,22,1],[3,25,1],[3,30,0]]}]),rep(2,()=>pd(.6))],[1,-1],FP({hy:100,w:16}),{label:"Faster around, same pound",hl:[0]}),"The left ball goes around the left leg at a quicker rhythm than the steady pound."];P("h_2xladder",0,1,2,3,4);P("h_2full",0,1,2,3,4,5);P("h_2juggle",1,2,4)}
+ P("h_2drum",1,2,3,3);P("h_2v",1,2,3);P("h_2shapes",0,1,2,3,3,0);P("h_2around",1,3,4,4);steps.h_2aroundp[3]=[front([rep(3,()=>[.4,"path",1,{pts:[[3,30,0],[16,33,0],[30,30,0],[30,25,1],[16,22,1],[3,25,1],[3,30,0]]}]),rep(2,()=>pd(.6))],[1,-1],FP({hy:100,w:16}),{label:"Faster around, same pound",hl:[0]}),"The left ball goes around the left leg at a quicker rhythm than the steady pound."];P("h_2xladder",0,1,2,3,4);P("h_2full",0,1,2,3,4,5);P("h_2juggle",1,2,4);P("h_2fig8",1,3,2)}
 const get=id=>{const[d,i]=String(id).split(":");return(steps[d]||[])[+i]};
 const cache=new WeakMap();
 function render(svg,id,t){const s=get(id);if(!s)return;let c=cache.get(svg);if(!c||c.id!==id){c={id,tick:s[0](svg)};cache.set(svg,c)}c.tick(t)}
@@ -2762,6 +2794,19 @@ function partner(svg,{hl=[],both=false}={}){const CYC=9*T,L=both?2*CYC:CYC;
 const CALLS=["cross","between","behind"],CNAME={cross:"Double cross",between:"Between",behind:"Behind"};
 function called(t){const L=4*T,n=Math.floor(t/L)%3,kind=CALLS[n];return{balls:walk2(t%L,kind),label:CNAME[kind]}}
 
+/* stationary partner drill (Pass-and-Cross): pass one ball, cross the other into that hand, catch the return; mirrored every other rep */
+function still(svg,{hl=[]}={}){const L=12*T;
+  return t=>{t=t%L;const u=t%(6*T),k=Math.floor(u/T),p=u/T-k,R=t>=6*T?-1:1,PX=75,PY=110,QX=75,QY=34,sP=PX+22*R,sO=PX-22*R;let a,b,label;
+    const pound=x=>({x,y:PY-6,h:hgt(p)}),bp=Math.abs(2*p-1)*.75+.1;
+    if(u<2*T){a=pound(sP);b=pound(sO);label="Pound both"}
+    else if(u<3*T){a={x:lerp(sP,QX+8*R,p),y:lerp(PY-6,QY+10,p),h:bp};b=pound(sO);label="Pass"}
+    else if(u<4*T){a={x:QX+8*R,y:QY+10,h:.9};b={x:lerp(sO,sP,p),y:PY-6,h:hgt(p)};label="Cross it over"}
+    else if(u<5*T){a={x:lerp(QX-8*R,sO,p),y:lerp(QY+10,PY-6,p),h:bp};b=pound(sP);label="Catch"}
+    else{a=pound(sO);b=pound(sP);label="Keep going"}
+    svg.innerHTML=topPerson(QX,QY,-1,0,"var(--muted)")+topPerson(PX,PY,1,0,"var(--body)")+topBall(a.x,a.y,0,a.h,{hl:hl.includes("a")})+topBall(b.x,b.y,1,b.h,{hl:hl.includes("b")})+
+      `<text x="8" y="144" text-anchor="start" font-size="9" fill="var(--muted)" font-family="Barlow,sans-serif">you</text><text x="75" y="${QY-14}" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Barlow,sans-serif">partner, standing still</text>`+
+      `<text x="144" y="144" text-anchor="end" font-family="Saira Condensed,Arial Narrow,sans-serif" font-weight="700" font-size="14" fill="var(--ink)">${label}</text>`}}
+
 const TBD=[
  {name:"Walking Two-Ball Exchanges",meta:"Handling Lv 3 · solo",clip:"https://www.youtube.com/watch?v=uGQN1qe-sDE&t=11s",steps:[
   ["Walk forward pounding both balls; every two steps, swap hands with a double cross.",s=>front(s,t=>walk2(t,"cross"),{hl:[0,1]}),"Front view. Both balls cross at once, one just in front of the other."],
@@ -2785,9 +2830,14 @@ const TBD=[
   ["Catch the return pass in your right hand, pound a few times, then wait for the next call. \"Pass left\" is the mirror.",s=>partner(s,{hl:["pass"],both:true}),"Right side, then left side."]]}];
 
 
-const IDS=["h_2walk", "h_2release", "h_r_2cones", "h_2pass"];
+TBD.push({name:"Pass-and-Cross",meta:"Handling Lv 2 · partner",steps:[
+  ["Stand facing your partner, both balls pounding at the same time, eyes up.",s=>still(s),"Top view. Shows the whole rep, then the mirror."],
+  ["On \"pass\", make a good bounce pass to your partner with one hand.",s=>still(s,{hl:["a"]}),""],
+  ["Cross the other ball over into the hand that just passed.",s=>still(s,{hl:["b"]}),""],
+  ["Catch the return pass in the free hand and keep both balls going.",s=>still(s,{hl:["a"]}),""]]});
+const IDS=["h_2walk", "h_2release", "h_r_2cones", "h_2pass", "h_2pc"];
 function make(svg,id){const [d,i]=id.split(":"),di=IDS.indexOf(d),s=TBD[di]&&TBD[di].steps[+i];if(!s)return null;
-  svg.setAttribute("viewBox",(di===2&&+i===0)||di===3?"0 0 150 150":"25 15 150 180");return s[1](svg)}
+  svg.setAttribute("viewBox",(di===2&&+i===0)||di===3||di===4?"0 0 150 150":"25 15 150 180");return s[1](svg)}
 return{make,has:id=>{const [d,i]=id.split(":");const di=IDS.indexOf(d);return di>=0&&!!TBD[di].steps[+i]}}})();
 /* player looks: set the drill's colors on each animation svg and make its hair style current while drawing */
 (function(){const norm=id=>{let k=String(id).split(":")[0];if(!D[k]&&D[k.slice(0,-1)])k=k.slice(0,-1);return k};
@@ -2797,7 +2847,7 @@ return{make,has:id=>{const [d,i]=id.split(":");const di=IDS.indexOf(d);return di
   for(const M of[FV,window.SV,window.HV,window.BV]){if(!M||!M.render)continue;const r=M.render;M.render=function(svg,id,t){paint(svg,id);try{return r.apply(this,arguments)}finally{HL.cur=null}}}
   const mk=TB.make;TB.make=function(svg,id){paint(svg,id);HL.cur=null;return mk.apply(this,arguments)}})();
 function hasAnim(d){return !!STEP_ANIM[d.id]||(d.steps||[]).some((_,i)=>{const id=d.id+":"+i;return (window.BV&&BV.has(id))||(window.SV&&SV.has(id))||(window.HV&&HV.has(id))||TB.has(id)||FV.has(id)})}
-function stepAnim(d,i){if(window.BV&&BV.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="vanim sq" viewBox="0 0 150 150" data-bv="${d.id}:${i}" role="img" aria-label="${esc(BV.note(d.id+":"+i))}"></svg></span>`;if(d.skill==="h"&&window.HV&&HV.has(d.id+":"+i)&&!TB.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="vanim sq" viewBox="0 0 150 150" data-hv="${d.id}:${i}" role="img" aria-label="${esc(HV.note(d.id+":"+i)||"Animation of step "+(i+1))}"></svg></span>`;if(d.skill==="s"&&window.SV&&SV.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="vanim sq" viewBox="0 0 150 150" data-sv="${d.id}:${i}" role="img" aria-label="${esc(SV.note(d.id+":"+i)||"Animation of step "+(i+1))}"></svg></span>`;if(TB.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="tbanim" data-tb="${d.id}:${i}" role="img" aria-label="Animation of step ${i+1}"></svg></span>`;if(d.skill==="f"&&FV.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="vanim" viewBox="0 0 200 160" data-fv="${d.id}:${i}" role="img" aria-label="Animation of step ${i+1}"></svg></span>`;
+function stepAnim(d,i){if(window.BV&&BV.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="vanim sq" viewBox="0 0 150 150" data-bv="${d.id}:${i}" role="img" aria-label="${esc(BV.note(d.id+":"+i))}"></svg></span>`;if(d.skill==="h"&&window.HV&&HV.has(d.id+":"+i)&&!TB.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="vanim sq" viewBox="0 0 150 150" data-hv="${d.id}:${i}" role="img" aria-label="${esc(HV.note(d.id+":"+i)||"Animation of step "+(i+1))}"></svg></span>`;if(d.skill==="s"&&window.SV&&SV.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="vanim sq" viewBox="0 0 150 150" data-sv="${d.id}:${i}" role="img" aria-label="${esc(SV.note(d.id+":"+i)||"Animation of step "+(i+1))}"></svg></span>`;if(TB.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="tbanim" data-tb="${d.id}:${i}" role="img" aria-label="Animation of step ${i+1}"></svg></span>`;if((d.skill==="f"||d.fv)&&FV.has(d.id+":"+i))return `<span class="sw v" data-n="${i+1}"><svg class="vanim" viewBox="0 0 200 160" data-fv="${d.id}:${i}" role="img" aria-label="Animation of step ${i+1}"></svg></span>`;
 const f=(STEP_ANIM[d.id]||[])[i];const px=d.skill==="f";return f?`<span class="sw" data-n="${i+1}"><img class="sanim${px?" px":""}" src="anim/${f}" alt="" width="${px?120:105}" height="${px?120:113}" loading="lazy"></span>`:""}
 const hasParts=d=>d.log==="timer"&&(!!d.mv||(!!window.HV&&HV.has(d.id+"p:0")));
 function partAnim(d,i){if(d.mv)return window.BV&&BV.has(d.id+":"+i)?stepAnim(d,i):"";const id=d.id+"p:"+i;return HV.has(id)?`<span class="sw v" data-n="${i+1}"><svg class="vanim sq" viewBox="0 0 150 150" data-hv="${id}" role="img" aria-label="${esc(HV.note(id))}"></svg></span>`:""}
