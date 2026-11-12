@@ -470,6 +470,11 @@ section{display:flex;flex-direction:column;gap:10px}
 .tnow .linkbtn{padding:0;font-size:14px}
 .tset .done{align-self:flex-end;margin-top:8px}
 @media (prefers-reduced-motion:reduce){.tsw input,.tsw input::after{transition:none}}
+.tseg.balls button{display:inline-flex;align-items:center;justify-content:center;gap:5px;--seg-bg:var(--surface-2)}
+.tseg.balls button[aria-pressed="true"]{--seg-bg:var(--ink)}
+.bi{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round}
+.bi .cut{stroke:var(--seg-bg);stroke-width:4}
+.bi-row{display:inline-flex;gap:2px}
 .lenfixed{font-size:13px;color:var(--muted);font-weight:600}
 .chip{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:6px 10px;font-size:13px;font-weight:600}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -3053,6 +3058,9 @@ const courtNeed=d=>COURT_FULL.has(d.id)?3:COURT_HALF.has(d.id)?2:d.skill==="s"||
 const courtHave=()=>COURT_N[S.settings.court]??3;
 /* balls you have today: two-ball drills need 2; conditioning and body routines need none (except the Hokie drill and the ball warm-ups) */
 const BALLS=[["2","2 basketballs","Two"],["1","1 basketball","One"],["0","No basketball","None"]],TWO_BALL=/^(h_2|h_r_2|f_2)|^(h_two|s_2chair)$/;
+const BALL_P=`<circle cx="8" cy="8" r="6.4"/><path d="M1.6 8h12.8M8 1.6v12.8M3.8 3.6c2.2 2 2.2 6.8 0 8.8M12.2 3.6c-2.2 2-2.2 6.8 0 8.8"/>`;
+const BALL_SVG=`<svg class="bi" viewBox="0 0 16 16" aria-hidden="true">${BALL_P}</svg>`,NOBALL_SVG=`<svg class="bi" viewBox="0 0 16 16" aria-hidden="true"><g opacity=".5">${BALL_P}</g><path class="cut" d="M2.5 13.5l11-11"/><path d="M2.5 13.5l11-11"/></svg>`;
+const ballIcons=v=>`<span class="bi-row" aria-hidden="true">${v==="0"?NOBALL_SVG:BALL_SVG.repeat(+v)}</span>`;
 const ballNeed=d=>TWO_BALL.test(d.id)?2:(d.cond&&d.id!=="c_hokie")||(d.body&&d.id!=="b_game"&&d.id!=="b_club")?0:1;
 const ballHave=()=>{const b=S.settings.balls;return b==null?2:+b};
 const placeOk=d=>courtNeed(d)<=courtHave();
@@ -3560,7 +3568,7 @@ function setupStrip(body,p){const k=S.rec.body&&S.rec.body.d===today()?S.rec.bod
   const bk=String(ballHave()),sum=[COURTS.find(c=>c[0]===ck)[1],BALLS.find(x=>x[0]===bk)[1],S.settings.partner?"With a partner":"Solo",S.settings.heavy?"Heavy ball":""].filter(Boolean).join(" · ");
   const head=`<div class="tsum"><div class="tx"><b>${esc(sum)}</b><small>${open?"These stay until you change them":"Stays until you change it"}</small></div>${open?"":`<button class="setup-btn" data-rec="setopen" aria-expanded="false">Change</button>`}</div>`;
   const edit=open?`<div class="tgrp"><span class="label">Where you train</span><div class="tseg" role="group" aria-label="Where you train" style="--n:${COURTS.length}">${COURTS.map(([v,t,sub])=>`<button data-rec="court:${v}" aria-pressed="${ck===v}">${t}<small>${sub}</small></button>`).join("")}</div>
-     <span class="label">Basketballs</span><div class="tseg" role="group" aria-label="Basketballs" style="--n:3">${BALLS.map(([v,t,sh])=>`<button data-rec="balls:${v}" aria-pressed="${bk===v}" aria-label="${t}">${sh}</button>`).join("")}</div>
+     <span class="label">Basketballs</span><div class="tseg balls" role="group" aria-label="Basketballs" style="--n:3">${BALLS.map(([v,t,sh])=>`<button data-rec="balls:${v}" aria-pressed="${bk===v}" aria-label="${t}">${ballIcons(v)}${sh}</button>`).join("")}</div>
      <label class="tsw"><span>With a partner<small>Adds partner drills</small></span><input type="checkbox" id="optPartner" ${S.settings.partner?"checked":""}></label>
      <label class="tsw"><span>Heavy ball<small>For the heavy-ball handling sets</small></span><input type="checkbox" id="optHeavy" ${S.settings.heavy?"checked":""}></label>
      <button class="btn sec small done" data-rec="setopen">Done</button></div>`:"";
