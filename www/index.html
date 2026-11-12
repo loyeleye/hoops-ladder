@@ -7596,9 +7596,7 @@ route();
 .buv .bu-m span.fix{background:#C13C2A}.buv .bu-m span.watch{background:#6b4a05}.buv .bu-m span.good{background:#1E8657}
 .buv .bu-note{font-size:12.5px;opacity:.72;text-align:center;padding:6px 16px 0;margin:0}
 .buv .bu-bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px 12px 14px}
-.bu-list{display:flex;flex-direction:column;gap:6px;margin:8px 0}
-.bu-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line,#ddd);border-radius:12px;padding:10px 12px;background:var(--card,#fff);color:inherit;font:inherit}
-.bu-item b{flex:1}.bu-item .muted{font-size:13px}`;
+`;
   document.head.appendChild(bst);
 
   let BV = null; // the open viewer: {bid, i, sel:Set, cmp, rate, el, raf}
@@ -7648,7 +7646,7 @@ route();
     if (oldPanes) oldPanes.remove();
     const nSel = BV.sel.size, selS = S0.filter(s => BV.sel.has(s.id)), allStar = nSel && selS.every(s => s.star), selV = selS.filter(s => s.v), allKeep = selV.length && selV.every(s => s.keep);
     BV.el.innerHTML = `<div class="lf-top"><div class="lf-title">Shot ${cur.n} <span style="opacity:.7">of ${S0.length} · ${esc(buDay(B.t))}</span></div>
-      ${S0.length > 1 ? `<button class="bl-ib" data-bv="lib" aria-label="All shots">${BLI.grid}</button>` : ""}<button class="btn sec small" data-bv="close">Done</button></div>
+      ${S0.length > 1 ? `<button class="btn sec small bv-lib" data-bv="lib">${BLI.grid}All shots</button>` : ""}<button class="btn sec small" data-bv="close">Done</button></div>
       <div class="bu-panes" data-swipe="1">${pane(cur, other ? `Shot ${cur.n}` : "")}${other ? pane(other, `Shot ${other.n}`) : ""}</div>
       <div class="bu-m">${cur.m.map(m => `<span class="${m.st}">${buGlyph(m.st)}${esc(m.l)} · ${esc(m.v)}</span>`).join("")}</div>
       <div class="bu-row">${[[1, "1×"], [.5, "½×"], [.25, "¼×"]].map(([r, l]) => `<button class="btn sec small" data-bv="rate:${r}" aria-pressed="${BV.rate === r}">${l}</button>`).join("")}
@@ -7849,6 +7847,7 @@ route();
   };
   const blst = document.createElement("style");
   blst.textContent = `
+.buv .bv-lib{display:flex;align-items:center;gap:6px;white-space:nowrap;min-height:44px}.buv .bv-lib svg{width:18px;height:18px;fill:currentColor}
 .bul{gap:0}.bul .lf-top{justify-content:flex-start}.bul .lf-top .lf-title{flex:1;min-width:0}
 .bl-ib{flex:none;width:44px;height:44px;border-radius:12px;border:1px solid #2A3858;background:#1C2844;color:#F2F5FA;display:flex;align-items:center;justify-content:center;padding:0}
 .bl-ib svg{width:22px;height:22px;fill:currentColor}
@@ -8423,22 +8422,83 @@ route();
   let BF = { free: false, ask: null };
   const buSizes = () => { const m = {}; for (const v of CO.vids) if (v.burst) m[v.id] = v.size || 0; return m; };
   function buBytes(B, sz) { const seen = new Set(); let n = 0; for (const s of B.shots) if (s.v && !seen.has(s.v)) { seen.add(s.v); n += sz[s.v] || 0; } return n; }
+  // the fold's rows use only theme tokens (surface-2, line, ink, muted), so they read in light and dark alike
+  const bfst = document.createElement("style");
+  bfst.textContent = `
+.bf-feat{display:flex;flex-direction:column;gap:10px;margin:2px 0 12px;padding:14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink)}
+.bf-feat .bf-top{display:flex;gap:12px;align-items:center}
+.bf-th{flex:none;width:56px;height:64px;border-radius:10px;overflow:hidden;background:var(--bg);border:1px solid var(--line);position:relative;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.bf-th img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}.bf-th svg{width:24px;height:24px;fill:currentColor}
+.bf-th b{position:absolute;right:3px;bottom:3px;z-index:1;font:700 12px var(--display);background:rgba(5,8,15,.8);color:#F2F5FA;border-radius:6px;padding:0 5px}
+.bf-tx{flex:1;min-width:0}.bf-tx b{display:block;font:700 19px/1.15 var(--display);text-transform:uppercase}.bf-tx span{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.bf-gb{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px}.bf-gb i{display:block}.bf-gb .fix{background:#E0533F}.bf-gb .watch{background:#E8A317}.bf-gb .good{background:#2FB377}
+.bf-gl{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--ink)}.bf-gl span{display:flex;align-items:center;gap:5px}
+.bf-feat .btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px}.bf-feat .btn svg{width:18px;height:18px;fill:currentColor}
+.bf-lab{font:700 14px var(--display);text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin:14px 0 6px}
+.bf-row{display:flex;align-items:center;gap:12px;width:100%;min-height:72px;padding:8px 10px;margin:0 0 6px;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;text-align:left}
+.bf-row .bf-th{width:48px;height:54px}.bf-row .bf-tx b{font-size:17px}
+.bf-row>svg.chev{flex:none;width:20px;height:20px;color:var(--muted)}
+.bf-row:active,.bf-feat .btn:active,.bf-sw:active{transform:scale(.98)}
+.bf-row:focus-visible,.bf-sw:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.bf-sw{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:10px 12px;margin:12px 0 0;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;text-align:left}
+.bf-sw[aria-checked="true"]{border:2px solid var(--accent);padding:9px 11px}
+.bf-sw .bf-tx b{font:600 16px/1.25 var(--body,inherit);text-transform:none}.bf-sw .bf-tx span{font-size:13px}
+.bf-sw .k{flex:none;width:48px;height:30px;border-radius:15px;background:#7A869E;position:relative}
+.bf-sw .k::after{content:"";position:absolute;left:4px;top:4px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .18s}
+.bf-sw[aria-checked="true"] .k{background:var(--accent)}.bf-sw[aria-checked="true"] .k::after{left:22px}
+.bf-how{margin-top:12px;border-top:1px solid var(--line);padding-top:6px}.bf-how summary{min-height:44px;display:flex;align-items:center;font-weight:600;cursor:pointer;color:var(--ink)}
+.bf-how p{font-size:14px;margin:4px 0 8px;color:var(--muted)}
+.bf-how summary{justify-content:space-between;list-style:none}.bf-how summary::-webkit-details-marker{display:none}.bf-how summary::after{content:"";width:9px;height:9px;border:solid var(--muted);border-width:0 2.4px 2.4px 0;transform:rotate(45deg);margin-right:6px}.bf-how[open] summary::after{transform:rotate(-135deg)}
+@media (prefers-reduced-motion:reduce){.bf-sw .k::after{transition:none}.bf-row:active,.bf-feat .btn:active,.bf-sw:active{transform:none}}`;
+  document.head.appendChild(bfst);
+  const BFCHEV = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const buWhere = B => B.src === "clip" ? "From a clip" : B.view === "behind" ? (B.front ? "From the front" : "From behind") : "From the side";
+  const buThumbShot = B => B.shots.find(s => s.star) || B.shots.find(s => s.keep) || B.shots[0];
   function buSection() {
-    const L = buList().slice().reverse(), sz = buSizes(), tot = Object.values(sz).reduce((a, b) => a + b, 0);
-    const row = B => {
-      const n = B.shots.length, st = B.shots.filter(s => s.star).length, mb = buBytes(B, sz);
-      return BF.free
-        ? `<div class="bu-item"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}</b><span class="muted">${mb ? fmtMB(mb) : "no video"}</span>${mb ? `<button class="btn sec small" data-buf="del:${B.id}">${BF.ask === B.id ? "Tap again" : "Delete videos"}</button>` : ""}</div>`
-        : `<button class="bu-item" data-buf="open:${B.id}"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}${st ? ` · ★${st}` : ""}</b><span class="muted">${B.src === "clip" ? "From a clip" : B.view === "behind" ? (B.front ? "From the front" : "From behind") : "From the side"}${mb ? " · " + fmtMB(mb) : ""}</span></button>`;
+    const L = buList().slice().sort((a, b) => b.t - a.t), sz = buSizes(), tot = Object.values(sz).reduce((a, b) => a + b, 0);
+    const th = B => { const s = buThumbShot(B); return `<span class="bf-th" aria-hidden="true">${BLI.grid}${s ? `<img data-fth="${s.id}" alt="" hidden>` : ""}<b>${B.shots.length}</b></span>`; };
+    const days = B => Math.ceil((B.t + BU.KEEP_DAYS * 864e5 - Date.now()) / 864e5);
+    const feat = B => {
+      const n = B.shots.length, cue = buFocus(B), gc = { fix: 0, watch: 0, good: 0 };
+      for (const s of B.shots) { const st = blSt(s, cue); if (st) gc[st]++; }
+      const lab = (B.shots.flatMap(s => s.m).find(m => m.k === cue) || {}).l || "";
+      const kept = B.shots.filter(blKept).length, st = B.shots.filter(s => s.star).length, d = days(B), unk = B.shots.filter(s => s.v && !blKept(s)).length;
+      const g = gc.fix + gc.watch + gc.good;
+      return `<div class="bf-feat"><div class="bf-top">${th(B)}<div class="bf-tx"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}</b><span>${esc(buWhere(B))}${lab ? ` · Focus: ${esc(lab)}` : ""}</span></div></div>
+        ${g ? `<div class="bf-gb" aria-hidden="true">${["fix", "watch", "good"].map(k => gc[k] ? `<i class="${k}" style="flex:${gc[k]}"></i>` : "").join("")}</div>
+        <div class="bf-gl">${["fix", "watch", "good"].map(k => `<span>${buGlyph(k)}${k === "fix" ? "Fix" : k === "watch" ? "Watch" : "Good"} ${gc[k]}</span>`).join("")}</div>` : ""}
+        <div class="bf-gl" style="color:var(--muted)"><span>${kept} kept${st ? ` · ★ ${st}` : ""}</span>${unk && d > 0 ? `<span style="${d <= 3 ? "color:var(--accent);font-weight:700" : ""}">${unk} video${unk > 1 ? "s" : ""} clear in ${d} day${d > 1 ? "s" : ""}</span>` : ""}</div>
+        <button class="btn pri" data-buf="open:${B.id}">${BLI.grid}Review shots</button></div>`;
     };
-    const list = BF.free ? L.slice().sort((a, b) => buBytes(b, sz) - buBytes(a, sz)) : L.slice(0, 10);
-    const body = `<p class="small" style="margin:0">Turn on <b>Keep video</b> in Live form check and each shot keeps its own few seconds of video, with its numbers. Only the shots are saved, never the time in between. A clip longer than ${BU.CLIP_MIN} s picked above is split into its shots the same way.</p>
-      <p class="small muted" style="margin:6px 0 0">At a Shoot360, prop the phone behind you in the lane, or straight in front of you under the basket. Live form check asks where before you start.</p>
-      <button class="bu-item" data-buf="pack" aria-pressed="${packOn()}"><b>Coach pack: ${packOn() ? "on" : "off"}</b><span class="muted">${packOn() ? "Keeps" : "Turn on to keep"} up to 5 shots of each session past cleanup (best, typical and worst on your focus cue, plus an early and a late one), and adds Coach pack to the shot library: those shots with your question and a session summary. More information, about 5 shots' video per session.</span></button>
-      ${list.length ? `<div class="bu-list">${list.map(row).join("")}</div>` : ""}
-      ${tot ? `<p class="small muted" style="margin:0">Shot videos use ${fmtMB(tot)}${CO.usage ? ` of the ${fmtMB(CO.usage)} the app uses on this phone` : ""}. Video for shots with no ★ or Keep is deleted 14 days after filming. The numbers stay.</p>
-      <button class="btn sec small" data-buf="free" style="margin-top:6px">${BF.free ? "Done" : "Free up space"}</button>` : ""}`;
-    return `<section>${fold("bursts", "Shot bursts", L.length ? `${L.length} burst${L.length > 1 ? "s" : ""}${tot ? " · " + fmtMB(tot) : ""}` : "None yet", body, false)}</section>`;
+    const row = B => {
+      const n = B.shots.length, st = B.shots.filter(s => s.star).length, kept = B.shots.filter(blKept).length, mb = buBytes(B, sz);
+      return BF.free
+        ? `<div class="bf-row">${th(B)}<div class="bf-tx"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}</b><span>${mb ? fmtMB(mb) : "No video"}</span></div>${mb ? `<button class="btn sec small" data-buf="del:${B.id}">${BF.ask === B.id ? "Tap again" : "Delete videos"}</button>` : ""}</div>`
+        : `<button class="bf-row" data-buf="open:${B.id}" aria-label="Open the shot library for ${esc(buDay(B.t))}, ${n} shots">${th(B)}<div class="bf-tx"><b>${esc(buDay(B.t))} · ${n} shot${n > 1 ? "s" : ""}</b><span>${esc(buWhere(B))}${kept ? ` · ${kept} kept` : ""}${st ? ` · ★${st}` : ""}${mb ? " · " + fmtMB(mb) : ""}</span></div>${BFCHEV}</button>`;
+    };
+    const list = BF.free ? L.slice().sort((a, b) => buBytes(b, sz) - buBytes(a, sz)) : L.slice(1, 10);
+    const per = L.length ? Math.round(tot / Math.max(1, L.reduce((a, B) => a + B.shots.filter(s => s.v).length, 0)) * 5) : 0;
+    const body = `${L.length && !BF.free ? feat(L[0]) : ""}
+      ${!L.length ? `<p class="small" style="margin:0 0 4px">Turn on <b>Keep video</b> in Live form check and each shot keeps its own few seconds of video, so you can review the session here.</p>` : ""}
+      ${list.length ? `<div class="bf-lab">${BF.free ? "Sessions by size" : "Earlier sessions"}</div>${list.map(row).join("")}` : ""}
+      ${tot ? `<p class="small muted" style="margin:12px 0 0">Shot videos use ${fmtMB(tot)}${CO.usage ? ` of the ${fmtMB(CO.usage)} the app uses on this phone` : ""}. Video for shots with no ★ or Keep clears 14 days after filming. The numbers stay.</p>
+      <button class="btn sec small" data-buf="free" style="margin-top:8px">${BF.free ? "Done" : "Free up space"}</button>` : ""}
+      <button class="bf-sw" role="switch" data-buf="pack" aria-checked="${packOn()}"><div class="bf-tx"><b>Coach pack</b><span>Keep 5 clips from every session for your coach, even after the other videos clear.</span><span style="color:var(--ink);font-weight:600">${packOn() ? `On${per ? ` · about ${fmtMB(per)} a session` : ""}` : "Off · videos clear after 14 days"}</span></div><span class="k" aria-hidden="true"></span></button>
+      <details class="bf-how"><summary>How shot bursts work</summary>
+        <p>Turn on <b>Keep video</b> in Live form check and each shot keeps its own few seconds of video, with its numbers. Only the shots are saved, never the time in between. A clip longer than ${BU.CLIP_MIN} s picked above is split into its shots the same way.</p>
+        <p>At a Shoot360, prop the phone behind you in the lane, or straight in front of you under the basket. Live form check asks where before you start.</p>
+        <p>Coach pack picks, on your focus cue: your best, a typical and your worst shot, plus a typical early and late one.</p></details>`;
+    setTimeout(buFormThumbs, 0);
+    return `<section>${fold("bursts", "Shot bursts", L.length ? `${L.length} session${L.length > 1 ? "s" : ""}${tot ? " · " + fmtMB(tot) : ""}` : "None yet", body, !!L.length)}</section>`;
+  }
+  async function buFormThumbs() {
+    for (const img of document.querySelectorAll("img[data-fth]")) {
+      const id = img.dataset.fth;
+      try {
+        if (!TH[id]) { const b = await vtx("readonly", (m, bl) => rq(bl.get(id + ":th"))); if (b) TH[id] = URL.createObjectURL(b); }
+        if (TH[id] && img.isConnected) { img.src = TH[id]; img.hidden = false; }
+      } catch (e) {}
+    }
   }
   {
     const prevViewForm = viewForm;
