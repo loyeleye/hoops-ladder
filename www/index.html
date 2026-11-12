@@ -1457,10 +1457,10 @@ const COND=[
   what:"The classic basketball conditioning run: sideline to sideline across the width of the court 17 times, touching each line, in about a minute. The app puts it right before Tired 3s when you've just been shooting, so those 3s are actually shot tired.",
   steps:["Start on one sideline with the phone at your feet.","On the beep, run across the court and touch the far sideline. That's 1. Touch and come back: 2.","Keep going to 17. You finish on the far sideline, so jog back and tap the phone as you pass it.","Beat 70 seconds. Once that's easy, aim for 60. Go straight into Tired 3s with no rest."],
   cue:"Touch every line. Low on the turns.",evn:"A standard team conditioning test. Coaches set the target anywhere from 60 to 70 seconds; 70 is the looser common one.",src:[{label:"Red Bull: 17s in 70 seconds",url:"https://www.redbull.com/ca-en/basketball-training-tips"},{label:"STACK: 17s in 60 seconds",url:"https://www.stack.com/?p=101146"}]},
- {id:"c_ub",cond:"sp",unlock:1,ev:"co",name:"Up-and-Backs",meta:"10 lengths, baseline to baseline · under 1 minute",unit:"Run",set:["10 lengths of the court. Tap the phone as you finish",120],nsets:1,rest:0,tapEnd:{target:60},
+ {id:"c_ub",cond:"sp",unlock:1,ev:"co",name:"Up-and-Backs",meta:"10 lengths, baseline to baseline · beat 55 s",unit:"Run",set:["10 lengths of the court. Tap the phone as you finish",120],nsets:1,rest:0,tapEnd:{target:55},
   what:"The shorter cousin of 17s: baseline to baseline 10 times (5 trips up and back), touching each line. On 30-minute days the app puts it right before Tired 3s when you've just been shooting; on 45-minute days you get 17s instead. Swap between the two on the Today tab.",
-  steps:["Start on the baseline with the phone at your feet.","On the beep, sprint to the far baseline and touch it. That's 1. Touch and come back: 2.","Keep going to 10. You finish back at the phone: tap it as you pass.","Finish in under a minute. Go straight into Tired 3s with no rest."],
-  cue:"Touch every line. Run through the finish.",evn:"Standard full-court conditioning. The standard target is under a minute.",src:[]},
+  steps:["Start on the baseline with the phone at your feet.","On the beep, sprint to the far baseline and touch it. That's 1. Touch and come back: 2.","Keep going to 10. You finish back at the phone: tap it as you pass.","Beat 55 seconds, and under 45 once that's easy. Go straight into Tired 3s with no rest."],
+  cue:"Touch every line. Run through the finish.",evn:"Standard full-court conditioning. No published norm for 10 lengths: the app counts 45–55 s as in shape and under 45 s as game shape. One coaching guide uses 10 in 50 s as a middle-school starting standard.",src:[]},
  {id:"c_farmers",cond:"sp",unlock:7,hard:true,ev:"co",name:"Farmers",meta:"Full and half court in 17 s",unit:"Run",set:["Full court and back, half court and back. Tap the phone at the end",30],nsets:4,rest:60,tapEnd:{target:17},
   what:"Smart's high school conditioning: baseline to baseline and back, then to half court and back, all inside 17 seconds.",
   steps:["Baseline to baseline and back.","Then to half court and back.","Tap the phone as you finish. Beat 17 seconds. Rest 60.","Start with 4. Never more than 8."],
@@ -1541,14 +1541,15 @@ function condEndPart(){if(!P||P.stage!=="work")return;const d=P.items[P.i],cur=p
 /* timed runs with a target (17s, Up-and-Backs, Farmers): the clock counts up and turns red past the target */
 function runClock(d){if(!P||P.stage!=="work"||P.cd>0||!d||!d.cond||!d.tapEnd||!d.tapEnd.target||isRestPart())return null;
   const el=phasesOf(d)[P.pi][1]-P.left,s=Math.max(0,Math.floor(el));return{txt:Math.floor(s/60)+":"+String(s%60).padStart(2,"0"),over:el>d.tapEnd.target,tg:d.tapEnd.target}}
-/* conditioning level from the runs before Tired 3s, averaged over your last 5 runs as a share of each run's target.
-   17s bands: under 60 s Game shape (the strict coaching standard), 60–70 In shape (the looser one), 70–80 Close, over 80 Building.
-   Up-and-Backs scale the same way from its 60 s target: under ~51, 51–60, 60–69, over 69. */
+/* conditioning level from the runs before Tired 3s: seconds over or under each run's target (the top of its In shape band),
+   averaged over your last 5 runs. Both drills have 10-second bands:
+   17s: under 60 s Game shape (the strict coaching standard), 60–70 In shape (the looser one), 70–80 Close, over 80 Building.
+   Up-and-Backs: under 45 Game shape, 45–55 In shape, 55–65 Close, over 65 Building. */
 const RUNS=["c_17s","c_ub"];
 function condLevel(){const runs=[];for(const se of S.sessions)for(const it of se.items){const d=D[it.id];if(!d||!RUNS.includes(it.id)||!it.times)continue;
-    for(const t of it.times)if(t!=null)runs.push({id:it.id,d:se.d,t,vs:Math.round((t-d.tapEnd.target)*10)/10,q:t/d.tapEnd.target})}
+    for(const t of it.times)if(t!=null)runs.push({id:it.id,d:se.d,t,vs:Math.round((t-d.tapEnd.target)*10)/10})}
   if(!runs.length)return null;const last=runs.slice(-5),avg=Math.round(last.reduce((a,x)=>a+x.vs,0)/last.length*10)/10;
-  const q=last.reduce((a,x)=>a+x.q,0)/last.length,lv=q<6/7?{n:"Game shape",c:"good"}:q<=1?{n:"In shape",c:"good"}:q<=8/7?{n:"Close",c:"warn"}:{n:"Building",c:"bad"};
+  const lv=avg<-10?{n:"Game shape",c:"good"}:avg<=0?{n:"In shape",c:"good"}:avg<=10?{n:"Close",c:"warn"}:{n:"Building",c:"bad"};
   const lastOf=id=>{for(let i=runs.length-1;i>=0;i--)if(runs[i].id===id)return runs[i];return null};
   return{...lv,avg,n5:last.length,runs,l17:lastOf("c_17s"),lub:lastOf("c_ub")}}
 const vsTxt=v=>v<=0?`${Math.abs(v).toFixed(1)} s under`:`${v.toFixed(1)} s over`;
@@ -1556,7 +1557,7 @@ function progCond(){const c=condLevel();if(!c)return `<section><div class="seche
   const st=(r,lab)=>`<div class="stat"><b>${r?r.t.toFixed(1)+" s":"–"}</b><span>${lab}${r?` · ${vsTxt(r.vs)}`:""}</span></div>`;
   return `<section><div class="sechead"><h2>Conditioning</h2></div>
    <div class="stats"><div class="stat"><b style="color:var(--${c.c})">${c.n}</b><span>Conditioning level</span></div>${st(c.l17,"Last 17s")}${st(c.lub,"Last Up-and-Backs")}</div>
-   <p class="muted small" style="margin:0">Your last ${c.n5===1?"run":c.n5+" runs"} averaged ${vsTxt(c.avg)} the target (17s: 70 s, Up-and-Backs: 60 s). Levels for 17s: Game shape under 60 s, In shape 60–70 s, Close 70–80 s, Building over 80 s. Up-and-Backs scale the same way: under 51 s, 51–60 s, 60–69 s, over 69 s.</p></section>`}
+   <p class="muted small" style="margin:0">Your last ${c.n5===1?"run":c.n5+" runs"} averaged ${vsTxt(c.avg)} the target (17s: 70 s, Up-and-Backs: 55 s). Levels for 17s: Game shape under 60 s, In shape 60–70 s, Close 70–80 s, Building over 80 s. Up-and-Backs: Game shape under 45 s, In shape 45–55 s, Close 55–65 s, Building over 65 s.</p></section>`}
 function condTap(){const d=P.items[P.i],cur=phasesOf(d)[P.pi];P.times[P.i].push(Math.round((cur[1]-P.left)*10)/10);P.tapped=true;beep(988,160);advance()}
 function condSum(d,i){const n=phasesOf(d).filter(p=>!/^rest\b/i.test(p[0])).length,u=(d.unit||"set").toLowerCase(),bits=[`${P.sd[i]} of ${n} ${u}s`];
   if(d.ask&&P.sd[i]){const c=d.ask.a.map(()=>0);for(let k=0;k<P.sd[i];k++)c[P.ans[i][k]??0]++;bits.push(d.ask.a.map((l,j)=>c[j]?`${c[j]} ${l.toLowerCase()}`:"").filter(Boolean).join(", "))}
