@@ -486,6 +486,8 @@
       return liveP;
     }
 
+    hooks.loadLivePose = loadLivePose; // live cues (section 10) use the same model
+
     // Form tab: add the live button under "Record or choose a clip".
     const origViewForm = viewForm;
     viewForm = function () {
@@ -831,7 +833,8 @@
     const scCd = o => { const v = +S.settings[o.cdKey] || (scVoiceOn() ? 5 : 10); return o.cdOpts.includes(v) ? v : o.cdOpts[o.cdOpts.length - 1]; };
     const scVoiceOn = () => !!hooks.listen && S.settings.scVoice !== false;
 
-    // o: { stream, mirror, kind: "shot" | "body", view?, title, getLm?, cdKey?, cdOpts?, now?, onGo, onClose? }
+    // o: { stream, mirror, kind: "shot" | "body", view?, title, getLm?, cdKey?, cdOpts?, now?, verb?, goSay?, onGo, onClose? }
+    // verb names what starts at zero ("Recording"); goSay is said at zero ("Recording.", or "" to say nothing).
     function setupCheck(o) {
       scClose();
       o = Object.assign({ kind: "body", cdKey: "scCd", cdOpts: [3, 5, 10] }, o);
@@ -891,14 +894,14 @@
     function scLow(s) {
       const o = s.o, low = s.el.querySelector(".sc-low"), cd = scCd(o);
       if (s.state === "count") {
-        low.innerHTML = `<p class="sc-note">${s.tapped ? "Walk back to your spot. " : ""}Recording starts at zero.${s.voice ? ' Say "stop" to cancel.' : ""}</p><button class="btn sec sc-go stop" data-sc="cancel">Cancel</button>`;
+        low.innerHTML = `<p class="sc-note">${s.tapped ? "Walk back to your spot. " : ""}${o.verb || "Recording"} starts at zero.${s.voice ? ' Say "stop" to cancel.' : ""}</p><button class="btn sec sc-go stop" data-sc="cancel">Cancel</button>`;
         return;
       }
       const set = s.ready || s.noPose;
       low.innerHTML = `<div class="sc-row"><span class="small">Countdown</span><div class="sc-seg" role="group" aria-label="Countdown before recording">${o.cdOpts.map(v => `<button data-sc="cd:${v}" aria-pressed="${v === cd}">${v} s</button>`).join("")}</div>
           ${hooks.listen ? `<button class="sc-chip" data-sc="voice" aria-pressed="${scVoiceOn()}">${scVoiceOn() ? (s.voice ? "Voice on" : "Voice…") : "Voice off"}</button>` : ""}</div>
         <button class="btn ${set ? "pri" : "sec wait"} sc-go" data-sc="go" ${set ? "" : 'aria-disabled="true"'}>Go</button>
-        <p class="sc-note">${set ? (s.voice ? `Say "go" or tap Go. Recording starts after ${cd} s.` : `Tap Go, then walk back. Recording starts after ${cd} s.`) : s.voice ? 'When the picture turns green, say "go".' : "When the picture turns green, tap Go."}</p>
+        <p class="sc-note">${set ? (s.voice ? `Say "go" or tap Go. ${o.verb || "Recording"} starts after ${cd} s.` : `Tap Go, then walk back. ${o.verb || "Recording"} starts after ${cd} s.`) : s.voice ? 'When the picture turns green, say "go".' : "When the picture turns green, tap Go."}</p>
         <div class="sc-row"><button class="linkbtn small" data-sc="anyway" ${set ? 'style="visibility:hidden" tabindex="-1"' : ""}>Start anyway</button>${o.now ? `<button class="linkbtn small" data-sc="now">Someone's filming me: record now</button>` : ""}</div>`;
     }
 
@@ -1004,7 +1007,7 @@
       const step = () => {
         if (SC !== s || s.state !== "count") return;
         if (s.n <= 0) { scDone(s, false); return; }
-        big.textContent = s.n; bb.textContent = "Recording in " + s.n;
+        big.textContent = s.n; bb.textContent = (s.o.verb || "Recording") + " in " + s.n;
         big.classList.remove("pop"); void big.offsetWidth; big.classList.add("pop");
         beep(s.n <= 3 ? 780 : 660, 100);
         if (s.n <= 3) setTimeout(() => { if (SC === s) say(String(s.n + 1)); }, 120);
@@ -1028,7 +1031,7 @@
     function scDone(s, now) {
       if (SC !== s) return;
       s.state = "done";
-      if (!now) { beep(1046, 450); say("Recording."); }
+      if (!now) { beep(1046, 450); if (s.o.goSay !== "") say(s.o.goSay || "Recording."); }
       try { navigator.vibrate?.(120); } catch (e) {}
       const go = s.o.onGo;
       scClose();
@@ -1044,6 +1047,8 @@
       s.video.srcObject = null;
       s.el.remove();
     }
+    hooks.setupCheck = setupCheck; // live cues (section 10) open it too, and close their own without its onClose
+    hooks.scClose = s => { if (SC === s) scClose(); };
     window.scBack = () => { if (!SC) return false; const s = SC; if (s.state === "count") scStop(s); else { scClose(); if (s.o.onClose) s.o.onClose(); } return true; };
 
     // Live form check: "Check my spot" under Place the phone runs the check with the live loop's own landmarks.
@@ -2906,6 +2911,412 @@
     const origDrawPlayer = drawPlayer, origDrawBig = drawBig;
     drawPlayer = function () { origDrawPlayer.apply(this, arguments); if (typeof pEl !== "undefined" && pEl) place(pEl); };
     drawBig = function () { origDrawBig.apply(this, arguments); if (typeof bigEl !== "undefined" && bigEl) place(bigEl); };
+  }
+
+  /* ---------- 10. Live cues while you dribble ----------
+     A switch on a saved workout (Edit workout › Live cues from the camera), off unless you turn it on. When that
+     workout is the one on Today and a stationary handling drill it covers starts, the front camera opens, the
+     setup check (4c) puts you in the picture, and the pose model (the one the live form check uses) watches you
+     dribble. From your wrists, hips, knees, ankles and head it finds each dribble (the hand pushing down and coming
+     back up) and checks, as you go: eyes up, sitting low, a base wider than your shoulders, the dribble below your
+     waist, keeping up with the beat, crosses outside your knees, the pound landing in one spot, two balls together
+     and at one height, and feet staying put. When one problem lasts, it says one short cue (never more than one
+     every few seconds, and not over the player's own calls) and shows it as the tip; when nothing needs fixing for
+     a while it says so. Frames are read in memory and thrown away; nothing is recorded. The rating screen shows
+     what it saw for each drill. See docs/LEARNING.md, step 34. */
+  {
+    const LC_IDS = new Set(["h_pound", "h_jolt", "h_five", "h_d2", "h_two"]);
+
+      // BEGIN lccore (tests: scratch Node harness feeds pose landmarks through this)
+      // Units: everything is measured in torso lengths (shoulders to hips, straight down), which stays steady when
+      // you turn a little, unlike shoulder width. y grows downward, as in the picture.
+      const LC = {
+        A: 0.13,          // a dribble: the wrist goes down, then back up, by at least this much
+        DOWN: 0.12,       // eyes down: the nose this much lower against the ears than when you looked at the phone
+        LOW: 0.9,         // thigh over shin, seen from the front: standing is about 1, sitting in a stance well under
+        WIDE: 0.72,       // ankles apart; your shoulders are about 0.7 torso lengths wide
+        HIGH: -0.2,       // the wrist at the top of a dribble this far above the hips: the ball's above your waist
+        FEET: 0.35        // an ankle sliding more than this in 3 s means the feet moved
+      };
+      // What to watch in one part of a drill. null: nothing (rest, no-dribble or moving parts).
+      function lcPart(id, name, bpm) {
+        const n = String(name || "").toLowerCase();
+        if (/^rest\b|no dribble|figure 8|moving|walking|forward|backward/.test(n)) return null;
+        const two = id === "h_two", behind = /behind/.test(n);
+        return {
+          id, two, behind,
+          pound: id === "h_pound",
+          cross: /cross/.test(n) && !/kobe/.test(n),
+          together: two && /together/.test(n),
+          even: two && /together|alternat/.test(n),
+          high: !/high.?low/.test(n) && !behind,   // check the dribble's height
+          stance: !/high.?low/.test(n),             // check that you sit low
+          bpm: bpm && !/kobe/.test(n) && !behind ? bpm : 0
+        };
+      }
+      function lcNew() {
+        return { fr: [], ev: [], hand: { L: null, R: null }, hd: [], base: null, cal: [], prob: {}, stats: lcStats() };
+      }
+      function lcStats() { return { n: 0, up: 0, low: 0, wide: 0, nl: 0, nw: 0, drib: 0, cues: {} }; }
+      // A frame's measurements from the 33 pose landmarks (x, y from 0 to 1, visibility), ar = picture width / height.
+      function lcFrame(lm, ar) {
+        if (!lm || lm.length < 33) return null;
+        const V = i => (lm[i].visibility ?? 1) > .5, X = i => lm[i].x * ar, Y = i => lm[i].y;
+        if (!V(11) || !V(12) || !V(23) || !V(24)) return null;
+        const shY = (Y(11) + Y(12)) / 2, hipY = (Y(23) + Y(24)) / 2, hipX = (X(23) + X(24)) / 2, tor = hipY - shY;
+        if (tor < .04) return null;
+        const f = { tor, hipX, hipY };
+        const legs = V(25) && V(26) && V(27) && V(28);
+        if (legs) {
+          const ts = i => (Y(i + 2) - Y(i)) / Math.max(.01, Y(i + 4) - Y(i + 2)); // (knee - hip) / (ankle - knee)
+          f.ts = (ts(23) + ts(24)) / 2;
+          f.st = Math.abs(X(27) - X(28)) / tor;
+          f.aL = { x: X(27) / tor, y: Y(27) / tor }; f.aR = { x: X(28) / tor, y: Y(28) / tor };
+          f.kL = Math.abs(X(25) - hipX) / tor; f.kR = Math.abs(X(26) - hipX) / tor;
+        }
+        if (V(0) && (V(7) || V(8))) {
+          const ear = V(7) && V(8) ? (Y(7) + Y(8)) / 2 : V(7) ? Y(7) : Y(8);
+          f.hd = (Y(0) - ear) / tor;
+        }
+        // wrists against the hips; out = how far out from the middle, toward that hand's own side
+        // (15 is your left wrist, 16 your right; from the front your left is on the picture's right)
+        const wr = (i, s) => (lm[i].visibility ?? 1) > .35 ? { y: (Y(i) - hipY) / tor, x: X(i) / tor, out: s * (X(i) - hipX) / tor } : null;
+        const sgn = X(23) > X(24) ? 1 : -1; // +1 when your left hip is on the picture's right (facing the phone)
+        f.wL = wr(15, sgn); f.wR = wr(16, -sgn);
+        return f;
+      }
+      // Calibrate "eyes up" from the setup check, when you're looking at the phone.
+      function lcCalib(C, lm, ar) { const f = lcFrame(lm, ar); if (f && f.hd != null) { C.cal.push(f.hd); if (C.cal.length > 90) C.cal.shift(); } }
+      const lcMed = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
+      function lcBase(C) {
+        if (C.base != null) return C.base;
+        if (C.cal.length >= 12) return (C.base = lcMed(C.cal));
+        // no calibration: the times you did look up, but never above a plain "looking ahead" value
+        if (C.hd.length < 30) return null;
+        const s = [...C.hd].sort((x, y) => x - y);
+        return Math.min(.04, s[Math.floor(s.length * .2)]);
+      }
+      // One frame. part from lcPart (null = only watch). Returns the dribbles found in this frame.
+      function lcStep(C, lm, t, ar, part) {
+        const f = lcFrame(lm, ar), out = [];
+        C.last = f ? t : C.last;
+        if (!f) { C.hand.L = C.hand.R = null; return out; }
+        f.t = t;
+        C.fr.push(f);
+        while (C.fr.length && C.fr[0].t < t - 6) C.fr.shift();
+        if (f.hd != null) { C.hd.push(f.hd); if (C.hd.length > 600) C.hd.shift(); }
+        if (!part) { C.hand.L = C.hand.R = null; return out; }
+        for (const h of ["L", "R"]) {
+          const w = h === "L" ? f.wL : f.wR;
+          let s = C.hand[h];
+          if (!w) continue;
+          if (!s) { C.hand[h] = { st: "up", top: w.y, bot: w.y, bt: t, xo: w.out, bx: w.x }; continue; }
+          s.xo = Math.max(s.xo, w.out);
+          if (s.st === "up") {
+            if (w.y < s.top) s.top = w.y;
+            if (w.y > s.top + LC.A) { s.st = "down"; s.bot = w.y; s.bt = t; s.bx = w.x; }
+          } else {
+            if (w.y > s.bot) { s.bot = w.y; s.bt = t; s.bx = w.x; }
+            if (w.y < s.bot - LC.A) {
+              // a push that ends below the chest and starts below the shoulders: not a wave, a toss or a shot
+              if (s.bot > -.55 && s.top > -1.3 && s.bot - s.top < 1.4) {
+                const kn = f.ts != null ? (h === "L" ? f.kL : f.kR) : null;
+                const e = { h, t: s.bt, top: s.top, bot: s.bot, x: s.bx, xo: s.xo, kn };
+                C.ev.push(e); out.push(e); C.stats.drib++;
+              }
+              C.hand[h] = { st: "up", top: w.y, bot: w.y, bt: t, xo: w.out, bx: w.x };
+            }
+          }
+        }
+        while (C.ev.length && C.ev[0].t < t - 8) C.ev.shift();
+        // the drill's running totals, for the rating screen
+        const St = C.stats, base = lcBase(C);
+        St.n++;
+        if (f.hd != null && base != null) St.up += f.hd - base <= LC.DOWN ? 1 : 0;
+        if (f.ts != null) { St.nl++; St.low += f.ts <= LC.LOW ? 1 : 0; St.nw++; St.wide += f.st >= LC.WIDE ? 1 : 0; }
+        return out;
+      }
+      // The biggest problem right now, if it has lasted. Returns { k, said, shown } or null; "good" when all is well.
+      const LC_CUE = {
+        eyes: ["Eyes up", "Eyes up."],
+        low: ["Sit lower", "Sit lower. Bend your knees."],
+        high: ["Below your waist", "Keep it below your waist."],
+        slow: ["Stay on the beat", "Speed up. One rep every beat."],
+        cross: ["Wider crosses", "Wider. Cross outside your knees."],
+        sync: ["Both balls together", "Both balls together."],
+        even: ["Same height, both hands", "Same height with both hands."],
+        spot: ["Same spot every bounce", "Same spot every bounce."],
+        wide: ["Wider base", "Wider base. Feet past your shoulders."],
+        feet: ["Feet stay put", "Feet stay put."]
+      };
+      const LC_ORDER = ["eyes", "low", "high", "slow", "cross", "sync", "even", "spot", "wide", "feet"];
+      const LC_GOOD = ["Good. Keep it going.", "That's it. Eyes up, stay low.", "Clean. Keep pounding.", "Nice rhythm."];
+      function lcCheck(C, t, part) {
+        if (!part) return null;
+        const fr = C.fr.filter(f => f.t > t - 3), now = fr.length ? fr[fr.length - 1] : null;
+        if (!now || t - now.t > .5) return null;
+        const ev = C.ev.filter(e => e.t > t - 6), last = n => ev.slice(-n);
+        const base = lcBase(C), act = {};
+        // eyes: down for most of the last 2 s
+        const h2 = fr.filter(f => f.t > t - 2 && f.hd != null);
+        if (base != null && h2.length >= 8 && h2.filter(f => f.hd - base > LC.DOWN).length >= h2.length * .75) act.eyes = 1;
+        const legs = fr.filter(f => f.ts != null);
+        if (legs.length >= 10) {
+          if (part.stance && lcMed(legs.map(f => f.ts)) > LC.LOW) act.low = 1;
+          if (lcMed(legs.map(f => f.st)) < LC.WIDE) act.wide = 1;
+          for (const k of ["aL", "aR"]) {
+            const xs = legs.map(f => f[k].x), ys = legs.map(f => f[k].y);
+            if (Math.max(...xs) - Math.min(...xs) > LC.FEET || Math.max(...ys) - Math.min(...ys) > LC.FEET) act.feet = 1;
+          }
+        }
+        if (part.high && ev.length >= 4 && last(5).filter(e => e.top < LC.HIGH).length >= 3) act.high = 1;
+        // the beat: one rep (one dribble) per tick; well under it for 6 s
+        if (part.bpm && t - (C.partT0 || 0) > 8 && ev.length * 10 < part.bpm * .7) act.slow = 1;
+        if (part.cross) { const c = last(6).filter(e => e.kn != null); if (c.length >= 4 && lcMed(c.map(e => e.xo - e.kn)) < 0) act.cross = 1; }
+        if (part.pound) for (const h of ["L", "R"]) { const b = ev.filter(e => e.h === h).slice(-6).map(e => e.x); if (b.length >= 5) { const m = b.reduce((a, x) => a + x, 0) / b.length; if (Math.sqrt(b.reduce((a, x) => a + (x - m) * (x - m), 0) / b.length) > .25) act.spot = 1; } }
+        if (part.together) { const e6 = last(6); if (e6.length >= 6 && e6.filter(e => ev.some(o => o.h !== e.h && Math.abs(o.t - e.t) < .15)).length < e6.length * .5) act.sync = 1; }
+        if (part.even) { const l = ev.filter(e => e.h === "L").map(e => e.top), r = ev.filter(e => e.h === "R").map(e => e.top); if (l.length >= 3 && r.length >= 3 && Math.abs(lcMed(l) - lcMed(r)) > .25) act.even = 1; }
+        // a problem counts once it has lasted 1 s (the beat: right away, since it already looks back 6 s)
+        for (const k of LC_ORDER) { if (act[k]) C.prob[k] = C.prob[k] || t; else delete C.prob[k]; }
+        const k = LC_ORDER.find(x => C.prob[x] && (x === "slow" || t - C.prob[x] >= 1));
+        if (k) return { k, shown: LC_CUE[k][0], said: LC_CUE[k][1] };
+        // all good: dribbling steadily and nothing to fix for 12 s
+        C.okSince = Object.keys(C.prob).length ? t : (C.okSince || t);
+        if (ev.length >= 8 && t - C.okSince > 12) return { k: "good", shown: "Good", said: LC_GOOD[Math.floor(t) % LC_GOOD.length] };
+        return null;
+      }
+      // END lccore
+
+    const st = document.createElement("style");
+    st.textContent = `
+.lcam{position:fixed;z-index:41;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 8px);display:flex;align-items:stretch;height:58px;
+  width:max-content;max-width:calc(100vw - 210px);min-width:120px;border-radius:12px;overflow:hidden;background:#05080F;border:2px solid #2A3858;color:#F2F5FA;font-family:var(--body)}
+.lcam.on{border-color:#2BD17E}.lcam.fix{border-color:#FFC23D}
+.lcam .lc-pic{position:relative;flex:none;height:100%;aspect-ratio:9/16;background:#0B1222}
+.lcam video,.lcam canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.lcam.mir video,.lcam.mir canvas{transform:scaleX(-1)}
+.lcam .lc-txt{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;padding:0 2px 0 8px}
+.lcam .lc-bar{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;font-family:var(--display);white-space:nowrap}
+.lcam .lc-dot{width:8px;height:8px;border-radius:50%;background:#7D8AA6;flex:none}.lcam.on .lc-dot{background:#2BD17E}.lcam.fix .lc-dot{background:#FFC23D}
+.lcam .lc-sub{font-size:12px;line-height:1.25;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lcam .lc-x{flex:none;border:0;background:none;color:inherit;font-size:20px;line-height:1;padding:0 8px;min-width:36px}
+.prow .lc-sum{font-size:12.5px;opacity:.85}
+.lc-note{margin:-4px 0 4px;font-size:13px}`;
+    document.head.appendChild(st);
+
+    let K = null; // the open coach: camera, pose loop and the drill-by-drill tracking
+    const lcWorkout = () => { const w = customToday(); return w && w.coach ? w : null; };
+    const lcOn = d => !!d && LC_IDS.has(d.id);
+    const lcCur = () => {
+      if (!P || P.stage !== "work") return null;
+      const d = P.items[P.i], ph = phasesOf(d)[P.pi];
+      if (!K || !K.items.has(P.i) || !ph) return null;
+      return lcPart(d.id, ph[0], ph[3] || 0);
+    };
+
+    // The player: when the workout has live cues on and one of its drills is covered, the coach opens first.
+    const origStart = startPlayer;
+    startPlayer = function () {
+      origStart.apply(this, arguments);
+      const w = lcWorkout();
+      if (!P || !w) return;
+      const items = new Set(P.items.map((d, i) => (lcOn(d) && w.items.includes(d.id) ? i : -1)).filter(i => i >= 0));
+      if (items.size) lcOpen(items);
+    };
+    const origClosePlayer = closePlayer;
+    closePlayer = function () { lcClose(); origClosePlayer.apply(this, arguments); };
+    const origDrawPlayer = drawPlayer;
+    drawPlayer = function () {
+      origDrawPlayer.apply(this, arguments);
+      if (!pEl || !P) return;
+      if (P.stage === "rate") {
+        if (K) lcStop(); // the camera's done; the totals stay for this screen
+        const rows = pEl.querySelectorAll(".prow");
+        P.items.forEach((d, i) => {
+          const s = P.lcStats && P.lcStats[i];
+          if (!s || s.n < 30 || !rows[i]) return;
+          const pc = (a, b) => (b ? Math.round(100 * a / b) + "%" : "–");
+          const top = Object.keys(s.cues).sort((a, b) => s.cues[b] - s.cues[a])[0];
+          const el = document.createElement("span");
+          el.className = "lc-sum";
+          el.textContent = `Camera saw ${s.drib} dribbles. Eyes up ${pc(s.up, s.n)} of the time, sitting low ${pc(s.low, s.nl)}, feet wider than shoulders ${pc(s.wide, s.nw)}.${top ? ` Said most: ${LC_CUE[top][0]}.` : ""}`;
+          const seg = rows[i].querySelector(".seg");
+          rows[i].insertBefore(el, seg || null);
+        });
+      }
+      lcBar();
+    };
+
+    function lcOpen(items) {
+      lcClose();
+      const el = document.createElement("div");
+      el.className = "lcam mir";
+      el.setAttribute("role", "status");
+      el.innerHTML = `<div class="lc-pic"><video playsinline muted autoplay></video><canvas></canvas></div>
+        <div class="lc-txt"><div class="lc-bar"><i class="lc-dot"></i>Live cues</div><div class="lc-sub">Starting the camera…</div></div>
+        <button class="lc-x" data-lc="off" aria-label="Turn off live cues for this run">×</button>`;
+      document.body.appendChild(el);
+      K = { el, items, video: el.querySelector("video"), cv: el.querySelector("canvas"), stream: null, pl: null, raf: 0, lastT: 0, raw: null,
+            C: null, Ci: -1, key: "", partT0: 0, saidAt: 0, said: {}, shown: "", placed: false, sub: "", face: "user" };
+      K.video.setAttribute("playsinline", "");
+      P.lcStats = P.lcStats || {};
+      el.addEventListener("click", e => {
+        e.stopPropagation();
+        const b = e.target.closest("[data-lc]");
+        if (b && b.dataset.lc === "off") { lcClose(); if (P && !P.running) togglePlay(); else if (P) drawPlayer(); }
+      });
+      // hold the player until you're in the picture
+      if (P.running) { P.running = false; P.cd = 0; }
+      try { speechSynthesis.cancel(); } catch (e) {}
+      drawPlayer();
+      lcCam();
+    }
+
+    async function lcCam() {
+      const me = K;
+      const fail = t => { if (K !== me) return; lcClose(); toast("Live cues are off for this run", t); if (P && !P.running) togglePlay(); };
+      try { me.pl = await hooks.loadLivePose(); } catch (e) { return fail("The pose model couldn't load on this phone."); }
+      if (K !== me) return;
+      let s;
+      try {
+        s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: me.face, width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } }, audio: false });
+      } catch (e) { return fail("Couldn't open the camera. Allow the camera for Hoops Ladder in your phone's settings."); }
+      if (K !== me) { s.getTracks().forEach(t => t.stop()); return; }
+      me.stream = s;
+      me.video.srcObject = s;
+      try { await me.video.play(); } catch (e) {}
+      me.raf = requestAnimationFrame(lcLoop);
+      lcSetup();
+    }
+
+    // The setup check from 4c, fed by this loop's own landmarks. While it's open, it also learns where your head is
+    // when you look at the phone (the "eyes up" baseline). Go starts the drill; Back runs it without cues.
+    function lcSetup() {
+      const me = K;
+      if (!me || !me.stream) return;
+      me.cal = lcNew();
+      me.sc = hooks.setupCheck({ stream: me.stream, mirror: me.face === "user", kind: "body", title: "Live cues", verb: "Dribbling", goSay: "", cdKey: "lcCd",
+        getLm: () => (K === me ? me.raw : null),
+        onGo: () => {
+          if (K !== me || !P) return;
+          me.placed = true;
+          me.base = me.cal.cal.length >= 12 ? lcMed(me.cal.cal) : null;
+          if (P.stage === "ready") { P.running = true; advance(); }
+          else if (!P.running) { P.running = true; P.cd = 0; P.lost = false; P.beat = 0; drawPlayer(); }
+        },
+        onClose: () => { if (K === me) { lcClose(); if (P && !P.running) togglePlay(); } } });
+    }
+
+    function lcStop() {
+      if (!K) return;
+      cancelAnimationFrame(K.raf);
+      if (K.stream) K.stream.getTracks().forEach(t => t.stop());
+      K.el.remove();
+      K = null;
+    }
+    function lcClose() { if (K) { hooks.scClose(K.sc); lcStop(); } }
+
+    function lcBar() {
+      if (!K) return;
+      const part = lcCur(), watching = !!part && P.running && !P.cd && K.placed;
+      K.el.classList.toggle("on", watching && !K.fix);
+      K.el.classList.toggle("fix", watching && !!K.fix);
+      let sub = !K.stream ? "Starting the camera…" : !K.placed ? "Get set" : !P || P.stage === "rest" || isRestPart() ? "Resting" : !P.running || P.cd ? "Paused"
+        : !K.items.has(P.i) ? "Not this drill" : !part ? "Not this part" : K.sub || "Watching";
+      const el = K.el.querySelector(".lc-sub");
+      if (el.textContent !== sub) el.textContent = sub;
+    }
+
+    function lcLoop() {
+      if (!K) return;
+      const me = K;
+      me.raf = requestAnimationFrame(lcLoop);
+      const v = me.video, now = performance.now();
+      const part = lcCur(), live = !!part && P && P.running && !P.cd && me.placed;
+      // 20 a second while watching or setting up, 5 while resting
+      if (!v.videoWidth || v.readyState < 2 || now - me.lastT < (live || !me.placed ? 50 : 200)) return;
+      me.lastT = now;
+      let r = null;
+      try { r = me.pl.detectForVideo(v, now); } catch (e) { return; }
+      const lm = me.raw = (r && r.landmarks && r.landmarks[0]) || null;
+      const ar = v.videoWidth / v.videoHeight, t = now / 1000;
+      lcDraw(lm);
+      if (!me.placed) { if (lm) lcCalib(me.cal, lm, ar); return lcBar(); }
+      if (!P) return;
+      // a new drill gets its own tracker; a new part restarts the problem timers
+      if (me.Ci !== P.i) { me.Ci = P.i; me.C = lcNew(); me.C.base = me.base; P.lcStats[P.i] = me.C.stats; }
+      const key = P.i + ":" + P.pi + ":" + P.stage;
+      if (key !== me.key) { me.key = key; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.hand = { L: null, R: null }; }
+      if (P.stage !== "work" || !P.running || P.cd) { me.fix = null; me.was = false; return lcBar(); }
+      // the player's own random tips step aside while the camera coaches this part
+      if (part) P.tipAt = 30;
+      if (!live) { me.fix = null; me.was = false; return lcBar(); }
+      // back from a pause or a lost ball: start the checks fresh, so the time away doesn't read as a slow beat
+      if (!me.was) { me.was = true; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.hand = { L: null, R: null }; }
+      lcStep(me.C, lm, t, ar, part);
+      const seen = lm && me.C.last === t;
+      const rate = me.C.ev.filter(e => e.t > t - 6).length * 10;
+      me.sub = !seen ? "Can't see you" : t - me.partT0 > 4 && !me.C.ev.some(e => e.t > t - 4) && !part.behind ? "Can't see the dribble" : rate ? `${rate} a min` : "Watching";
+      const c = seen ? lcCheck(me.C, t, part) : null;
+      me.fix = c && c.k !== "good" ? c : null;
+      if (c) lcSay(c, t);
+      lcBar();
+    }
+
+    // One cue at a time: not in a part's first 4 s or last 2 s (the player names parts), never over other speech, at least
+    // 5 s apart, the same fix not again for 12 s, praise at most every 30 s. The tip line shows it either way.
+    function lcSay(c, t) {
+      const me = K;
+      if (c.k === "good" ? (t - (me.said.good || -99) < 30 || t - me.saidAt < 10) : (t - me.saidAt < 5 || t - (me.said[c.k] || -99) < 12)) return;
+      if (t - me.partT0 < 4 || P.left < 2) return; // the player is about to name the next part
+      if (performance.now() < talkUntil || (window.speechSynthesis && speechSynthesis.speaking)) return;
+      me.saidAt = t; me.said[c.k] = t;
+      if (c.k !== "good") me.C.stats.cues[c.k] = (me.C.stats.cues[c.k] || 0) + 1;
+      P.tip = c.k === "good" ? c.said : c.shown;
+      P.tipFlash = Date.now();
+      updPlayer();
+      say(c.said);
+      try { if (c.k !== "good") navigator.vibrate?.(40); } catch (e) {}
+    }
+
+    function lcDraw(lm) {
+      const cv = K.cv, v = K.video, w = v.videoWidth, h = v.videoHeight;
+      if (cv.width !== w) { cv.width = w; cv.height = h; }
+      const c = cv.getContext("2d");
+      c.clearRect(0, 0, w, h);
+      if (!lm) return;
+      c.lineCap = "round";
+      c.lineWidth = Math.max(3, w / 120);
+      for (const [a, b] of BONES) {
+        const A = lm[a], B = lm[b];
+        if ((A.visibility ?? 1) < .5 || (B.visibility ?? 1) < .5) continue;
+        c.strokeStyle = K.fix ? "#FFC23D" : "rgba(43,209,126,.9)";
+        c.beginPath(); c.moveTo(A.x * w, A.y * h); c.lineTo(B.x * w, B.y * h); c.stroke();
+      }
+      c.fillStyle = "#FF8A3D";
+      for (const i of [15, 16]) if ((lm[i].visibility ?? 1) > .35) { c.beginPath(); c.arc(lm[i].x * w, lm[i].y * h, w / 40, 0, 7); c.fill(); }
+    }
+
+    // Edit workout: the switch, shown when the workout has a drill it covers. Off unless you turn it on.
+    const origBuilder = builderHTML;
+    builderHTML = function () {
+      const h = origBuilder.apply(this, arguments);
+      if (!B || B.view === "pick") return h;
+      const ds = bItems().map(id => D[id]).filter(lcOn);
+      if (!ds.length) return h;
+      const names = ds.map(d => d.name), list = names.length > 2 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names.join(" and ");
+      return h.replace('<label class="toggle"><input type="checkbox" id="bkeep"',
+        `<label class="toggle"><input type="checkbox" id="bcoach" ${B.coach ? "checked" : ""}> Live cues from the camera</label>
+        <p class="muted lc-note">The front camera watches you dribble during ${esc(list)} and calls out fixes: eyes up, sit lower, a wider base, the dribble's height and more. Prop the phone 6 to 10 ft in front of you, screen toward you. Nothing is recorded.</p>
+        <label class="toggle"><input type="checkbox" id="bkeep"`);
+    };
+    const origOpenBuilder = openBuilder;
+    openBuilder = function (wid) {
+      origOpenBuilder.apply(this, arguments);
+      const w = wid && S.rec.workouts.find(x => x.id === wid);
+      if (B && w && w.coach) { B.coach = true; bsSet(builderHTML()); }
+    };
+    document.addEventListener("change", e => { if (B && e.target.id === "bcoach") B.coach = e.target.checked; });
   }
 
   /* ---------- 9. Share › Hoops Ladder: links and videos come back to the page ----------
