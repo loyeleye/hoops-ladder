@@ -1274,3 +1274,67 @@ strips of the rim:
 It ran at about 380 frames a second in Node, so it has room on a phone at 30. A Playwright run fed a minute of a
 clip in as the camera: it logged 1 for 1, 2 for 2, 3 for 3, 3 for 4 and 3 for 5, which matches the clip.
 The analysis scripts are in the project files under `hoops-app/ball-tracking/`.
+
+## Step 34. Live cues while you dribble
+
+**What it does.** A saved workout gets a switch, *Live cues from the camera* (Edit workout, under the drill list). It
+is off unless you turn it on, and it only shows when the workout has a drill it covers:
+
+| Drill | What it checks |
+|---|---|
+| Weight-Shift Pounds | eyes up, sitting low, base, height (knee to hip), the ball landing in one spot, feet set |
+| Crossover → Jolt Cross | eyes up, sitting low, base, height, crosses outside your knees, feet set |
+| Beginner Five | eyes up, sitting low, base, height, feet set |
+| D2 Rep Count | all of the above, plus keeping up with the beat (not on Kobes or behind the back) |
+| Two-Ball Pounds | eyes up, sitting low, base, both balls together and at one height (not on the moving part) |
+| In The Lab Daily Warm-Up | the standing parts: eyes up, sitting low, base, height, crosses (not the walk or jump-stop parts; no feet check where you step or snatch back) |
+| Crossover + Thigh Tap | eyes up, sitting low, base, height, crosses outside your knees, feet set |
+| Bounce Over an Object | eyes up, sitting low, base, height, feet set |
+| Two-Ball Fingertips and Drumroll, Two-Ball Shape Series | eyes up, sitting low, base, height (fingertip taps are too small to count as dribbles) |
+| D2 Called Burnout | eyes up, sitting low, base, crosses, and keeping up with each call's own tempo (not Kobes or behind the back) |
+| Called Crossovers | eyes up, sitting low, base, and the ball in the called hand within 1.6 s ("Quicker on the switch") |
+| Random Combo Calls | eyes up, sitting low, base, height, crosses on Cross calls (no feet check on Retreat, Snatch back or Hesi) |
+| Two-Ball V Dribbles, Stationary Exchange Ladder | eyes up, sitting low, base, both balls together and at one height |
+| Pound and Around | eyes up, sitting low, base, and the pounding hand never stopping ("Keep the pound going") |
+
+When that workout is the one on Today and one of these drills starts, the player holds, the **front** camera opens
+(prop the phone 6 to 10 ft in front of you, screen toward you), and the setup check from step 31 puts you in the
+picture. Go starts the drill. A small *Live cues* chip sits at the top of the player with a thumbnail of the camera,
+how many dribbles a minute it sees, and a green or amber edge. When something needs fixing it says one short cue
+("Eyes up", "Sit lower. Bend your knees.", "Wider. Cross outside your knees.") and shows it in the tip line; after 12
+clean seconds it says so. The × on the chip turns it off for that run. The rating screen adds a line per drill: how
+many dribbles it saw, the share of time with eyes up, sitting low and feet wider than shoulders, and the cue it said
+most. Frames are read in memory and thrown away; nothing is recorded.
+
+**How it sees a dribble** (`lcFrame` / `lcStep` / `lcCheck`, section 10 of `native-web/native.js`). The pose model is
+the live form check's (MediaPipe pose landmarker lite, VIDEO mode, CPU), run up to 20 times a second. Everything is
+measured in torso lengths, shoulders to hips, which stays steady when you turn a little.
+1. **Dribbles.** Each wrist's height against the hips goes through a small state machine: down by 0.13 torso, then
+   back up by 0.13, is one push. Pushes that start above the shoulders or swing more than 1.4 torsos (a shot, a toss,
+   a wave) don't count. The highest point of each push is how high the ball comes up.
+2. **Eyes up.** The nose against the ears. The setup check learns where your head is when you look at the phone; more
+   than 0.12 lower for most of 2 s is eyes down.
+3. **Sitting low.** From the front a bent knee shortens the thigh, not the shin, so thigh over shin is about 1 standing
+   and well under 1 in a stance. Over 0.9 for most of 3 s: sit lower.
+4. **Base.** Ankles less than 0.72 torso apart (about shoulder width).
+5. **Beat.** On D2 parts, fewer than 70% of the beat's reps in the last 4 to 6 s. On D2 Called Burnout the same against
+   each call's tempo, counted from 1.5 s after the call.
+6. **Crosses.** The hand's widest point in each push against its knee.
+   **Called hand.** After a "Left" or "Right" call, the next 1.6 s of dribbles should include that hand.
+   **Pound and Around.** The pounding hand going 1.3 s without a dribble.
+7. A problem has to last a second before it's said. One cue at a time: not in a part's first 4 s or last 2 s (the player
+   names parts then), never over other speech, at least 5 s apart, the same fix not again for 12 s.
+
+**How it was checked.** There's no dribbling footage in the project yet, so the logic was checked two ways:
+- A Node harness drove the same functions with synthetic poses at 15 and 20 frames a second: a clean pound, eyes down,
+  standing tall, a narrow base, a high dribble, a wandering ball, moving feet, crossovers on and off the beat and inside
+  the knees, two balls together, out of sync and uneven, and no ball. Each gave its own cue, the clean ones said "good",
+  and the dribble counts matched (50 in 20 s at 2.5 a second).
+- Two of the Nov 2024 front-view clips (standing, holding and shooting, not dribbling) were run through the real pose
+  model to set the scale: standing thigh over shin is 1.0 to 1.15 and a shooting dip 0.7 to 0.85. A Playwright run fed
+  one in as the camera through the whole flow: the switch in Edit workout, the setup check turning green, the drill
+  starting on Go, cues spoken and shown ("Sit lower", "Feet stay put", which fit a person standing upright and walking),
+  and the rating screen's summary.
+
+The thresholds are first guesses from that and need a real session to tune; they sit together in `LC` at the top of the
+section.
