@@ -2919,13 +2919,15 @@
      setup check (4c) puts you in the picture, and the pose model (the one the live form check uses) watches you
      dribble. From your wrists, hips, knees, ankles and head it finds each dribble (the hand pushing down and coming
      back up) and checks, as you go: eyes up, sitting low, a base wider than your shoulders, the dribble below your
-     waist, keeping up with the beat, crosses outside your knees, the pound landing in one spot, two balls together
-     and at one height, and feet staying put. When one problem lasts, it says one short cue (never more than one
+     waist, keeping up with the beat (or each call's tempo), crosses outside your knees, the pound landing in one spot,
+     two balls together and at one height, the ball reaching a called hand, a pounding hand that keeps going, and feet
+     staying put. When one problem lasts, it says one short cue (never more than one
      every few seconds, and not over the player's own calls) and shows it as the tip; when nothing needs fixing for
      a while it says so. Frames are read in memory and thrown away; nothing is recorded. The rating screen shows
      what it saw for each drill. See docs/LEARNING.md, step 34. */
   {
-    const LC_IDS = new Set(["h_pound", "h_jolt", "h_five", "h_d2", "h_two"]);
+    const LC_IDS = new Set(["h_pound", "h_jolt", "h_five", "h_d2", "h_two", "h_lab", "h_thightap", "h_over", "h_2drum", "h_2shapes",
+      "h_d2r", "h_r_cross", "h_r_combo", "h_2v", "h_2xladder", "h_2around"]);
 
       // BEGIN lccore (tests: scratch Node harness feeds pose landmarks through this)
       // Units: everything is measured in torso lengths (shoulders to hips, straight down), which stays steady when
@@ -2938,19 +2940,28 @@
         HIGH: -0.2,       // the wrist at the top of a dribble this far above the hips: the ball's above your waist
         FEET: 0.35        // an ankle sliding more than this in 3 s means the feet moved
       };
-      // What to watch in one part of a drill. null: nothing (rest, no-dribble or moving parts).
+      // What to watch in one part of a drill. null: nothing (rest, no-dribble, walking or jumping parts).
+      // For drills with called moves, name is the current call ("Cross", "Between right", "Left").
       function lcPart(id, name, bpm) {
         const n = String(name || "").toLowerCase();
-        if (/^rest\b|no dribble|figure 8|moving|walking|forward|backward/.test(n)) return null;
-        const two = id === "h_two", behind = /behind/.test(n);
+        if (/^rest\b|no dribble|figure 8|moving|walk|forward|backward|jump/.test(n)) return null;
+        const behind = /behind/.test(n);
+        // two balls: both bounce at once (together), and both come up to the same height (even)
+        const together = (id === "h_two" && /together/.test(n)) || id === "h_2v" || (id === "h_2xladder" && /pound/.test(n));
+        const even = (id === "h_two" && /together|alternat/.test(n)) || id === "h_2v" || (id === "h_2xladder" && !behind);
+        // Pound and Around: one hand keeps pounding while the other ball circles a leg
+        const pm = id === "h_2around" && n.match(/(left|right) hand pounds|(left|right) ball around/);
         return {
-          id, two, behind,
+          id, behind,
           pound: id === "h_pound",
-          cross: /cross/.test(n) && !/kobe/.test(n),
-          together: two && /together/.test(n),
-          even: two && /together|alternat/.test(n),
-          high: !/high.?low/.test(n) && !behind,   // check the dribble's height
-          stance: !/high.?low/.test(n),             // check that you sit low
+          cross: /cross/.test(n) && !/kobe|snatch/.test(n),
+          together, even,
+          steady: pm ? (pm[1] ? pm[1][0].toUpperCase() : pm[2] === "left" ? "R" : "L") : null,
+          hands: id === "h_r_cross",                  // the call names the hand the ball should be in
+          feet: !/step|snatch|retreat|hesi/.test(n),  // these moves move your feet on purpose
+          high: !/high.?low/.test(n) && !behind,      // check the dribble's height
+          stance: !/high.?low/.test(n),               // check that you sit low
+          quiet: id === "h_2drum",                    // fingertip taps are too small to count, so don't say it can't see them
           bpm: bpm && !/kobe/.test(n) && !behind ? bpm : 0
         };
       }
@@ -3042,6 +3053,8 @@
         low: ["Sit lower", "Sit lower. Bend your knees."],
         high: ["Below your waist", "Keep it below your waist."],
         slow: ["Stay on the beat", "Speed up. One rep every beat."],
+        late: ["Quicker switch", "Quicker on the switch."],
+        steady: ["Keep the pound going", "Keep the pound going."],
         cross: ["Wider crosses", "Wider. Cross outside your knees."],
         sync: ["Both balls together", "Both balls together."],
         even: ["Same height, both hands", "Same height with both hands."],
@@ -3049,7 +3062,7 @@
         wide: ["Wider base", "Wider base. Feet past your shoulders."],
         feet: ["Feet stay put", "Feet stay put."]
       };
-      const LC_ORDER = ["eyes", "low", "high", "slow", "cross", "sync", "even", "spot", "wide", "feet"];
+      const LC_ORDER = ["eyes", "late", "steady", "low", "high", "slow", "cross", "sync", "even", "spot", "wide", "feet"];
       const LC_GOOD = ["Good. Keep it going.", "That's it. Eyes up, stay low.", "Clean. Keep pounding.", "Nice rhythm."];
       function lcCheck(C, t, part) {
         if (!part) return null;
@@ -3064,21 +3077,33 @@
         if (legs.length >= 10) {
           if (part.stance && lcMed(legs.map(f => f.ts)) > LC.LOW) act.low = 1;
           if (lcMed(legs.map(f => f.st)) < LC.WIDE) act.wide = 1;
-          for (const k of ["aL", "aR"]) {
+          if (part.feet) for (const k of ["aL", "aR"]) {
             const xs = legs.map(f => f[k].x), ys = legs.map(f => f[k].y);
             if (Math.max(...xs) - Math.min(...xs) > LC.FEET || Math.max(...ys) - Math.min(...ys) > LC.FEET) act.feet = 1;
           }
         }
         if (part.high && ev.length >= 4 && last(5).filter(e => e.top < LC.HIGH).length >= 3) act.high = 1;
-        // the beat: one rep (one dribble) per tick; well under it for 6 s
-        if (part.bpm && t - (C.partT0 || 0) > 8 && ev.length * 10 < part.bpm * .7) act.slow = 1;
+        // the beat: one rep (one dribble) per tick; well under it over the last 4 to 6 s, counted from 1.5 s after the
+        // part or the latest call started (time to react)
+        if (part.bpm) { const from = Math.max(t - 6, (C.partT0 || 0) + 1.5, (C.callT0 || 0) + 1.5), span = t - from;
+          if (span >= 4 && C.ev.filter(e => e.t > from).length * 60 / span < part.bpm * .7) act.slow = 1; }
+        // a called hand: the ball should be in that hand within 1.6 s of the call
+        if (part.hands && C.call && !C.call.done && t > C.call.t + 1.6) {
+          C.call.done = true;
+          const want = /^left/i.test(C.call.name) ? "L" : /^right/i.test(C.call.name) ? "R" : null;
+          const win = C.ev.filter(e => e.t > C.call.t && e.t <= C.call.t + 1.6);
+          if (want && win.length && !win.some(e => e.h === want)) C.lateUntil = t + 2;
+        }
+        if (part.hands && t < (C.lateUntil || 0)) act.late = 1;
+        // Pound and Around: the pounding hand has stopped for a beat
+        if (part.steady && t - (C.partT0 || 0) > 4) { const g = ev.filter(e => e.h === part.steady); if (!g.length || t - g[g.length - 1].t > 1.3) act.steady = 1; }
         if (part.cross) { const c = last(6).filter(e => e.kn != null); if (c.length >= 4 && lcMed(c.map(e => e.xo - e.kn)) < 0) act.cross = 1; }
         if (part.pound) for (const h of ["L", "R"]) { const b = ev.filter(e => e.h === h).slice(-6).map(e => e.x); if (b.length >= 5) { const m = b.reduce((a, x) => a + x, 0) / b.length; if (Math.sqrt(b.reduce((a, x) => a + (x - m) * (x - m), 0) / b.length) > .25) act.spot = 1; } }
         if (part.together) { const e6 = last(6); if (e6.length >= 6 && e6.filter(e => ev.some(o => o.h !== e.h && Math.abs(o.t - e.t) < .15)).length < e6.length * .5) act.sync = 1; }
         if (part.even) { const l = ev.filter(e => e.h === "L").map(e => e.top), r = ev.filter(e => e.h === "R").map(e => e.top); if (l.length >= 3 && r.length >= 3 && Math.abs(lcMed(l) - lcMed(r)) > .25) act.even = 1; }
-        // a problem counts once it has lasted 1 s (the beat: right away, since it already looks back 6 s)
+        // a problem counts once it has lasted 1 s (the beat and a late switch: right away, they already look back)
         for (const k of LC_ORDER) { if (act[k]) C.prob[k] = C.prob[k] || t; else delete C.prob[k]; }
-        const k = LC_ORDER.find(x => C.prob[x] && (x === "slow" || t - C.prob[x] >= 1));
+        const k = LC_ORDER.find(x => C.prob[x] && (x === "slow" || x === "late" || t - C.prob[x] >= 1));
         if (k) return { k, shown: LC_CUE[k][0], said: LC_CUE[k][1] };
         // all good: dribbling steadily and nothing to fix for 12 s
         C.okSince = Object.keys(C.prob).length ? t : (C.okSince || t);
@@ -3111,6 +3136,8 @@
       if (!P || P.stage !== "work") return null;
       const d = P.items[P.i], ph = phasesOf(d)[P.pi];
       if (!K || !K.items.has(P.i) || !ph) return null;
+      // drills with called moves: watch for the current call, at the tempo the player picked for it (D2 Called Burnout)
+      if (d.log === "react") return /^rest\b/i.test(ph[0]) ? null : lcPart(d.id, P.call || "", d.tempoCalls && P.call ? P.bpm : 0);
       return lcPart(d.id, ph[0], ph[3] || 0);
     };
 
@@ -3222,7 +3249,7 @@
       K.el.classList.toggle("on", watching && !K.fix);
       K.el.classList.toggle("fix", watching && !!K.fix);
       let sub = !K.stream ? "Starting the camera…" : !K.placed ? "Get set" : !P || P.stage === "rest" || isRestPart() ? "Resting" : !P.running || P.cd ? "Paused"
-        : !K.items.has(P.i) ? "Not this drill" : !part ? "Not this part" : K.sub || "Watching";
+        : !K.items.has(P.i) ? "Not this drill" : !part ? "Not this part" : K.cue && performance.now() / 1000 < K.cue.until ? K.cue.text : K.sub || "Watching";
       const el = K.el.querySelector(".lc-sub");
       if (el.textContent !== sub) el.textContent = sub;
     }
@@ -3247,6 +3274,8 @@
       if (me.Ci !== P.i) { me.Ci = P.i; me.C = lcNew(); me.C.base = me.base; P.lcStats[P.i] = me.C.stats; }
       const key = P.i + ":" + P.pi + ":" + P.stage;
       if (key !== me.key) { me.key = key; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.hand = { L: null, R: null }; }
+      // a new call ("Left", "Cross"): when it came, for the switch and tempo checks
+      if (P.flashAt && P.flashAt !== me.flash) { me.flash = P.flashAt; me.C.call = { name: P.call || "", t, done: false }; me.C.callT0 = t; }
       if (P.stage !== "work" || !P.running || P.cd) { me.fix = null; me.was = false; return lcBar(); }
       // the player's own random tips step aside while the camera coaches this part
       if (part) P.tipAt = 30;
@@ -3256,7 +3285,7 @@
       lcStep(me.C, lm, t, ar, part);
       const seen = lm && me.C.last === t;
       const rate = me.C.ev.filter(e => e.t > t - 6).length * 10;
-      me.sub = !seen ? "Can't see you" : t - me.partT0 > 4 && !me.C.ev.some(e => e.t > t - 4) && !part.behind ? "Can't see the dribble" : rate ? `${rate} a min` : "Watching";
+      me.sub = !seen ? "Can't see you" : t - me.partT0 > 4 && !me.C.ev.some(e => e.t > t - 4) && !part.behind && !part.quiet ? "Can't see the dribble" : rate ? `${rate} a min` : "Watching";
       const c = seen ? lcCheck(me.C, t, part) : null;
       me.fix = c && c.k !== "good" ? c : null;
       if (c) lcSay(c, t);
@@ -3273,6 +3302,7 @@
       me.saidAt = t; me.said[c.k] = t;
       if (c.k !== "good") me.C.stats.cues[c.k] = (me.C.stats.cues[c.k] || 0) + 1;
       P.tip = c.k === "good" ? c.said : c.shown;
+      me.cue = { text: P.tip, until: t + 3 }; // the chip shows it too (drills with calls have no tip line)
       P.tipFlash = Date.now();
       updPlayer();
       say(c.said);

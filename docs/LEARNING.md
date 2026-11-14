@@ -1287,6 +1287,15 @@ is off unless you turn it on, and it only shows when the workout has a drill it 
 | Beginner Five | eyes up, sitting low, base, height, feet set |
 | D2 Rep Count | all of the above, plus keeping up with the beat (not on Kobes or behind the back) |
 | Two-Ball Pounds | eyes up, sitting low, base, both balls together and at one height (not on the moving part) |
+| In The Lab Daily Warm-Up | the standing parts: eyes up, sitting low, base, height, crosses (not the walk or jump-stop parts; no feet check where you step or snatch back) |
+| Crossover + Thigh Tap | eyes up, sitting low, base, height, crosses outside your knees, feet set |
+| Bounce Over an Object | eyes up, sitting low, base, height, feet set |
+| Two-Ball Fingertips and Drumroll, Two-Ball Shape Series | eyes up, sitting low, base, height (fingertip taps are too small to count as dribbles) |
+| D2 Called Burnout | eyes up, sitting low, base, crosses, and keeping up with each call's own tempo (not Kobes or behind the back) |
+| Called Crossovers | eyes up, sitting low, base, and the ball in the called hand within 1.6 s ("Quicker on the switch") |
+| Random Combo Calls | eyes up, sitting low, base, height, crosses on Cross calls (no feet check on Retreat, Snatch back or Hesi) |
+| Two-Ball V Dribbles, Stationary Exchange Ladder | eyes up, sitting low, base, both balls together and at one height |
+| Pound and Around | eyes up, sitting low, base, and the pounding hand never stopping ("Keep the pound going") |
 
 When that workout is the one on Today and one of these drills starts, the player holds, the **front** camera opens
 (prop the phone 6 to 10 ft in front of you, screen toward you), and the setup check from step 31 puts you in the
@@ -1308,8 +1317,11 @@ measured in torso lengths, shoulders to hips, which stays steady when you turn a
 3. **Sitting low.** From the front a bent knee shortens the thigh, not the shin, so thigh over shin is about 1 standing
    and well under 1 in a stance. Over 0.9 for most of 3 s: sit lower.
 4. **Base.** Ankles less than 0.72 torso apart (about shoulder width).
-5. **Beat.** On D2 parts, fewer than 70% of the beat's reps in the last 6 s.
+5. **Beat.** On D2 parts, fewer than 70% of the beat's reps in the last 4 to 6 s. On D2 Called Burnout the same against
+   each call's tempo, counted from 1.5 s after the call.
 6. **Crosses.** The hand's widest point in each push against its knee.
+   **Called hand.** After a "Left" or "Right" call, the next 1.6 s of dribbles should include that hand.
+   **Pound and Around.** The pounding hand going 1.3 s without a dribble.
 7. A problem has to last a second before it's said. One cue at a time: not in a part's first 4 s or last 2 s (the player
    names parts then), never over other speech, at least 5 s apart, the same fix not again for 12 s.
 
