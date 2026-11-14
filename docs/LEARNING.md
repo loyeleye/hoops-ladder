@@ -1296,6 +1296,13 @@ is off unless you turn it on, and it only shows when the workout has a drill it 
 | Random Combo Calls | eyes up, sitting low, base, height, crosses on Cross calls (no feet check on Retreat, Snatch back or Hesi) |
 | Two-Ball V Dribbles, Stationary Exchange Ladder | eyes up, sitting low, base, both balls together and at one height |
 | Pound and Around | eyes up, sitting low, base, and the pounding hand never stopping ("Keep the pound going") |
+| One-Hand Cross Series | eyes up, sitting low, base, height, feet set (no "wider crosses": this drill keeps the ball inside your legs) |
+| Between-the-Legs Pickups | eyes up, sitting low, base, height, feet set (no feet check on "Chops, feet moving") |
+| Pound–Between–Behind | eyes up, sitting low, base, feet set (no height or "can't see the dribble": the ball goes behind you every rep) |
+| Two-Ball Juggle | eyes up (not on the slow first part), sitting low, base, height, feet set |
+| Behind-the-Back Catch | sitting low, base, feet set (it's one dribble and a catch, so no eyes, height or dribble checks) |
+| Eyes-Up Signals | eyes up (on the phone, where the signals are), sitting low, base, height, and the ball in the hand a ← or → signal names. Cues are shown, never spoken, since the drill is silent |
+| Tennis Ball Toss and Snatch, Tennis Ball Exchange, Toss Cross One Bounce (standing parts), Toss Move Catch, Drop Move Catch | sitting low, base, height, feet set, and "Keep the dribble alive". No eyes up: your eyes belong on the tennis ball |
 
 When that workout is the one on Today and one of these drills starts, the player holds, the **front** camera opens
 (prop the phone 6 to 10 ft in front of you, screen toward you), and the setup check from step 31 puts you in the
@@ -1322,6 +1329,11 @@ measured in torso lengths, shoulders to hips, which stays steady when you turn a
 6. **Crosses.** The hand's widest point in each push against its knee.
    **Called hand.** After a "Left" or "Right" call, the next 1.6 s of dribbles should include that hand.
    **Pound and Around.** The pounding hand going 1.3 s without a dribble.
+   **Tennis ball drills.** A hand that comes up to chest height or higher (`LC.TOSS`) is tossing or catching. A push
+   that started up there doesn't count, and a finished dribble waits 0.35 s (`LC.HOLD`) and is dropped if its hand
+   goes up into a toss, so a wind-up isn't counted either. This works on the drills where the balls swap hands, since
+   it looks at what each hand is doing rather than which hand was named. No counted dribble from either hand for
+   1.6 s after that wait: "Keep the dribble alive".
 7. A problem has to last a second before it's said. One cue at a time: not in a part's first 4 s or last 2 s (the player
    names parts then), never over other speech, at least 5 s apart, the same fix not again for 12 s.
 
@@ -1335,6 +1347,19 @@ measured in torso lengths, shoulders to hips, which stays steady when you turn a
   one in as the camera through the whole flow: the switch in Edit workout, the setup check turning green, the drill
   starting on Go, cues spoken and shown ("Sit lower", "Feet stay put", which fit a person standing upright and walking),
   and the rating screen's summary.
+
+**Not covered, on purpose.** Tennis Ball Wall Drills (you face a wall, so the phone can't sit in front of you),
+Partner Tennis Ball Catch (your partner stands between you and the phone), Tennis Ball Combos on the Move and the
+walking parts of Toss Cross One Bounce (you're moving the whole time). Three drill-specific cues wait for a real
+dribbling clip to tune on, because the camera sees your wrist, not the ball: "by your big toe" on Pound–Between–Behind,
+"center of your base" on Pickups and "hand by your leg" on Behind-the-Back Catch.
+
+**The second batch was checked** the same way: 25 synthetic cases at 15 and 20 frames a second (a tossing hand not
+counted while the dribbling hand is, including hands swapping every 2 s; the dribble dying; no eyes cue on tennis
+drills, the catch or the slow juggle; no "wider crosses" on One-Hand Cross while Jolt Cross gives it for the same
+motion; no height cue on Pound–Between–Behind; a missed ← signal), then the real-camera flow with a Nov 2024 clip on
+Tennis Ball Toss and Snatch ("Sit lower" and "Keep the dribble alive" for a person who isn't dribbling, no "Eyes up")
+and Eyes-Up Signals (cues on the chip, nothing spoken, the signal card not covered).
 
 The thresholds are first guesses from that and need a real session to tune; they sit together in `LC` at the top of the
 section.
