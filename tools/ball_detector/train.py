@@ -12,7 +12,8 @@ for nm in TRAIN:
             for k in range(i+1,j):
                 w=(k-i)/(j-i); full[k]=dict(t=k,x=lab[i]["x"]*(1-w)+lab[j]["x"]*w,y=lab[i]["y"]*(1-w)+lab[j]["y"]*w,r=(lab[i]["r"]+lab[j]["r"])/2)
     clips[nm]=a
-    items+=[(nm,l) for l in full if l and l["t"]>=2]
+    step=int(__import__("os").environ.get("SUB_"+nm,"1"))
+    items+=[(nm,l) for l in full if l and l["t"]>=2 and l["t"]%step==0]
 print("train frames",len(items),flush=True)
 CH,CW=192,256
 def sample(nm,l):
@@ -58,7 +59,10 @@ def focal(logit,hm):
     p=torch.sigmoid(logit).clamp(1e-4,1-1e-4); pos=hm.ge(.99).float(); neg=1-pos
     pl=-((1-p)**2*torch.log(p)*pos).sum(); nl=-((1-hm)**4*p**2*torch.log(1-p)*neg).sum()
     return (pl+nl)/pos.sum().clamp(min=1)
-net=Net(24); opt=torch.optim.AdamW(net.parameters(),2e-3,weight_decay=1e-4)
+net=Net(24)
+import os
+if os.environ.get("INIT"): net.load_state_dict(torch.load(os.environ["INIT"]))
+opt=torch.optim.AdamW(net.parameters(),2e-3,weight_decay=1e-4)
 B=16; steps=EPOCHS*len(items)//B; sched=torch.optim.lr_scheduler.OneCycleLR(opt,2e-3,total_steps=steps)
 print("params",sum(p.numel() for p in net.parameters()),"steps",steps,flush=True)
 t0=time.time(); st=0

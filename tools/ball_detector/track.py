@@ -1,6 +1,10 @@
 import numpy as np, cv2, json, sys
 C=dict(hlo=-9,hhi=15,smin=70,vmin=45)
+import os
+DARK=os.environ.get("BALL")=="dark"
 def cmask(img):
+    if DARK:
+        hsv=cv2.cvtColor(img,cv2.COLOR_BGR2HSV); return ((hsv[...,2]<44)&(hsv[...,1]<70)).astype(np.uint8)
     hsv=cv2.cvtColor(img,cv2.COLOR_BGR2HSV); h=hsv[...,0].astype(np.int16); h=np.where(h>90,h-180,h)
     return ((h>=C["hlo"])&(h<=C["hhi"])&(hsv[...,1]>=C["smin"])&(hsv[...,2]>=C["vmin"])).astype(np.uint8)
 def run(name):
