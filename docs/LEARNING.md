@@ -1301,7 +1301,7 @@ is off unless you turn it on, and it only shows when the workout has a drill it 
 | Pound–Between–Behind | eyes up, sitting low, base, feet set (no height or "can't see the dribble": the ball goes behind you every rep) |
 | Two-Ball Juggle | eyes up (not on the slow first part), sitting low, base, height, feet set |
 | Behind-the-Back Catch | sitting low, base, feet set (it's one dribble and a catch, so no eyes, height or dribble checks) |
-| Eyes-Up Signals | eyes up (on the phone, where the signals are), sitting low, base, height, and the ball in the hand a ← or → signal names. Cues are shown, never spoken, since the drill is silent |
+| Eyes-Up Signals | eyes up (on the phone, where the signals are), sitting low, base, height, and the ball in the hand a ← or → signal names. Cues are shown, never spoken, since the drill is silent. Also a score per round (see below) |
 | Tennis Ball Toss and Snatch, Tennis Ball Exchange, Toss Cross One Bounce (standing parts), Toss Move Catch, Drop Move Catch | sitting low, base, height, feet set, and "Keep the dribble alive". No eyes up: your eyes belong on the tennis ball |
 
 When that workout is the one on Today and one of these drills starts, the player holds, the **front** camera opens
@@ -1363,3 +1363,18 @@ and Eyes-Up Signals (cues on the chip, nothing spoken, the signal card not cover
 
 The thresholds are first guesses from that and need a real session to tune; they sit together in `LC` at the top of the
 section.
+
+**Round scores on called-hand drills** (`lcWant` / `lcHandIn` / `lcScore`). Eyes-Up Signals and Called Crossovers
+also count, per round, how many calls ended with the ball in the hand the call wants: Left and Right name it; Between,
+Behind and Cross switch hands; Retreat and Pound keep it. The hand dribbling is the wrist whose height bobs the most
+(spread over 1 s) when it clearly bobs more than the other. It's read in the second before the call (the starting hand)
+and in the last second before the next call, at most 3.5 s after it. A call isn't counted when the next one came within
+2.2 s (too soon for most moves to finish) or when neither hand clearly dribbles, so the score reads "9 of 11", not "9 of
+15". The rating screen adds "Ball in the called hand: Round 1 9 of 11, …", and with Signals in shapes, colors or words
+the next round's key screen shows the last round's score.
+
+What it doesn't check: which move you made. On the Nov 14 2026 move-check clips (see `site/move-check.html`) the pose
+alone told cross, between and behind apart only about half the time in the drills, so moves wait for ball tracking.
+On those clips, through the same functions as the app: clean crossovers, behind-the-backs, standing-tall behinds and the
+turned-45° block scored every counted call right (15/15, 15/15, 8/8, 16/16); betweens 25/26; the mixed bag 15/18; the
+two Signals rounds 26/29, where the misses were retreats done with a crossover.
