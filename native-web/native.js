@@ -1685,7 +1685,8 @@
   /* -- the shot library: every shot of a burst in a grid, to pick what to keep, send to a coach or delete --
      Each tile shows the focus cue (the cue with the most Fix grades, or the one picked) in colour and shape, so a
      whole session reads at a glance and shots compare on the same thing. Filters: ★, Kept, Make/Miss and grade on
-     the focus cue; sort by shot order or worst/best on it. Select several (Select, or hold a tile) to Keep, ★, Send to
+     the focus cue; sort by shot order, by how far each shot is from the cue's ideal range (farthest or closest
+     first), or by the cue's value (high to low or low to high). The sort sticks to the burst, like the focus. Select several (Select, or hold a tile) to Keep, ★, Send to
      coach or Delete video. Deleting asks first, with counts, never touches kept shots, and can be undone for a few
      seconds. Quick pick plays one shot at a time: Skip, ★ or Keep (or swipe the video), and an optional Make/Miss.
      ★ always keeps the shot too. Thumbnails are made once from each shot's video at the release, cropped to the
@@ -1794,7 +1795,7 @@
     el.classList.add("bl-in");
     el.addEventListener("animationend", () => el.classList.remove("bl-in"), { once: true });
     document.body.appendChild(el);
-    BL = { bid: id, el, mode: "grid", f: "all", g: null, sort: "n", cue: null, sel: new Set(), selOn: false, from: from == null ? null : from, qi: 0, q: [], hist: [], pend: null, snack: null, ask: null, rate: .5 };
+    BL = { bid: id, el, mode: "grid", f: "all", g: null, sort: BL_SORTS.some(o => o[0] === burstFind(id).burst.sort) ? burstFind(id).burst.sort : "n", cue: null, sel: new Set(), selOn: false, from: from == null ? null : from, qi: 0, q: [], hist: [], pend: null, snack: null, ask: null, rate: .5 };
     el.addEventListener("click", blClick);
     el.addEventListener("change", blChange);
     el.addEventListener("input", e => { if (BL && BL.pk && e.target.dataset.bl === "pkq") { BL.pk.q = e.target.value; const n = BL.el.querySelector("[data-bl='pknext']"); if (n) n.disabled = !BL.pk.q.trim(); } });
@@ -1830,6 +1831,34 @@
   const blCue = B => buFocus(B, BL.cue);
   const blSt = (s, k) => (s.st && s.st[k]) || (s.m.find(m => m.k === k) || {}).st || null;
   const RK = { fix: 2, watch: 1, good: 0 };
+  // library sort orders: [value, label in the grid, label in Quick pick]
+  const BL_SORTS = [["n", "Shot order", "In order"], ["worst", "Farthest from ideal", "Farthest from ideal"], ["best", "Closest to ideal", "Closest to ideal"], ["hi", "Value high to low", "Value high to low"], ["lo", "Value low to high", "Value low to high"]];
+  // each cue's ideal (Good) range, matching the grading in computeBehind / computeSide; null means no limit on that side
+  const BL_IDEAL = { bElbow: [-10, 10], bLine: [-60, 15], bGuide: [null, 12], bSway: [-3, 3], bStance: [.7, 1.6],
+    drift: [-5, 5], knee: [100, 150], seq: [-.08, .5], tilt: [-20, 25], ext: [160, null], hold: [.5, null], tempo: [null, .8] };
+  function blGap(B, cue) { // how far a shot's value sits outside the ideal range; inside it's negative, more so nearer the middle
+    const R = BL_IDEAL[cue];
+    const good = R ? [] : B.shots.filter(s => blSt(s, cue) === "good").map(s => s.vals && s.vals[cue]).filter(x => typeof x === "number");
+    const mid = good.length ? med(good) : 0; // a cue with no known range: distance from the good shots' median
+    return s => {
+      const x = s.vals && s.vals[cue];
+      if (typeof x !== "number") return null;
+      if (!R) return Math.abs(x - mid);
+      const [lo, hi] = R;
+      if (lo != null && x < lo) return lo - x;
+      if (hi != null && x > hi) return x - hi;
+      return -Math.min(lo == null ? Infinity : x - lo, hi == null ? Infinity : hi - x);
+    };
+  }
+  function blOrder(B, cue, sort) { // a compare function for the library and Quick pick; shots with no reading go last
+    const val = s => { const x = s.vals && s.vals[cue]; return typeof x === "number" ? x : null; };
+    const rk = s => { const st = blSt(s, cue); return st && st in RK ? RK[st] : null; };
+    const byGap = sort === "worst" || sort === "best", key = byGap ? blGap(B, cue) : val;
+    const dir = sort === "best" || sort === "lo" ? 1 : -1;
+    const cmp = (x, y) => x == null && y == null ? 0 : x == null ? 1 : y == null ? -1 : dir * (x - y);
+    // farthest / closest go by the grade shown on the tile first, so the colours stay in blocks
+    return (a, b) => (byGap ? cmp(rk(a), rk(b)) : 0) || cmp(key(a), key(b)) || a.n - b.n;
+  }
   /* -- coach pack (a switch in the Form tab's Shot bursts fold, off by default) --
      For each burst: up to 5 shots on the focus cue (best, typical, worst, and a typical early and late one), kept
      past the 14-day cleanup so a matched set survives, and a Coach pack sheet in the library that sends them with
@@ -1888,10 +1917,7 @@
     else if (f === "make") L = L.filter(s => s.mk === 1);
     else if (f === "miss") L = L.filter(s => s.mk === 0);
     if (BL.g && !noGrade) L = L.filter(s => blSt(s, cue) === BL.g);
-    if (BL.sort !== "n") {
-      const score = buScore(B, cue);
-      L.sort((a, b) => (BL.sort === "worst" ? score(b) - score(a) : (score(a) < 0) - (score(b) < 0) || score(a) - score(b)) || a.n - b.n);
-    }
+    if (BL.sort !== "n") L.sort(blOrder(B, cue, BL.sort));
     return L;
   }
   function blTile(s, cue, PK) {
@@ -1936,7 +1962,7 @@
     BL.el.innerHTML = `${top}
       <div class="bl-chips">${chip("all", "All", S0.length)}${chip("star", BLI.star + "Starred", nStar, "st")}${chip("kept", BLI.keep + "Kept", nKept)}${nMk || nMs ? chip("make", "Make", nMk) + chip("miss", "Miss", nMs) : ""}</div>
       <div class="bl-row"><select class="bl-sel" data-bl="cue" aria-label="Focus cue">${cues.map(c => `<option value="${esc(c.k)}"${c.k === cue ? " selected" : ""}>Focus: ${esc(c.l)}</option>`).join("")}</select>
-        <select class="bl-sel" data-bl="sort" aria-label="Sort" style="flex:0 0 auto">${[["n", "Shot order"], ["worst", "Worst first"], ["best", "Best first"]].map(([v, l]) => `<option value="${v}"${BL.sort === v ? " selected" : ""}>${l}</option>`).join("")}</select></div>
+        <select class="bl-sel" data-bl="sort" aria-label="Sort" style="flex:0 0 auto">${BL_SORTS.map(([v, l]) => `<option value="${v}"${BL.sort === v ? " selected" : ""}>${l}</option>`).join("")}</select></div>
       <div class="bl-gb" role="group" aria-label="Grade on the focus cue">${["fix", "watch", "good"].map(st => `<button class="${st}" data-bl="g:${st}" aria-pressed="${BL.g === st}" style="flex:${Math.max(gc[st], 1) + base.length * .12}">${buGlyph(st)}${st === "fix" ? "Fix" : st === "watch" ? "Watch" : "Good"} ${gc[st]}</button>`).join("")}</div>
       ${note}
       <div class="bl-grid" role="list">${list.length ? list.map(s => blTile(s, cue, PK)).join("") : `<div class="bl-empty">${BL.f === "kept" ? "No kept shots yet. Quick pick goes through them one at a time." : BL.f === "star" ? "No starred shots yet." : BL.g === "fix" ? "No Fix shots on this cue. Nice work." : "No shots match."}</div>`}</div>
@@ -2054,7 +2080,7 @@
     const s = e.target.closest("[data-bl]");
     if (!s || !BL || (s.dataset.bl !== "cue" && s.dataset.bl !== "sort")) return;
     if (s.dataset.bl === "cue") { BL.cue = s.value; BL.g = null; const B = blCur(); if (B) { B.cue = s.value; persist(); } }
-    if (s.dataset.bl === "sort") BL.sort = s.value;
+    if (s.dataset.bl === "sort") { BL.sort = s.value; const B = blCur(); if (B) { B.sort = s.value; persist(); } }
     const g = BL.el.querySelector(".bl-grid");
     if (g) g.scrollTop = 0;
     blDraw();
@@ -2148,7 +2174,7 @@
     const nKept = B.shots.filter(blKept).length;
     const last = BL.hist[BL.hist.length - 1];
     const undo = last ? `<button class="btn sec small" data-bl="qundo">↶ Undo ${last.act} #${last.n}</button>` : `<button class="btn sec small" data-bl="qundo" disabled>↶ Undo</button>`;
-    const order = `<select class="bl-sel" data-bl="qord" aria-label="Order" style="flex:0 0 auto;min-height:48px"><option value="n"${BL.sort === "n" ? " selected" : ""}>In order</option><option value="worst"${BL.sort === "worst" ? " selected" : ""}>Worst first</option><option value="best"${BL.sort === "best" ? " selected" : ""}>Best first</option></select>`;
+    const order = `<select class="bl-sel" data-bl="qord" aria-label="Order" style="flex:0 0 auto;min-height:48px">${BL_SORTS.map(([v, , l]) => `<option value="${v}"${BL.sort === v ? " selected" : ""}>${l}</option>`).join("")}</select>`;
     if (BL.qi >= N) {
       const exp = B.t + BU.KEEP_DAYS * 864e5, unk = B.shots.filter(s => s.v && !blKept(s)).length;
       BL.el.innerHTML = `<div class="lf-top"><button class="bl-ib" data-bl="qback" aria-label="Back to the library">${BLI.back}</button><div class="lf-title">Quick pick</div></div>
