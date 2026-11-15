@@ -48,12 +48,13 @@ label.chk{display:flex;gap:8px;align-items:center}
 #run .mid{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:12px;min-height:0}
 #bigtxt{font-size:clamp(44px,15vw,96px);font-weight:900;line-height:1.05;text-wrap:balance}
 #bigtxt.sym{font-size:clamp(120px,48vw,260px)}
-#subtxt{font-size:clamp(18px,5vw,26px);color:#C9D3E6;max-width:30ch;text-wrap:balance}
+#subtxt{font-size:clamp(18px,5vw,26px);color:#C9D3E6;max-width:32ch;text-wrap:pretty}
 #count{font-size:clamp(60px,22vw,140px);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
 #run .mini{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));width:84px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;background:#000;opacity:.8}
 #run .mini video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
 #run .bottom{display:flex;gap:10px;justify-content:center}
-#run .bottom button{background:transparent;color:var(--onplate);border-color:#3A4A6E;min-width:120px}
+#run .bottom button{background:transparent;color:var(--onplate);border-color:#3A4A6E;min-width:100px}
+#run .bottom #redoBtn{background:var(--accent);border-color:var(--accent);color:#fff}
 #run.flash{background:#24365E}
 @media (prefers-reduced-motion: reduce){#run{transition:none}}
 .err{color:#C0392B;font-weight:700}
@@ -72,6 +73,9 @@ label.chk{display:flex;gap:8px;align-items:center}
       <li>Your whole body in the outline, head to feet, with a little room on each side.</li>
       <li>Turn the volume up. It talks you through each block, counts down, then calls each rep.</li>
       <li>Perfect moves aren't needed. Go at a speed that keeps the move clean.</li>
+      <li>Each block shows its steps first, then counts down from 10. Tap Pause if you need longer. Messed a block up? Tap Redo during the rest.</li>
+      <li>Retreat always means two dribbles back with the same hand. No crossover.</li>
+      <li>Between calls, keep a pound dribble going in whichever hand has the ball.</li>
     </ul>
     <div class="preview"><video id="pv" playsinline muted autoplay></video><div class="frame"><span class="top">head</span><span class="bot">feet</span></div></div>
     <p id="camMsg" class="muted" style="text-align:center;margin:0">Camera is off.</p>
@@ -79,7 +83,7 @@ label.chk{display:flex;gap:8px;align-items:center}
       <button id="camBtn">Turn on camera</button>
       <button id="startBtn" class="primary" disabled>Start session</button>
     </div>
-    <label class="chk" style="margin-top:12px"><input type="checkbox" id="optChk" checked> Include the optional blocks (marked *)</label>
+    <label class="chk" style="margin-top:12px"><input type="checkbox" id="optChk"> Include the optional blocks (marked *)</label>
   </div>
 
   <h2>Blocks</h2>
@@ -102,7 +106,7 @@ label.chk{display:flex;gap:8px;align-items:center}
     <div id="subtxt"></div>
   </div>
   <div class="mini"><video id="mv" playsinline muted autoplay></video></div>
-  <div class="bottom"><button id="pauseBtn">Pause</button><button id="stopBtn">Stop</button></div>
+  <div class="bottom"><button id="redoBtn" hidden>Redo</button><button id="pauseBtn">Pause</button><button id="stopBtn">Stop</button></div>
 </div>
 
 <script>
@@ -130,24 +134,28 @@ function signalCalls() { // like the Eyes-Up Signals drill: silent, 75 s, a sign
   while (t < 75) { let k; do k = Math.floor(Math.random() * SIGNALS.length); while (k === last); last = k; const s = SIGNALS[k]; out.push({ ...C(s[0], s[1], s[2]), meaning: s[3], gap: 1.8 + Math.random() * 1.6 }); t += out[out.length - 1].gap; }
   return out;
 }
+// Paced so there's time to read and set up: every block shows its steps on screen, then a 10 s countdown.
+// "one" is the one-line reminder that stays on screen while recording.
 const BLOCKS = [
-  { id: "01", name: "Crossover", start: "Ball in your right hand.", how: "Low, wide crossovers below the knees. On each call, cross to that hand.", gap: 3, calls: () => alt(15, h => C("Cross " + side(h), "cross", h)) },
-  { id: "02a", name: "Between, staggered stance", start: "Ball in your right hand, left foot forward.", how: "Staggered stance, sit low, ball between your knees front to back. Switch feet each time. On each call, go between to that hand.", gap: 3.4, calls: () => alt(15, h => C("Between " + side(h), "between", h, "staggered")) },
-  { id: "02b", name: "Between, square stance", start: "Ball in your right hand, feet even and wide.", how: "Defensive stance, feet even, sit low, ball between your legs side to side. On each call, go between to that hand.", gap: 3, calls: () => alt(15, h => C("Between " + side(h), "between", h, "square")) },
-  { id: "03", name: "Behind the back", start: "Ball in your right hand.", how: "Wrap the ball behind your hips to the other hand. On each call, go behind to that hand.", gap: 3.4, calls: () => alt(15, h => C("Behind " + side(h), "behind", h)) },
-  { id: "04", name: "Retreat", start: "Ball in your right hand.", how: "Two dribbles back with the same hand while your feet slide back, then step back to where you started. Halfway through, switch to your left hand when it says so.", gap: 4.5, calls: () => [...Array(7)].map(() => C("Retreat", "retreat", "R")).concat([C("Switch to your left hand", "switch", "L")], [...Array(7)].map(() => C("Retreat", "retreat", "L"))) },
-  { id: "05", name: "Pound only", start: "Ball in your right hand.", how: "Just pound the ball, no moves. Thirty seconds per hand. This is the baseline.", gap: 30, calls: () => [C("Pound right", "pound", "R"), C("Switch. Pound left", "pound", "L")] },
-  { id: "06", opt: 1, name: "Narrow crossover", start: "Ball in your right hand. Stand tall.", how: "Stand tall. The ball crosses just a few inches in front of your belly and lands between your feet.", gap: 3, calls: () => alt(10, h => C("Narrow cross " + side(h), "cross", h, "narrow")) },
-  { id: "07", opt: 1, name: "High crossover", start: "Ball in your right hand.", how: "Normal crossovers, but let the ball come up to your chest.", gap: 3, calls: () => alt(10, h => C("High cross " + side(h), "cross", h, "high")) },
-  { id: "08", opt: 1, name: "Standing-tall between", start: "Ball in your right hand. Legs nearly straight.", how: "Legs nearly straight, no knee bend, feet close together, ball pushed through from up high.", gap: 3.4, calls: () => alt(10, h => C("Tall between " + side(h), "between", h, "tall")) },
-  { id: "09", opt: 1, name: "Failed between", start: "Ball in your right hand.", how: "Start a between, but let the ball come back out the front on the same side, and catch it with the same hand.", gap: 3.4, calls: () => [...Array(10)].map(() => C("Failed between", "between_failed", "R")) },
-  { id: "10", opt: 1, name: "Around the hip", start: "Ball in your right hand.", how: "A lazy behind the back: the ball goes around your side instead of behind you, and your wrist stays in view.", gap: 3.4, calls: () => alt(10, h => C("Around the hip " + side(h), "behind", h, "around_hip")) },
-  { id: "11", opt: 1, name: "Failed behind", start: "Ball in your right hand.", how: "Swing your arm behind you, but let the ball bounce in front, and pick it up with the other hand.", gap: 3.4, calls: () => alt(10, h => C("Failed behind " + side(h), "behind_failed", h)) },
-  { id: "12", opt: 1, name: "Fake retreat", start: "Ball in your right hand.", how: "First, pull the dribble back without moving your feet. Then, when it says so, retreat and cross over at the same time.", gap: 4, calls: () => [...Array(6)].map(() => C("Fake retreat", "retreat_fake", "R")).concat(alt(6, h => C("Retreat and cross " + side(h), "retreat_cross", h))) },
-  { id: "13", opt: 1, name: "Turned 45 degrees", start: "Turn your body about 45 degrees to your right. Ball in your right hand.", how: "Same moves, body turned about 45 degrees to the phone: crossovers, both betweens, then behind the back.", gap: 3.4, calls: () => [].concat(alt(5, h => C("Cross " + side(h), "cross", h, "turned")), alt(5, h => C("Staggered between " + side(h), "between", h, "staggered_turned")), alt(5, h => C("Square between " + side(h), "between", h, "square_turned")), alt(5, h => C("Behind " + side(h), "behind", h, "turned"))) },
-  { id: "14", opt: 1, name: "Mixed bag", start: "Face the phone. Ball in your right hand.", how: "Random moves. Twice it will tell you to lose the ball on purpose. Pick it up and keep going.", gap: 3.4, calls: mixedCalls },
-  { id: "15a", name: "Eyes-Up Signals, round 1", silent: 1, start: "Face the phone. Live pound dribble.", how: "Like the drill: no voice, just a beep and a signal. Left or right arrow: get the ball to that hand. Down arrow: between. Circle arrow: behind. Hand: two retreat dribbles. Dot: keep pounding.", calls: signalCalls },
-  { id: "15b", name: "Eyes-Up Signals, round 2", silent: 1, start: "Face the phone. Live pound dribble.", how: "Same as round 1. Eyes on the signal.", calls: signalCalls },
+  { id: "01", name: "Crossover", start: "Ball in your right hand.", how: "Low, wide crossovers below the knees. On each call, cross the ball to the hand it names.", one: "Cross to the hand it calls.", gap: 4, calls: () => alt(12, h => C("Cross " + side(h), "cross", h)) },
+  { id: "02a", name: "Between, staggered stance", start: "Ball in your right hand, left foot forward.", how: "Staggered stance, sit low. The ball goes between your knees, front to back, to the hand it names. Switch your feet each time.", one: "Between to the hand it calls. Switch feet each time.", gap: 4.5, calls: () => alt(12, h => C("Between " + side(h), "between", h, "staggered")) },
+  { id: "02b", name: "Between, square stance", start: "Ball in your right hand, feet even and wide.", how: "Defensive stance, feet even and wide, sit low. The ball goes between your legs, side to side, to the hand it names.", one: "Between to the hand it calls. Feet stay even.", gap: 4, calls: () => alt(12, h => C("Between " + side(h), "between", h, "square")) },
+  { id: "03", name: "Behind the back", start: "Ball in your right hand.", how: "Wrap the ball behind your hips to the hand it names.", one: "Behind the back to the hand it calls.", gap: 4.5, calls: () => alt(12, h => C("Behind " + side(h), "behind", h)) },
+  { id: "04", name: "Retreat", start: "Ball in your right hand.", how: "A retreat is two dribbles backward with the same hand while your feet slide back. No crossover. Then walk back to your spot and keep pounding until the next call. Halfway through it tells you to switch to your left hand.", one: "Two dribbles back, same hand, no crossover. Walk back.", gap: 6.5, calls: () => [...Array(5)].map(() => C("Retreat", "retreat", "R")).concat([C("Switch to your left hand", "switch", "L")], [...Array(5)].map(() => C("Retreat", "retreat", "L"))) },
+  { id: "05", name: "Pound only", start: "Ball in your right hand.", how: "Just pound the ball, no moves. Thirty seconds per hand. This is the baseline.", one: "Just pound. No moves.", gap: 30, calls: () => [C("Pound right", "pound", "R"), C("Switch. Pound left", "pound", "L")] },
+  { id: "06", opt: 1, name: "Narrow crossover", start: "Stand tall. Ball in your right hand.", how: "This is a lazy crossover on purpose. Stand tall, no knee bend. The ball crosses only a few inches in front of your belly and bounces between your feet.", one: "Stand tall. Tiny crossover between your feet.", gap: 5, calls: () => alt(8, h => C("Narrow cross " + side(h), "cross", h, "narrow")) },
+  { id: "07", opt: 1, name: "High crossover", start: "Ball in your right hand.", how: "A normal wide crossover, but dribble high so the ball comes up to your chest.", one: "Wide crossover, ball up to your chest.", gap: 5, calls: () => alt(8, h => C("High cross " + side(h), "cross", h, "high")) },
+  { id: "08", opt: 1, name: "Standing-tall between", start: "Legs nearly straight, feet close together. Ball in your right hand.", how: "A lazy between on purpose. Legs nearly straight, feet close together, and push the ball through your legs from up high.", one: "Legs straight. Between from up high.", gap: 5, calls: () => alt(8, h => C("Tall between " + side(h), "between", h, "tall")) },
+  { id: "09", opt: 1, name: "Failed between", start: "Ball in your right hand.", how: "Start a between the legs, but don't finish it. The ball comes back out the front on the same side, and the same hand catches it. The ball stays in your right hand the whole block.", one: "Start a between, ball comes back out. Same hand.", gap: 5, calls: () => [...Array(8)].map(() => C("Failed between", "between_failed", "R")) },
+  { id: "10", opt: 1, name: "Around the hip", start: "Ball in your right hand.", how: "A lazy behind the back. Instead of going behind you, the ball swings around the side of your hip to the other hand, and your hand stays where the camera can see it.", one: "Ball goes around your side, not behind you.", gap: 5, calls: () => alt(8, h => C("Around the hip " + side(h), "behind", h, "around_hip")) },
+  { id: "11", opt: 1, name: "Failed behind", start: "Ball in your right hand.", how: "Swing your arm behind your back, but let the ball bounce in front of you instead, and pick it up with the other hand.", one: "Arm goes behind, ball bounces in front.", gap: 5, calls: () => alt(8, h => C("Failed behind " + side(h), "behind_failed", h)) },
+  { id: "12", opt: 1, name: "Fake retreat", start: "Ball in your right hand.", how: "Two parts. First, 'Fake retreat': pull the dribble back toward you, but don't move your feet. Then, 'Retreat and cross': a normal retreat, two dribbles back, then cross over to the hand it names.", one: "Fake: feet don't move. Retreat and cross: back two, then cross.", gap: 6, calls: () => [...Array(4)].map(() => C("Fake retreat", "retreat_fake", "R")).concat(alt(4, h => C("Retreat and cross " + side(h), "retreat_cross", h))) },
+  { id: "13", opt: 1, name: "Turned 45 degrees", start: "Turn your body about 45 degrees to your right. Ball in your right hand.", how: "The same clean moves, with your body turned about 45 degrees: crossovers, staggered betweens, square betweens, then behind the back.", one: "Body turned. Clean moves to the hand it calls.", gap: 4.5, calls: () => { const out = []; let cur = "R"; // keep alternating across the four moves, so every call names the hand without the ball
+    for (const [w, m, v] of [["Cross", "cross", "turned"], ["Staggered between", "between", "staggered_turned"], ["Square between", "between", "square_turned"], ["Behind", "behind", "turned"]]) for (let i = 0; i < 4; i++) { cur = cur === "L" ? "R" : "L"; out.push(C(w + " " + side(cur), m, cur, v)); }
+    return out; } },
+  { id: "14", opt: 1, name: "Mixed bag", start: "Face the phone. Ball in your right hand.", how: "Random clean moves to the hand it names. A retreat here is two dribbles back with the same hand, no crossover. Twice it tells you to lose the ball on purpose: let it go, pick it up with the hand it says, and keep going.", one: "Clean moves. Retreat means same hand, no crossover.", gap: 4.5, calls: mixedCalls },
+  { id: "15a", name: "Eyes-Up Signals, round 1", silent: 1, start: "Face the phone. Live pound dribble.", how: "The real drill: no voice, just a beep and a signal. Left or right arrow: get the ball to that hand. Down arrow: between. Circle arrow: behind. Hand: two retreat dribbles, same hand, no crossover. Dot: keep pounding.", one: "", calls: signalCalls },
+  { id: "15b", name: "Eyes-Up Signals, round 2", silent: 1, start: "Face the phone. Live pound dribble.", how: "Same as round 1. The hand means retreat, with no crossover.", one: "", calls: signalCalls },
 ];
 
 // ---- small helpers ----
@@ -209,17 +217,18 @@ async function runBlock(b) {
   show(b.name, b.how);
   await say("Block " + b.id.replace(/^0/, "") + ". " + b.name + ". " + b.how, true);
   await waitWhilePaused();
-  show("Get set", b.start);
+  show("Get set", b.start + " " + b.how);
   await say(b.start, true);
-  await countdown(5);
+  await countdown(10);
   const calls = b.calls(), h = await startRecorder(), log = [];
+  show("Recording", b.one || "");
   $("#runRec").hidden = false; $("#pauseBtn").disabled = true;
   try {
     show("", ""); await sleep(1.5);
     for (let i = 0; i < calls.length; i++) {
       const c = calls[i], t = (performance.now() - h.t0) / 1000;
       log.push({ i, t: +t.toFixed(3), ...c, gap: undefined });
-      show(c.text, b.silent ? "" : `${i + 1} of ${calls.length}`, { sym: !!b.silent });
+      show(c.text, b.silent ? "" : `${i + 1} of ${calls.length}${b.one ? " · " + b.one : ""}`, { sym: !!b.silent });
       beep(); flash(); if (!b.silent) say(c.text);
       await sleep(c.gap || b.gap);
     }
@@ -243,12 +252,14 @@ async function runFrom(startIdx, onlyOne) {
   try {
     for (let k = 0; k < plan.length; k++) {
       await runBlock(plan[k]);
-      if (k < plan.length - 1) {
-        const nx = plan[k + 1];
-        show("Rest", "Next: block " + nx.id + ", " + nx.name);
-        say("Nice. Rest. Next up, " + nx.name + ".");
-        $("#count").hidden = false; for (let i = 20; i > 0; i--) { await waitWhilePaused(); $("#count").textContent = i; await sleep(1); } $("#count").hidden = true;
-      }
+      // rest, with a chance to redo the block just recorded (also after the last one)
+      const nx = plan[k + 1];
+      show("Rest", (nx ? "Next: block " + nx.id + ", " + nx.name + ". " : "") + "Messed that one up? Tap Redo.");
+      say("Rest. If that block went wrong, tap Redo." + (nx ? " Next up, " + nx.name + "." : ""));
+      ctl.redo = false; $("#redoBtn").hidden = false;
+      $("#count").hidden = false; for (let i = nx ? 25 : 12; i > 0 && !ctl.redo; i--) { await waitWhilePaused(); $("#count").textContent = i; await sleep(1); } $("#count").hidden = true;
+      $("#redoBtn").hidden = true;
+      if (ctl.redo) { say("Okay, again."); k--; }
     }
     show("All done", "Tap Stop, then Share all to send the clips."); say("All done. Great work.");
     $("#stopBtn").textContent = "Finish";
@@ -294,6 +305,7 @@ $("#clearAll").onclick = async () => { if (!clearArmed) { clearArmed = true; $("
 
 $("#camBtn").onclick = camOn;
 $("#startBtn").onclick = () => runFrom(0, false);
+$("#redoBtn").onclick = () => { ctl.redo = true; ctl.paused = false; $("#pauseBtn").textContent = "Pause"; };
 $("#pauseBtn").onclick = () => { ctl.paused = !ctl.paused; $("#pauseBtn").textContent = ctl.paused ? "Resume" : "Pause"; if (ctl.paused) speechSynthesis?.cancel(); };
 $("#stopBtn").onclick = () => { if ($("#stopBtn").textContent === "Stop") ctl.stop = true; };
 if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) $("#camMsg").innerHTML = '<span class="err">This browser can\'t record video.</span> Open this page in Chrome on your phone.';

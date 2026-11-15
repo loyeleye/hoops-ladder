@@ -535,6 +535,20 @@ section{display:flex;flex-direction:column;gap:10px}
 .ptip.flash{animation:tipin .4s ease-out}@keyframes tipin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.ptip.flash{animation:none}}
 .pcall.sig{font-size:clamp(56px,20vw,120px)}
+.pcall.sym{display:flex;align-items:center;justify-content:center;min-height:1.3em;min-width:1.6em;text-transform:none}
+.sigshape{width:1.15em;height:1.15em;fill:currentColor;display:block}
+.sigsw{display:inline-block;width:1.15em;height:1.15em;border-radius:22%;box-shadow:0 0 0 3px color-mix(in srgb,currentColor 35%,transparent)}
+.sigword{font-size:.8em;text-transform:uppercase}
+.sigkey{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:420px}
+.sigrows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;width:100%}
+.sigrow{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:14px;background:color-mix(in srgb,var(--bg) 12%,transparent);font-weight:700;font-size:clamp(17px,4.6vw,22px);min-width:0}
+.sigrow>span:last-child{min-width:0}
+.sigshape.sm,.sigsw.sm{width:44px;height:44px;flex:none}
+.sigword.sm{font-family:var(--display);font-weight:800;font-size:clamp(20px,5.4vw,26px);flex:none;color:var(--accent)}
+.sigstrip{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;font-size:14px;opacity:.85}
+.sigstrip>span{display:inline-flex;align-items:center;gap:6px}
+.sigshape.xs,.sigsw.xs{width:18px;height:18px}
+.sigword.xs{font-weight:800;font-size:14px}
 #pRep{font-variant-numeric:tabular-nums}#pRep span{font-size:.45em;opacity:.6}
 .prate{display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-width:560px;width:100%;margin:0 auto}
 .prate h2{font-size:30px;text-transform:uppercase}
@@ -1317,7 +1331,7 @@ const DRILLS=[
   cue:"Make the move at the cone, not before it.",src:[{label:"From your D2 training session",url:""}]},
  {id:"h_r_signal",skill:"h",name:"Eyes-Up Signals",role:"handle",read:true,silent:true,unlock:2,mins:2,log:"react",secs:75,gap:[1.8,3.4],calls:["← Left hand","→ Right hand","↓ Between","↺ Behind","✋ Retreat","● Pound"],
   what:"The coach's hand signals, on your phone. It doesn't speak. It beeps and flashes a signal, and you change your dribble to match. You have to watch it, so your eyes stay up.",
-  steps:["Prop the phone at eye height, 6 to 10 feet away. Keep a live pound dribble.","← or →: get the ball to that hand. ↓: between the legs. ↺: behind the back. ✋: two retreat dribbles. ●: keep pounding.","Hit the change as soon as you see it, then keep the dribble alive until the next one."],
+  steps:["Prop the phone at eye height, 6 to 10 feet away. Keep a live pound dribble.","← or →: get the ball to that hand. ↓: between the legs. ↺: behind the back. ✋: two retreat dribbles with the same hand, no crossover. ●: keep pounding.","Hit the change as soon as you see it, then keep the dribble alive until the next one.","Want it harder? Under Signals, pick Shapes, Words or Colors. Each round starts with a key that matches each move to a symbol. Learn it, then dribble from memory."],
   cue:"Eyes on the signal. Hands react.",src:[{label:"From your D2 training session",url:""}]},
  {id:"h_r_cones",skill:"h",name:"Cone Signals",role:"handle",read:true,unlock:4,mins:3,log:"react",secs:90,gap:[2.4,4],calls:["Cross","Between","Behind","In-and-out","Hesi","Retreat","Go left","Go right"],
   what:"The cone weave, but you don't know the move until you're close. Whatever the phone calls, hit it at the next cone.",
@@ -1449,6 +1463,38 @@ const D2R_GAPS=[["Steady",6,10],["Game",3,7],["Chaos",2,4]];
 DRILLS.forEach(d=>{if(d.tempoCalls){Object.defineProperty(d,"phases",{get(){const c=D2R(),n=c.n,w=c.work,out=[];
   for(let i=1;i<=n;i++){if(i>1&&c.rest)out.push(["Rest · shake out your hands",c.rest]);out.push([i===n?"Burnout round · top half of your tempo":`Round ${i} of ${n}`,w,null,null,{burn:i===n}])}return out}});
   Object.defineProperty(d,"secs",{get(){return d.phases.reduce((a,p)=>a+p[1],0)}})}});
+/* Eyes-Up Signals with a key. Instead of arrows, each round matches the moves to shapes, words or colors. A key screen
+   shows the matches first (tap or wait), then you dribble from memory. P.call stays the move itself ("← Left hand"),
+   so live cues still check the right hand; only what's drawn changes. A new key every round. */
+const SIG_SHAPES=[["Triangle",'<path d="M50 7 95 89H5z"/>'],["Square",'<rect x="11" y="11" width="78" height="78" rx="4"/>'],["Circle",'<circle cx="50" cy="50" r="43"/>'],["Star",'<path d="M50 4l13.4 29.5 32.2 3.6-24 21.8 6.6 31.7L50 74.4 21.8 90.6l6.6-31.7-24-21.8 32.2-3.6z"/>'],["Diamond",'<path d="M50 3 97 50 50 97 3 50z"/>'],["Plus",'<path d="M35 5h30v30h30v30H65v30H35V65H5V35h30z"/>']];
+const SIG_WORDS=["Tiger","Eagle","Shark","Wolf","Bear","Fox"];
+/* Okabe-Ito colors: told apart with the common kinds of color blindness, no red-green pair */
+const SIG_COLORS=[["Yellow","#F0E442"],["Sky blue","#56B4E9"],["Green","#009E73"],["Pink","#CC79A7"],["Orange","#E69F00"],["White","#FFFFFF"]];
+const SIG_MODES=[["arrows","Arrows"],["shapes","Shapes"],["words","Words"],["colors","Colors"]],SIG_GAP=[2.4,4];
+/* 3 rounds that share the drill's time (75 s: 25 s each), so the Time control still works */
+const sigPh=d=>{const r=Math.max(15,Math.round(d.secs/15)*5);return[1,2,3].map(i=>["Round "+i,r])};
+const SIG=()=>Object.assign({m:"arrows",n:4,key:1,ks:15},S.settings.sig||{});
+const sigOn=d=>!!d&&d.id==="h_r_signal"&&SIG().m!=="arrows";
+const sigMove=c=>String(c).replace(/^[^a-z]+/i,"");
+function sigMap(prev){const n=SIG().n,mv=D.h_r_signal.calls.slice(0,n);let ix;
+  do{ix=[0,1,2,3,4,5].sort(()=>Math.random()-.5).slice(0,n)}while(prev&&prev.every((x,i)=>x[1]===ix[i]));return mv.map((m,i)=>[m,ix[i]])}
+function sigSym(k,cls){const m=SIG().m;
+  if(m==="shapes")return `<svg class="sigshape${cls?" "+cls:""}" viewBox="0 0 100 100" role="img" aria-label="${SIG_SHAPES[k][0]}">${SIG_SHAPES[k][1]}</svg>`;
+  if(m==="colors")return `<span class="sigsw${cls?" "+cls:""}" style="background:${SIG_COLORS[k][1]}" role="img" aria-label="${SIG_COLORS[k][0]}"></span>`;
+  return `<span class="sigword${cls?" "+cls:""}">${SIG_WORDS[k]}</span>`}
+/* a new part of the drill: a fresh key for a symbol round, nothing otherwise */
+function sigPart(d){P.sig=sigOn(d)?{map:sigMap(P.sig&&P.sig.map),key:SIG().ks}:null}
+function sigGo(){P.sig.key=0;P.call=null;P.nextAt=1.5;beep(988,200);drawPlayer()}
+function sigCallHTML(){const x=P.sig.map.find(y=>y[0]===P.call);return x?sigSym(x[1]):"Ready…"}
+function sigKeyHTML(){const c=SIG();return `<div class="sigkey" id="pKey"><div class="label">Your key${P.pi?" · new this round":""}</div><div class="sigrows">${P.sig.map.map(([m,k])=>`<div class="sigrow">${sigSym(k,"sm")}<span>${esc(sigMove(m))}</span></div>`).join("")}</div>
+   <div class="pmeta" id="pKeyLeft">Learn it. Starts in ${Math.ceil(P.sig.key)} s, or tap to start${c.key?"":". The key hides once you start"}</div></div>`}
+function sigStrip(){return SIG().key?`<div class="sigstrip" aria-label="Key">${P.sig.map.map(([m,k])=>`<span>${sigSym(k,"xs")}${esc(sigMove(m).replace(/ hand$/,""))}</span>`).join("")}</div>`:""}
+function sigCtl(){const c=SIG(),on=c.m!=="arrows";
+  return `<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Signals</span><div class="seg">${SIG_MODES.map(([v,l])=>`<button data-k="sig:m:${v}" aria-pressed="${c.m===v}">${l}</button>`).join("")}</div></div>
+   ${on?`<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Moves</span><div class="seg">${[[4,"4 · hands, between, behind"],[6,"6 · plus retreat, pound"]].map(([v,l])=>`<button data-k="sig:n:${v}" aria-pressed="${c.n===v}">${l}</button>`).join("")}</div></div>
+   <div class="row" style="justify-content:center;gap:10px"><span class="small muted">Key while you dribble</span><div class="seg">${[[1,"Show"],[0,"Hide"]].map(([v,l])=>`<button data-k="sig:key:${v}" aria-pressed="${c.key===v}">${l}</button>`).join("")}</div></div>
+   <div class="pcd"><span class="small">Key screen</span><div class="seg"><button data-k="sig:ks:-1" aria-label="Shorter" ${c.ks<=5?"disabled":""}>−</button><span class="num cdv">${c.ks} s</span><button data-k="sig:ks:1" aria-label="Longer" ${c.ks>=30?"disabled":""}>+</button></div></div>
+   <span class="small muted" style="text-align:center">3 rounds, each with a new key. A signal every ${SIG_GAP[0]} to ${SIG_GAP[1]} s. Getting harder: Shapes with the key showing, then hidden, then 6 moves, then Words. Colors can be caught with your eyes down, so they train peripheral vision more than eyes-up.</span>`:""}`}
 function d2rCtl(){const c=D2R(),sg=(f,v,dn,up)=>`<div class="seg"><button data-k="d2r:${f}:-1" aria-label="${dn}">−</button><span class="num cdv">${v}</span><button data-k="d2r:${f}:1" aria-label="${up}">+</button></div>`,st=(f,v,lbl,dn,up)=>`<div class="pcd"><span class="small">${lbl}</span>${sg(f,v,dn,up)}</div>`,sec=x=>x<60?x+" s":x%60?`${Math.floor(x/60)}:${String(x%60).padStart(2,"0")}`:x/60+" min";
   return `<div class="row" style="justify-content:center;gap:4px 14px;flex-wrap:wrap">${st("n",c.n,"Rounds","Fewer rounds","More rounds")}${st("work",sec(c.work),"Work","Shorter rounds","Longer rounds")}${st("rest",c.rest?sec(c.rest):"None","Rest","Shorter rest","Longer rest")}</div>
    <div class="pcd"><span class="small">Tempo</span>${sg("lo",c.lo,"Slower","Faster")}<span class="small">to</span>${sg("hi",c.hi,"Slower","Faster")}<span class="small">per min</span></div>
@@ -3397,7 +3443,7 @@ function rowGoal(d){if(d.cond)return d.meta;if(d.gm==="streak")return `${d.strea
   else if(d.stages)tgt=d.stageBy==="makes"?`${d.stageN} makes × ${d.stages.length} distances`:`${d.stages.length} rounds of ${d.stageN}`;
   else if(d.log==="makes")tgt=d.goal?`${d.goal} makes · goal ${targetPct(d)}%`:`${d.att} shots · goal ${targetPct(d)}%`;
   else if(d.log==="timer")tgt=`${Math.round(d.phases.reduce((a,p)=>a+p[1],0)/60*10)/10} min timer`;
-  else if(d.log==="react")tgt=`${d.secs}s of calls`;
+  else if(d.log==="react")tgt=sigOn(d)?"3 rounds, a new key each":`${d.secs}s of calls`;
   else tgt=`${d.sets.length} sets`;
   return tgt}
 function drillRow(d,i,opts={}){
@@ -4037,7 +4083,7 @@ function drawDock(){
      ${g.ok?`<button class="btn pri" data-k="play">Start · ${fmt(totalOf(d))}</button>`:`<button class="btn sec" data-k="anyway">Start anyway</button>`}<span class="small muted" style="text-align:center">5-second countdown, then each ${u} starts on a beep. Prop the phone where you can see and hear it.</span>`;return bind()}
   if(d.log==="timer"||d.log==="react"){const ph=phasesOf(d);
     el.innerHTML=`${hasParts(d)?"":`<div class="phases">${ph.map((p,i)=>{const sg=d.log==="timer"&&partSegs(p);return `<span class="prow2"><span>${esc(p[0])} · ${p[1]}s${sg?`<small class="pseg">${sg.map(x=>esc(x)).join(" · ")}, ${segLen(p,sg)}s each</small>`:""}</span>${clipLinks(d,i)}</span>`}).join("")}</div>`}
-     ${d.volume?(R.dockSet?`<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Set</span><div class="seg">${[[0,"Regular · 100"],[1,"Full D2 · 500"]].map(([v,l])=>`<button data-k="vol:${v}" aria-pressed="${volBig()===!!v}">${l}</button>`).join("")}</div></div><div class="dbeat">${beatSlider()}</div><div class="row" style="justify-content:center">${cdCtl("data-k")}</div><button class="linkbtn" data-k="dockset" style="align-self:center">Done</button>`:`<button class="linkbtn" data-k="dockset" style="align-self:center">${volBig()?"Full D2 · 500":"Regular · 100"} · beat and countdown ›</button>`):""}${d.tempoCalls?d2rCtl():""}
+     ${d.volume?(R.dockSet?`<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Set</span><div class="seg">${[[0,"Regular · 100"],[1,"Full D2 · 500"]].map(([v,l])=>`<button data-k="vol:${v}" aria-pressed="${volBig()===!!v}">${l}</button>`).join("")}</div></div><div class="dbeat">${beatSlider()}</div><div class="row" style="justify-content:center">${cdCtl("data-k")}</div><button class="linkbtn" data-k="dockset" style="align-self:center">Done</button>`:`<button class="linkbtn" data-k="dockset" style="align-self:center">${volBig()?"Full D2 · 500":"Regular · 100"} · beat and countdown ›</button>`):""}${d.tempoCalls?d2rCtl():""}${d.id==="h_r_signal"?sigCtl():""}
      ${goalEdit(d)}<button class="btn pri" data-k="play">Start · ${fmt(totalOf(d))}</button>${CLIPS[d.id]?`<span class="small muted" style="text-align:center">▶ opens a short demo of that part on YouTube at the right moment.</span>`:""}<span class="small muted" style="text-align:center">5-second countdown, then the phone calls each part out loud. Prop it up where you can see it.</span>`;return bind()}
   const modeSeg=setupBlock(d);
   /* before the first shot the dock stays small (goal, how you count, one start button) so the steps and demo above have room;
@@ -4286,6 +4332,7 @@ function stopVoice(){if(!voice)return;const r=voice;voice=null;try{r.abort()}cat
 function flash(){R.flash=true;drawDock();setTimeout(()=>{if(R){R.flash=false;drawDock()}},350)}
 function act(k){
   const d=R.d;let dir=null,sw=false;if(k.startsWith("miss:")){dir=k.slice(5);k="miss"}if(k==="swish"){sw=true;k="make"}
+  if(k.startsWith("sig:")){const[,f,v]=k.split(":"),c=SIG();if(f==="m")c.m=v;else if(f==="n")c.n=+v;else if(f==="key")c.key=+v;else if(f==="ks")c.ks=Math.max(5,Math.min(30,c.ks+5*(+v)));S.settings.sig=c;persist();return drawDock()}
   if(k.startsWith("d2r:")){const[,f,v]=k.split(":"),c=D2R(),n=+v;const cl=(x,a,b)=>Math.max(a,Math.min(b,x));if(f==="gap")c.gap=n;else if(f==="n")c.n=cl(c.n+n,1,10);else if(f==="work")c.work=cl(c.work+15*n,15,180);else if(f==="rest")c.rest=cl(c.rest+15*n,0,120);else if(f==="lo")c.lo=cl(c.lo+5*n,40,c.hi-10);else if(f==="hi")c.hi=cl(c.hi+5*n,c.lo+10,160);S.settings.d2r=c;persist();return drawDock()}
   if(k==="dockopen"){R.dockOpen=true;return drawDock()}
   if(k==="dockset"){R.dockSet=!R.dockSet;return drawDock()}
@@ -4426,7 +4473,7 @@ function pickTip(name,d){if(d&&d.cond){const pool=[d.cue,...(d.tips||[])];let t;
 const PART_CALLS=[[/^light called slides/i,{calls:["Slide left","Slide right","Drop left","Drop right"],gap:[2.2,3.6]}]];
 function partCalls(d,pi){const ph=d&&d.phases&&d.phases[pi];if(!ph||d.log!=="timer")return null;const m=PART_CALLS.find(([re])=>re.test(ph[0]));return m?m[1]:null}
 const isRestPart=()=>P&&P.stage==="work"&&/^rest\b/i.test((phasesOf(P.items[P.i])[P.pi]||[""])[0]);
-const phasesOf=d=>d.log==="react"&&!d.tempoCalls?[[d.silent?"Watch the signals":"Follow the calls",d.secs]]:d.phases;
+const phasesOf=d=>sigOn(d)?sigPh(d):d.log==="react"&&!d.tempoCalls?[[d.silent?"Watch the signals":"Follow the calls",d.secs]]:d.phases;
 const totalOf=d=>phasesOf(d).reduce((a,p)=>a+p[1],0);
 const IC_PAUSE=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>`,IC_PLAY=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>`,IC_SKIP=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7zM16 5h3v14h-3z"/></svg>`;
 function startPlayer(ids,fromRunner){
@@ -4434,7 +4481,7 @@ function startPlayer(ids,fromRunner){
   P={items,i:0,pi:0,stage:"ready",left:5,running:true,el:items.map(()=>0),ratings:items.map(()=>1),drops:items.map(()=>0),lost:false,call:null,nextAt:0,fromRunner,
     ans:items.map(()=>[]),sd:items.map(()=>0),hs:items.map(()=>0),times:items.map(()=>[]),tapped:false};
   pEl=document.createElement("div");pEl.className="bigtap player";document.body.appendChild(pEl);
-  pEl.addEventListener("click",e=>{if(!P||e.target.closest("button")||e.target.closest("a")||e.target.closest("input")||e.target.closest(".pbeat")||e.target.closest(".pcd")||P.stage==="rate")return;const cd=P.items[P.i];if(P.stage==="work"&&P.running&&!P.cd&&cd.cond&&cd.tapEnd&&!isRestPart())condTap();else if(P.stage==="work"&&P.running&&!P.cd&&!cd.body&&!cd.cond&&!isRestPart())lostIt();else togglePlay()});
+  pEl.addEventListener("click",e=>{if(!P||e.target.closest("button")||e.target.closest("a")||e.target.closest("input")||e.target.closest(".pbeat")||e.target.closest(".pcd")||P.stage==="rate")return;if(P.stage==="work"&&P.running&&P.sig&&P.sig.key>0)return sigGo();const cd=P.items[P.i];if(P.stage==="work"&&P.running&&!P.cd&&cd.cond&&cd.tapEnd&&!isRestPart())condTap();else if(P.stage==="work"&&P.running&&!P.cd&&!cd.body&&!cd.cond&&!isRestPart())lostIt();else togglePlay()});
   lockOn();beep(660,120);say(`Get ready. ${items[0].name}. ${phasesOf(items[0])[0][0]}`);drawPlayer();pmT=0;pmLast=0;cancelAnimationFrame(pmRAF);pmRAF=requestAnimationFrame(pmLoop);
   clearInterval(ptick);let last=performance.now();
   ptick=setInterval(()=>{const now=performance.now(),dt=(now-last)/1000;last=now;if(!P||!P.running||P.stage==="rate")return;stepPlayer(dt)},50)}
@@ -4497,6 +4544,7 @@ function halfway(ph,left,dt){const sg=partSegs(ph);if(!sg)return;const len=ph[1]
   for(let k=1;k<sg.length;k++){const b=ph[1]-k*len;if(left<=b&&left+dt>b){beep(988,160);say(sg[k])}}}
 function stepPlayer(dt){
   if(P.cd>0){const b=Math.ceil(P.cd);P.cd-=dt;const a=Math.ceil(P.cd);if(P.cd<=0){P.cd=0;P.lost=false;P.beat=0;beep(988,200);say("Go");return drawPlayer()}if(a!==b){beep(660,90);say(String(a))}return updPlayer()}
+  if(P.stage==="work"&&P.sig&&P.sig.key>0){const kb=Math.ceil(P.sig.key);P.sig.key-=dt;const ka=Math.ceil(P.sig.key);if(P.sig.key<=0)return sigGo();if(ka!==kb){if(ka<=3)beep(660,90);const kl=$("#pKeyLeft");if(kl)kl.textContent=kl.textContent.replace(/\d+ s/,ka+" s")}return}
   const b=Math.ceil(P.left);P.left-=dt;const a=Math.ceil(P.left);if(a!==b&&a>=1&&a<=3)beep(a===1?880:660,90);
   const d=P.items[P.i];
   if(P.stage==="work"){P.el[P.i]+=dt;const sg=d.log==="timer"&&partSegs(phasesOf(d)[P.pi]);
@@ -4504,7 +4552,7 @@ function stepPlayer(dt){
     if(!sg&&d.log!=="react"&&!(d.cond&&(d.calls||d.set[1]<20))&&!partCalls(d,P.pi)&&!/^rest\b/i.test(phasesOf(d)[P.pi][0])){P.tipAt=(P.tipAt==null?7:P.tipAt)-dt;if(P.tipAt<=0){P.tip=pickTip(phasesOf(d)[P.pi][0],d);P.tipAt=12+Math.random()*6;if(!d.silent)say(P.tip);P.tipFlash=Date.now()}}
     const cur=phasesOf(d)[P.pi];if(cur&&cur[3]){P.beat=(P.beat||0)+dt;const iv=60/cur[3];while(P.beat>=iv&&P.rep<cur[2]){P.beat-=iv;P.rep++;beep(P.rep%10===0?1320:1100,35);if(P.rep%50===0&&P.rep<cur[2])say(String(P.rep))}}
     if(d.log==="react"&&d.tempoCalls){if(!isRestPart())tempoCallStep(d,dt)}
-    else if(d.log==="react"||(d.cond&&d.calls&&!isRestPart())||partCalls(d,P.pi)){const cc=partCalls(d,P.pi)||d;P.nextAt-=dt;if(P.nextAt<=0){const c=cc.calls;let x;do{x=c[Math.floor(Math.random()*c.length)]}while(c.length>2&&x===P.call&&Math.random()<.6);P.call=x;P.nextAt=cc.gap[0]+Math.random()*(cc.gap[1]-cc.gap[0]);beep(x.toLowerCase().startsWith("l")?740:988,160);if(!d.silent)say(x);P.flashAt=Date.now()}}}
+    else if(d.log==="react"||(d.cond&&d.calls&&!isRestPart())||partCalls(d,P.pi)){const cc=partCalls(d,P.pi)||d;P.nextAt-=dt;if(P.nextAt<=0){const c=P.sig?P.sig.map.map(y=>y[0]):cc.calls,gp=P.sig?SIG_GAP:cc.gap;let x;do{x=c[Math.floor(Math.random()*c.length)]}while(c.length>2&&x===P.call&&Math.random()<.6);P.call=x;P.nextAt=gp[0]+Math.random()*(gp[1]-gp[0]);beep(x.toLowerCase().startsWith("l")?740:988,160);if(!d.silent)say(x);P.flashAt=Date.now()}}}
   if(P.left<=0)advance();else updPlayer()}
 /* called moves at a random tempo: never the same move twice, at least 3 ticks of a move (6 for Kobes) before the next call */
 function tempoCallStep(d,dt){const cur=phasesOf(d)[P.pi],c=D2R();P.nextAt-=dt;
@@ -4515,9 +4563,9 @@ function tempoCallStep(d,dt){const cur=phasesOf(d)[P.pi],c=D2R();P.nextAt-=dt;
   if(P.call&&P.bpm){P.beat=(P.beat||0)+dt;const iv=60/P.bpm;while(P.beat>=iv){P.beat-=iv;P.rep=(P.rep||0)+1;beep(P.rep%10===0?1320:1100,35)}}}
 function advance(){
   const d=P.items[P.i],ph=phasesOf(d);
-  if(P.stage==="ready"||P.stage==="rest"){if(P.stage==="rest")P.i++;const n=P.items[P.i];P.stage="work";P.pi=0;P.rep=0;P.beat=0;P.left=phasesOf(n)[0][1];P.call=null;P.nextAt=n.log==="react"||n.cond&&n.calls?2:0;beep(988,200);segTip(n.log==="timer"&&partSegs(phasesOf(n)[0]));say(n.log==="timer"?partSay(phasesOf(n)[0]):phasesOf(n)[0][0]);return drawPlayer()}
+  if(P.stage==="ready"||P.stage==="rest"){if(P.stage==="rest")P.i++;const n=P.items[P.i];P.stage="work";P.pi=0;P.rep=0;P.beat=0;P.left=phasesOf(n)[0][1];P.call=null;sigPart(n);P.nextAt=n.log==="react"||n.cond&&n.calls?2:0;beep(988,200);segTip(n.log==="timer"&&partSegs(phasesOf(n)[0]));say(n.log==="timer"?partSay(phasesOf(n)[0]):phasesOf(n)[0][0]);return drawPlayer()}
   if(P.stage==="work"){condEndPart();P.pi++;
-    if(P.pi<ph.length){P.rep=0;P.beat=0;if(d.tempoCalls){P.call=null;P.bpm=0;P.nextAt=1.5}if(d.cond&&d.calls||partCalls(d,P.pi)){P.call=null;P.nextAt=1.5}P.left=ph[P.pi][1];beep(988,200);segTip(d.log==="timer"&&partSegs(ph[P.pi]));say(d.log==="timer"?partSay(ph[P.pi]):ph[P.pi][0]);return drawPlayer()}
+    if(P.pi<ph.length){P.rep=0;P.beat=0;if(d.tempoCalls){P.call=null;P.bpm=0;P.nextAt=1.5}if(d.cond&&d.calls||partCalls(d,P.pi)){P.call=null;P.nextAt=1.5}if(sigOn(d)){P.call=null;sigPart(d)}P.left=ph[P.pi][1];beep(988,200);segTip(d.log==="timer"&&partSegs(ph[P.pi]));say(d.log==="timer"?partSay(ph[P.pi]):ph[P.pi][0]);return drawPlayer()}
     if(P.i+1<P.items.length){P.stage="rest";P.left=10;beep(520,300);say(`Rest. Next: ${P.items[P.i+1].name}`);return drawPlayer()}
     return toRate()}}
 function toRate(){condEndPart();P.items.forEach((d,i)=>{if(d.cond){P.ratings[i]=condRating(d,i);return}const m=P.el[i]/60;if(m>0){const dpm=P.drops[i]/m;P.ratings[i]=dpm<=.5?2:dpm<=3?1:0}});P.stage="rate";P.running=false;lockOff();beep(784,120);setTimeout(()=>beep(1046,220),130);say("Done. How did it go?");drawPlayer()}
@@ -4566,8 +4614,8 @@ function drawPlayer(){
     const head=P.cd>0?"Get set":!P.running?(P.lost?"Lost it":"Paused"):part;
     pEl.innerHTML=`<div class="bt-top"><button class="btn sec small" data-p="end">End</button><span class="bt-sp"></span><button class="btn sec small" data-p="coach" aria-label="Coach session: pause and film with your coach">Coach</button></div>
      <div class="bt-mid"><div class="pmeta">${P.items.length>1?`Drill ${P.i+(P.stage==="rest"?2:1)} of ${P.items.length} · `:""}${esc(P.stage==="rest"?P.items[P.i+1].name:d.name)}${head!==part?` · ${esc(part)}`:""}</div>
-      <div class="bt-label${head!==part?" st":""}">${esc(head)}</div>${pMove()}
-      ${(d.log==="react"||d.cond&&d.calls||P.stage==="work"&&partCalls(d,P.pi))&&P.stage==="work"&&!isRestPart()?`<div class="pcall${d.silent?" sig":""}" id="pCall">${esc(P.call||"Ready…")}</div>`:""}${d.tempoCalls&&P.stage==="work"&&!isRestPart()?`<div class="pmeta" id="pBpm">${P.bpm?`${P.bpm} per min · ${P.rep||0} reps`:"Get set…"}</div>`:""}
+      <div class="bt-label${head!==part?" st":""}">${esc(head)}</div>${P.stage==="work"&&P.sig?"":pMove()}
+      ${P.stage==="work"&&P.sig&&P.sig.key>0?sigKeyHTML():P.stage==="work"&&P.sig?`<div class="pcall sig sym" id="pCall" data-c="${esc(P.call||"")}">${sigCallHTML()}</div>${sigStrip()}`:(d.log==="react"||d.cond&&d.calls||P.stage==="work"&&partCalls(d,P.pi))&&P.stage==="work"&&!isRestPart()?`<div class="pcall${d.silent?" sig":""}" id="pCall">${esc(P.call||"Ready…")}</div>`:""}${d.tempoCalls&&P.stage==="work"&&!isRestPart()?`<div class="pmeta" id="pBpm">${P.bpm?`${P.bpm} per min · ${P.rep||0} reps`:"Get set…"}</div>`:""}
       ${P.stage==="work"&&phasesOf(d)[P.pi][3]?`<div class="pcall" id="pRep">${P.rep||0} <span>/ ${phasesOf(d)[P.pi][2]}</span></div>`:""}
       ${(()=>{const rc=runClock(d);return `<div class="bt-count num${rc&&rc.over?" ms":""}" id="pClock">${P.cd>0?Math.ceil(P.cd):rc?rc.txt:fmt(P.left)}</div>${rc?`<div class="pmeta" id="pTgt">Target ${fmt(rc.tg)}${rc.over?" · over":""}</div>`:""}`})()}${condRest()}
       ${P.stage==="work"&&d.log!=="react"&&!(d.cond&&isRestPart())?`<div class="ptip" id="pTip">${esc(P.tip||"")}</div>${d.log==="timer"&&partSegs(ph[P.pi])?`<div class="pmeta" id="pSeg">${esc(segMeta(ph[P.pi],P.left))}</div>`:""}`:""}${P.cd>0?`<div class="pmeta">Dribbling starts at zero</div>`:""}${P.running?"":`${P.lost?`<div class="pmeta">Tap when you have it${P.stage==="work"&&phasesOf(d)[P.pi][3]&&cdSecs()?`, then a ${cdSecs()}-second countdown`:""}</div>`:""}${P.stage==="work"&&phasesOf(d)[P.pi][3]?cdCtl("data-p"):""}${P.lost&&P.back?`<div class="pmeta">Took back ${P.back} reps for the time it took to tap</div>`:""}<div style="display:none"></div>`}${P.stage==="work"&&P.drops[P.i]?`<div class="pmeta">${P.drops[P.i]} drop${P.drops[P.i]===1?"":"s"}</div>`:""}</div>
@@ -4579,7 +4627,7 @@ function drawPlayer(){
     else if(k==="discard"){const fr=P.fromRunner;closePlayer();if(fr)closeRunner(true)}else if(k==="save")savePlayer()});
   pEl.querySelectorAll("[data-rate]").forEach(b=>b.onclick=e=>{e.stopPropagation();const [i,r]=b.dataset.rate.split(":").map(Number);P.ratings[i]=r;drawPlayer()})}
 function updPlayer(){const c=$("#pClock"),rc=runClock(P.items[P.i]);if(c){c.textContent=P.cd>0?String(Math.ceil(P.cd)):rc?rc.txt:fmt(P.left);c.classList.toggle("ms",!!(rc&&rc.over))}
-  {const g=$("#pTgt");if(g&&rc){const t=`Target ${fmt(rc.tg)}${rc.over?" · over":""}`;if(g.textContent!==t)g.textContent=t}}const tp=$("#pTip");if(tp){if(tp.textContent!==(P.tip||""))tp.textContent=P.tip||"";tp.classList.toggle("flash",Date.now()-(P.tipFlash||0)<1500)}const sm=$("#pSeg");if(sm&&P.stage==="work"){const t=segMeta(phasesOf(P.items[P.i])[P.pi],P.left);if(sm.textContent!==t)sm.textContent=t}const rp=$("#pRep");if(rp&&rp.firstChild)rp.firstChild.nodeValue=(P.rep||0)+" ";const bp=$("#pBpm");if(bp&&P.bpm)bp.textContent=`${P.bpm} per min · ${P.rep||0} reps`;const k=$("#pCall");if(k){if(k.textContent!==(P.call||"Ready…"))k.textContent=P.call||"Ready…";k.classList.toggle("flash",Date.now()-(P.flashAt||0)<400)}}
+  {const g=$("#pTgt");if(g&&rc){const t=`Target ${fmt(rc.tg)}${rc.over?" · over":""}`;if(g.textContent!==t)g.textContent=t}}const tp=$("#pTip");if(tp){if(tp.textContent!==(P.tip||""))tp.textContent=P.tip||"";tp.classList.toggle("flash",Date.now()-(P.tipFlash||0)<1500)}const sm=$("#pSeg");if(sm&&P.stage==="work"){const t=segMeta(phasesOf(P.items[P.i])[P.pi],P.left);if(sm.textContent!==t)sm.textContent=t}const rp=$("#pRep");if(rp&&rp.firstChild)rp.firstChild.nodeValue=(P.rep||0)+" ";const bp=$("#pBpm");if(bp&&P.bpm)bp.textContent=`${P.bpm} per min · ${P.rep||0} reps`;const k=$("#pCall");if(k){if(P.sig){if(k.dataset.c!==(P.call||"")){k.dataset.c=P.call||"";k.innerHTML=sigCallHTML()}}else if(k.textContent!==(P.call||"Ready…"))k.textContent=P.call||"Ready…";k.classList.toggle("flash",Date.now()-(P.flashAt||0)<400)}}
 function savePlayer(){
   const before=[sL(),hL(),oL(),fL(),cL()];let se=todaySession();if(!se){se={d:today(),items:[]};S.sessions.push(se)}let tot=0;const sks=new Set();
   P.items.forEach((d,i)=>{const xp=pxp(d,i);if(!xp)return;const it={id:d.id,t:Date.now(),xp,r:P.ratings[i]};
