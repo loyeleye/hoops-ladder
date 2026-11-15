@@ -26,7 +26,11 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 button:disabled{opacity:.5}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .preview{position:relative;width:100%;max-width:300px;aspect-ratio:9/16;background:#000;border-radius:14px;overflow:hidden;margin:12px auto}
-.preview video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.preview video{width:100%;height:100%;object-fit:cover}
+/* the front camera's picture is mirrored so it moves like a mirror; the back camera's isn't */
+body.mirror .preview video,body.mirror #run .mini video{transform:scaleX(-1)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}.seg button{border:0;border-radius:0;padding:8px 14px}.seg button[aria-pressed=true]{background:var(--accent);color:#fff}
+select{font:inherit;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%}
 .frame{position:absolute;inset:6% 18%;border:2px dashed rgba(255,255,255,.7);border-radius:40% 40% 8% 8%/18% 18% 4% 4%;pointer-events:none}
 .frame span{position:absolute;left:50%;transform:translateX(-50%);color:#fff;font-size:12px;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:6px;white-space:nowrap}
 .frame .top{top:-10px}.frame .bot{bottom:-10px}
@@ -51,7 +55,7 @@ label.chk{display:flex;gap:8px;align-items:center}
 #subtxt{font-size:clamp(18px,5vw,26px);color:#C9D3E6;max-width:32ch;text-wrap:pretty}
 #count{font-size:clamp(60px,22vw,140px);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
 #run .mini{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));width:84px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;background:#000;opacity:.8}
-#run .mini video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+#run .mini video{width:100%;height:100%;object-fit:cover}
 /* while lining up, the camera view grows so you can see yourself from across the room */
 #run.framing .mini{width:min(46vw,260px);right:50%;transform:translateX(50%);bottom:calc(84px + env(safe-area-inset-bottom));opacity:1;border:4px solid #FFC23D}
 #run.framing.ok .mini{border-color:#2BD17E}
@@ -85,6 +89,12 @@ label.chk{display:flex;gap:8px;align-items:center}
     </ul>
     <div class="preview"><video id="pv" playsinline muted autoplay></video><div class="frame"><span class="top">head</span><span class="bot">feet</span></div></div>
     <p id="camMsg" class="muted" style="text-align:center;margin:0">Camera is off.</p>
+    <div class="row" style="justify-content:center;margin-top:10px">
+      <div class="seg" role="group" aria-label="Camera"><button type="button" data-face="user" aria-pressed="true">Front</button><button type="button" data-face="environment" aria-pressed="false">Back</button></div>
+      <span id="zoomRow" class="seg" role="group" aria-label="Zoom" hidden></span>
+    </div>
+    <div class="row" id="lensRow" style="justify-content:center;margin-top:8px" hidden><label for="lens" class="muted" style="font-size:15px">Lens</label><select id="lens"></select></div>
+    <p id="backNote" class="muted" style="font-size:15px;text-align:center;margin:6px 0 0" hidden>Back camera: the screen faces away from you, so listen for the calls. The silent Eyes-Up Signals blocks (15a, 15b) need the front camera. For 0.5x, pick 0.5x if it shows, or try each lens in the list until the picture gets wider.</p>
     <div class="row" style="justify-content:center;margin-top:10px">
       <button id="camBtn">Turn on camera</button>
       <button id="startBtn" class="primary" disabled>Start session</button>
@@ -190,13 +200,51 @@ const clearClips = () => tx("readwrite", s => s.clear());
 
 // ---- camera and recording ----
 let stream = null;
-async function camOn() {
-  if (stream) return true;
-  const v = { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 }, frameRate: { ideal: 30 } };
+// Which camera: front or back, a specific lens (some phones list the 0.5x wide lens as its own camera), and zoom
+// (others offer 0.5x as a zoom setting). Remembered on this phone.
+const cam = (() => { try { return Object.assign({ face: "user", id: "", zoom: null }, JSON.parse(localStorage.getItem("movecheck.cam") || "{}")); } catch (e) { return { face: "user", id: "", zoom: null }; } })();
+const saveCam = () => { try { localStorage.setItem("movecheck.cam", JSON.stringify(cam)); } catch (e) {} };
+function camUI() {
+  document.querySelectorAll("[data-face]").forEach(b => b.setAttribute("aria-pressed", b.dataset.face === cam.face));
+  document.body.classList.toggle("mirror", cam.face === "user");
+  $("#backNote").hidden = cam.face !== "environment";
+}
+async function lensList() {
+  let ds = []; try { ds = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === "videoinput"); } catch (e) {}
+  const want = cam.face === "user" ? /front|user|facing front/i : /back|rear|environment|facing back/i;
+  const mine = ds.filter(d => want.test(d.label)), list = mine.length ? mine : ds;
+  const sel = $("#lens"), cur = stream && stream.getVideoTracks()[0].getSettings().deviceId;
+  sel.textContent = "";
+  list.forEach((d, i) => { const o = document.createElement("option"); o.value = d.deviceId; o.textContent = d.label || ("Camera " + (i + 1)); if (d.deviceId === cur) o.selected = true; sel.appendChild(o); });
+  $("#lensRow").hidden = list.length < 2;
+}
+function zoomUI() {
+  const row = $("#zoomRow"), t = stream && stream.getVideoTracks()[0];
+  const caps = t && t.getCapabilities ? t.getCapabilities() : {};
+  row.textContent = "";
+  if (!caps.zoom || caps.zoom.max <= caps.zoom.min) { row.hidden = true; return; }
+  const cur = t.getSettings().zoom, opts = [...new Set([caps.zoom.min, 1].filter(z => z >= caps.zoom.min && z <= caps.zoom.max))];
+  if (opts.length < 2) { row.hidden = true; return; }
+  for (const z of opts) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = (Math.round(z * 10) / 10) + "x"; b.setAttribute("aria-pressed", Math.abs((cur ?? 1) - z) < .05);
+    b.onclick = async () => { try { await t.applyConstraints({ advanced: [{ zoom: z }] }); cam.zoom = z; saveCam(); } catch (e) {} zoomUI(); };
+    row.appendChild(b);
+  }
+  row.hidden = false;
+}
+async function camOn(force) {
+  if (stream && !force) return true;
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  camUI();
+  const v = { width: { ideal: 720 }, height: { ideal: 1280 }, frameRate: { ideal: 30 } };
+  if (cam.id) v.deviceId = { exact: cam.id }; else v.facingMode = cam.face;
   try { stream = await navigator.mediaDevices.getUserMedia({ video: v, audio: true }); }
   catch (e) { try { stream = await navigator.mediaDevices.getUserMedia({ video: v }); } catch (e2) { $("#camMsg").innerHTML = '<span class="err">Camera blocked.</span> Allow camera access for this site in the browser settings, then reload.'; return false; } }
   $("#pv").srcObject = stream; $("#mv").srcObject = stream;
-  const s = stream.getVideoTracks()[0].getSettings();
+  const tr = stream.getVideoTracks()[0];
+  if (cam.zoom) { try { await tr.applyConstraints({ advanced: [{ zoom: cam.zoom }] }); } catch (e) {} }
+  await lensList(); zoomUI();
+  const s = tr.getSettings();
   $("#camMsg").textContent = "Camera on" + (s.width ? ` (${s.width}×${s.height})` : "") + ". Line yourself up in the outline.";
   $("#startBtn").disabled = false; $("#camBtn").hidden = true;
   if ($("#frameChk").checked) loadPose().catch(() => {});
@@ -307,7 +355,7 @@ async function runBlock(b) {
   const blob = await stopRecorder(h);
   $("#runRec").hidden = true; $("#pauseBtn").disabled = false;
   const v = stream.getVideoTracks()[0].getSettings();
-  const labels = { block: b.id, name: b.name, recordedAt: new Date().toISOString(), mime: h.mime, video: { width: v.width, height: v.height, mirrored: false }, silent: !!b.silent, note: "t is seconds from the start of the clip; hand is the hand the ball should end in", calls: log };
+  const labels = { block: b.id, name: b.name, recordedAt: new Date().toISOString(), mime: h.mime, video: { width: v.width, height: v.height, mirrored: false, camera: cam.face === "user" ? "front" : "back", lens: (stream.getVideoTracks()[0].label || ""), zoom: v.zoom ?? null }, silent: !!b.silent, note: "t is seconds from the start of the clip; hand is the hand the ball should end in", calls: log };
   await putClip({ id: b.id, name: b.name, blob, labels, at: Date.now() });
   await renderList();
 }
@@ -373,7 +421,10 @@ $("#shareAll").onclick = async () => {
 let clearArmed = false;
 $("#clearAll").onclick = async () => { if (!clearArmed) { clearArmed = true; $("#clearAll").textContent = "Tap again to delete"; setTimeout(() => { clearArmed = false; $("#clearAll").textContent = "Delete all clips"; }, 3000); return; } await clearClips(); clearArmed = false; $("#clearAll").textContent = "Delete all clips"; renderList(); };
 
-$("#camBtn").onclick = camOn;
+$("#camBtn").onclick = () => camOn();
+document.querySelectorAll("[data-face]").forEach(b => b.onclick = () => { if (cam.face === b.dataset.face) return; cam.face = b.dataset.face; cam.id = ""; cam.zoom = null; saveCam(); camUI(); if (stream) camOn(true); });
+$("#lens").onchange = () => { cam.id = $("#lens").value; cam.zoom = null; saveCam(); camOn(true); };
+camUI();
 $("#startBtn").onclick = () => runFrom(0, false);
 $("#redoBtn").onclick = () => { if ($("#run").classList.contains("framing")) { ctl.skip = true; return; } ctl.redo = true; ctl.paused = false; $("#pauseBtn").textContent = "Pause"; };
 $("#pauseBtn").onclick = () => { ctl.paused = !ctl.paused; $("#pauseBtn").textContent = ctl.paused ? "Resume" : "Pause"; if (ctl.paused) speechSynthesis?.cancel(); };
