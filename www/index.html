@@ -1496,8 +1496,9 @@ function sigSym(k,cls){const m=SIG().m;
 function sigPart(d){P.sig=sigOn(d)?{map:sigMap(P.sig&&P.sig.map),key:SIG().ks}:null}
 function sigGo(){P.sig.key=0;P.call=null;P.nextAt=1.5;beep(988,200);drawPlayer()}
 function sigCallHTML(){const x=P.sig.map.find(y=>y[0]===P.call);return x?sigSym(x[1]):"Ready…"}
-function sigKeyHTML(){const c=SIG();return `<div class="sigkey" id="pKey"><div class="label">Your key${P.pi?" · new this round":""}</div><div class="sigrows">${P.sig.map.map(([m,k])=>`<div class="sigrow">${sigSym(k,"sm")}<span>${esc(sigMove(m))}</span></div>`).join("")}</div>
+function sigKeyHTML(){const c=SIG();return `<div class="sigkey" id="pKey"><div class="label">Your key${P.pi?" · new this round":""}</div>${sigLast()}<div class="sigrows">${P.sig.map.map(([m,k])=>`<div class="sigrow">${sigSym(k,"sm")}<span>${esc(sigMove(m))}</span></div>`).join("")}</div>
    <div class="pmeta" id="pKeyLeft">Learn it. Starts in ${Math.ceil(P.sig.key)} s, or tap to start${c.key?"":". The key hides once you start"}</div></div>`}
+function sigLast(){const r=P.pi&&P.lcStats&&P.lcStats[P.i]&&P.lcStats[P.i].rounds&&P.lcStats[P.i].rounds[P.pi-1];return r&&r.n?`<div class="pmeta siglast">Last round: ball in the called hand ${r.ok} of ${r.n}</div>`:""}
 function sigStrip(){return SIG().key?`<div class="sigstrip" aria-label="Key">${P.sig.map.map(([m,k])=>`<span>${sigSym(k,"xs")}${esc(sigMove(m).replace(/ hand$/,""))}</span>`).join("")}</div>`:""}
 function sigCtl(){const c=SIG(),on=c.m!=="arrows";
   return `<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Signals</span><div class="seg">${SIG_MODES.map(([v,l])=>`<button data-k="sig:m:${v}" aria-pressed="${c.m===v}">${l}</button>`).join("")}</div></div>
@@ -10005,7 +10006,9 @@ route();
      staying put. When one problem lasts, it says one short cue (never more than one
      every few seconds, and not over the player's own calls) and shows it as the tip; when nothing needs fixing for
      a while it says so. Frames are read in memory and thrown away; nothing is recorded. The rating screen shows
-     what it saw for each drill. See docs/LEARNING.md, step 34. */
+     what it saw for each drill. Drills whose calls name a hand (Eyes-Up Signals, Called Crossovers) also get a score
+     per round: how many calls ended with the ball in the hand the call wants (lcScore), shown on the rating screen
+     and, for Eyes-Up Signals, on the next round's key screen. See docs/LEARNING.md, step 34. */
   {
     const LC_IDS = new Set(["h_pound", "h_jolt", "h_five", "h_d2", "h_two", "h_lab", "h_thightap", "h_over", "h_2drum", "h_2shapes",
       "h_d2r", "h_r_cross", "h_r_combo", "h_2v", "h_2xladder", "h_2around",
@@ -10062,7 +10065,46 @@ route();
       function lcNew() {
         return { fr: [], ev: [], pend: [], hand: { L: null, R: null }, hd: [], base: null, cal: [], prob: {}, stats: lcStats() };
       }
-      function lcStats() { return { n: 0, up: 0, nu: 0, low: 0, wide: 0, nl: 0, nw: 0, drib: 0, cues: {} }; }
+      function lcStats() { return { n: 0, up: 0, nu: 0, low: 0, wide: 0, nl: 0, nw: 0, drib: 0, cues: {}, rounds: {} }; }
+      // Round scores for drills whose calls name a hand (Eyes-Up Signals, Called Crossovers): the hand the ball
+      // should end up in. Left and Right name it; Between, Behind and Cross switch hands; Retreat and Pound keep it.
+      function lcWant(name, from) {
+        const n = String(name || "").replace(/^[^a-z]+/i, "").toLowerCase();
+        if (/^left/.test(n)) return "L";
+        if (/^right/.test(n)) return "R";
+        if (!from) return null;
+        if (/between|behind|cross/.test(n)) return from === "L" ? "R" : "L";
+        if (/retreat|pound/.test(n)) return from;
+        return null;
+      }
+      // Which hand is dribbling from a to b: the wrist that bobs up and down the most (spread of its height), when it
+      // clearly bobs more than the other. null when neither moves or it's too close to call.
+      function lcHandIn(C, a, b) {
+        const fr = C.fr.filter(f => f.t > a && f.t <= b), sd = k => {
+          const y = fr.map(f => f[k] && f[k].y).filter(v => v != null);
+          if (y.length < 4) return 0;
+          const m = y.reduce((s, v) => s + v, 0) / y.length;
+          return Math.sqrt(y.reduce((s, v) => s + (v - m) * (v - m), 0) / y.length);
+        };
+        const l = sd("wL"), r = sd("wR");
+        if (l + r < .03) return null;
+        return l > r * 1.3 ? "L" : r > l * 1.3 ? "R" : null;
+      }
+      // Score the last call when the next one comes (or the part ends, at most 3.5 s after it): right if the hand
+      // dribbling in the last second is the one the call wants. Calls where that can't be told aren't counted.
+      // On the clips from the move-check recorder this matched the called hand 47 times out of 51.
+      function lcScore(C, t) {
+        const c = C && C.call;
+        if (!c || c.scored || !c.hands) return;
+        c.scored = true;
+        const end = Math.min(t, c.t + 3.5);
+        if (end - c.t < 2.2) return; // the next call came before most moves finish: too soon to judge
+        const want = lcWant(c.name, c.from), got = lcHandIn(C, end - 1, end);
+        if (!want || !got) return;
+        const r = C.stats.rounds[c.pi] = C.stats.rounds[c.pi] || { ok: 0, n: 0 };
+        r.n++;
+        if (got === want) r.ok++;
+      }
       // A frame's measurements from the 33 pose landmarks (x, y from 0 to 1, visibility), ar = picture width / height.
       function lcFrame(lm, ar) {
         if (!lm || lm.length < 33) return null;
@@ -10263,7 +10305,7 @@ route();
       origDrawPlayer.apply(this, arguments);
       if (!pEl || !P) return;
       if (P.stage === "rate") {
-        if (K) lcStop(); // the camera's done; the totals stay for this screen
+        if (K) { lcScore(K.C, performance.now() / 1000); lcStop(); } // the camera's done; the totals stay for this screen
         const rows = pEl.querySelectorAll(".prow");
         P.items.forEach((d, i) => {
           const s = P.lcStats && P.lcStats[i];
@@ -10272,13 +10314,23 @@ route();
           const top = Object.keys(s.cues).sort((a, b) => s.cues[b] - s.cues[a])[0];
           const el = document.createElement("span");
           el.className = "lc-sum";
-          el.textContent = `Camera saw ${s.drib} dribbles. ${s.nu ? `Eyes up ${pc(s.up, s.nu)} of the time, sitting` : "Sitting"} low ${pc(s.low, s.nl)}, feet wider than shoulders ${pc(s.wide, s.nw)}.${top ? ` Said most: ${LC_CUE[top][0]}.` : ""}`;
+          el.textContent = `Camera saw ${s.drib} dribbles. ${s.nu ? `Eyes up ${pc(s.up, s.nu)} of the time, sitting` : "Sitting"} low ${pc(s.low, s.nl)}, feet wider than shoulders ${pc(s.wide, s.nw)}.${top ? ` Said most: ${LC_CUE[top][0]}.` : ""}${lcRounds(d, s)}`;
           const seg = rows[i].querySelector(".seg");
           rows[i].insertBefore(el, seg || null);
         });
       }
       lcBar();
     };
+
+    // "Ball in the called hand: Round 1 9 of 11, Round 2 …" (only what the camera could judge)
+    function lcRounds(d, s) {
+      const ks = Object.keys(s.rounds || {}).filter(k => s.rounds[k].n).sort((a, b) => a - b);
+      if (!ks.length) return "";
+      let ph = []; try { ph = phasesOf(d) || []; } catch (e) {}
+      const of = k => `${s.rounds[k].ok} of ${s.rounds[k].n}`;
+      return ` Ball in the called hand: ${ks.length === 1 && ph.length === 1 ? of(ks[0]) : ks.map(k => `${ph[k] ? ph[k][0] : "Part " + (+k + 1)} ${of(k)}`).join(", ")}.`;
+    }
+    window.__hoopsLcRounds = lcRounds;
 
     function lcOpen(items) {
       lcClose();
@@ -10379,9 +10431,18 @@ route();
       // a new drill gets its own tracker; a new part restarts the problem timers
       if (me.Ci !== P.i) { me.Ci = P.i; me.C = lcNew(); me.C.base = me.base; P.lcStats[P.i] = me.C.stats; }
       const key = P.i + ":" + P.pi + ":" + P.stage;
-      if (key !== me.key) { me.key = key; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.pend = []; me.C.hand = { L: null, R: null }; }
+      if (key !== me.key) {
+        lcScore(me.C, t);
+        // Eyes-Up Signals: the next round's key screen is already up, so add the round just scored to it
+        const kEl = document.getElementById("pKey");
+        if (kEl && typeof sigLast === "function") { const old = kEl.querySelector(".siglast"); if (old) old.outerHTML = sigLast(); else kEl.querySelector(".label").insertAdjacentHTML("afterend", sigLast()); }
+        me.key = key; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.pend = []; me.C.hand = { L: null, R: null }; }
       // a new call ("Left", "Cross"): when it came, for the switch and tempo checks
-      if (P.flashAt && P.flashAt !== me.flash) { me.flash = P.flashAt; me.C.call = { name: P.call || "", t, done: false }; me.C.callT0 = t; }
+      if (P.flashAt && P.flashAt !== me.flash) {
+        me.flash = P.flashAt; lcScore(me.C, t);
+        // the hand dribbling when the call came, for moves that switch or keep it
+        me.C.call = { name: P.call || "", t, done: false, pi: P.pi, hands: !!(part && part.hands), from: lcHandIn(me.C, t - 1, t) }; me.C.callT0 = t;
+      }
       if (P.stage !== "work" || !P.running || P.cd) { me.fix = null; me.was = false; return lcBar(); }
       // the player's own random tips step aside while the camera coaches this part
       if (part) P.tipAt = 30;
