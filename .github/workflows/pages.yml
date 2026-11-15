@@ -7,7 +7,7 @@ name: Website
 on:
   push:
     branches: [main]
-    paths: ["site/**", ".github/workflows/pages.yml"]
+    paths: ["site/**", ".github/workflows/pages.yml", "www/vision_bundle.mjs", "www/wasm/**", "www/pose_landmarker_lite.task"]
   workflow_dispatch:
 
 permissions:
@@ -28,6 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: actions/configure-pages@v5
+      # the Move Check Recorder's line-up check uses the app's own pose model and runtime
+      - run: mkdir -p site/pose && cp -r www/vision_bundle.mjs www/wasm www/pose_landmarker_lite.task site/pose/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
