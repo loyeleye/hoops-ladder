@@ -768,6 +768,7 @@
 .scx .sc-msg{position:absolute;left:16px;right:16px;top:16px;text-align:center;background:rgba(5,8,15,.8);border-radius:14px;padding:10px 12px;transition:background .25s}
 .scx .sc-msg b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(38px,11vw,52px);line-height:1;text-transform:uppercase;letter-spacing:.02em}
 .scx .sc-msg span{display:block;font-size:16px;font-weight:600;margin-top:4px}.scx .sc-msg span:empty{display:none}
+.scx .sc-cq{margin:10px auto 2px;min-height:48px;font-size:17px;padding:10px 20px}
 .scx.fix .sc-msg b{color:#FFC23D}
 .scx.ok .sc-msg{background:#1E8657}
 .scx.count .sc-frame::after{animation:none}
@@ -789,7 +790,10 @@
 
     // Where you are in the picture, from the pose landmarks (0 to 1 across and down). "shot" also wants room above
     // your head for your hands at the release; "body" only wants all of you in, head to feet.
-    function scJudge(lm, kind, loose, view, ar) {
+    // close: close quarters, for a room too small to fit your feet (live cues only). Head down to the middle of your
+    // thighs is then enough. It's the bottom of you that gets cut, never the head: the pose model finds you by your face,
+    // and on clips cropped at the knees it found nobody at all.
+    function scJudge(lm, kind, loose, view, ar, close) {
       if (!lm || lm.length < 33) return { k: "none" };
       const V = i => (lm[i].visibility ?? 1) > .5 && lm[i].x > -.05 && lm[i].x < 1.05;
       const sh = [11, 12].filter(V), hp = [23, 24].filter(V);
@@ -807,6 +811,15 @@
       const box = { x0: Math.min(...xs) - .04, x1: Math.max(...xs) + .04, top, bottom, H, hipX };
       // Once you're set the edges loosen, so a jittery landmark at 20 ft doesn't flick you back to amber.
       const e = loose ? .02 : 0;
+      if (close && kind === "body" && (feet == null || feet > .955 + e * 1.5)) {
+        // the hips and the top of the thighs: the dribbling wrists sit about there at the bottom of a low dribble
+        const thigh = hipY + .3 * torso, cb = Object.assign({}, box, { bottom: Math.min(1, thigh), H: thigh - top });
+        if (top < .015 - e) return { k: "head", box: cb };
+        if (hp.length < 2 || lm[23].y > 1 || lm[24].y > 1 || thigh > .99 + e) return { k: "hips", box: cb };
+        if (thigh - top < .3 - e) return { k: "far", box: cb };
+        if (hipX < .22 - e * 3 || hipX > .78 + e * 3) return { k: "mid", box: cb, dir: hipX < .5 ? 1 : -1 };
+        return { k: "ok", box: cb, close: true };
+      }
       if (feet == null || feet > .955 + e * 1.5) return { k: "feet", box };
       if (top < .015 - e) return { k: "head", box };
       // A jump shot's release: standing reach plus the jump and the ball, about half a body height above your head.
@@ -822,6 +835,9 @@
       none: ["Step into the picture", "Stand where the phone can see all of you.", "Step into the picture."],
       feet: ["Farther from the phone", "Your feet are cut off.", "Move farther from the phone. Your feet are cut off."],
       head: ["Farther from the phone", "Your head is cut off.", "Move farther from the phone. Your head is cut off."],
+      // after 25 s of feet cut off; the check still goes green if you do get head to feet in
+      feetq: ["Farther from the phone", "No room to back up? Use close quarters: head to thighs is enough.", "Your feet are still cut off. No room to back up? Tap close quarters."],
+      hips: ["Farther from the phone", "Close quarters: get your hips and the top of your legs in.", "Move back a little. Get your hips and the top of your legs in."],
       room: ["Farther from the phone", "Leave room above your hands for the release.", "Move a little farther from the phone, so your hands stay in at the release."],
       far: ["Closer to the phone", "You're small in the picture, so the tracking gets shaky.", "Come a few steps closer to the phone."],
       turn: ["Turn sideways", "Shooting arm toward the phone.", "Turn sideways, with your shooting arm toward the phone."],
@@ -844,12 +860,12 @@
       el.setAttribute("aria-label", "Get set");
       el.innerHTML = `<div class="sc-top"><div class="sc-title">Get set <span>· ${esc(o.title || "")}</span></div><button class="btn sec small" data-sc="close">Back</button></div>
         <div class="sc-stage"><div class="sc-frame${o.mirror ? " mir" : ""}"><video playsinline muted autoplay></video><canvas></canvas><div class="sc-hold"></div></div>
-          <div class="sc-msg" role="status" aria-live="polite"><b></b><span></span></div><div class="sc-big num" aria-live="assertive"></div></div>
+          <div class="sc-msg" role="status" aria-live="polite"><b></b><span></span><button class="btn pri sc-cq" data-sc="cq" hidden>Use close quarters</button></div><div class="sc-big num" aria-live="assertive"></div></div>
         <div class="sc-low"></div>`;
       document.body.appendChild(el);
       const s = SC = { o, el, video: el.querySelector("video"), cv: el.querySelector("canvas"), frame: el.querySelector(".sc-frame"),
         state: "check", ready: false, okAt: 0, badAt: 0, setAt: 0, tapped: false, j: { k: "none" }, key: "", keyAt: 0, saidAt: 0, saidKey: "", lastT: 0, raf: 0,
-        pl: null, noPose: false, n: 0, timer: 0, ls: null, voice: false };
+        pl: null, noPose: false, n: 0, timer: 0, ls: null, voice: false, close: !!o.close && S.settings.scClose === true, feetAt: 0 };
       s.video.setAttribute("playsinline", "");
       s.video.srcObject = o.stream;
       s.video.play().catch(() => {});
@@ -864,6 +880,7 @@
         else if (a === "cancel") scStop(s);
         else if (a.startsWith("cd:")) { S.settings[o.cdKey] = +a.slice(3); persist(); scLow(s); }
         else if (a === "voice") { S.settings.scVoice = !scVoiceOn(); persist(); scListen(s); scLow(s); }
+        else if (a === "cq") scClose4(s, !s.close);
       });
       if (!o.getLm) loadLivePose().then(pl => { if (SC === s) s.pl = pl; }).catch(() => { if (SC === s) { s.noPose = true; scLow(s); } });
       scListen(s);
@@ -872,18 +889,28 @@
       return s;
     }
 
+    // Close quarters on or off (remembered for next time). The green light starts over under the new rule.
+    function scClose4(s, on) {
+      if (!s.o.close || s.close === on) return;
+      s.close = on; S.settings.scClose = on; persist();
+      s.okAt = 0; s.feetAt = 0;
+      if (s.ready) scSetReady(s, false); else scLow(s);
+      if (on) say("Close quarters. Head down to your thighs in the picture.");
+    }
+
     // "go" while you're set (or "go anyway" any time) starts the countdown; "stop" or "wait" during it cancels.
     function scListen(s) {
       if (s.ls) { s.ls.stop(); s.ls = null; }
       s.voice = false;
       if (!scVoiceOn() || SC !== s || s.state === "done") return;
-      const ls = s.ls = hooks.listen(["go", "go anyway", "start anyway", "ready", "start", "stop", "wait", "cancel"], (text, alts, fin) => {
+      const ls = s.ls = hooks.listen(["go", "go anyway", "start anyway", "ready", "start", "stop", "wait", "cancel"].concat(s.o.close ? ["close quarters"] : []), (text, alts, fin) => {
         if (SC !== s || s.ls !== ls) return;
         for (const x of [text].concat(alts || [])) {
           const t = " " + String(x || "").toLowerCase().replace(/[^a-z ]/g, " ").replace(/\s+/g, " ") + " ";
           if (s.state === "count" && / (stop|wait|cancel|hold on) /.test(t)) { scStop(s); return; }
           if (s.state !== "check") return;
           if (!fin) return; // whole phrases only, so a stray syllable (or the phone's own voice) doesn't start it
+          if (s.o.close && / close quarters? /.test(t)) { scClose4(s, true); return; }
           if (/ (go anyway|start anyway) /.test(t) || ((s.ready || s.noPose) && / (go|let s go|start|ready|record) /.test(t))) { scCount(s); return; }
           if (fin && / go /.test(t) && Date.now() - s.saidAt > 2500) { s.saidAt = Date.now(); say("Not set yet. " + SC_MSG[s.j.k === "ok" ? "hold" : s.j.k][2] + ' Or say "go anyway".'); return; }
         }
@@ -899,7 +926,9 @@
       }
       const set = s.ready || s.noPose;
       low.innerHTML = `<div class="sc-row"><span class="small">Countdown</span><div class="sc-seg" role="group" aria-label="Countdown before recording">${o.cdOpts.map(v => `<button data-sc="cd:${v}" aria-pressed="${v === cd}">${v} s</button>`).join("")}</div>
-          ${hooks.listen ? `<button class="sc-chip" data-sc="voice" aria-pressed="${scVoiceOn()}">${scVoiceOn() ? (s.voice ? "Voice on" : "Voice…") : "Voice off"}</button>` : ""}</div>
+          ${hooks.listen ? `<button class="sc-chip" data-sc="voice" aria-pressed="${scVoiceOn()}">${scVoiceOn() ? (s.voice ? "Voice on" : "Voice…") : "Voice off"}</button>` : ""}
+          ${o.close ? `<button class="sc-chip" data-sc="cq" aria-pressed="${s.close}">Close quarters</button>` : ""}</div>
+        ${s.close ? '<p class="sc-note">Close quarters: head down to your thighs. The camera can\'t see your legs, so sitting low, a wide base and feet staying put aren\'t checked.</p>' : ""}
         <button class="btn ${set ? "pri" : "sec wait"} sc-go" data-sc="go" ${set ? "" : 'aria-disabled="true"'}>Go</button>
         <p class="sc-note">${set ? (s.voice ? `Say "go" or tap Go. ${o.verb || "Recording"} starts after ${cd} s.` : `Tap Go, then walk back. ${o.verb || "Recording"} starts after ${cd} s.`) : s.voice ? 'When the picture turns green, say "go".' : "When the picture turns green, tap Go."}</p>
         <div class="sc-row"><button class="linkbtn small" data-sc="anyway" ${set ? 'style="visibility:hidden" tabindex="-1"' : ""}>Start anyway</button>${o.now ? `<button class="linkbtn small" data-sc="now">Someone's filming me: record now</button>` : ""}</div>`;
@@ -931,22 +960,29 @@
       let lm = null;
       if (s.o.getLm) lm = s.o.getLm();
       else if (s.pl && v.readyState >= 2) { try { const r = s.pl.detectForVideo(v, now); lm = r && r.landmarks && r.landmarks[0]; } catch (e) {} }
-      const j = s.j = lm ? scJudge(lm, s.o.kind, s.ready || s.okAt > 0, s.o.view, v.videoWidth / v.videoHeight) : { k: "none" };
+      const j = s.j = lm ? scJudge(lm, s.o.kind, s.ready || s.okAt > 0, s.o.view, v.videoWidth / v.videoHeight, s.close) : { k: "none" };
+      // feet cut off for 25 s where close quarters is allowed: offer it (a button in the banner and a spoken prompt)
+      // (a dropped frame or a moment in view doesn't restart the 25 s; 2 s of your feet in does)
+      if (j.k === "feet" && s.o.close && !s.close) { s.feetAt = s.feetAt || now; s.feetOk = 0; }
+      else if (s.feetAt && (s.close || (s.feetOk = s.feetOk || now, now - s.feetOk > 2000))) s.feetAt = 0;
       // Green after 0.8 s in a good spot. It stays green for 15 s even if you walk up to tap Go, then needs you back.
       if (j.k === "ok") { s.badAt = 0; s.setAt = s.ready ? now : s.setAt; s.okAt = s.okAt || now; if (!s.ready && now - s.okAt > 800) scSetReady(s, true); }
       else { s.badAt = s.badAt || now; if (now - s.badAt > 300) s.okAt = 0; if (s.ready && now - s.setAt > 15000) scSetReady(s, false); }
       const hb = s.el.querySelector(".sc-hold"), hw = !s.ready && s.okAt ? Math.min(100, (now - s.okAt) / 8) + "%" : "0";
       if (hb.style.width !== hw) hb.style.width = hw;
       // Words on screen now; said out loud once the same problem has lasted a second, and not too often.
-      const key = s.ready ? "ready" : s.noPose && !s.o.getLm ? "nopose" : s.okAt ? "hold" : j.k;
+      const key = s.ready ? "ready" : s.noPose && !s.o.getLm ? "nopose" : s.okAt ? "hold" : s.feetAt && now - s.feetAt > 25000 ? "feetq" : j.k;
       if (key !== s.key) { s.key = key; s.keyAt = now; }
-      const m = key === "ready" ? ["You're set", s.voice ? 'Say "go" or tap Go' : "Tap Go"] : SC_MSG[key];
+      const m = key === "ready" ? ["You're set", s.voice ? 'Say "go" or tap Go' : "Tap Go"]
+        : key === "feetq" && s.voice ? [SC_MSG.feetq[0], SC_MSG.feetq[1], 'Your feet are still cut off. No room to back up? Say "close quarters", or tap the button.'] : SC_MSG[key];
+      const cqb = s.el.querySelector(".sc-cq");
+      if (cqb.hidden !== (key !== "feetq")) cqb.hidden = key !== "feetq";
       const bb = s.el.querySelector(".sc-msg b"), ss = s.el.querySelector(".sc-msg span");
       if (bb.textContent !== m[0]) bb.textContent = m[0];
       if (ss.textContent !== m[1]) ss.textContent = m[1];
       s.el.classList.toggle("fix", !s.ready && key !== "none" && key !== "nopose" && key !== "hold");
       s.el.classList.toggle("hold", key === "hold");
-      if (!s.ready && m[2] && now - s.keyAt > 1100 && (s.saidKey !== key || now - s.saidAt > 4500) && now - s.saidAt > 3500 && !(window.speechSynthesis && speechSynthesis.speaking)) {
+      if (!s.ready && m[2] && now - s.keyAt > 1100 && (s.saidKey !== key || (key !== "feetq" && now - s.saidAt > 4500)) && now - s.saidAt > 3500 && !(window.speechSynthesis && speechSynthesis.speaking)) {
         s.saidKey = key; s.saidAt = now; say(m[2]);
       }
       scDraw(s, j, w, h);
@@ -981,7 +1017,7 @@
       }
       // red edge where you're cut off
       c.fillStyle = "rgba(255,90,70,.75)";
-      if (j.k === "feet") c.fillRect(0, h - 8, w, 8);
+      if (j.k === "feet" || j.k === "hips") c.fillRect(0, h - 8, w, 8);
       if (j.k === "head" || j.k === "room") c.fillRect(0, 0, w, 8);
       if (j.k === "mid") { // arrow toward the middle, drawn in the picture's own direction (the frame mirrors it with the video)
         const ax = b.hipX * w, ay = (b.top + b.bottom) / 2 * h, d = j.dir, tx = ax + d * w * .22;
@@ -3052,7 +3088,10 @@
       // A frame's measurements from the 33 pose landmarks (x, y from 0 to 1, visibility), ar = picture width / height.
       function lcFrame(lm, ar) {
         if (!lm || lm.length < 33) return null;
-        const V = i => (lm[i].visibility ?? 1) > .5, X = i => lm[i].x * ar, Y = i => lm[i].y;
+        // in the picture, too: the model guesses joints outside it (feet below the bottom edge in close quarters) and
+        // can still call them visible
+        const In = i => lm[i].y > -.02 && lm[i].y < 1.02 && lm[i].x > -.02 && lm[i].x < 1.02;
+        const V = i => (lm[i].visibility ?? 1) > .5 && In(i), X = i => lm[i].x * ar, Y = i => lm[i].y;
         if (!V(11) || !V(12) || !V(23) || !V(24)) return null;
         const shY = (Y(11) + Y(12)) / 2, hipY = (Y(23) + Y(24)) / 2, hipX = (X(23) + X(24)) / 2, tor = hipY - shY;
         if (tor < .04) return null;
@@ -3063,15 +3102,16 @@
           f.ts = (ts(23) + ts(24)) / 2;
           f.st = Math.abs(X(27) - X(28)) / tor;
           f.aL = { x: X(27) / tor, y: Y(27) / tor }; f.aR = { x: X(28) / tor, y: Y(28) / tor };
-          f.kL = Math.abs(X(25) - hipX) / tor; f.kR = Math.abs(X(26) - hipX) / tor;
         }
+        // knees alone (close quarters with the knees in) are enough for the crossover's width
+        if (V(25) && V(26)) { f.kL = Math.abs(X(25) - hipX) / tor; f.kR = Math.abs(X(26) - hipX) / tor; }
         if (V(0) && (V(7) || V(8))) {
           const ear = V(7) && V(8) ? (Y(7) + Y(8)) / 2 : V(7) ? Y(7) : Y(8);
           f.hd = (Y(0) - ear) / tor;
         }
         // wrists against the hips; out = how far out from the middle, toward that hand's own side
         // (15 is your left wrist, 16 your right; from the front your left is on the picture's right)
-        const wr = (i, s) => (lm[i].visibility ?? 1) > .35 ? { y: (Y(i) - hipY) / tor, x: X(i) / tor, out: s * (X(i) - hipX) / tor } : null;
+        const wr = (i, s) => (lm[i].visibility ?? 1) > .35 && In(i) ? { y: (Y(i) - hipY) / tor, x: X(i) / tor, out: s * (X(i) - hipX) / tor } : null;
         const sgn = X(23) > X(24) ? 1 : -1; // +1 when your left hip is on the picture's right (facing the phone)
         f.wL = wr(15, sgn); f.wR = wr(16, -sgn);
         return f;
@@ -3119,7 +3159,7 @@
             if (w.y < s.bot - LC.A) {
               // a push that ends below the chest and starts below the shoulders: not a wave, a toss or a shot
               if (s.bot > -.55 && s.top > -1.3 && s.bot - s.top < 1.4 && !(part.tb && s.top < LC.TOSS)) {
-                const kn = f.ts != null ? (h === "L" ? f.kL : f.kR) : null;
+                const kn = f.kL != null ? (h === "L" ? f.kL : f.kR) : null;
                 const e = { h, t: s.bt, top: s.top, bot: s.bot, x: s.bx, xo: s.xo, kn };
                 if (part.tb) { e.at = t; pend.push(e); } else { C.ev.push(e); out.push(e); C.stats.drib++; }
               }
@@ -3258,7 +3298,11 @@
           const top = Object.keys(s.cues).sort((a, b) => s.cues[b] - s.cues[a])[0];
           const el = document.createElement("span");
           el.className = "lc-sum";
-          el.textContent = `Camera saw ${s.drib} dribbles. ${s.nu ? `Eyes up ${pc(s.up, s.nu)} of the time, sitting` : "Sitting"} low ${pc(s.low, s.nl)}, feet wider than shoulders ${pc(s.wide, s.nw)}.${top ? ` Said most: ${LC_CUE[top][0]}.` : ""}${lcRounds(d, s)}`;
+          // close quarters: no legs in the picture, so no stance numbers
+          const legs = s.nl >= 30 ? `${s.nu ? "sitting" : "Sitting"} low ${pc(s.low, s.nl)}, feet wider than shoulders ${pc(s.wide, s.nw)}` : "";
+          const eyes = s.nu ? `Eyes up ${pc(s.up, s.nu)} of the time` : "";
+          const seen = eyes && legs ? `${eyes}, ${legs}.` : eyes || legs ? `${eyes || legs}.` : "";
+          el.textContent = `Camera saw ${s.drib} dribbles. ${seen}${legs ? "" : " Legs not in the picture (close quarters), so no stance checks."}${top ? ` Said most: ${LC_CUE[top][0]}.` : ""}${lcRounds(d, s)}`.replace(/  +/g, " ");
           const seg = rows[i].querySelector(".seg");
           rows[i].insertBefore(el, seg || null);
         });
@@ -3324,7 +3368,7 @@
       const me = K;
       if (!me || !me.stream) return;
       me.cal = lcNew();
-      me.sc = hooks.setupCheck({ stream: me.stream, mirror: me.face === "user", kind: "body", title: "Live cues", verb: "Dribbling", goSay: "", cdKey: "lcCd",
+      me.sc = hooks.setupCheck({ stream: me.stream, mirror: me.face === "user", kind: "body", close: true, title: "Live cues", verb: "Dribbling", goSay: "", cdKey: "lcCd",
         getLm: () => (K === me ? me.raw : null),
         onGo: () => {
           if (K !== me || !P) return;
