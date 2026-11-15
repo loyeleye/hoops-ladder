@@ -1172,7 +1172,11 @@ and back to the viewer shot you came from.
 shot number coloured by grade, and the focus cue's reading under it with its grade as a shape (Fix square, Watch
 triangle, Good circle, so it doesn't rely on colour). ★ and a white bookmark (kept) sit top right. The *focus cue*
 is the cue graded Fix most often, or the one picked, so every tile shows the same thing and shots compare. Sort by
-shot order or worst/best on it; filter by Starred, Kept, Make, Miss, or the Fix/Watch/Good bar.
+shot order or by the focus cue, two ways: *Farthest from ideal* / *Closest to ideal* go by grade, then by how far the
+value sits outside the cue's Good range (`BL_IDEAL`, the same thresholds the grading uses; inside the range, nearer
+the middle counts as closer), and *Value high to low* / *low to high* go by the raw reading (for Elbow under the ball,
+high is flared out, low is tucked in). Shots with no reading go last. A burst opens on *Closest to ideal*; the sort you pick sticks to the burst, like the focus.
+Filter by Starred, Kept, Make, Miss, or the Fix/Watch/Good bar.
 
 **Thumbnails.** Made once, one shot at a time with a hidden video, nearest the screen first, and saved as a small JPEG
 at `blobs[shotId+":th"]`. They stay after the video is deleted, dimmed with "Video deleted".
@@ -1187,7 +1191,7 @@ removed when that note goes. *Free X MB now* in the storage note works the same 
 **Quick pick.** One shot at a time at ½× with its skeleton and all its cues, focus cue first. *Skip*, *★* or *Keep*,
 or swipe the video right to keep and left to skip. A swipe that starts within 28 px of the screen edge is left to
 Android's Back gesture. An optional *Make / Miss* tag per shot feeds the Make and Miss filters. Undo names what it
-undoes ("Undo keep #34"). The order can be shot order or worst/best on the focus cue. At the end it says how many are
+undoes ("Undo keep #34"). The order picker has the same five sorts as the grid. At the end it says how many are
 kept and when the rest go. Code: `burstLib`, `bl*`, `qp*`, `thMake`.
 
 **Coach pack (off by default).** A switch in the Form tab's *Your sessions* fold trades space for information. When
