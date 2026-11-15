@@ -1117,6 +1117,11 @@ const DRILLS=[
   what:"The Never Too Late club warm-up on days with the other coach: the same laps and moves across the court, then five floor exercises for your core, legs and upper body.",
   steps:["Laps: run around the outside of the whole court. First at a jog, then three-quarter speed, then full speed.","Hip CARs: lift a knee, open it out to the side, and circle it back down, slow and as big as you can control.","Plank: forearms under your shoulders, body in one straight line, squeeze your glutes. Wall sit: back flat on the wall, knees over your ankles. Push-ups: drop to your knees once your form goes.","Ball twists: hold the ball at your chest and rotate side to side, touching your elbow to each hip."],
   cue:"Build the laps. Hold your form on the floor.",src:[{label:"Never Too Late adult basketball club"}]},
+ {id:"b_paint",mv:["lgcatch",null,"lgcatch",null,"lgroll",null,"lgroll",null,"lgdrib",null,"lgdrib",null,"paintbox",null,"paintbox"],skill:"h",body:true,rt:"warm",short:"A coach's ball warm-up: deep lunges with the ball, then a dribbling lap around the paint. Bring a ball.",name:"Lunge & Paint-Line Warm-Up",role:"body",unlock:1,mins:8,log:"timer",
+  phases:[["Deep lunges, between the legs and catch: half court and back",60],["Rest, then go again",5],["Deep lunges, between the legs and catch: half court and back",60],["Rest. Next: roll it under",5],["Deep lunges, roll the ball under: half court and back",60],["Rest, then go again",5],["Deep lunges, roll the ball under: half court and back",60],["Rest. Next: dribble it under",5],["Deep lunges, between-the-legs dribble: half court and back",50],["Rest, then go again",5],["Deep lunges, between-the-legs dribble: half court and back",50],["Rest. Next: paint box dribble",5],["Paint box dribble, one lap",40],["Rest, then go again",5],["Paint box dribble, one lap",40]],
+  what:"A warm-up a coach walked you through: deep walking lunges with the ball to half court and back, three ways, then a lap around the paint while you dribble on the lines. Each one twice, with 5 seconds of rest. It opens your hips and gets the ball in your hands before you train.",
+  steps:["Every lunge is long and deep: front knee over your foot, back knee close to the floor. Switch legs every step, from the baseline to half court and back.","Between the legs and catch: pass the ball under your front leg, touch the floor beside that foot with the hand that passed it, and catch the ball with your other hand. No extra dribble. Then the other leg and the other hand.","Roll it under: the same lunges, but roll the ball under your front leg so it never leaves the floor. Then the same lunges again with a normal between-the-legs dribble every step.","Paint box dribble: start on the baseline just outside a lane line, facing the basket, with that line on your right. Stay low and face the basket the whole lap, with the ball on the line in the hand nearest it. Backpedal to the free throw line, slide across it, step outside the other lane line with the ball in your left hand, and walk forward to the baseline. Then go straight back the same way to finish where you started, with the ball in your right hand. The app calls each side."],
+  cue:"Low hips, ball on the line.",src:[{label:"A coach's warm-up, shown in person (Nov 14, 2026)"}]},
  {id:"b_cool2",mv:["walk","hamstr","quad","calfwall","hipflex","fig4","butterfly","child","twist","shoulder"],skill:"h",body:true,rt:"cool",short:"Longer stretch for after a hard session or a game.",name:"Full Cool-Down",role:"cool",unlock:1,mins:8,log:"timer",
   phases:[["Walk it off, breathe out slowly",60],["Standing hamstring stretch, each leg",60],["Quad stretch, each leg",40],["Calf stretch against the wall, each leg",40],["Hip flexor stretch, each side",60],["Figure-four glute stretch, each side",60],["Butterfly stretch",40],["Child's pose",40],["Lying twist, each side",40],["Cross-body shoulder stretch, each arm",30]],
   what:"Eight minutes from head to toe after a long session or a game: legs, hips, lower back and shoulders. Your muscles are warm, so this is the best time to work on how far you can stretch.",
@@ -2917,7 +2922,7 @@ function floor(t,scroll){let s=`<rect x="0" y="0" width="150" height="150" fill=
 const cap=t=>t?`<rect x="16" y="5" width="${Math.min(132,t.length*5.6+14)}" height="17" rx="8.5" fill="${C.ink}"/><text x="23" y="17.2" font-family="Saira Condensed,Arial Narrow,sans-serif" font-weight="700" font-size="12" fill="#fff">${t}</text>`:"";
 function TL(keys){const Lt=keys[keys.length-1][0];return t=>{t=((t%Lt)+Lt)%Lt;let i=0;while(i<keys.length-2&&t>=keys[i+1][0])i++;const[t0,a,ea]=keys[i],[t1,b]=keys[i+1];const u=t1>t0?sm(Math.min(1,Math.max(0,(t-t0)/(t1-t0)))):0;const p=mix(a,b,u);p.cap=(ea&&ea.cap)||"";p.wall=a.wall;return p}}
 function anim(keys,o={}){const tl=TL(keys);return t=>{const p=tl(t);let s=floor(t,o.scroll||0);if(o.wall)s+=`<rect x="${o.wall}" y="20" width="8" height="${G-20}" fill="${C.line}"/>`;const q=solve(p);s+=figure(q);
-  if(o.ball){const b=o.ball(t,q);s+=`<circle cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" r="6.5" fill="var(--fv-ball,#E07A2E)" stroke="${C.ink}" stroke-width="1.3"/>`}
+  if(o.ball){const b=o.ball(t,q);s+=b.back?`<circle cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" r="6.5" fill="var(--fv-ball,#E07A2E)" fill-opacity=".3" stroke="var(--fv-ball,#E07A2E)" stroke-width="1.6" stroke-dasharray="3 2"/>`:`<circle cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" r="6.5" fill="var(--fv-ball,#E07A2E)" stroke="${C.ink}" stroke-width="1.3"/>`}
   if(o.arrow)s+=o.arrow(t);return s+cap(p.cap||o.cap||"")}}
 /* poses */
 const run=(lean,str)=>[P({lean,air:3,n:{th:40*str,kn:75,an:-5},f:{th:-28*str,kn:70,an:30},na:{sh:-35,el:85},fa:{sh:40,el:80}}),P({lean,air:3,f:{th:40*str,kn:75,an:-5},n:{th:-28*str,kn:70,an:30},fa:{sh:-35,el:85},na:{sh:40,el:80}})];
@@ -3025,6 +3030,42 @@ const M={jog:B0[0],hops:B0[1],lunge:B0[2],swing:B0[3],calf:B0[4],slide:B0[5],bui
  calledslide:[anim([[0,SL(75,30,30),{cap:"Call: left"}],[.3,SL(68,22,40)],[.6,SL(61,30,30)],[.9,SL(54,22,40)],[1.3,SL(54,30,30),{cap:"Hold stance"}],[2,SL(54,30,30),{cap:"Call: right"}],[2.3,SL(61,40,22)],[2.6,SL(68,30,30)],[2.9,SL(75,40,22)],[3.3,SL(75,30,30),{cap:"Hold stance"}],[4,SL(75,30,30)]]),"Light called slides: the phone calls a direction, you slide two or three steps at half speed and hold your stance until the next call."],
  balance:[anim([[0,BAL(0),{cap:"Big toe down, hip level"}],[1,BAL(2)],[2,BAL(-1)],[3,BAL(0)]]),"Single-leg balance: slight knee bend, hips level, still. Switch legs at the call."],
  landing:[anim([[0,LAND(0),{cap:"Small hop"}],[.35,LAND(1)],[.7,LAND(2),{cap:"Land soft, hold 2 s"}],[2.2,LAND(2)],[2.8,LAND(0)]]),"Soft landings: a small hop, land on both feet with your hips back and knees over your toes, quiet, and hold for 2 seconds."]};
+/* the coach's Lunge & Paint-Line Warm-Up. Side view: you lunge toward the right, the near leg is your right leg.
+   The ball moves side to side under the front leg, so it shows dashed while it's on your far (left) side. */
+const DL=(lead,o={})=>{const fr={th:86,kn:88,an:0},bk={th:-16,kn:92,an:62};return P({lean:o.lean!=null?o.lean:22,n:lead==="n"?fr:bk,f:lead==="n"?bk:fr,na:o.na||{sh:30,el:30},fa:o.fa||{sh:30,el:30}})};
+const STB=P({...STAND,na:{sh:20,el:60},fa:{sh:20,el:60}});
+const knee=(q,k)=>q.legs.find(l=>l.key===k).k,under=(q,k)=>({x:knee(q,k).x-9,y:G-7});
+/* a ball path: in phases [t0,t1,from,to,how] between hands ("na"/"fa"), via the floor under the front knee */
+const ballPath=(segs,L)=>(t,q)=>{t=((t%L)+L)%L;const g=segs.find(s=>t>=s[0]&&t<s[1])||segs[segs.length-1];const[t0,t1,a,b,how,lead]=g,u=Math.min(1,Math.max(0,(t-t0)/(t1-t0)));
+  const at=k=>{const h=hand(q,k);return{x:h.x+3,y:h.y+4}};const far=k=>k==="fa";
+  if(how==="hold")return{...at(a),back:far(a)};
+  if(how==="floor")return{...under(q,lead),back:u>.5?far(b):far(a)};
+  if(how==="drop"){const A=at(a),U=under(q,lead),p=u*u;return{x:lerp(A.x,U.x,p),y:lerp(A.y,U.y,p),back:far(a)}}
+  if(how==="lift"){const B=at(b),U=under(q,lead),p=sm(u);return{x:lerp(U.x,B.x,p),y:lerp(U.y,B.y,p),back:far(b)}}
+  const A=at(a),B=at(b),U=under(q,lead);if(u<.5){const p=sm(u*2);return{x:lerp(A.x,U.x,p),y:lerp(A.y,U.y,p),back:far(a)}}const p=sm((u-.5)*2);return{x:lerp(U.x,B.x,p),y:lerp(U.y,B.y,p),back:far(b)}};
+const LUNGE_BALL={
+ lgcatch:[anim([[0,STB,{cap:"Ball in your right hand"}],[.7,DL("n",{lean:38,na:{sh:30,el:-5},fa:{sh:8,el:20}}),{cap:"Under the front leg"}],[1.3,DL("n",{lean:46,na:{sh:24,el:-8},fa:{sh:4,el:30}}),{cap:"Touch the floor, catch"}],[1.9,DL("n",{lean:46,na:{sh:24,el:-8},fa:{sh:4,el:30}})],[2.5,STB,{cap:"Now the left hand"}],[3.2,DL("f",{lean:38,fa:{sh:30,el:-5},na:{sh:8,el:20}}),{cap:"Under the front leg"}],[3.8,DL("f",{lean:46,fa:{sh:24,el:-8},na:{sh:4,el:30}}),{cap:"Touch the floor, catch"}],[4.4,DL("f",{lean:46,fa:{sh:24,el:-8},na:{sh:4,el:30}})],[5,STB]],
+   {scroll:10,ball:ballPath([[0,.4,"na","na","hold"],[.4,1.3,"na","fa","pass","n"],[1.3,2.9,"fa","fa","hold"],[2.9,3.8,"fa","na","pass","f"],[3.8,5,"na","na","hold"]],5)}),
+   "Deep lunge, pass the ball under your front leg, touch the floor beside that foot with the hand that passed it, and catch with the other hand. No extra dribble. Dashed = on your far side."],
+ lgroll:[anim([[0,STB,{cap:"Step long and deep"}],[.7,DL("n",{lean:50,na:{sh:26,el:-6},fa:{sh:14,el:6}}),{cap:"Roll it under, on the floor"}],[1.8,DL("n",{lean:50,na:{sh:14,el:6},fa:{sh:26,el:-6}})],[2.5,STB,{cap:"Other leg"}],[3.2,DL("f",{lean:50,fa:{sh:26,el:-6},na:{sh:14,el:6}}),{cap:"Roll it under, on the floor"}],[4.3,DL("f",{lean:50,fa:{sh:14,el:6},na:{sh:26,el:-6}})],[5,STB]],
+   {scroll:10,ball:ballPath([[0,.6,"na","na","hold"],[.6,.75,"na","na","drop","n"],[.75,1.9,"na","fa","floor","n"],[1.9,2.5,"fa","fa","lift","n"],[2.5,3.1,"fa","fa","hold"],[3.1,3.25,"fa","fa","drop","f"],[3.25,4.4,"fa","na","floor","f"],[4.4,5,"na","na","lift","f"]],5)}),
+   "Deep lunge and roll the ball under your front leg from one hand to the other. It never leaves the floor. Dashed = on your far side."],
+ lgdrib:[anim([[0,STB,{cap:"Step long and deep"}],[.6,DL("n",{lean:30,na:{sh:22,el:30},fa:{sh:10,el:40}}),{cap:"Dribble it under"}],[1.3,DL("n",{lean:30,na:{sh:10,el:40},fa:{sh:22,el:30}})],[1.9,STB,{cap:"Other leg"}],[2.5,DL("f",{lean:30,fa:{sh:22,el:30},na:{sh:10,el:40}}),{cap:"Dribble it under"}],[3.2,DL("f",{lean:30,fa:{sh:10,el:40},na:{sh:22,el:30}})],[3.8,STB]],
+   {scroll:12,ball:ballPath([[0,.55,"na","na","hold"],[.55,1.3,"na","fa","pass","n"],[1.3,2.45,"fa","fa","hold"],[2.45,3.2,"fa","na","pass","f"],[3.2,3.8,"na","na","hold"]],3.8)}),
+   "Deep lunge with a normal between-the-legs dribble under the front leg every step. Dashed = on your far side."]};
+/* paint box dribble, top view: the baseline is at the top and you face it the whole lap */
+const PAINT_K=[[0,37,30,1,"Backpedal, right hand"],[2.2,37,104,1,"Slide across"],[3.8,113,104,1,"Step out, left hand"],[4.1,113,104,-1,"Walk forward"],[6.1,113,30,-1,"Backpedal, left hand"],[8.3,113,104,-1,"Slide back across"],[9.9,37,104,-1,"Step out, right hand"],[10.2,37,104,1,"Walk forward"],[12.2,37,30,1]];
+function paintBox(t){const X=window.SV._,L=12.2;t=((t%L)+L)%L;let i=0;while(i<PAINT_K.length-2&&t>=PAINT_K[i+1][0])i++;
+  const a=PAINT_K[i],b=PAINT_K[i+1],u=sm(Math.min(1,(t-a[0])/(b[0]-a[0]))),x=lerp(a[1],b[1],u),y=lerp(a[2],b[2],u),sd=lerp(a[3],b[3],u);
+  let s=`<rect x="0" y="0" width="150" height="150" fill="${C.floor}"/><g stroke="${C.line}" fill="none" stroke-width="1.4"><line x1="0" y1="24" x2="150" y2="24"/><rect x="45" y="24" width="60" height="71"/><path d="M53 95 a22 22 0 0 0 44 0"/></g><line x1="64" y1="39" x2="86" y2="39" stroke="${C.ink}" stroke-width="2"/><circle cx="75" cy="44" r="3.2" fill="none" stroke="${C.jer}" stroke-width="1.4"/>`;
+  s+=`<path d="M37 30 V104 H113 V30 M113 104 H37" fill="none" stroke="${C.hl}" stroke-width="1.3" stroke-dasharray="3 3" opacity=".8"/>`;
+  s+=X.topMan(x,y,0,null,{arms:true});
+  const by=y>100?96:y-4,bx=x+sd*8,r=3.2+.5*Math.abs(Math.sin(t*PI*3.2));
+  s+=`<circle cx="${bx.toFixed(1)}" cy="${by.toFixed(1)}" r="${r.toFixed(2)}" fill="var(--fv-ball,#E07A2E)" stroke="${C.ink}" stroke-width=".9"/>`;
+  s+=X.txt(75,147,"baseline at the top",{a:"middle",s:9,w:500,f:"Barlow,sans-serif",c:C.line});
+  return s+cap(a[4]||"")}
+const PI=Math.PI;
+Object.assign(M,LUNGE_BALL,{paintbox:[paintBox,"Top view, baseline at the top. Face the basket the whole lap, ball on the line in the hand nearest it: backpedal to the free throw line, slide across, step outside the other lane line and switch hands, walk forward. Then the same back the other way."]});
 for(const d of DRILLS)if(d.mv)steps[d.id]=d.mv.map(k=>M[k]||null);
 const get=id=>{const[d,i]=String(id).split(":");return(steps[d]||[])[+i]};
 function render(svg,id,t){const s=get(id);if(!s)return;svg.innerHTML=s[0](t)}
@@ -3308,7 +3349,7 @@ const JUMPY=new Set(["c_17s","c_ub","f_power","f_bump","f_contact","f_spots","f_
    Full-length runs need a full court; runs that use court lines (17s and the like) need at least a half court;
    shooting and finishing need a hoop; ball handling and the rest work anywhere. */
 const COURTS=[["full","Full court","Everything"],["half","Half court","No long runs"],["hoop","Just a hoop","No line runs"],["none","No hoop","Handling"]],COURT_N={full:3,half:2,hoop:1,none:0},COURT_NAME={full:"a full court",half:"a half court",hoop:"just a hoop",none:"no hoop"};
-const COURT_FULL=new Set(["c_ub","c_farmers","h_2full"]),COURT_HALF=new Set(["c_17s","c_rsa","c_multi","c_hokie","c_pinky","c_help","c_called","h_walk","h_free","c_lane","c_laneball","c_ra_1v1"]);
+const COURT_FULL=new Set(["c_ub","c_farmers","h_2full"]),COURT_HALF=new Set(["b_paint","c_17s","c_rsa","c_multi","c_hokie","c_pinky","c_help","c_called","h_walk","h_free","c_lane","c_laneball","c_ra_1v1"]);
 const courtNeed=d=>COURT_FULL.has(d.id)?3:COURT_HALF.has(d.id)?2:d.skill==="s"||d.skill==="f"?1:0;
 const courtHave=()=>COURT_N[S.settings.court]??3;
 /* balls you have today: two-ball drills need 2; conditioning and body routines need none (except the Hokie drill, ball agility drills and the ball warm-ups) */
@@ -3316,7 +3357,9 @@ const BALLS=[["2","2 basketballs","Two"],["1","1 basketball","One"],["0","No bas
 const BALL_P=`<circle cx="8" cy="8" r="6.4"/><path d="M1.6 8h12.8M8 1.6v12.8M3.8 3.6c2.2 2 2.2 6.8 0 8.8M12.2 3.6c-2.2 2-2.2 6.8 0 8.8"/>`;
 const BALL_SVG=`<svg class="bi" viewBox="0 0 16 16" aria-hidden="true">${BALL_P}</svg>`,NOBALL_SVG=`<svg class="bi" viewBox="0 0 16 16" aria-hidden="true"><g opacity=".5">${BALL_P}</g><path class="cut" d="M2.5 13.5l11-11"/><path d="M2.5 13.5l11-11"/></svg>`;
 const ballIcons=v=>`<span class="bi-row" aria-hidden="true">${v==="0"?NOBALL_SVG:BALL_SVG.repeat(+v)}</span>`;
-const ballNeed=d=>TWO_BALL.test(d.id)?2:(d.cond&&d.id!=="c_hokie"&&!d.ball)||(d.body&&d.id!=="b_game"&&d.id!=="b_club")?0:1;
+/* body routines that use a ball */
+const BALL_BODY=new Set(["b_game","b_club","b_club2","b_paint"]);
+const ballNeed=d=>TWO_BALL.test(d.id)?2:(d.cond&&d.id!=="c_hokie"&&!d.ball)||(d.body&&!BALL_BODY.has(d.id))?0:1;
 const ballHave=()=>{const b=S.settings.balls;return b==null?2:+b};
 const placeOk=d=>courtNeed(d)<=courtHave();
 /* tennis ball drills (tb) need one; on until you turn it off in Today's setup */
@@ -4587,7 +4630,9 @@ const SIDE_SEGS=[
  [/^quad stretch/,["Right quad","Left quad"]],
  [/^hip flexor stretch/,["Right knee down","Left knee down"]],
  [/^figure-four/,["Right ankle over left knee","Left ankle over right knee"]],
- [/^lying twist/,["Knees to your right","Knees to your left"]]];
+ [/^lying twist/,["Knees to your right","Knees to your left"]],
+ [/^deep lunges.*half court and back/,["Down to half court","Back to the baseline"]],
+ [/^paint box dribble/,["Backpedal, right hand on the line","Slide across the free throw line","Step outside, left hand, walk forward","Backpedal, left hand on the line","Slide back across","Step outside, right hand, walk forward"]]];
 function segsOf(name){const n=String(name||"").toLowerCase(),m=SIDE_SEGS.find(([re])=>re.test(n));if(m)return m[1];
   const e=n.match(/\beach (leg|side|foot|arm)\b/);if(e)return["Right "+e[1],"Left "+e[1]];
   return /both directions|one way, then the other/.test(n)?["One way","Other way"]:null}
