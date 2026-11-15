@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Move Check Recorder</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="icon.png">
+<style>
+/* Guided recording session for the Eyes-Up Signals move checks. Everything stays on the phone until you save or share it.
+   Colors match the app (site/style.css). */
+:root{--bg:#EBEFF4;--surface:#FFFFFF;--ink:#12203A;--muted:#5A6781;--line:#D2D9E4;--accent:#C2500F;--plate:#12203A;--onplate:#F4F6FA;--good:#1D7A46;color-scheme:light}
+@media (prefers-color-scheme: dark){:root{--bg:#0D1524;--surface:#162038;--ink:#E9EEF7;--muted:#9AA6BF;--line:#2A3858;--accent:#F07A35;--plate:#0A1120;--onplate:#F4F6FA;--good:#4CC27E;color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) 48px max(16px,env(safe-area-inset-left))}
+h1{font-size:28px;line-height:1.15;margin:4px 0}
+h2{font-size:19px;margin:22px 0 8px}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+button{font:inherit;font-weight:700;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:12px 16px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.5}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.preview{position:relative;width:100%;max-width:300px;aspect-ratio:9/16;background:#000;border-radius:14px;overflow:hidden;margin:12px auto}
+.preview video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.frame{position:absolute;inset:6% 18%;border:2px dashed rgba(255,255,255,.7);border-radius:40% 40% 8% 8%/18% 18% 4% 4%;pointer-events:none}
+.frame span{position:absolute;left:50%;transform:translateX(-50%);color:#fff;font-size:12px;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:6px;white-space:nowrap}
+.frame .top{top:-10px}.frame .bot{bottom:-10px}
+ol.blocks{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+ol.blocks li{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+ol.blocks .num{font-weight:800;min-width:2.6em;font-variant-numeric:tabular-nums}
+ol.blocks .txt{flex:1;min-width:0}
+ol.blocks .txt small{display:block;color:var(--muted)}
+ol.blocks .st{font-size:14px;font-weight:700;color:var(--muted)}
+ol.blocks .st.ok{color:var(--good)}
+ol.blocks li.opt .num::after{content:"*";color:var(--muted)}
+ol.blocks button{padding:6px 10px;font-size:14px}
+label.chk{display:flex;gap:8px;align-items:center}
+/* the run screen: read from 6 to 10 feet away */
+#run{position:fixed;inset:0;background:var(--plate);color:var(--onplate);display:flex;flex-direction:column;padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+#run .top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700}
+#run .rec{display:inline-flex;align-items:center;gap:6px;color:#FF6B6B}
+#run .rec::before{content:"";width:12px;height:12px;border-radius:50%;background:#FF4040}
+#run .mid{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:12px;min-height:0}
+#bigtxt{font-size:clamp(44px,15vw,96px);font-weight:900;line-height:1.05;text-wrap:balance}
+#bigtxt.sym{font-size:clamp(120px,48vw,260px)}
+#subtxt{font-size:clamp(18px,5vw,26px);color:#C9D3E6;max-width:30ch;text-wrap:balance}
+#count{font-size:clamp(60px,22vw,140px);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
+#run .mini{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));width:84px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;background:#000;opacity:.8}
+#run .mini video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+#run .bottom{display:flex;gap:10px;justify-content:center}
+#run .bottom button{background:transparent;color:var(--onplate);border-color:#3A4A6E;min-width:120px}
+#run.flash{background:#24365E}
+@media (prefers-reduced-motion: reduce){#run{transition:none}}
+.err{color:#C0392B;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap" id="home">
+  <p class="muted" style="margin:0"><a href="./" style="color:var(--accent)">Hoops Ladder</a> · move check</p>
+  <h1>Move Check Recorder</h1>
+  <p class="muted">A guided session that films you doing each dribble move while it calls them out, so every rep comes labeled. About 25 minutes. Clips stay on this phone until you save or share them.</p>
+
+  <div class="card">
+    <strong>Setup</strong>
+    <ul style="margin:6px 0 0;padding-left:20px">
+      <li>Prop the phone upright at about eye height, 6 to 10 feet away, screen facing you.</li>
+      <li>Your whole body in the outline, head to feet, with a little room on each side.</li>
+      <li>Turn the volume up. It talks you through each block, counts down, then calls each rep.</li>
+      <li>Perfect moves aren't needed. Go at a speed that keeps the move clean.</li>
+    </ul>
+    <div class="preview"><video id="pv" playsinline muted autoplay></video><div class="frame"><span class="top">head</span><span class="bot">feet</span></div></div>
+    <p id="camMsg" class="muted" style="text-align:center;margin:0">Camera is off.</p>
+    <div class="row" style="justify-content:center;margin-top:10px">
+      <button id="camBtn">Turn on camera</button>
+      <button id="startBtn" class="primary" disabled>Start session</button>
+    </div>
+    <label class="chk" style="margin-top:12px"><input type="checkbox" id="optChk" checked> Include the optional blocks (marked *)</label>
+  </div>
+
+  <h2>Blocks</h2>
+  <p class="muted" style="margin-top:0">The session runs them in order, with a short rest between. To redo one, tap Record on it.</p>
+  <ol class="blocks" id="list"></ol>
+
+  <h2>Send the clips</h2>
+  <div class="card">
+    <p style="margin-top:0">When you're done, tap <strong>Share all</strong> and pick Google Drive, or <strong>Save all</strong> to download them, then add them to the project. Each clip comes with a small labels file listing every call and when it happened.</p>
+    <div class="row"><button id="shareAll" class="primary">Share all</button><button id="saveAll">Save all</button><button id="clearAll">Delete all clips</button></div>
+    <p id="saveMsg" class="muted" style="margin-bottom:0"></p>
+  </div>
+</div>
+
+<div id="run" hidden>
+  <div class="top"><span id="runBlock"></span><span id="runRec" class="rec" hidden>REC</span></div>
+  <div class="mid">
+    <div id="count" hidden></div>
+    <div id="bigtxt"></div>
+    <div id="subtxt"></div>
+  </div>
+  <div class="mini"><video id="mv" playsinline muted autoplay></video></div>
+  <div class="bottom"><button id="pauseBtn">Pause</button><button id="stopBtn">Stop</button></div>
+</div>
+
+<script>
+"use strict";
+// ---- the session plan (matches reviews/eyes-up-signals/recording_plan.md in the project) ----
+// Each call: text (shown and spoken), move, hand (the hand the ball should end in: L/R, or null), variant.
+const C = (text, move, hand, variant) => ({ text, move, hand: hand || null, variant: variant || null });
+const alt = (n, f) => Array.from({ length: n }, (_, i) => f(i % 2 ? "R" : "L"));
+const side = h => h === "L" ? "left" : "right";
+const SIGNALS = [["←", "hand", "L", "Left hand"], ["→", "hand", "R", "Right hand"], ["↓", "between", null, "Between"], ["↺", "behind", null, "Behind"], ["✋", "retreat", null, "Retreat"], ["●", "pound", null, "Pound"]];
+function shuffled(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function mixedCalls() { // random moves; each one starts from the hand the last one ended in
+  const moves = [["Cross", "cross"], ["Cross", "cross"], ["Staggered between", "between", "staggered"], ["Square between", "between", "square"], ["Behind", "behind"], ["Retreat", "retreat"]];
+  const a = []; let cur = "R";
+  for (let i = 0; i < 18; i++) {
+    if (i === 6 || i === 12) a.push(C("Lose it on purpose. Pick it up with your " + side(cur) + " hand", "fumble", cur));
+    const m = moves[Math.floor(Math.random() * moves.length)];
+    if (m[1] === "retreat") a.push(C("Retreat", "retreat", cur));
+    else { cur = cur === "L" ? "R" : "L"; a.push(C(m[0] + " " + side(cur), m[1], cur, m[2])); }
+  }
+  return a;
+}
+function signalCalls() { // like the Eyes-Up Signals drill: silent, 75 s, a signal every 1.8 to 3.4 s
+  const out = []; let t = 0, last = -1;
+  while (t < 75) { let k; do k = Math.floor(Math.random() * SIGNALS.length); while (k === last); last = k; const s = SIGNALS[k]; out.push({ ...C(s[0], s[1], s[2]), meaning: s[3], gap: 1.8 + Math.random() * 1.6 }); t += out[out.length - 1].gap; }
+  return out;
+}
+const BLOCKS = [
+  { id: "01", name: "Crossover", start: "Ball in your right hand.", how: "Low, wide crossovers below the knees. On each call, cross to that hand.", gap: 3, calls: () => alt(15, h => C("Cross " + side(h), "cross", h)) },
+  { id: "02a", name: "Between, staggered stance", start: "Ball in your right hand, left foot forward.", how: "Staggered stance, sit low, ball between your knees front to back. Switch feet each time. On each call, go between to that hand.", gap: 3.4, calls: () => alt(15, h => C("Between " + side(h), "between", h, "staggered")) },
+  { id: "02b", name: "Between, square stance", start: "Ball in your right hand, feet even and wide.", how: "Defensive stance, feet even, sit low, ball between your legs side to side. On each call, go between to that hand.", gap: 3, calls: () => alt(15, h => C("Between " + side(h), "between", h, "square")) },
+  { id: "03", name: "Behind the back", start: "Ball in your right hand.", how: "Wrap the ball behind your hips to the other hand. On each call, go behind to that hand.", gap: 3.4, calls: () => alt(15, h => C("Behind " + side(h), "behind", h)) },
+  { id: "04", name: "Retreat", start: "Ball in your right hand.", how: "Two dribbles back with the same hand while your feet slide back, then step back to where you started. Halfway through, switch to your left hand when it says so.", gap: 4.5, calls: () => [...Array(7)].map(() => C("Retreat", "retreat", "R")).concat([C("Switch to your left hand", "switch", "L")], [...Array(7)].map(() => C("Retreat", "retreat", "L"))) },
+  { id: "05", name: "Pound only", start: "Ball in your right hand.", how: "Just pound the ball, no moves. Thirty seconds per hand. This is the baseline.", gap: 30, calls: () => [C("Pound right", "pound", "R"), C("Switch. Pound left", "pound", "L")] },
+  { id: "06", opt: 1, name: "Narrow crossover", start: "Ball in your right hand. Stand tall.", how: "Stand tall. The ball crosses just a few inches in front of your belly and lands between your feet.", gap: 3, calls: () => alt(10, h => C("Narrow cross " + side(h), "cross", h, "narrow")) },
+  { id: "07", opt: 1, name: "High crossover", start: "Ball in your right hand.", how: "Normal crossovers, but let the ball come up to your chest.", gap: 3, calls: () => alt(10, h => C("High cross " + side(h), "cross", h, "high")) },
+  { id: "08", opt: 1, name: "Standing-tall between", start: "Ball in your right hand. Legs nearly straight.", how: "Legs nearly straight, no knee bend, feet close together, ball pushed through from up high.", gap: 3.4, calls: () => alt(10, h => C("Tall between " + side(h), "between", h, "tall")) },
+  { id: "09", opt: 1, name: "Failed between", start: "Ball in your right hand.", how: "Start a between, but let the ball come back out the front on the same side, and catch it with the same hand.", gap: 3.4, calls: () => [...Array(10)].map(() => C("Failed between", "between_failed", "R")) },
+  { id: "10", opt: 1, name: "Around the hip", start: "Ball in your right hand.", how: "A lazy behind the back: the ball goes around your side instead of behind you, and your wrist stays in view.", gap: 3.4, calls: () => alt(10, h => C("Around the hip " + side(h), "behind", h, "around_hip")) },
+  { id: "11", opt: 1, name: "Failed behind", start: "Ball in your right hand.", how: "Swing your arm behind you, but let the ball bounce in front, and pick it up with the other hand.", gap: 3.4, calls: () => alt(10, h => C("Failed behind " + side(h), "behind_failed", h)) },
+  { id: "12", opt: 1, name: "Fake retreat", start: "Ball in your right hand.", how: "First, pull the dribble back without moving your feet. Then, when it says so, retreat and cross over at the same time.", gap: 4, calls: () => [...Array(6)].map(() => C("Fake retreat", "retreat_fake", "R")).concat(alt(6, h => C("Retreat and cross " + side(h), "retreat_cross", h))) },
+  { id: "13", opt: 1, name: "Turned 45 degrees", start: "Turn your body about 45 degrees to your right. Ball in your right hand.", how: "Same moves, body turned about 45 degrees to the phone: crossovers, both betweens, then behind the back.", gap: 3.4, calls: () => [].concat(alt(5, h => C("Cross " + side(h), "cross", h, "turned")), alt(5, h => C("Staggered between " + side(h), "between", h, "staggered_turned")), alt(5, h => C("Square between " + side(h), "between", h, "square_turned")), alt(5, h => C("Behind " + side(h), "behind", h, "turned"))) },
+  { id: "14", opt: 1, name: "Mixed bag", start: "Face the phone. Ball in your right hand.", how: "Random moves. Twice it will tell you to lose the ball on purpose. Pick it up and keep going.", gap: 3.4, calls: mixedCalls },
+  { id: "15a", name: "Eyes-Up Signals, round 1", silent: 1, start: "Face the phone. Live pound dribble.", how: "Like the drill: no voice, just a beep and a signal. Left or right arrow: get the ball to that hand. Down arrow: between. Circle arrow: behind. Hand: two retreat dribbles. Dot: keep pounding.", calls: signalCalls },
+  { id: "15b", name: "Eyes-Up Signals, round 2", silent: 1, start: "Face the phone. Live pound dribble.", how: "Same as round 1. Eyes on the signal.", calls: signalCalls },
+];
+
+// ---- small helpers ----
+const $ = s => document.querySelector(s);
+const ctl = { paused: false, stop: false };
+async function sleep(sec) { const end = performance.now() + sec * 1000; while (performance.now() < end) { if (ctl.stop) throw new Error("stopped"); await new Promise(r => setTimeout(r, 50)); } }
+async function waitWhilePaused() { while (ctl.paused) { if (ctl.stop) throw new Error("stopped"); await new Promise(r => setTimeout(r, 100)); } }
+let actx = null;
+function beep(freq = 880, ms = 140) { try { actx = actx || new AudioContext(); const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = freq; g.gain.value = .25; o.connect(g).connect(actx.destination); o.start(); o.stop(actx.currentTime + ms / 1000); } catch (e) {} }
+function say(text, wait) {
+  return new Promise(res => {
+    if (!("speechSynthesis" in window)) return res();
+    try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.rate = 1.05; u.lang = "en-US"; u.onend = u.onerror = () => res(); speechSynthesis.speak(u); if (!wait) res(); setTimeout(res, 2000 + text.length * 90); } catch (e) { res(); }
+  });
+}
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+// ---- storage: clips live in IndexedDB on this phone ----
+let dbp = null;
+function db() { return dbp || (dbp = new Promise((res, rej) => { const r = indexedDB.open("movecheck", 1); r.onupgradeneeded = () => r.result.createObjectStore("clips", { keyPath: "id" }); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })); }
+async function tx(mode, f) { const d = await db(); return new Promise((res, rej) => { const t = d.transaction("clips", mode); const out = f(t.objectStore("clips")); t.oncomplete = () => res(out && out.result); t.onerror = () => rej(t.error); }); }
+const putClip = c => tx("readwrite", s => s.put(c));
+const allClips = () => tx("readonly", s => s.getAll());
+const clearClips = () => tx("readwrite", s => s.clear());
+
+// ---- camera and recording ----
+let stream = null;
+async function camOn() {
+  if (stream) return true;
+  const v = { facingMode: "user", width: { ideal: 720 }, height: { ideal: 1280 }, frameRate: { ideal: 30 } };
+  try { stream = await navigator.mediaDevices.getUserMedia({ video: v, audio: true }); }
+  catch (e) { try { stream = await navigator.mediaDevices.getUserMedia({ video: v }); } catch (e2) { $("#camMsg").innerHTML = '<span class="err">Camera blocked.</span> Allow camera access for this site in the browser settings, then reload.'; return false; } }
+  $("#pv").srcObject = stream; $("#mv").srcObject = stream;
+  const s = stream.getVideoTracks()[0].getSettings();
+  $("#camMsg").textContent = "Camera on" + (s.width ? ` (${s.width}×${s.height})` : "") + ". Line yourself up in the outline.";
+  $("#startBtn").disabled = false; $("#camBtn").hidden = true;
+  return true;
+}
+function pickMime() { for (const m of ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"]) if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m; return ""; }
+function startRecorder() {
+  return new Promise((res, rej) => {
+    const mime = pickMime(), chunks = [];
+    const r = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 1500000 } : {});
+    r.ondataavailable = e => e.data.size && chunks.push(e.data);
+    r.onstart = () => res({ r, t0: performance.now(), chunks, mime: r.mimeType || mime || "video/webm" });
+    r.onerror = e => rej(e.error || e);
+    r.start(1000);
+  });
+}
+function stopRecorder(h) { return new Promise(res => { h.r.onstop = () => res(new Blob(h.chunks, { type: h.mime })); h.r.stop(); }); }
+
+// ---- the run screen ----
+function show(big, sub, opts = {}) { const b = $("#bigtxt"); b.textContent = big || ""; b.className = opts.sym ? "sym" : ""; $("#subtxt").textContent = sub || ""; }
+async function countdown(n, label) { const c = $("#count"); c.hidden = false; for (let i = n; i > 0; i--) { await waitWhilePaused(); c.textContent = i; if (i <= 3) beep(660, 100); if (label && i === n) say(label); await sleep(1); } c.hidden = true; }
+function flash() { const r = $("#run"); r.classList.add("flash"); setTimeout(() => r.classList.remove("flash"), 250); }
+
+async function runBlock(b) {
+  $("#runBlock").textContent = "Block " + b.id + " · " + b.name;
+  show(b.name, b.how);
+  await say("Block " + b.id.replace(/^0/, "") + ". " + b.name + ". " + b.how, true);
+  await waitWhilePaused();
+  show("Get set", b.start);
+  await say(b.start, true);
+  await countdown(5);
+  const calls = b.calls(), h = await startRecorder(), log = [];
+  $("#runRec").hidden = false; $("#pauseBtn").disabled = true;
+  try {
+    show("", ""); await sleep(1.5);
+    for (let i = 0; i < calls.length; i++) {
+      const c = calls[i], t = (performance.now() - h.t0) / 1000;
+      log.push({ i, t: +t.toFixed(3), ...c, gap: undefined });
+      show(c.text, b.silent ? "" : `${i + 1} of ${calls.length}`, { sym: !!b.silent });
+      beep(); flash(); if (!b.silent) say(c.text);
+      await sleep(c.gap || b.gap);
+    }
+    show("Done", "Keep dribbling for a second."); await sleep(2);
+  } catch (e) { await stopRecorder(h); $("#runRec").hidden = true; $("#pauseBtn").disabled = false; throw e; }
+  const blob = await stopRecorder(h);
+  $("#runRec").hidden = true; $("#pauseBtn").disabled = false;
+  const v = stream.getVideoTracks()[0].getSettings();
+  const labels = { block: b.id, name: b.name, recordedAt: new Date().toISOString(), mime: h.mime, video: { width: v.width, height: v.height, mirrored: false }, silent: !!b.silent, note: "t is seconds from the start of the clip; hand is the hand the ball should end in", calls: log };
+  await putClip({ id: b.id, name: b.name, blob, labels, at: Date.now() });
+  await renderList();
+}
+
+async function runFrom(startIdx, onlyOne) {
+  if (!(await camOn())) return;
+  ctl.stop = false; ctl.paused = false; $("#pauseBtn").textContent = "Pause";
+  try { await navigator.wakeLock?.request("screen"); } catch (e) {}
+  beep(1, 1); // unlock audio from the tap
+  $("#home").hidden = true; $("#run").hidden = false;
+  const plan = BLOCKS.filter((b, i) => i >= startIdx && (onlyOne ? i === startIdx : (!b.opt || $("#optChk").checked)));
+  try {
+    for (let k = 0; k < plan.length; k++) {
+      await runBlock(plan[k]);
+      if (k < plan.length - 1) {
+        const nx = plan[k + 1];
+        show("Rest", "Next: block " + nx.id + ", " + nx.name);
+        say("Nice. Rest. Next up, " + nx.name + ".");
+        $("#count").hidden = false; for (let i = 20; i > 0; i--) { await waitWhilePaused(); $("#count").textContent = i; await sleep(1); } $("#count").hidden = true;
+      }
+    }
+    show("All done", "Tap Stop, then Share all to send the clips."); say("All done. Great work.");
+    $("#stopBtn").textContent = "Finish";
+    await new Promise(r => { const f = () => { $("#stopBtn").removeEventListener("click", f); r(); }; $("#stopBtn").addEventListener("click", f); });
+  } catch (e) { if (e.message !== "stopped") alertMsg("Something went wrong: " + e.message); }
+  speechSynthesis?.cancel();
+  $("#stopBtn").textContent = "Stop"; $("#count").hidden = true;
+  $("#run").hidden = true; $("#home").hidden = false;
+}
+function alertMsg(m) { $("#saveMsg").textContent = m; }
+
+// ---- block list ----
+async function renderList() {
+  let clips = []; try { clips = await allClips(); } catch (e) {}
+  const have = new Map(clips.map(c => [c.id, c]));
+  const ol = $("#list"); ol.textContent = "";
+  BLOCKS.forEach((b, i) => {
+    const li = document.createElement("li"); if (b.opt) li.className = "opt";
+    const c = have.get(b.id);
+    li.innerHTML = `<span class="num">${b.id}</span><span class="txt"><strong></strong><small></small></span><span class="st${c ? " ok" : ""}">${c ? "✓ " + (c.blob.size / 1e6).toFixed(1) + " MB" : ""}</span><button type="button">${c ? "Redo" : "Record"}</button>`;
+    li.querySelector("strong").textContent = b.name; li.querySelector("small").textContent = b.how;
+    li.querySelector("button").onclick = () => runFrom(i, true);
+    ol.appendChild(li);
+  });
+  $("#saveMsg").textContent = clips.length ? `${clips.length} clip${clips.length > 1 ? "s" : ""} saved on this phone.` : "No clips yet.";
+}
+
+// ---- saving and sharing ----
+function clipFiles(c) {
+  const ext = /mp4/.test(c.blob.type) ? "mp4" : "webm", base = `movecheck_${c.id}_${slug(c.name)}`;
+  return [new File([c.blob], base + "." + ext, { type: c.blob.type }), new File([JSON.stringify(c.labels, null, 1)], base + ".json", { type: "application/json" })];
+}
+function download(f) { const a = document.createElement("a"); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000); }
+$("#saveAll").onclick = async () => { const cs = await allClips(); if (!cs.length) return alertMsg("No clips yet."); for (const c of cs.sort((a, b) => a.id.localeCompare(b.id))) for (const f of clipFiles(c)) { download(f); await new Promise(r => setTimeout(r, 700)); } alertMsg("Downloading " + cs.length * 2 + " files. If the browser asks to allow multiple downloads, allow it."); };
+$("#shareAll").onclick = async () => {
+  const cs = await allClips(); if (!cs.length) return alertMsg("No clips yet.");
+  const files = cs.sort((a, b) => a.id.localeCompare(b.id)).flatMap(clipFiles);
+  if (navigator.canShare && navigator.canShare({ files })) { try { await navigator.share({ files, title: "Move check clips" }); alertMsg("Shared."); } catch (e) { if (e.name !== "AbortError") alertMsg("Sharing didn't work (" + e.message + "). Try Save all."); } }
+  else alertMsg("This browser can't share files. Use Save all instead.");
+};
+let clearArmed = false;
+$("#clearAll").onclick = async () => { if (!clearArmed) { clearArmed = true; $("#clearAll").textContent = "Tap again to delete"; setTimeout(() => { clearArmed = false; $("#clearAll").textContent = "Delete all clips"; }, 3000); return; } await clearClips(); clearArmed = false; $("#clearAll").textContent = "Delete all clips"; renderList(); };
+
+$("#camBtn").onclick = camOn;
+$("#startBtn").onclick = () => runFrom(0, false);
+$("#pauseBtn").onclick = () => { ctl.paused = !ctl.paused; $("#pauseBtn").textContent = ctl.paused ? "Resume" : "Pause"; if (ctl.paused) speechSynthesis?.cancel(); };
+$("#stopBtn").onclick = () => { if ($("#stopBtn").textContent === "Stop") ctl.stop = true; };
+if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) $("#camMsg").innerHTML = '<span class="err">This browser can\'t record video.</span> Open this page in Chrome on your phone.';
+renderList();
+</script>
+</body>
+</html>
