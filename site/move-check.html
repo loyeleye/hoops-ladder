@@ -62,7 +62,7 @@ label.chk{display:flex;gap:8px;align-items:center}
 #run.framing .mini{aspect-ratio:auto;width:min(80vw,340px)}#run.framing .mini video{height:auto;display:block;object-fit:contain} /* the whole picture the check sees */
 #run.framing #bigtxt{font-size:clamp(34px,11vw,72px)}
 #run.framing .mid{justify-content:flex-start;padding-top:4vh}
-#run .bottom{display:flex;gap:10px;justify-content:center}
+#run .bottom{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 #run .bottom button{background:transparent;color:var(--onplate);border-color:#3A4A6E;min-width:100px}
 #run .bottom #redoBtn{background:var(--accent);border-color:var(--accent);color:#fff}
 #run.flash{background:#24365E}
@@ -80,7 +80,7 @@ label.chk{display:flex;gap:8px;align-items:center}
     <strong>Setup</strong>
     <ul style="margin:6px 0 0;padding-left:20px">
       <li>Prop the phone upright at about eye height, 6 to 10 feet away, screen facing you.</li>
-      <li>Your whole body in the picture, head to feet, with a little room on each side. Before each block it checks this and tells you out loud to move back, closer, left or right. The check runs on the phone; nothing is sent anywhere.</li>
+      <li>Your whole body in the picture, head to feet, with a little room on each side. Before each block it checks this and tells you out loud to move back, closer, left or right. The check runs on the phone; nothing is sent anywhere. In a small room where your feet won't fit, turn on <strong>Close quarters</strong> below (or tap it during the line-up): head down to the middle of your thighs is then enough, and each clip's labels say which framing it used.</li>
       <li>Turn the volume up. It talks you through each block, counts down, then calls each rep.</li>
       <li>Perfect moves aren't needed. Go at a speed that keeps the move clean.</li>
       <li>Each block shows its steps first, then counts down from 10. Tap Pause if you need longer. Messed a block up? Tap Redo during the rest.</li>
@@ -101,6 +101,7 @@ label.chk{display:flex;gap:8px;align-items:center}
     </div>
     <label class="chk" style="margin-top:12px"><input type="checkbox" id="optChk"> Include the optional blocks (marked *)</label>
     <label class="chk" style="margin-top:6px"><input type="checkbox" id="frameChk" checked> Line me up by voice before each block (head to feet in the picture)</label>
+    <label class="chk" style="margin-top:6px"><input type="checkbox" id="closeChk"> Close quarters: no room for my feet, so head down to the thighs is enough</label>
   </div>
 
   <h2>Blocks</h2>
@@ -123,7 +124,7 @@ label.chk{display:flex;gap:8px;align-items:center}
     <div id="subtxt"></div>
   </div>
   <div class="mini"><video id="mv" playsinline muted autoplay></video></div>
-  <div class="bottom"><button id="redoBtn" hidden>Redo</button><button id="pauseBtn">Pause</button><button id="stopBtn">Stop</button></div>
+  <div class="bottom"><button id="closeBtn" hidden>Close quarters</button><button id="redoBtn" hidden>Redo</button><button id="pauseBtn">Pause</button><button id="stopBtn">Stop</button></div>
 </div>
 
 <script>
@@ -284,15 +285,27 @@ function loadPose() {
 }
 // What to say, from one frame's landmarks (x, y from 0 to 1 in the camera's own picture, not the mirrored preview).
 // The front camera faces you, so the picture's left edge is your right side: drifting toward it means step left.
-function frameAdvice(lm) {
+// close: close quarters, for a room too small to fit your feet. Head down to the middle of your thighs is enough (the
+// pose model needs your head to find you at all, so the bottom of you is the part that gets cut).
+function frameAdvice(lm, close) {
   if (!lm) return { k: "none", say: "I can't see you. Stand in front of the phone." };
-  const vis = i => (lm[i].visibility ?? 1) > .5;
+  // a joint the model guesses from outside the picture can still say it's visible, so it has to be in the picture too
+  const vis = i => (lm[i].visibility ?? 1) > .5 && lm[i].y > -.02 && lm[i].y < 1.02 && lm[i].x > -.02 && lm[i].x < 1.02;
   const feet = [27, 28, 29, 30, 31, 32].filter(vis), hands = [15, 16, 17, 18, 19, 20].filter(vis);
   const head = lm[0].y - .6 * Math.abs(((lm[11].y + lm[12].y) / 2) - lm[0].y); // top of the head, about
   const footY = feet.length ? Math.max(...feet.map(i => lm[i].y)) : 1.1;
   const tall = footY - head, cx = (lm[11].x + lm[12].x + lm[23].x + lm[24].x) / 4;
   const xs = [11, 12, 23, 24, ...hands, ...feet].map(i => lm[i].x);
   const cutTop = head < .02, cutFeet = feet.length < 4 || footY > .97;
+  if (close && cutFeet) {
+    const sh = (lm[11].y + lm[12].y) / 2, hip = (lm[23].y + lm[24].y) / 2, thigh = hip + .3 * Math.max(.03, hip - sh);
+    if (cutTop || !vis(23) || !vis(24) || thigh > .99) return { k: "back", say: cutTop ? "Move back a little. Your head is cut off." : "Move back a little. Get your hips and the top of your legs in." };
+    const xs = [11, 12, 23, 24, ...hands].map(i => lm[i].x);
+    if (cx < .38 || Math.min(...xs) < .04) return { k: "left", say: "Step to your left." };
+    if (cx > .62 || Math.max(...xs) > .96) return { k: "right", say: "Step to your right." };
+    if (thigh - head < .3) return { k: "closer", say: "Come a little closer." };
+    return { k: "ok", say: "Perfect. Stay right there." };
+  }
   if (cutTop || cutFeet) return { k: "back", say: cutFeet && !cutTop ? "Move back a little. Your feet are cut off." : cutTop && !cutFeet ? "Move back a little. Your head is cut off." : "Move back a little." };
   if (cx < .38 || Math.min(...xs) < .04) return { k: "left", say: "Step to your left." };
   if (cx > .62 || Math.max(...xs) > .96) return { k: "right", say: "Step to your right." };
@@ -309,7 +322,9 @@ async function lineUp() {
   show("Lining up", "Loading the body tracker…");
   try { pl = await loadPose(); } catch (e) { show("Get set", "The body tracker didn't load, so check the picture yourself."); await say("Check that your whole body is in the picture.", true); return; }
   run.classList.add("framing"); ctl.skip = false; $("#redoBtn").textContent = "Start anyway"; $("#redoBtn").hidden = false;
-  let last = "", saidAt = 0, okSince = 0, lastT = 0;
+  let last = "", saidAt = 0, okSince = 0, lastT = 0, feetSince = 0, offered = false;
+  // Feet cut off for a while: offer close quarters (head to thighs), once per line-up.
+  $("#closeBtn").hidden = $("#closeChk").checked;
   try {
     while (!ctl.skip) {
       await waitWhilePaused();
@@ -318,15 +333,18 @@ async function lineUp() {
       if (v.readyState < 2) continue;
       const now = performance.now(); if (now <= lastT) continue; lastT = now;
       let lm = null; try { const r = pl.detectForVideo(v, now); lm = r.landmarks && r.landmarks[0] || null; } catch (e) { continue; }
-      const a = frameAdvice(lm);
+      const close = $("#closeChk").checked, a = frameAdvice(lm, close);
       run.classList.toggle("ok", a.k === "ok");
-      show(FRAME_SHOW[a.k], a.k === "ok" ? "Hold still for a second." : a.say);
+      const feetCut = !close && a.k === "back" && /feet/.test(a.say);
+      feetSince = feetCut ? feetSince || now : 0;
+      if (feetCut && now - feetSince > 6000 && !offered) { offered = true; say("No room to fit your feet? Tap close quarters, and head to thighs is enough."); saidAt = now; last = a.k; }
+      show(FRAME_SHOW[a.k], a.k === "ok" ? "Hold still for a second." : offered && feetCut ? a.say + " No room? Tap Close quarters." : a.say);
       if (a.k === "ok") { okSince = okSince || now; if (now - okSince > 1500) { await say(a.say, true); break; } }
       else okSince = 0;
       if (a.k !== "ok" && (a.k !== last || now - saidAt > 4000)) { say(a.say); saidAt = now; }
       last = a.k;
     }
-  } finally { run.classList.remove("framing", "ok"); $("#redoBtn").hidden = true; $("#redoBtn").textContent = "Redo"; ctl.skip = false; }
+  } finally { run.classList.remove("framing", "ok"); $("#closeBtn").hidden = true; $("#redoBtn").hidden = true; $("#redoBtn").textContent = "Redo"; ctl.skip = false; }
 }
 
 async function runBlock(b) {
@@ -355,7 +373,7 @@ async function runBlock(b) {
   const blob = await stopRecorder(h);
   $("#runRec").hidden = true; $("#pauseBtn").disabled = false;
   const v = stream.getVideoTracks()[0].getSettings();
-  const labels = { block: b.id, name: b.name, recordedAt: new Date().toISOString(), mime: h.mime, video: { width: v.width, height: v.height, mirrored: false, camera: cam.face === "user" ? "front" : "back", lens: (stream.getVideoTracks()[0].label || ""), zoom: v.zoom ?? null }, silent: !!b.silent, note: "t is seconds from the start of the clip; hand is the hand the ball should end in", calls: log };
+  const labels = { block: b.id, name: b.name, recordedAt: new Date().toISOString(), mime: h.mime, framing: $("#closeChk").checked ? "close" : "full", video: { width: v.width, height: v.height, mirrored: false, camera: cam.face === "user" ? "front" : "back", lens: (stream.getVideoTracks()[0].label || ""), zoom: v.zoom ?? null }, silent: !!b.silent, note: "t is seconds from the start of the clip; hand is the hand the ball should end in", calls: log };
   await putClip({ id: b.id, name: b.name, blob, labels, at: Date.now() });
   await renderList();
 }
@@ -427,6 +445,7 @@ $("#lens").onchange = () => { cam.id = $("#lens").value; cam.zoom = null; saveCa
 camUI();
 $("#startBtn").onclick = () => runFrom(0, false);
 $("#redoBtn").onclick = () => { if ($("#run").classList.contains("framing")) { ctl.skip = true; return; } ctl.redo = true; ctl.paused = false; $("#pauseBtn").textContent = "Pause"; };
+$("#closeBtn").onclick = () => { $("#closeChk").checked = true; $("#closeBtn").hidden = true; say("Close quarters. Head down to your thighs in the picture."); };
 $("#pauseBtn").onclick = () => { ctl.paused = !ctl.paused; $("#pauseBtn").textContent = ctl.paused ? "Resume" : "Pause"; if (ctl.paused) speechSynthesis?.cancel(); };
 $("#stopBtn").onclick = () => { if ($("#stopBtn").textContent === "Stop") ctl.stop = true; };
 if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) $("#camMsg").innerHTML = '<span class="err">This browser can\'t record video.</span> Open this page in Chrome on your phone.';
