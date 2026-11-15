@@ -768,6 +768,7 @@
 .scx .sc-msg{position:absolute;left:16px;right:16px;top:16px;text-align:center;background:rgba(5,8,15,.8);border-radius:14px;padding:10px 12px;transition:background .25s}
 .scx .sc-msg b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(38px,11vw,52px);line-height:1;text-transform:uppercase;letter-spacing:.02em}
 .scx .sc-msg span{display:block;font-size:16px;font-weight:600;margin-top:4px}.scx .sc-msg span:empty{display:none}
+.scx .sc-cq{margin:10px auto 2px;min-height:48px;font-size:17px;padding:10px 20px}
 .scx.fix .sc-msg b{color:#FFC23D}
 .scx.ok .sc-msg{background:#1E8657}
 .scx.count .sc-frame::after{animation:none}
@@ -834,7 +835,8 @@
       none: ["Step into the picture", "Stand where the phone can see all of you.", "Step into the picture."],
       feet: ["Farther from the phone", "Your feet are cut off.", "Move farther from the phone. Your feet are cut off."],
       head: ["Farther from the phone", "Your head is cut off.", "Move farther from the phone. Your head is cut off."],
-      feetq: ["Farther from the phone", "Your feet are cut off. No room to back up? Tap Close quarters.", "Move farther from the phone. No room to back up? Use close quarters."],
+      // after 25 s of feet cut off; the check still goes green if you do get head to feet in
+      feetq: ["Farther from the phone", "No room to back up? Use close quarters: head to thighs is enough.", "Your feet are still cut off. No room to back up? Tap close quarters."],
       hips: ["Farther from the phone", "Close quarters: get your hips and the top of your legs in.", "Move back a little. Get your hips and the top of your legs in."],
       room: ["Farther from the phone", "Leave room above your hands for the release.", "Move a little farther from the phone, so your hands stay in at the release."],
       far: ["Closer to the phone", "You're small in the picture, so the tracking gets shaky.", "Come a few steps closer to the phone."],
@@ -858,7 +860,7 @@
       el.setAttribute("aria-label", "Get set");
       el.innerHTML = `<div class="sc-top"><div class="sc-title">Get set <span>· ${esc(o.title || "")}</span></div><button class="btn sec small" data-sc="close">Back</button></div>
         <div class="sc-stage"><div class="sc-frame${o.mirror ? " mir" : ""}"><video playsinline muted autoplay></video><canvas></canvas><div class="sc-hold"></div></div>
-          <div class="sc-msg" role="status" aria-live="polite"><b></b><span></span></div><div class="sc-big num" aria-live="assertive"></div></div>
+          <div class="sc-msg" role="status" aria-live="polite"><b></b><span></span><button class="btn pri sc-cq" data-sc="cq" hidden>Use close quarters</button></div><div class="sc-big num" aria-live="assertive"></div></div>
         <div class="sc-low"></div>`;
       document.body.appendChild(el);
       const s = SC = { o, el, video: el.querySelector("video"), cv: el.querySelector("canvas"), frame: el.querySelector(".sc-frame"),
@@ -959,23 +961,28 @@
       if (s.o.getLm) lm = s.o.getLm();
       else if (s.pl && v.readyState >= 2) { try { const r = s.pl.detectForVideo(v, now); lm = r && r.landmarks && r.landmarks[0]; } catch (e) {} }
       const j = s.j = lm ? scJudge(lm, s.o.kind, s.ready || s.okAt > 0, s.o.view, v.videoWidth / v.videoHeight, s.close) : { k: "none" };
-      // feet cut off for 5 s where close quarters is allowed: offer it
-      s.feetAt = j.k === "feet" && s.o.close && !s.close ? s.feetAt || now : 0;
+      // feet cut off for 25 s where close quarters is allowed: offer it (a button in the banner and a spoken prompt)
+      // (a dropped frame or a moment in view doesn't restart the 25 s; 2 s of your feet in does)
+      if (j.k === "feet" && s.o.close && !s.close) { s.feetAt = s.feetAt || now; s.feetOk = 0; }
+      else if (s.feetAt && (s.close || (s.feetOk = s.feetOk || now, now - s.feetOk > 2000))) s.feetAt = 0;
       // Green after 0.8 s in a good spot. It stays green for 15 s even if you walk up to tap Go, then needs you back.
       if (j.k === "ok") { s.badAt = 0; s.setAt = s.ready ? now : s.setAt; s.okAt = s.okAt || now; if (!s.ready && now - s.okAt > 800) scSetReady(s, true); }
       else { s.badAt = s.badAt || now; if (now - s.badAt > 300) s.okAt = 0; if (s.ready && now - s.setAt > 15000) scSetReady(s, false); }
       const hb = s.el.querySelector(".sc-hold"), hw = !s.ready && s.okAt ? Math.min(100, (now - s.okAt) / 8) + "%" : "0";
       if (hb.style.width !== hw) hb.style.width = hw;
       // Words on screen now; said out loud once the same problem has lasted a second, and not too often.
-      const key = s.ready ? "ready" : s.noPose && !s.o.getLm ? "nopose" : s.okAt ? "hold" : s.feetAt && now - s.feetAt > 5000 ? "feetq" : j.k;
+      const key = s.ready ? "ready" : s.noPose && !s.o.getLm ? "nopose" : s.okAt ? "hold" : s.feetAt && now - s.feetAt > 25000 ? "feetq" : j.k;
       if (key !== s.key) { s.key = key; s.keyAt = now; }
-      const m = key === "ready" ? ["You're set", s.voice ? 'Say "go" or tap Go' : "Tap Go"] : SC_MSG[key];
+      const m = key === "ready" ? ["You're set", s.voice ? 'Say "go" or tap Go' : "Tap Go"]
+        : key === "feetq" && s.voice ? [SC_MSG.feetq[0], SC_MSG.feetq[1], 'Your feet are still cut off. No room to back up? Say "close quarters", or tap the button.'] : SC_MSG[key];
+      const cqb = s.el.querySelector(".sc-cq");
+      if (cqb.hidden !== (key !== "feetq")) cqb.hidden = key !== "feetq";
       const bb = s.el.querySelector(".sc-msg b"), ss = s.el.querySelector(".sc-msg span");
       if (bb.textContent !== m[0]) bb.textContent = m[0];
       if (ss.textContent !== m[1]) ss.textContent = m[1];
       s.el.classList.toggle("fix", !s.ready && key !== "none" && key !== "nopose" && key !== "hold");
       s.el.classList.toggle("hold", key === "hold");
-      if (!s.ready && m[2] && now - s.keyAt > 1100 && (s.saidKey !== key || now - s.saidAt > 4500) && now - s.saidAt > 3500 && !(window.speechSynthesis && speechSynthesis.speaking)) {
+      if (!s.ready && m[2] && now - s.keyAt > 1100 && (s.saidKey !== key || (key !== "feetq" && now - s.saidAt > 4500)) && now - s.saidAt > 3500 && !(window.speechSynthesis && speechSynthesis.speaking)) {
         s.saidKey = key; s.saidAt = now; say(m[2]);
       }
       scDraw(s, j, w, h);

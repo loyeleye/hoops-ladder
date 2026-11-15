@@ -322,7 +322,7 @@ async function lineUp() {
   show("Lining up", "Loading the body tracker…");
   try { pl = await loadPose(); } catch (e) { show("Get set", "The body tracker didn't load, so check the picture yourself."); await say("Check that your whole body is in the picture.", true); return; }
   run.classList.add("framing"); ctl.skip = false; $("#redoBtn").textContent = "Start anyway"; $("#redoBtn").hidden = false;
-  let last = "", saidAt = 0, okSince = 0, lastT = 0, feetSince = 0, offered = false;
+  let last = "", saidAt = 0, okSince = 0, lastT = 0, feetSince = 0, feetOk = 0, offered = false;
   // Feet cut off for a while: offer close quarters (head to thighs), once per line-up.
   $("#closeBtn").hidden = $("#closeChk").checked;
   try {
@@ -336,8 +336,9 @@ async function lineUp() {
       const close = $("#closeChk").checked, a = frameAdvice(lm, close);
       run.classList.toggle("ok", a.k === "ok");
       const feetCut = !close && a.k === "back" && /feet/.test(a.say);
-      feetSince = feetCut ? feetSince || now : 0;
-      if (feetCut && now - feetSince > 6000 && !offered) { offered = true; say("No room to fit your feet? Tap close quarters, and head to thighs is enough."); saidAt = now; last = a.k; }
+      // a dropped frame doesn't restart the 25 s; 2 s with your feet in does
+      if (feetCut) { feetSince = feetSince || now; feetOk = 0; } else if (feetSince && (feetOk = feetOk || now, now - feetOk > 2000)) feetSince = 0;
+      if (feetCut && now - feetSince > 25000 && !offered) { offered = true; say("No room to fit your feet? Tap close quarters, and head to thighs is enough."); saidAt = now; last = a.k; }
       show(FRAME_SHOW[a.k], a.k === "ok" ? "Hold still for a second." : offered && feetCut ? a.say + " No room? Tap Close quarters." : a.say);
       if (a.k === "ok") { okSince = okSince || now; if (now - okSince > 1500) { await say(a.say, true); break; } }
       else okSince = 0;

@@ -1224,9 +1224,11 @@ green for 15 s if you walk up to the phone to tap Go.
 *Someone's filming me: record now*. The voice part uses the HoopsVoice plugin through `hooks.listen` and only acts on
 whole phrases, never while the app itself is talking. Code: `setupCheck`, `scJudge`, `scTick`, `scCount`, `liveCheck`.
 
-**Close quarters** (live cues only, Nov 2026). In a small room the front camera can't fit you head to feet. After 5 s of
-*your feet are cut off*, the banner adds "No room to back up? Tap Close quarters", and a *Close quarters* chip (or
-saying "close quarters") switches the check to head down to the top of your thighs: your head in, your hips in with
+**Close quarters** (live cues only, Nov 2026). In a small room the front camera can't fit you head to feet. A *Close quarters* chip under
+the picture (or saying "close quarters") is there from the start. After 25 s of *your feet are cut off*, the banner
+also offers it with a *Use close quarters* button and says so once ("…say close quarters, or tap the button"); until
+you take it, the check keeps waiting for head to feet, and full view still turns it green. Close quarters switches the
+check to head down to the top of your thighs (a full view still counts): your head in, your hips in with
 about a third of a torso of thigh below them, big enough and in the middle. It's remembered for next time
 (`S.settings.scClose`), and the chip turns it off again. The bottom of you is what gets cut, never the head: the pose
 model finds a person by the face, and on a move-check clip cropped at the knees it found nobody in any of 114 frames
@@ -1404,6 +1406,18 @@ mid-shin, the knees and mid-thigh: the same dribbles (14 to 16 against 15) and t
 the full picture. Cropped right at the hips, the hand read dropped to "can't tell" in 4 of 14 half seconds, which is
 why the setup check wants some thigh in.
 
+The labeled Nov 15 clips (01 crossover, 02b square-stance between, 03 behind-the-back), cropped the same way and
+scored with `lcScore` against their call labels:
+
+| Clip | Full picture | Cut at hips + 0.5 torso | Hips + 0.3 torso | At the hips |
+|---|---|---|---|---|
+| 01 Crossover | 12/12, 123 dribbles | 12/12, 122 | 12/12, 115 | 0/0 (body found in 4% of frames) |
+| 02b Between | 12/12, 115 | 12/12, 120 | 11/12, 117 | 4/4 (31%) |
+| 03 Behind | 11/12, 127 | 11/12, 129 | 11/12, 122 | 2/3 (20%) |
+
+Down to a third of a torso below the hips, close quarters scores like the full picture (at most one call fewer).
+Cut at the hips, the hips themselves drop out and `lcFrame` has nothing to measure from.
+
 The Move Check Recorder (`site/move-check.html`) has the same fallback: a *Close quarters* box on the start screen, and
-a *Close quarters* button plus a spoken offer during the voice line-up after 6 s of feet cut off. `frameAdvice(lm,
+a *Close quarters* button plus a spoken offer during the voice line-up after 25 s of feet cut off. `frameAdvice(lm,
 close)` then wants your head in and the top of your thighs, and each clip's labels say `framing: "close"` or `"full"`.
