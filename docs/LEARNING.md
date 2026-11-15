@@ -1175,7 +1175,7 @@ is the cue graded Fix most often, or the one picked, so every tile shows the sam
 shot order or by the focus cue, two ways: *Farthest from ideal* / *Closest to ideal* go by grade, then by how far the
 value sits outside the cue's Good range (`BL_IDEAL`, the same thresholds the grading uses; inside the range, nearer
 the middle counts as closer), and *Value high to low* / *low to high* go by the raw reading (for Elbow under the ball,
-high is flared out, low is tucked in). Shots with no reading go last. The sort sticks to the burst, like the focus.
+high is flared out, low is tucked in). Shots with no reading go last. A burst opens on *Closest to ideal*; the sort you pick sticks to the burst, like the focus.
 Filter by Starred, Kept, Make, Miss, or the Fix/Watch/Good bar.
 
 **Thumbnails.** Made once, one shot at a time with a hidden video, nearest the screen first, and saved as a small JPEG

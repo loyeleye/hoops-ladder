@@ -1685,7 +1685,7 @@
   /* -- the shot library: every shot of a burst in a grid, to pick what to keep, send to a coach or delete --
      Each tile shows the focus cue (the cue with the most Fix grades, or the one picked) in colour and shape, so a
      whole session reads at a glance and shots compare on the same thing. Filters: ★, Kept, Make/Miss and grade on
-     the focus cue; sort by shot order, by how far each shot is from the cue's ideal range (farthest or closest
+     the focus cue; sort (Closest to ideal until you pick another) by shot order, by how far each shot is from the cue's ideal range (farthest or closest
      first), or by the cue's value (high to low or low to high). The sort sticks to the burst, like the focus. Select several (Select, or hold a tile) to Keep, ★, Send to
      coach or Delete video. Deleting asks first, with counts, never touches kept shots, and can be undone for a few
      seconds. Quick pick plays one shot at a time: Skip, ★ or Keep (or swipe the video), and an optional Make/Miss.
@@ -1795,7 +1795,7 @@
     el.classList.add("bl-in");
     el.addEventListener("animationend", () => el.classList.remove("bl-in"), { once: true });
     document.body.appendChild(el);
-    BL = { bid: id, el, mode: "grid", f: "all", g: null, sort: BL_SORTS.some(o => o[0] === burstFind(id).burst.sort) ? burstFind(id).burst.sort : "n", cue: null, sel: new Set(), selOn: false, from: from == null ? null : from, qi: 0, q: [], hist: [], pend: null, snack: null, ask: null, rate: .5 };
+    BL = { bid: id, el, mode: "grid", f: "all", g: null, sort: BL_SORTS.some(o => o[0] === burstFind(id).burst.sort) ? burstFind(id).burst.sort : "best", cue: null, sel: new Set(), selOn: false, from: from == null ? null : from, qi: 0, q: [], hist: [], pend: null, snack: null, ask: null, rate: .5 };
     el.addEventListener("click", blClick);
     el.addEventListener("change", blChange);
     el.addEventListener("input", e => { if (BL && BL.pk && e.target.dataset.bl === "pkq") { BL.pk.q = e.target.value; const n = BL.el.querySelector("[data-bl='pknext']"); if (n) n.disabled = !BL.pk.q.trim(); } });
