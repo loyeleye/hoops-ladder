@@ -52,6 +52,12 @@ label.chk{display:flex;gap:8px;align-items:center}
 #count{font-size:clamp(60px,22vw,140px);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums}
 #run .mini{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:calc(84px + env(safe-area-inset-bottom));width:84px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;background:#000;opacity:.8}
 #run .mini video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+/* while lining up, the camera view grows so you can see yourself from across the room */
+#run.framing .mini{width:min(46vw,260px);right:50%;transform:translateX(50%);bottom:calc(84px + env(safe-area-inset-bottom));opacity:1;border:4px solid #FFC23D}
+#run.framing.ok .mini{border-color:#2BD17E}
+#run.framing .mini{aspect-ratio:auto;width:min(80vw,340px)}#run.framing .mini video{height:auto;display:block;object-fit:contain} /* the whole picture the check sees */
+#run.framing #bigtxt{font-size:clamp(34px,11vw,72px)}
+#run.framing .mid{justify-content:flex-start;padding-top:4vh}
 #run .bottom{display:flex;gap:10px;justify-content:center}
 #run .bottom button{background:transparent;color:var(--onplate);border-color:#3A4A6E;min-width:100px}
 #run .bottom #redoBtn{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -70,7 +76,7 @@ label.chk{display:flex;gap:8px;align-items:center}
     <strong>Setup</strong>
     <ul style="margin:6px 0 0;padding-left:20px">
       <li>Prop the phone upright at about eye height, 6 to 10 feet away, screen facing you.</li>
-      <li>Your whole body in the outline, head to feet, with a little room on each side.</li>
+      <li>Your whole body in the picture, head to feet, with a little room on each side. Before each block it checks this and tells you out loud to move back, closer, left or right. The check runs on the phone; nothing is sent anywhere.</li>
       <li>Turn the volume up. It talks you through each block, counts down, then calls each rep.</li>
       <li>Perfect moves aren't needed. Go at a speed that keeps the move clean.</li>
       <li>Each block shows its steps first, then counts down from 10. Tap Pause if you need longer. Messed a block up? Tap Redo during the rest.</li>
@@ -84,6 +90,7 @@ label.chk{display:flex;gap:8px;align-items:center}
       <button id="startBtn" class="primary" disabled>Start session</button>
     </div>
     <label class="chk" style="margin-top:12px"><input type="checkbox" id="optChk"> Include the optional blocks (marked *)</label>
+    <label class="chk" style="margin-top:6px"><input type="checkbox" id="frameChk" checked> Line me up by voice before each block (head to feet in the picture)</label>
   </div>
 
   <h2>Blocks</h2>
@@ -192,6 +199,7 @@ async function camOn() {
   const s = stream.getVideoTracks()[0].getSettings();
   $("#camMsg").textContent = "Camera on" + (s.width ? ` (${s.width}×${s.height})` : "") + ". Line yourself up in the outline.";
   $("#startBtn").disabled = false; $("#camBtn").hidden = true;
+  if ($("#frameChk").checked) loadPose().catch(() => {});
   return true;
 }
 function pickMime() { for (const m of ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"]) if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m; return ""; }
@@ -212,11 +220,73 @@ function show(big, sub, opts = {}) { const b = $("#bigtxt"); b.textContent = big
 async function countdown(n, label) { const c = $("#count"); c.hidden = false; for (let i = n; i > 0; i--) { await waitWhilePaused(); c.textContent = i; if (i <= 3) beep(660, 100); if (label && i === n) say(label); await sleep(1); } c.hidden = true; }
 function flash() { const r = $("#run"); r.classList.add("flash"); setTimeout(() => r.classList.remove("flash"), 250); }
 
+// ---- lining up: the pose model finds your head, hands and feet, and the voice moves you into the picture ----
+// The same model files as the app: the website workflow copies them from www/ into the site (pose/). Loaded the first
+// time it's needed (about 6 MB plus the runtime). If it can't load, blocks start with the plain countdown.
+const MP = new URL("pose", document.baseURI).href;
+const POSE_MODEL = MP + "/pose_landmarker_lite.task";
+let poseP = null;
+function loadPose() {
+  if (!poseP) poseP = (async () => {
+    const v = await import(MP + "/vision_bundle.mjs");
+    const fs = await v.FilesetResolver.forVisionTasks(MP + "/wasm");
+    return v.PoseLandmarker.createFromOptions(fs, { baseOptions: { modelAssetPath: POSE_MODEL, delegate: "CPU" }, runningMode: "VIDEO", numPoses: 1 });
+  })().catch(e => { poseP = null; throw e; });
+  return poseP;
+}
+// What to say, from one frame's landmarks (x, y from 0 to 1 in the camera's own picture, not the mirrored preview).
+// The front camera faces you, so the picture's left edge is your right side: drifting toward it means step left.
+function frameAdvice(lm) {
+  if (!lm) return { k: "none", say: "I can't see you. Stand in front of the phone." };
+  const vis = i => (lm[i].visibility ?? 1) > .5;
+  const feet = [27, 28, 29, 30, 31, 32].filter(vis), hands = [15, 16, 17, 18, 19, 20].filter(vis);
+  const head = lm[0].y - .6 * Math.abs(((lm[11].y + lm[12].y) / 2) - lm[0].y); // top of the head, about
+  const footY = feet.length ? Math.max(...feet.map(i => lm[i].y)) : 1.1;
+  const tall = footY - head, cx = (lm[11].x + lm[12].x + lm[23].x + lm[24].x) / 4;
+  const xs = [11, 12, 23, 24, ...hands, ...feet].map(i => lm[i].x);
+  const cutTop = head < .02, cutFeet = feet.length < 4 || footY > .97;
+  if (cutTop || cutFeet) return { k: "back", say: cutFeet && !cutTop ? "Move back a little. Your feet are cut off." : cutTop && !cutFeet ? "Move back a little. Your head is cut off." : "Move back a little." };
+  if (cx < .38 || Math.min(...xs) < .04) return { k: "left", say: "Step to your left." };
+  if (cx > .62 || Math.max(...xs) > .96) return { k: "right", say: "Step to your right." };
+  if (tall < .6) return { k: "closer", say: "Come a little closer." };
+  return { k: "ok", say: "Perfect. Stay right there." };
+}
+const FRAME_SHOW = { none: "Step into the picture", back: "Move back", left: "Step left", right: "Step right", closer: "Come closer", ok: "Good. Stay there." };
+// Runs until you've been in the picture for 1.5 s straight. Says a fix when it changes, or again every 4 s.
+// "Start anyway" (the Redo button, relabeled) skips it.
+async function lineUp() {
+  if (!$("#frameChk").checked) return;
+  const run = $("#run"), v = $("#mv");
+  let pl = null;
+  show("Lining up", "Loading the body tracker…");
+  try { pl = await loadPose(); } catch (e) { show("Get set", "The body tracker didn't load, so check the picture yourself."); await say("Check that your whole body is in the picture.", true); return; }
+  run.classList.add("framing"); ctl.skip = false; $("#redoBtn").textContent = "Start anyway"; $("#redoBtn").hidden = false;
+  let last = "", saidAt = 0, okSince = 0, lastT = 0;
+  try {
+    while (!ctl.skip) {
+      await waitWhilePaused();
+      if (ctl.stop) throw new Error("stopped");
+      await new Promise(r => setTimeout(r, 100));
+      if (v.readyState < 2) continue;
+      const now = performance.now(); if (now <= lastT) continue; lastT = now;
+      let lm = null; try { const r = pl.detectForVideo(v, now); lm = r.landmarks && r.landmarks[0] || null; } catch (e) { continue; }
+      const a = frameAdvice(lm);
+      run.classList.toggle("ok", a.k === "ok");
+      show(FRAME_SHOW[a.k], a.k === "ok" ? "Hold still for a second." : a.say);
+      if (a.k === "ok") { okSince = okSince || now; if (now - okSince > 1500) { await say(a.say, true); break; } }
+      else okSince = 0;
+      if (a.k !== "ok" && (a.k !== last || now - saidAt > 4000)) { say(a.say); saidAt = now; }
+      last = a.k;
+    }
+  } finally { run.classList.remove("framing", "ok"); $("#redoBtn").hidden = true; $("#redoBtn").textContent = "Redo"; ctl.skip = false; }
+}
+
 async function runBlock(b) {
   $("#runBlock").textContent = "Block " + b.id + " · " + b.name;
   show(b.name, b.how);
   await say("Block " + b.id.replace(/^0/, "") + ". " + b.name + ". " + b.how, true);
   await waitWhilePaused();
+  await lineUp();
   show("Get set", b.start + " " + b.how);
   await say(b.start, true);
   await countdown(10);
@@ -305,7 +375,7 @@ $("#clearAll").onclick = async () => { if (!clearArmed) { clearArmed = true; $("
 
 $("#camBtn").onclick = camOn;
 $("#startBtn").onclick = () => runFrom(0, false);
-$("#redoBtn").onclick = () => { ctl.redo = true; ctl.paused = false; $("#pauseBtn").textContent = "Pause"; };
+$("#redoBtn").onclick = () => { if ($("#run").classList.contains("framing")) { ctl.skip = true; return; } ctl.redo = true; ctl.paused = false; $("#pauseBtn").textContent = "Pause"; };
 $("#pauseBtn").onclick = () => { ctl.paused = !ctl.paused; $("#pauseBtn").textContent = ctl.paused ? "Resume" : "Pause"; if (ctl.paused) speechSynthesis?.cancel(); };
 $("#stopBtn").onclick = () => { if ($("#stopBtn").textContent === "Stop") ctl.stop = true; };
 if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) $("#camMsg").innerHTML = '<span class="err">This browser can\'t record video.</span> Open this page in Chrome on your phone.';
