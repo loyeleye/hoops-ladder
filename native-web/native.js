@@ -3016,7 +3016,7 @@
         BALL: 0.3,        // ball detector: a find at least this confident (as in tools/ball_detector/infer.py)
         LOST: 1.5,        // lost ball: this long (s) with no ball near you and no dribble
         RISE: 0.02,       // eyes up: how far the baseline may rise toward your usual head position during the drill
-        SLOW: 0.8,        // a push whose way down takes longer than this (s) is an arm drifting, not a dribble
+        SLOW: 0.8,        // a push whose way down, or back up, takes longer than this (s) is an arm drifting, not a dribble
         LOWR: 0.9,        // sitting low: hips at most this share of their standing height above the ankles
         STAND: 2.1,       // standing hip height above the ankles, in shoulder widths, when the setup check saw no taller value
         ARM: -0.15        // off arm up: the free hand's wrist at least this far above the hips (protecting the ball)
@@ -3233,7 +3233,7 @@
             if (w.y > s.bot) { s.bot = w.y; s.bt = t; s.bx = w.x; }
             if (w.y < s.bot - LC.A) {
               // a push that ends below the chest and starts below the shoulders: not a wave, a toss or a shot
-              if (s.bot > -.55 && s.top > -1.3 && s.bot - s.top < 1.4 && !(part.tb && s.top < LC.TOSS) && s.bt - s.dt <= LC.SLOW) {
+              if (s.bot > -.55 && s.top > -1.3 && s.bot - s.top < 1.4 && !(part.tb && s.top < LC.TOSS) && s.bt - s.dt <= LC.SLOW && t - s.bt <= LC.SLOW) {
                 const kn = f.kL != null ? (h === "L" ? f.kL : f.kR) : null;
                 const e = { h, t: s.bt, top: s.top, bot: s.bot, x: s.bx, xo: s.xo, kn, mid: Math.abs(s.bx - f.hipX / f.tor), lim: lcNear(f) };
                 if (part.tb) { e.at = t; pend.push(e); } else { C.ev.push(e); out.push(e); C.stats.drib++; }
@@ -3248,7 +3248,8 @@
         St.n++;
         const R = lcRound(C, t);
         // turned side-on (a retreat): the nose drops against the ears without looking down, so those frames don't count
-        if (part.eyes && f.sw < .45 && C.dn && C.dn.pi === C.pi && t - C.dn.t1 <= LC.GAP) C.dn.t1 = t; // a look down that turns side-on stays one glance
+        // a look down that turns side-on, or loses the face for a moment, stays one glance
+        if (part.eyes && (f.sw < .45 || f.hd == null) && C.dn && C.dn.pi === C.pi && t - C.dn.t1 <= LC.GAP) C.dn.t1 = t;
         if (part.eyes && f.hd != null && base != null && f.sw >= .45) { St.nu++; St.up += lcEyes(C, f, t, base) ? 0 : 1; }
         if (f.ts != null) { St.nl++; St.low += f.ts <= LC.LOW ? 1 : 0; St.nw++; St.wide += f.st >= LC.WIDE ? 1 : 0; }
         // sitting low: hip height against standing (the setup check's value if it's taller than LC.STAND), since thigh
