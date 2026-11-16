@@ -3173,7 +3173,8 @@
         const floor = ank != null && y > ank - .4 && ![f.wL, f.wR].some(w => w && Math.hypot(w.x - x, w.y - y) < .6);
         if ((!nearW && !feet) || floor) { C.away = (C.away || []).filter(a => a > b.t - LC.LOST); C.away.push(b.t); }
         // seen clearly away from both hands and your feet: a "dribble" at that moment is a reach for a loose ball
-        if (!nearW && !feet) { C.off = (C.off || []).filter(a => a > b.t - 3); C.off.push(b.t); }
+        // (2 torso lengths from both wrists: a wide cross or retreat with the hand on the ball reads up to about 1.3)
+        if (!feet && ![f.wL, f.wR].some(w => w && Math.hypot(w.x - x, w.y - y) < 2)) { C.off = (C.off || []).filter(a => a > b.t - 3); C.off.push(b.t); }
         if (!nearW && !feet) return;
         C.ballT = Math.max(C.ballT || 0, b.t);
         const R = lcRound(C, b.t);
@@ -3279,13 +3280,14 @@
         // held ball, so "no ball seen" alone isn't enough). Counted once until you dribble again.
         if (C.ballOn && !part.behind && !part.tb && t - (C.partT0 || 0) > 3) {
           // the newest dribble by time: a slow push is added late with an older bottom time
-          // dribbles the detector contradicts (the ball seen away from you within 0.25 s) don't count: reaching for a
+          // dribbles the detector contradicts (the ball seen well away from you twice within 0.4 s) don't count: reaching for a
           // loose ball moves the wrist like a dribble. A dribble with no ball find near it still counts, since the
           // detector often misses the ball mid-cross.
-          const off = C.off || [], real = e => !off.some(a => Math.abs(a - e.t) <= .25);
+          const off = C.off || [], real = e => off.filter(a => Math.abs(a - e.t) <= .4).length < 2; // 2 finds agree
           const quiet = t - Math.max(C.ev.reduce((m, e) => real(e) ? Math.max(m, e.t) : m, 0), C.partT0 || 0) > LC.LOST;
           const away = (C.away || []).filter(a => a > t - LC.LOST).length >= 2;
-          if (quiet && away) { if (!C.lost) { C.lost = true; R.lost++; } } else if (!quiet) C.lost = false;
+          // one loss, one count: not again within 3 s of the last
+          if (quiet && away) { if (!C.lost && t - (C.lostT || -9) > 3) { C.lost = true; C.lostT = t; R.lost++; } } else if (!quiet) C.lost = false;
         }
         return out;
       }
