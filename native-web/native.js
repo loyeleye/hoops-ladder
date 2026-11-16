@@ -3455,7 +3455,8 @@
         let p = v(R); if (p == null) return null;
         if (inv) p = 100 - p; // hi counts dribbles above the waist
         p = Math.round(p);
-        return { l, p, ok: p >= tg && !(l.startsWith("Feet") && R.feet), x: x ? x(R) : "" };
+        // feet: a step or two in a round is fine (Signals has retreats); more and the base isn't holding
+        return { l, p, ok: p >= tg && !(l.startsWith("Feet") && R.feet > 2), x: x ? x(R) : "" };
       }).filter(Boolean);
       if (!rows.length) return null;
       const pace = R.sec >= 5 ? Math.round(R.drib * 60 / R.sec) : null;

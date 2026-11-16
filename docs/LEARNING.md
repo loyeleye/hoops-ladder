@@ -1317,7 +1317,7 @@ is off unless you turn it on, and it only shows when the workout has a drill it 
 | Pound–Between–Behind | eyes up, sitting low, base, feet set (no height or "can't see the dribble": the ball goes behind you every rep) |
 | Two-Ball Juggle | eyes up (not on the slow first part), sitting low, base, height, feet set |
 | Behind-the-Back Catch | sitting low, base, feet set (it's one dribble and a catch, so no eyes, height or dribble checks) |
-| Eyes-Up Signals | eyes up (on the phone, where the signals are), sitting low, base, height, and the ball in the hand a ← or → signal names. Cues are shown, never spoken, since the drill is silent. Also a score per round (see below) |
+| Eyes-Up Signals | eyes up (on the phone, where the signals are), sitting low, base, height, and the ball in the hand a ← or → signal names. Cues are shown, never spoken, since the drill is silent. Also a score per round and a round card: eyes up and glances down, plus the dribble cues (see below) |
 | Tennis Ball Toss and Snatch, Tennis Ball Exchange, Toss Cross One Bounce (standing parts), Toss Move Catch, Drop Move Catch | sitting low, base, height, feet set, and "Keep the dribble alive". No eyes up: your eyes belong on the tennis ball |
 
 When that workout is the one on Today and one of these drills starts, the player holds, the **front** camera opens
@@ -1417,6 +1417,58 @@ scored with `lcScore` against their call labels:
 
 Down to a third of a torso below the hips, close quarters scores like the full picture (at most one call fewer).
 Cut at the hips, the hips themselves drop out and `lcFrame` has nothing to measure from.
+
+**Eyes-Up Signals round card** (Nov 2026). Eyes-Up Signals is for practicing two things at once: reading the phone
+while the dribble runs on its own. So each round now gets a card on the rating screen, one column per round, and the
+next round's key screen leads with the last round's eyes up ("Last round: eyes up 96%, 1 glance down · 7 of 9 cues on
+target · ball in the called hand 9 of 11"). Every cue is graded against the standard case, low, quick and wide (green
+on target, amber not), and the round's score is how many of the cues the camera could judge were on target:
+
+| Cue | How it's measured (`lcRound` totals, `LC_CARD`) | Target |
+|---|---|---|
+| Eyes up | share of frames with the head up (`lcEyes`), plus glances down: the nose dropping more than `LC.DOWN` (0.12) against the ears for at least `LC.GLANCE` (0.15 s); looks down less than `LC.GAP` (0.3 s) apart, or across side-on or no-face frames, are one glance | 90% |
+| Sitting low | hips above the ankles in shoulder widths (`f.lg`), at most `LC.LOWR` (0.9) of standing: the setup check's value or `LC.STAND` (2.1), whichever is taller. Skipped when turned (shoulders under 0.7 torso) | 70% |
+| Feet wider than shoulders | ankles at least 0.72 torso apart; also how many times the feet started to wander (the "Feet stay put" check) | 70%, at most 2 wanders |
+| Off arm up | while one hand alone has dribbled in the last second, the free wrist at least 0.15 torso above the hips | 50% |
+| Dribbles below the waist | the top of each push below `LC.HIGH` | 80% |
+| Bounces close to your body | side to side only: no more than a ball's width (`LC.OUT`) outside your feet. From the ball detector's low finds when it has 10, else from the hand at the bottom of each push | 80% |
+| Crosses outside your knees | the first dribble in the new hand after a switch (not on between or behind calls): the hand's widest point against its knee | 70% |
+| Lost balls | ball detector: no dribble for `LC.LOST` (1.5 s) while it sees the ball away from you or loose on the floor at least twice | 0 |
+| Dribbles a minute | a round average, so breaking rhythm on purpose isn't marked down | 120 |
+
+The frames on the key screen between rounds don't count (you're reading the new key). Pushes whose way down or back up
+takes more than `LC.SLOW` (0.8 s) are an arm drifting, not a dribble. The eyes-up baseline starts from the setup check
+and can rise by `LC.RISE` (0.02) toward where your head sits during the drill.
+
+**Ball detector in the app.** `native-web/ball_worker.mjs` runs `ball3f_v2.onnx` (the 474 KB model from
+`tools/ball_detector`, trained only on Ladi's clips) with ONNX Runtime Web (MIT, the single-threaded WebAssembly build,
+about 11 MB in `www/ort/`) in a module worker, so it gets its own core next to the pose model. The page grabs 3 frames
+in a row at 480x270 (the training size, 33 ms apart), sends them, and grabs the next 3 only once the answer is back.
+`lcBall` keeps a find only below the shoulders and near a hand or around the feet, as `filt.py` does. Its output
+matches the Python model exactly on the same frames. Speed: 57 ms a frame on one desktop core in Chromium (38 ms on 2
+threads, 34 on 4, but threads need cross-origin isolation, which would block the YouTube demo player); on a phone
+expect a few results a second, which is enough for lost balls and the bounce spot. If the worker or model can't load,
+lost balls don't show and the bounce spot falls back to the hand.
+
+**How it was checked.** `tools/live_cues_eval/` feeds recorded clips through the same `lccore` functions (pose at the
+app's rate, the ball detector every 0.15 s, the first 2 s standing in for the setup check). All 30 Move Check Recorder
+clips from Nov 14-15 (3 sessions) went through five passes, with frames checked by eye:
+- **Glances**, on 6 clips with 23 real looks down labeled by eye: 18 caught, 3 counted falsely (face toward the camera
+  in a deep stance), 5 missed (small or very short dips). The thresholds were picked from a grid of 18 settings; looser
+  ones caught more but counted up to 13 false. Calibrating standing tall and then dribbling low had made a deep stance
+  read as looking down (14 glances on one clip, 4 of them real); turned side-on on a retreat had nearly counted one.
+  Eyes-only glances (head still) can't be seen: the face is about 40 px tall in a 720p frame.
+- **Lost balls**: 3 of the 4 counted are real (two "lose it on purpose" calls and a pickup); one is a ball held at the
+  hip on a fake retreat. Missed: a ball that got away in a Signals round, because reaching for it looked like dribbles.
+  An earlier version counted a ball held in the hands as lost (the detector is weak on a held ball), which is why it
+  now needs the ball seen away or loose.
+- **Sitting low**: thigh over shin (the live "Sit lower" cue) read about 0.3 apart between sessions for the same stance,
+  and hips over torso length went the wrong way (a forward lean shortens the torso from the front). Hips over shoulder
+  width held across all three sessions: about 2.1 standing tall, 1.8-1.9 in an athletic stance. Standing-tall clips
+  score 0-3%, athletic ones 61-97%. The margin is small (about 12%), and no clip opens with Ladi standing, so the
+  setup check's standing value is still untested.
+- **Off arm up** matched the frames (21% and 41% on two Signals rounds: the free arm mostly hangs).
+- **Dribble count**: 10 of 10 bounces on a counted 5 s stretch.
 
 The Move Check Recorder (`site/move-check.html`) has the same fallback: a *Close quarters* box on the start screen, and
 a *Close quarters* button plus a spoken offer during the voice line-up after 25 s of feet cut off. `frameAdvice(lm,
