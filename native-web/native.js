@@ -3010,7 +3010,8 @@
         ALIVE: 1.6,       // tennis ball drills: this long with no dribble from either hand and the dribble has died
         GLANCE: 0.2,      // eyes down this long (s) is one glance down at the ball
         GAP: 0.3,         // back up for less than this (s) between two looks down: still the same glance
-        NEAR: 0.9,        // bounce spot: the hand at the bottom of a dribble within this far of your middle, side to side
+        NEAR: 0.9,        // bounce spot when the feet aren't in the picture: within this far of your middle, side to side
+        OUT: 0.35,        // bounce spot: no more than about a ball's width outside your feet counts as close to your body
         PACE: 120,        // a quick dribble: at least this many dribbles a minute over the round
         BALL: 0.3,        // ball detector: a find at least this confident (as in tools/ball_detector/infer.py)
         LOST: 1.5,        // lost ball: this long (s) with no ball near you and no dribble
@@ -3121,7 +3122,7 @@
         if (!V(11) || !V(12) || !V(23) || !V(24)) return null;
         const shY = (Y(11) + Y(12)) / 2, hipY = (Y(23) + Y(24)) / 2, hipX = (X(23) + X(24)) / 2, tor = hipY - shY;
         if (tor < .04) return null;
-        const f = { tor, hipX, hipY };
+        const f = { tor, hipX, hipY, sw: Math.abs(X(11) - X(12)) / tor }; // sw: shoulder width, small when turned side-on
         const legs = V(25) && V(26) && V(27) && V(28);
         if (legs) {
           const ts = i => (Y(i + 2) - Y(i)) / Math.max(.01, Y(i + 4) - Y(i + 2)); // (knee - hip) / (ankle - knee)
@@ -3142,6 +3143,9 @@
         f.wL = wr(15, sgn); f.wR = wr(16, -sgn);
         return f;
       }
+      // How far from your middle (side to side) a bounce can land and still be close to your body: inside your feet plus
+      // about a ball's width, or LC.NEAR when the feet aren't in the picture.
+      function lcNear(f) { return f.aL ? Math.abs(f.aL.x - f.aR.x) / 2 + LC.OUT : LC.NEAR; }
       // One ball detector result (b.x, b.y from 0 to 1 in the picture, b.s confidence, b.t its newest frame), checked
       // against the pose: below the shoulders, and near a hand or around the feet (as tools/ball_detector/filt.py does).
       function lcBall(C, b, ar) {
@@ -3154,19 +3158,31 @@
         if (y < -1.1) return;
         const nearW = [f.wL, f.wR].some(w => w && Math.hypot(w.x - x, w.y - y) < 1.3);
         const feet = f.aL && y > 0 && x >= Math.min(f.aL.x, f.aR.x) - .7 && x <= Math.max(f.aL.x, f.aR.x) + .7;
+        // for the lost-ball check: the ball away from you, or down at the floor with no hand on it
+        const ank = f.aL ? Math.max(f.aL.y, f.aR.y) - f.hipY / f.tor : null;
+        const floor = ank != null && y > ank - .4 && ![f.wL, f.wR].some(w => w && Math.hypot(w.x - x, w.y - y) < .6);
+        if ((!nearW && !feet) || floor) { C.away = (C.away || []).filter(a => a > b.t - LC.LOST); C.away.push(b.t); }
         if (!nearW && !feet) return;
         C.ballT = Math.max(C.ballT || 0, b.t);
         const R = lcRound(C, b.t);
         R.nball++;
         // low in the bounce (below about knee height): where it lands, side to side
-        if (y > .6) { R.nbb++; R.nearb += Math.abs(x - mid) <= LC.NEAR ? 1 : 0; }
+        if (y > .6) { R.nbb++; R.nearb += Math.abs(x - mid) <= lcNear(f) ? 1 : 0; }
       }
       // Calibrate "eyes up" from the setup check, when you're looking at the phone.
       function lcCalib(C, lm, ar) { const f = lcFrame(lm, ar); if (f && f.hd != null) { C.cal.push(f.hd); if (C.cal.length > 90) C.cal.shift(); } }
       const lcMed = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
       function lcBase(C) {
-        if (C.base != null) return C.base;
-        if (C.cal.length >= 12) return (C.base = lcMed(C.cal));
+        if (C.base == null && C.cal.length >= 12) C.base = lcMed(C.cal);
+        if (C.base != null) {
+          // The setup check often catches you standing tall; dribbling in a deep stance then tips the head a little lower
+          // with your eyes still on the phone (on the Nov 2026 clips the calibrated value ran from 0.003 to 0.09). Once
+          // there are 3 s of the drill, raise the baseline to where your head is most of the time (30th percentile), by
+          // at most 0.08. Eyes-up drills are mostly eyes up, so short glances barely move it.
+          if (C.hd.length < 60) return C.base;
+          const s = [...C.hd].sort((x, y) => x - y);
+          return Math.max(C.base, Math.min(C.base + .08, s[Math.floor(s.length * .3)]));
+        }
         // no calibration: the times you did look up, but never above a plain "looking ahead" value
         if (C.hd.length < 30) return null;
         const s = [...C.hd].sort((x, y) => x - y);
@@ -3205,7 +3221,7 @@
               // a push that ends below the chest and starts below the shoulders: not a wave, a toss or a shot
               if (s.bot > -.55 && s.top > -1.3 && s.bot - s.top < 1.4 && !(part.tb && s.top < LC.TOSS)) {
                 const kn = f.kL != null ? (h === "L" ? f.kL : f.kR) : null;
-                const e = { h, t: s.bt, top: s.top, bot: s.bot, x: s.bx, xo: s.xo, kn, mid: Math.abs(s.bx - f.hipX / f.tor) };
+                const e = { h, t: s.bt, top: s.top, bot: s.bot, x: s.bx, xo: s.xo, kn, mid: Math.abs(s.bx - f.hipX / f.tor), lim: lcNear(f) };
                 if (part.tb) { e.at = t; pend.push(e); } else { C.ev.push(e); out.push(e); C.stats.drib++; }
               }
               C.hand[h] = { st: "up", top: w.y, bot: w.y, bt: t, xo: w.out, bx: w.x };
@@ -3217,7 +3233,8 @@
         const St = C.stats, base = lcBase(C);
         St.n++;
         const R = lcRound(C, t);
-        if (part.eyes && f.hd != null && base != null) { St.nu++; St.up += lcEyes(C, f, t, base) ? 0 : 1; }
+        // turned side-on (a retreat): the nose drops against the ears without looking down, so those frames don't count
+        if (part.eyes && f.hd != null && base != null && f.sw >= .45) { St.nu++; St.up += lcEyes(C, f, t, base) ? 0 : 1; }
         if (f.ts != null) { St.nl++; St.low += f.ts <= LC.LOW ? 1 : 0; St.nw++; St.wide += f.st >= LC.WIDE ? 1 : 0; }
         if (f.ts != null && part.stance) { R.nl++; R.low += f.ts <= LC.LOW ? 1 : 0; }
         if (f.st != null) { R.nw++; R.wide += f.st >= LC.WIDE ? 1 : 0; }
@@ -3229,16 +3246,19 @@
           if (part.high) { R.nh++; R.hi += e.top < LC.HIGH ? 1 : 0; }
           // bounce spot, side to side only (the front camera can't see how far in front): from the hand, until the ball
           // detector can say where the ball lands
-          if (!part.behind) { R.nb++; R.near += e.mid <= LC.NEAR ? 1 : 0; }
+          if (!part.behind) { R.nb++; R.near += e.mid <= e.lim ? 1 : 0; }
           // crossover width: the first dribble in the new hand after a switch (not a between or behind call), the hand's
           // widest point against its knee, as the "wider crosses" cue does
           if (C.lastH && C.lastH !== e.h && e.kn != null && !part.behind && !part.btw) { R.nx++; R.wx += e.xo >= e.kn ? 1 : 0; }
           C.lastH = e.h;
         }
-        // lost ball (only while the ball detector runs): no ball near you and no dribble for LC.LOST s, counted once
+        // lost ball (only while the ball detector runs): no dribble for LC.LOST s while the detector sees the ball away
+        // from you or loose on the floor at least twice. A ball held in your hands isn't lost (the detector is weak on a
+        // held ball, so "no ball seen" alone isn't enough). Counted once until you dribble again.
         if (C.ballOn && !part.behind && !part.tb && t - (C.partT0 || 0) > 3) {
-          const seen = Math.max(C.ballT || 0, C.ev.length ? C.ev[C.ev.length - 1].t : 0, C.partT0 || 0);
-          if (t - seen > LC.LOST) { if (!C.lost) { C.lost = true; R.lost++; } } else C.lost = false;
+          const quiet = t - Math.max(C.ev.length ? C.ev[C.ev.length - 1].t : 0, C.partT0 || 0) > LC.LOST;
+          const away = (C.away || []).filter(a => a > t - LC.LOST).length >= 2;
+          if (quiet && away) { if (!C.lost) { C.lost = true; R.lost++; } } else if (!quiet) C.lost = false;
         }
         return out;
       }
