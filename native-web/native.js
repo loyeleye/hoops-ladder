@@ -3007,7 +3007,10 @@
         FEET: 0.35,       // an ankle sliding more than this in 3 s means the feet moved
         TOSS: -0.7,       // a wrist above this (about chest height) is tossing or catching a tennis ball, not dribbling
         HOLD: 0.35,       // tennis ball drills: a dribble waits this long, in case the hand goes up into a toss
-        ALIVE: 1.6        // tennis ball drills: this long with no dribble from either hand and the dribble has died
+        ALIVE: 1.6,       // tennis ball drills: this long with no dribble from either hand and the dribble has died
+        GLANCE: 0.2,      // eyes down this long (s) is one glance down at the ball
+        GAP: 0.3,         // back up for less than this (s) between two looks down: still the same glance
+        ARM: -0.15        // off arm up: the free hand's wrist at least this far above the hips (protecting the ball)
       };
       // tennis ball drills: one hand dribbles, the other tosses and catches (and they swap on some drills)
       const LC_TB = new Set(["h_tb_snatch", "h_tb_swap", "h_tb_bounce", "h_tb_toss", "h_tb_drop"]);
@@ -3043,9 +3046,28 @@
         };
       }
       function lcNew() {
-        return { fr: [], ev: [], pend: [], hand: { L: null, R: null }, hd: [], base: null, cal: [], prob: {}, stats: lcStats() };
+        return { fr: [], ev: [], pend: [], hand: { L: null, R: null }, hd: [], base: null, cal: [], prob: {}, pi: 0, dn: null, stats: lcStats() };
       }
-      function lcStats() { return { n: 0, up: 0, nu: 0, low: 0, wide: 0, nl: 0, nw: 0, drib: 0, cues: {}, rounds: {} }; }
+      function lcStats() { return { n: 0, up: 0, nu: 0, low: 0, wide: 0, nl: 0, nw: 0, drib: 0, cues: {}, rounds: {}, pr: {} }; }
+      // Per round (C.pi is the part) totals for the round card: eyes up and glances down, sitting low, base, feet moved,
+      // off arm up, dribbles below the waist (graded), and dribbles and time for the pace (shown only).
+      function lcRound(C, t) {
+        const R = C.stats.pr[C.pi] = C.stats.pr[C.pi] || { sec: 0, lt: t, nu: 0, up: 0, gl: 0, nl: 0, low: 0, nw: 0, wide: 0, feet: 0, na: 0, arm: 0, drib: 0, nh: 0, hi: 0 };
+        R.sec += Math.min(Math.max(t - R.lt, 0), .2); R.lt = t;
+        return R;
+      }
+      // Eyes up: the share of watched frames with your head up, and how many times you glanced down at the ball (down
+      // at least LC.GLANCE s; looks down less than LC.GAP s apart are one glance).
+      function lcEyes(C, f, t, base) {
+        const E = lcRound(C, t);
+        const down = f.hd - base > LC.DOWN;
+        E.nu++;
+        if (!down) { E.up++; return down; }
+        const g = C.dn && C.dn.pi === C.pi && t - C.dn.t1 <= LC.GAP ? C.dn : (C.dn = { t0: t, t1: t, pi: C.pi, n: false });
+        g.t1 = t;
+        if (!g.n && g.t1 - g.t0 >= LC.GLANCE) { g.n = true; E.gl++; }
+        return down;
+      }
       // Round scores for drills whose calls name a hand (Eyes-Up Signals, Called Crossovers): the hand the ball
       // should end up in. Left and Right name it; Between, Behind and Cross switch hands; Retreat and Pound keep it.
       function lcWant(name, from) {
@@ -3171,8 +3193,15 @@
         // the drill's running totals, for the rating screen
         const St = C.stats, base = lcBase(C);
         St.n++;
-        if (part.eyes && f.hd != null && base != null) { St.nu++; St.up += f.hd - base <= LC.DOWN ? 1 : 0; }
+        const R = lcRound(C, t);
+        if (part.eyes && f.hd != null && base != null) { St.nu++; St.up += lcEyes(C, f, t, base) ? 0 : 1; }
         if (f.ts != null) { St.nl++; St.low += f.ts <= LC.LOW ? 1 : 0; St.nw++; St.wide += f.st >= LC.WIDE ? 1 : 0; }
+        if (f.ts != null && part.stance) { R.nl++; R.low += f.ts <= LC.LOW ? 1 : 0; }
+        if (f.st != null) { R.nw++; R.wide += f.st >= LC.WIDE ? 1 : 0; }
+        // off arm: only while one hand alone has dribbled in the last second (one ball, not mid-switch)
+        const hs = new Set(C.ev.filter(e => e.t > t - 1).map(e => e.h));
+        if (hs.size === 1 && !part.tb) { const w = hs.has("L") ? f.wR : f.wL; if (w) { R.na++; R.arm += w.y < LC.ARM ? 1 : 0; } }
+        for (const e of out) { R.drib++; if (part.high) { R.nh++; R.hi += e.top < LC.HIGH ? 1 : 0; } }
         return out;
       }
       // The biggest problem right now, if it has lasted. Returns { k, said, shown } or null; "good" when all is well.
@@ -3234,6 +3263,7 @@
         if (part.together) { const e6 = last(6); if (e6.length >= 6 && e6.filter(e => ev.some(o => o.h !== e.h && Math.abs(o.t - e.t) < .15)).length < e6.length * .5) act.sync = 1; }
         if (part.even) { const l = ev.filter(e => e.h === "L").map(e => e.top), r = ev.filter(e => e.h === "R").map(e => e.top); if (l.length >= 3 && r.length >= 3 && Math.abs(lcMed(l) - lcMed(r)) > .25) act.even = 1; }
         // a problem counts once it has lasted 1 s (the beat and a late switch: right away, they already look back)
+        if (act.feet && !C.prob.feet) lcRound(C, t).feet++; // each time the feet start to wander
         for (const k of LC_ORDER) { if (act[k]) C.prob[k] = C.prob[k] || t; else delete C.prob[k]; }
         const k = LC_ORDER.find(x => C.prob[x] && (x === "slow" || x === "late" || t - C.prob[x] >= 1));
         if (k) return { k, shown: LC_CUE[k][0], said: LC_CUE[k][1] };
@@ -3258,6 +3288,12 @@
 .lcam .lc-sub{font-size:12px;line-height:1.25;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lcam .lc-x{flex:none;border:0;background:none;color:inherit;font-size:20px;line-height:1;padding:0 8px;min-width:36px}
 .prow .lc-sum{font-size:12.5px;opacity:.85}
+.prow .lc-card{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0}
+.lc-card th,.lc-card td{padding:3px 4px;text-align:left;vertical-align:top;font-weight:500}
+.lc-card thead th{font-family:var(--display);text-transform:uppercase;letter-spacing:.03em;opacity:.8}
+.lc-card tbody th{opacity:.85}.lc-card td small{display:block;opacity:.75;font-size:11px}
+.lc-card td.ok{color:#2BD17E}.lc-card td.no{color:#FFC23D}.lc-card tr.sc td,.lc-card tr.sc th{font-weight:700;border-top:1px solid rgba(127,140,166,.35)}
+.lc-card tr.info td,.lc-card tr.info th{opacity:.7}
 .lc-note{margin:-4px 0 4px;font-size:13px}`;
     document.head.appendChild(st);
 
@@ -3305,6 +3341,8 @@
           el.textContent = `Camera saw ${s.drib} dribbles. ${seen}${legs ? "" : " Legs not in the picture (close quarters), so no stance checks."}${top ? ` Said most: ${LC_CUE[top][0]}.` : ""}${lcRounds(d, s)}`.replace(/  +/g, " ");
           const seg = rows[i].querySelector(".seg");
           rows[i].insertBefore(el, seg || null);
+          const card = lcCardHTML(d, s);
+          if (card) el.insertAdjacentHTML("afterend", card);
         });
       }
       lcBar();
@@ -3319,6 +3357,47 @@
       return ` Ball in the called hand: ${ks.length === 1 && ph.length === 1 ? of(ks[0]) : ks.map(k => `${ph[k] ? ph[k][0] : "Part " + (+k + 1)} ${of(k)}`).join(", ")}.`;
     }
     window.__hoopsLcRounds = lcRounds;
+    // Eyes-Up Signals' round card. Graded cues have a target (first guesses, to tune on real rounds); a round's score is
+    // how many of the cues the camera could judge were on target. Dribbles and pace are shown, not graded: advanced
+    // players change speed on purpose. A share needs 2 s of frames (40) before it shows.
+    const lcGl = n => (n ? `${n} glance${n > 1 ? "s" : ""} down` : "no glances down");
+    const LC_CARD = [
+      // [label, value 0-100 or null, target, extra]
+      ["Eyes up", R => R.nu >= 40 ? 100 * R.up / R.nu : null, 90, R => lcGl(R.gl)],
+      ["Sitting low", R => R.nl >= 40 ? 100 * R.low / R.nl : null, 70],
+      ["Feet wider than shoulders", R => R.nw >= 40 ? 100 * R.wide / R.nw : null, 70, R => R.feet ? `feet moved ${R.feet}×` : "feet planted"],
+      ["Off arm up", R => R.na >= 40 ? 100 * R.arm / R.na : null, 50],
+      ["Dribbles below the waist", R => R.nh >= 5 ? 100 * R.hi / R.nh : null, 80, null, true]
+    ];
+    function lcCard(R) {
+      if (!R) return null;
+      const rows = LC_CARD.map(([l, v, tg, x, inv]) => {
+        let p = v(R); if (p == null) return null;
+        if (inv) p = 100 - p; // hi counts dribbles above the waist
+        p = Math.round(p);
+        return { l, p, ok: p >= tg && !(l.startsWith("Feet") && R.feet), x: x ? x(R) : "" };
+      }).filter(Boolean);
+      if (!rows.length) return null;
+      return { rows, ok: rows.filter(r => r.ok).length, n: rows.length, drib: R.drib, pace: R.sec >= 5 ? Math.round(R.drib * 60 / R.sec) : null };
+    }
+    // Next round's key screen: "eyes up 94%, 1 glance down · 4 of 5 cues on target"
+    function lcCardShort(R) {
+      const c = lcCard(R), e = c && c.rows.find(r => r.l === "Eyes up");
+      return c ? [e && `eyes up ${e.p}%, ${e.x}`, `${c.ok} of ${c.n} cues on target`].filter(Boolean).join(" · ") : "";
+    }
+    window.__hoopsLcEyes = lcCardShort;
+    function lcCardHTML(d, s) {
+      if (!d || d.id !== "h_r_signal") return "";
+      const ks = Object.keys(s.pr || {}).filter(k => lcCard(s.pr[k])).sort((a, b) => a - b);
+      if (!ks.length) return "";
+      let ph = []; try { ph = phasesOf(d) || []; } catch (e) {}
+      const cs = ks.map(k => lcCard(s.pr[k])), labels = LC_CARD.map(r => r[0]).filter(l => cs.some(c => c.rows.some(r => r.l === l)));
+      const cell = (c, l) => { const r = c.rows.find(x => x.l === l); return r ? `<td class="${r.ok ? "ok" : "no"}">${r.p}%${r.x ? `<small>${esc(r.x)}</small>` : ""}</td>` : "<td>–</td>"; };
+      return `<table class="lc-card"><thead><tr><th></th>${ks.map(k => `<th>${esc(ph[k] ? ph[k][0] : "Part " + (+k + 1))}</th>`).join("")}</tr></thead><tbody>
+        ${labels.map(l => `<tr><th>${l}</th>${cs.map(c => cell(c, l)).join("")}</tr>`).join("")}
+        <tr class="sc"><th>On target</th>${cs.map(c => `<td>${c.ok} of ${c.n}</td>`).join("")}</tr>
+        <tr class="info"><th>Dribbles (info)</th>${cs.map(c => `<td>${c.drib}${c.pace ? `<small>${c.pace} a min</small>` : ""}</td>`).join("")}</tr></tbody></table>`;
+    }
 
     function lcOpen(items) {
       lcClose();
@@ -3405,7 +3484,8 @@
       const me = K;
       me.raf = requestAnimationFrame(lcLoop);
       const v = me.video, now = performance.now();
-      const part = lcCur(), live = !!part && P && P.running && !P.cd && me.placed;
+      // Eyes-Up Signals' key screen isn't dribbling time: you're reading the new key, so it doesn't count
+      const part = lcCur(), live = !!part && P && P.running && !P.cd && me.placed && !(P.sig && P.sig.key > 0);
       // 20 a second while watching or setting up, 5 while resting
       if (!v.videoWidth || v.readyState < 2 || now - me.lastT < (live || !me.placed ? 50 : 200)) return;
       me.lastT = now;
@@ -3424,7 +3504,7 @@
         // Eyes-Up Signals: the next round's key screen is already up, so add the round just scored to it
         const kEl = document.getElementById("pKey");
         if (kEl && typeof sigLast === "function") { const old = kEl.querySelector(".siglast"); if (old) old.outerHTML = sigLast(); else kEl.querySelector(".label").insertAdjacentHTML("afterend", sigLast()); }
-        me.key = key; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.pend = []; me.C.hand = { L: null, R: null }; }
+        me.key = key; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.pend = []; me.C.hand = { L: null, R: null }; me.C.pi = P.pi; me.C.dn = null; }
       // a new call ("Left", "Cross"): when it came, for the switch and tempo checks
       if (P.flashAt && P.flashAt !== me.flash) {
         me.flash = P.flashAt; lcScore(me.C, t);
