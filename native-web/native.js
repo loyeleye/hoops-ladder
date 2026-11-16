@@ -3044,7 +3044,9 @@
           together, even,
           steady: pm ? (pm[1] ? pm[1][0].toUpperCase() : pm[2] === "left" ? "R" : "L") : null,
           hands: id === "h_r_cross" || id === "h_r_signal", // the call names the hand the ball should be in
-          feet: !/step|snatch back|retreat|hesi|feet moving/.test(n), // these moves move your feet on purpose
+          // these moves move your feet on purpose; Eyes-Up Signals doesn't ask for planted feet at all (Ladi: moving feet
+          // is part of the game)
+          feet: !/step|snatch back|retreat|hesi|feet moving/.test(n) && id !== "h_r_signal",
           // eyes go to the tennis ball; the catch is one dribble; the slow juggle is finding the rhythm
           eyes: !tb && id !== "h_btbcatch" && !(id === "h_2juggle" && /slow/.test(n)),
           tb, alive: tb,                              // the tennis ball hand doesn't count; the dribble has to keep going
@@ -3061,7 +3063,7 @@
       // Per round (C.pi is the part) totals for the round card: eyes up and glances down, sitting low, base, feet moved,
       // off arm up, dribbles below the waist (graded), and dribbles and time for the pace (shown only).
       function lcRound(C, t) {
-        const R = C.stats.pr[C.pi] = C.stats.pr[C.pi] || { nball: 0, nbb: 0, nearb: 0, lost: 0, sec: 0, lt: t, nu: 0, up: 0, gl: 0, nl: 0, low: 0, nw: 0, wide: 0, feet: 0, na: 0, arm: 0, drib: 0, nh: 0, hi: 0, nb: 0, near: 0, nx: 0, wx: 0 };
+        const R = C.stats.pr[C.pi] = C.stats.pr[C.pi] || { nball: 0, nbb: 0, nearb: 0, lost: 0, sec: 0, lt: t, nu: 0, up: 0, gl: 0, nl: 0, low: 0, nw: 0, wide: 0, na: 0, arm: 0, drib: 0, nh: 0, hi: 0, nb: 0, near: 0, nx: 0, wx: 0 };
         if (t > R.lt) { R.sec += Math.min(t - R.lt, .2); R.lt = t; }
         return R;
       }
@@ -3340,7 +3342,6 @@
         if (part.together) { const e6 = last(6); if (e6.length >= 6 && e6.filter(e => ev.some(o => o.h !== e.h && Math.abs(o.t - e.t) < .15)).length < e6.length * .5) act.sync = 1; }
         if (part.even) { const l = ev.filter(e => e.h === "L").map(e => e.top), r = ev.filter(e => e.h === "R").map(e => e.top); if (l.length >= 3 && r.length >= 3 && Math.abs(lcMed(l) - lcMed(r)) > .25) act.even = 1; }
         // a problem counts once it has lasted 1 s (the beat and a late switch: right away, they already look back)
-        if (act.feet && !C.prob.feet) lcRound(C, t).feet++; // each time the feet start to wander
         for (const k of LC_ORDER) { if (act[k]) C.prob[k] = C.prob[k] || t; else delete C.prob[k]; }
         const k = LC_ORDER.find(x => C.prob[x] && (x === "slow" || x === "late" || t - C.prob[x] >= 1));
         if (k) return { k, shown: LC_CUE[k][0], said: LC_CUE[k][1] };
@@ -3443,7 +3444,7 @@
       // [label, value 0-100 or null, target, extra]
       ["Eyes up", R => R.nu >= 40 ? 100 * R.up / R.nu : null, 90, R => lcGl(R.gl)],
       ["Sitting low", R => R.nl >= 40 ? 100 * R.low / R.nl : null, 70],
-      ["Feet wider than shoulders", R => R.nw >= 40 ? 100 * R.wide / R.nw : null, 70, R => R.feet ? `feet moved ${R.feet}×` : "feet planted"],
+      ["Feet wider than shoulders", R => R.nw >= 40 ? 100 * R.wide / R.nw : null, 70],
       ["Off arm up", R => R.na >= 40 ? 100 * R.arm / R.na : null, 50],
       ["Dribbles below the waist", R => R.nh >= 5 ? 100 * R.hi / R.nh : null, 80, null, true],
       ["Bounces close to your body", R => R.nbb >= 10 ? 100 * R.nearb / R.nbb : R.nb >= 5 ? 100 * R.near / R.nb : null, 80],
@@ -3455,8 +3456,7 @@
         let p = v(R); if (p == null) return null;
         if (inv) p = 100 - p; // hi counts dribbles above the waist
         p = Math.round(p);
-        // feet: a step or two in a round is fine (Signals has retreats); more and the base isn't holding
-        return { l, p, ok: p >= tg && !(l.startsWith("Feet") && R.feet > 2), x: x ? x(R) : "" };
+        return { l, p, ok: p >= tg, x: x ? x(R) : "" };
       }).filter(Boolean);
       if (!rows.length) return null;
       const pace = R.sec >= 5 ? Math.round(R.drib * 60 / R.sec) : null;
