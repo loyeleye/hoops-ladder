@@ -1503,7 +1503,7 @@ function sigGo(){P.sig.key=0;P.call=null;P.nextAt=1.5;beep(988,200);drawPlayer()
 function sigCallHTML(){const x=P.sig.map.find(y=>y[0]===P.call);return x?sigSym(x[1]):"Ready…"}
 function sigKeyHTML(){const c=SIG();return `<div class="sigkey" id="pKey"><div class="label">Your key${P.pi?" · new this round":""}</div>${sigLast()}<div class="sigrows">${P.sig.map.map(([m,k])=>`<div class="sigrow">${sigSym(k,"sm")}<span>${esc(sigMove(m))}</span></div>`).join("")}</div>
    <div class="pmeta" id="pKeyLeft">Learn it. Starts in ${Math.ceil(P.sig.key)} s, or tap to start${c.key?"":". The key hides once you start"}</div></div>`}
-function sigLast(){const r=P.pi&&P.lcStats&&P.lcStats[P.i]&&P.lcStats[P.i].rounds&&P.lcStats[P.i].rounds[P.pi-1];return r&&r.n?`<div class="pmeta siglast">Last round: ball in the called hand ${r.ok} of ${r.n}</div>`:""}
+function sigLast(){const s=P.pi&&P.lcStats&&P.lcStats[P.i],r=s&&s.rounds&&s.rounds[P.pi-1],e=s&&s.pr&&window.__hoopsLcEyes?window.__hoopsLcEyes(s.pr[P.pi-1]):"",x=[e,r&&r.n&&`ball in the called hand ${r.ok} of ${r.n}`].filter(Boolean);return x.length?`<div class="pmeta siglast">Last round: ${x.join(" · ")}</div>`:""}
 function sigStrip(){return SIG().key?`<div class="sigstrip" aria-label="Key">${P.sig.map.map(([m,k])=>`<span>${sigSym(k,"xs")}${esc(sigMove(m).replace(/ hand$/,""))}</span>`).join("")}</div>`:""}
 function sigCtl(){const c=SIG(),on=c.m!=="arrows";
   return `<div class="row" style="justify-content:center;gap:10px"><span class="small muted">Signals</span><div class="seg">${SIG_MODES.map(([v,l])=>`<button data-k="sig:m:${v}" aria-pressed="${c.m===v}">${l}</button>`).join("")}</div></div>
@@ -10174,7 +10174,19 @@ route();
         FEET: 0.35,       // an ankle sliding more than this in 3 s means the feet moved
         TOSS: -0.7,       // a wrist above this (about chest height) is tossing or catching a tennis ball, not dribbling
         HOLD: 0.35,       // tennis ball drills: a dribble waits this long, in case the hand goes up into a toss
-        ALIVE: 1.6        // tennis ball drills: this long with no dribble from either hand and the dribble has died
+        ALIVE: 1.6,       // tennis ball drills: this long with no dribble from either hand and the dribble has died
+        GLANCE: 0.15,     // eyes down this long (s) is one glance down at the ball
+        GAP: 0.3,         // back up for less than this (s) between two looks down: still the same glance
+        NEAR: 0.9,        // bounce spot when the feet aren't in the picture: within this far of your middle, side to side
+        OUT: 0.35,        // bounce spot: no more than about a ball's width outside your feet counts as close to your body
+        PACE: 120,        // a quick dribble: at least this many dribbles a minute over the round
+        BALL: 0.3,        // ball detector: a find at least this confident (as in tools/ball_detector/infer.py)
+        LOST: 1.5,        // lost ball: this long (s) with no ball near you and no dribble
+        RISE: 0.02,       // eyes up: how far the baseline may rise toward your usual head position during the drill
+        SLOW: 0.8,        // a push whose way down, or back up, takes longer than this (s) is an arm drifting, not a dribble
+        LOWR: 0.9,        // sitting low: hips at most this share of their standing height above the ankles
+        STAND: 2.1,       // standing hip height above the ankles, in shoulder widths, when the setup check saw no taller value
+        ARM: -0.15        // off arm up: the free hand's wrist at least this far above the hips (protecting the ball)
       };
       // tennis ball drills: one hand dribbles, the other tosses and catches (and they swap on some drills)
       const LC_TB = new Set(["h_tb_snatch", "h_tb_swap", "h_tb_bounce", "h_tb_toss", "h_tb_drop"]);
@@ -10192,7 +10204,7 @@ route();
         // Pound and Around: one hand keeps pounding while the other ball circles a leg
         const pm = id === "h_2around" && n.match(/(left|right) hand pounds|(left|right) ball around/);
         return {
-          id, behind,
+          id, behind, btw: /between/.test(n),
           pound: id === "h_pound",
           // One-Hand Cross Series keeps the ball inside your legs on purpose
           cross: /cross/.test(n) && !/kobe|snatch back/.test(n) && id !== "h_handy",
@@ -10210,9 +10222,28 @@ route();
         };
       }
       function lcNew() {
-        return { fr: [], ev: [], pend: [], hand: { L: null, R: null }, hd: [], base: null, cal: [], prob: {}, stats: lcStats() };
+        return { fr: [], ev: [], pend: [], hand: { L: null, R: null }, hd: [], base: null, cal: [], prob: {}, pi: 0, dn: null, stats: lcStats() };
       }
-      function lcStats() { return { n: 0, up: 0, nu: 0, low: 0, wide: 0, nl: 0, nw: 0, drib: 0, cues: {}, rounds: {} }; }
+      function lcStats() { return { n: 0, up: 0, nu: 0, low: 0, wide: 0, nl: 0, nw: 0, drib: 0, cues: {}, rounds: {}, pr: {} }; }
+      // Per round (C.pi is the part) totals for the round card: eyes up and glances down, sitting low, base, feet moved,
+      // off arm up, dribbles below the waist (graded), and dribbles and time for the pace (shown only).
+      function lcRound(C, t) {
+        const R = C.stats.pr[C.pi] = C.stats.pr[C.pi] || { nball: 0, nbb: 0, nearb: 0, lost: 0, sec: 0, lt: t, nu: 0, up: 0, gl: 0, nl: 0, low: 0, nw: 0, wide: 0, feet: 0, na: 0, arm: 0, drib: 0, nh: 0, hi: 0, nb: 0, near: 0, nx: 0, wx: 0 };
+        if (t > R.lt) { R.sec += Math.min(t - R.lt, .2); R.lt = t; }
+        return R;
+      }
+      // Eyes up: the share of watched frames with your head up, and how many times you glanced down at the ball (down
+      // at least LC.GLANCE s; looks down less than LC.GAP s apart are one glance).
+      function lcEyes(C, f, t, base) {
+        const E = lcRound(C, t);
+        const down = f.hd - base > LC.DOWN;
+        E.nu++;
+        if (!down) { E.up++; return down; }
+        const g = C.dn && C.dn.pi === C.pi && t - C.dn.t1 <= LC.GAP ? C.dn : (C.dn = { t0: t, t1: t, pi: C.pi, n: false });
+        g.t1 = t;
+        if (!g.n && g.t1 - g.t0 >= LC.GLANCE) { g.n = true; E.gl++; }
+        return down;
+      }
       // Round scores for drills whose calls name a hand (Eyes-Up Signals, Called Crossovers): the hand the ball
       // should end up in. Left and Right name it; Between, Behind and Cross switch hands; Retreat and Pound keep it.
       function lcWant(name, from) {
@@ -10262,13 +10293,17 @@ route();
         if (!V(11) || !V(12) || !V(23) || !V(24)) return null;
         const shY = (Y(11) + Y(12)) / 2, hipY = (Y(23) + Y(24)) / 2, hipX = (X(23) + X(24)) / 2, tor = hipY - shY;
         if (tor < .04) return null;
-        const f = { tor, hipX, hipY };
+        const f = { tor, hipX, hipY, sw: Math.abs(X(11) - X(12)) / tor }; // sw: shoulder width, small when turned side-on
         const legs = V(25) && V(26) && V(27) && V(28);
         if (legs) {
           const ts = i => (Y(i + 2) - Y(i)) / Math.max(.01, Y(i + 4) - Y(i + 2)); // (knee - hip) / (ankle - knee)
           f.ts = (ts(23) + ts(24)) / 2;
           f.st = Math.abs(X(27) - X(28)) / tor;
           f.aL = { x: X(27) / tor, y: Y(27) / tor }; f.aR = { x: X(28) / tor, y: Y(28) / tor };
+          // hips above the ankles, in shoulder widths (a forward lean shortens the torso from the front, so not torso
+          // lengths); about 2.1 standing and 1.8-1.9 in an athletic stance on the Nov 2026 clips. null when turned.
+          const sw = Math.abs(X(11) - X(12));
+          f.lg = sw / tor >= .7 ? ((Y(27) + Y(28)) / 2 - hipY) / sw : null;
         }
         // knees alone (close quarters with the knees in) are enough for the crossover's width
         if (V(25) && V(26)) { f.kL = Math.abs(X(25) - hipX) / tor; f.kR = Math.abs(X(26) - hipX) / tor; }
@@ -10283,12 +10318,51 @@ route();
         f.wL = wr(15, sgn); f.wR = wr(16, -sgn);
         return f;
       }
+      // How far from your middle (side to side) a bounce can land and still be close to your body: inside your feet plus
+      // about a ball's width, or LC.NEAR when the feet aren't in the picture.
+      function lcNear(f) { return f.aL ? Math.abs(f.aL.x - f.aR.x) / 2 + LC.OUT : LC.NEAR; }
+      // One ball detector result (b.x, b.y from 0 to 1 in the picture, b.s confidence, b.t its newest frame), checked
+      // against the pose: below the shoulders, and near a hand or around the feet (as tools/ball_detector/filt.py does).
+      function lcBall(C, b, ar) {
+        let f = null;
+        for (const g of C.fr) if (!f || Math.abs(g.t - b.t) < Math.abs(f.t - b.t)) f = g; // the pose nearest in time
+        if (!f || Math.abs(b.t - f.t) > .15) return;
+        C.ballOn = true;
+        if (b.s < LC.BALL) return;
+        const x = b.x * ar / f.tor, y = (b.y - f.hipY) / f.tor, mid = f.hipX / f.tor;
+        if (y < -1.1) return;
+        const nearW = [f.wL, f.wR].some(w => w && Math.hypot(w.x - x, w.y - y) < 1.3);
+        const feet = f.aL && y > 0 && x >= Math.min(f.aL.x, f.aR.x) - .7 && x <= Math.max(f.aL.x, f.aR.x) + .7;
+        // for the lost-ball check: the ball away from you, or down at the floor with no hand on it
+        const ank = f.aL ? Math.max(f.aL.y, f.aR.y) - f.hipY / f.tor : null;
+        const floor = ank != null && y > ank - .4 && ![f.wL, f.wR].some(w => w && Math.hypot(w.x - x, w.y - y) < .6);
+        if ((!nearW && !feet) || floor) { C.away = (C.away || []).filter(a => a > b.t - LC.LOST); C.away.push(b.t); }
+        if (!nearW && !feet) return;
+        C.ballT = Math.max(C.ballT || 0, b.t);
+        const R = lcRound(C, b.t);
+        R.nball++;
+        // low in the bounce (below about knee height): where it lands, side to side
+        if (y > .6) { R.nbb++; R.nearb += Math.abs(x - mid) <= lcNear(f) ? 1 : 0; }
+      }
       // Calibrate "eyes up" from the setup check, when you're looking at the phone.
-      function lcCalib(C, lm, ar) { const f = lcFrame(lm, ar); if (f && f.hd != null) { C.cal.push(f.hd); if (C.cal.length > 90) C.cal.shift(); } }
+      function lcCalib(C, lm, ar) {
+        const f = lcFrame(lm, ar);
+        if (f && f.hd != null) { C.cal.push(f.hd); if (C.cal.length > 90) C.cal.shift(); }
+        // your standing hip height, for sitting low (the setup check has you standing in the picture)
+        if (f && f.lg != null) { (C.lg = C.lg || []).push(f.lg); if (C.lg.length > 90) C.lg.shift(); }
+      }
       const lcMed = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return s[s.length >> 1]; };
       function lcBase(C) {
-        if (C.base != null) return C.base;
-        if (C.cal.length >= 12) return (C.base = lcMed(C.cal));
+        if (C.base == null && C.cal.length >= 12) C.base = lcMed(C.cal);
+        if (C.base != null) {
+          // The setup check often catches you standing tall; dribbling in a deep stance then tips the head a little lower
+          // with your eyes still on the phone (on the Nov 2026 clips the calibrated value ran from 0.003 to 0.09). Once
+          // there are 3 s of the drill, raise the baseline to where your head is most of the time (30th percentile), by
+          // at most 0.08. Eyes-up drills are mostly eyes up, so short glances barely move it.
+          if (C.hd.length < 60) return C.base;
+          const s = [...C.hd].sort((x, y) => x - y);
+          return Math.max(C.base, Math.min(C.base + LC.RISE, s[Math.floor(s.length * .3)]));
+        }
         // no calibration: the times you did look up, but never above a plain "looking ahead" value
         if (C.hd.length < 30) return null;
         const s = [...C.hd].sort((x, y) => x - y);
@@ -10320,14 +10394,15 @@ route();
           s.xo = Math.max(s.xo, w.out);
           if (s.st === "up") {
             if (w.y < s.top) s.top = w.y;
-            if (w.y > s.top + LC.A) { s.st = "down"; s.bot = w.y; s.bt = t; s.bx = w.x; }
+            if (w.y <= s.top + LC.A / 2) s.nt = t; // the last time the wrist was still up near the top
+            if (w.y > s.top + LC.A) { s.st = "down"; s.bot = w.y; s.bt = t; s.bx = w.x; s.dt = s.nt ?? t; } // dt: left the top
           } else {
             if (w.y > s.bot) { s.bot = w.y; s.bt = t; s.bx = w.x; }
             if (w.y < s.bot - LC.A) {
               // a push that ends below the chest and starts below the shoulders: not a wave, a toss or a shot
-              if (s.bot > -.55 && s.top > -1.3 && s.bot - s.top < 1.4 && !(part.tb && s.top < LC.TOSS)) {
+              if (s.bot > -.55 && s.top > -1.3 && s.bot - s.top < 1.4 && !(part.tb && s.top < LC.TOSS) && s.bt - s.dt <= LC.SLOW && t - s.bt <= LC.SLOW) {
                 const kn = f.kL != null ? (h === "L" ? f.kL : f.kR) : null;
-                const e = { h, t: s.bt, top: s.top, bot: s.bot, x: s.bx, xo: s.xo, kn };
+                const e = { h, t: s.bt, top: s.top, bot: s.bot, x: s.bx, xo: s.xo, kn, mid: Math.abs(s.bx - f.hipX / f.tor), lim: lcNear(f) };
                 if (part.tb) { e.at = t; pend.push(e); } else { C.ev.push(e); out.push(e); C.stats.drib++; }
               }
               C.hand[h] = { st: "up", top: w.y, bot: w.y, bt: t, xo: w.out, bx: w.x };
@@ -10338,8 +10413,39 @@ route();
         // the drill's running totals, for the rating screen
         const St = C.stats, base = lcBase(C);
         St.n++;
-        if (part.eyes && f.hd != null && base != null) { St.nu++; St.up += f.hd - base <= LC.DOWN ? 1 : 0; }
+        const R = lcRound(C, t);
+        // turned side-on (a retreat): the nose drops against the ears without looking down, so those frames don't count
+        // a look down that turns side-on, or loses the face for a moment, stays one glance
+        if (part.eyes && (f.sw < .45 || f.hd == null) && C.dn && C.dn.pi === C.pi && t - C.dn.t1 <= LC.GAP) C.dn.t1 = t;
+        if (part.eyes && f.hd != null && base != null && f.sw >= .45) { St.nu++; St.up += lcEyes(C, f, t, base) ? 0 : 1; }
         if (f.ts != null) { St.nl++; St.low += f.ts <= LC.LOW ? 1 : 0; St.nw++; St.wide += f.st >= LC.WIDE ? 1 : 0; }
+        // sitting low: hip height against standing (the setup check's value if it's taller than LC.STAND), since thigh
+        // over shin read about 0.3 apart between camera setups for the same stance (Nov 2026 clips)
+        if (part.stance && f.lg != null) { R.nl++; R.low += f.lg <= LC.LOWR * Math.max(C.stand || 0, LC.STAND) ? 1 : 0; }
+        if (f.st != null) { R.nw++; R.wide += f.st >= LC.WIDE ? 1 : 0; }
+        // off arm: only while one hand alone has dribbled in the last second (one ball, not mid-switch)
+        const hs = new Set(C.ev.filter(e => e.t > t - 1).map(e => e.h));
+        if (hs.size === 1 && !part.tb) { const w = hs.has("L") ? f.wR : f.wL; if (w) { R.na++; R.arm += w.y < LC.ARM ? 1 : 0; } }
+        for (const e of out) {
+          R.drib++;
+          if (part.high) { R.nh++; R.hi += e.top < LC.HIGH ? 1 : 0; }
+          // bounce spot, side to side only (the front camera can't see how far in front): from the hand, until the ball
+          // detector can say where the ball lands
+          if (!part.behind) { R.nb++; R.near += e.mid <= e.lim ? 1 : 0; }
+          // crossover width: the first dribble in the new hand after a switch (not a between or behind call), the hand's
+          // widest point against its knee, as the "wider crosses" cue does
+          if (C.lastH && C.lastH !== e.h && e.kn != null && !part.behind && !part.btw) { R.nx++; R.wx += e.xo >= e.kn ? 1 : 0; }
+          C.lastH = e.h;
+        }
+        // lost ball (only while the ball detector runs): no dribble for LC.LOST s while the detector sees the ball away
+        // from you or loose on the floor at least twice. A ball held in your hands isn't lost (the detector is weak on a
+        // held ball, so "no ball seen" alone isn't enough). Counted once until you dribble again.
+        if (C.ballOn && !part.behind && !part.tb && t - (C.partT0 || 0) > 3) {
+          // the newest dribble by time: a slow push is added late with an older bottom time
+          const quiet = t - Math.max(C.ev.reduce((m, e) => Math.max(m, e.t), 0), C.partT0 || 0) > LC.LOST;
+          const away = (C.away || []).filter(a => a > t - LC.LOST).length >= 2;
+          if (quiet && away) { if (!C.lost) { C.lost = true; R.lost++; } } else if (!quiet) C.lost = false;
+        }
         return out;
       }
       // The biggest problem right now, if it has lasted. Returns { k, said, shown } or null; "good" when all is well.
@@ -10401,6 +10507,7 @@ route();
         if (part.together) { const e6 = last(6); if (e6.length >= 6 && e6.filter(e => ev.some(o => o.h !== e.h && Math.abs(o.t - e.t) < .15)).length < e6.length * .5) act.sync = 1; }
         if (part.even) { const l = ev.filter(e => e.h === "L").map(e => e.top), r = ev.filter(e => e.h === "R").map(e => e.top); if (l.length >= 3 && r.length >= 3 && Math.abs(lcMed(l) - lcMed(r)) > .25) act.even = 1; }
         // a problem counts once it has lasted 1 s (the beat and a late switch: right away, they already look back)
+        if (act.feet && !C.prob.feet) lcRound(C, t).feet++; // each time the feet start to wander
         for (const k of LC_ORDER) { if (act[k]) C.prob[k] = C.prob[k] || t; else delete C.prob[k]; }
         const k = LC_ORDER.find(x => C.prob[x] && (x === "slow" || x === "late" || t - C.prob[x] >= 1));
         if (k) return { k, shown: LC_CUE[k][0], said: LC_CUE[k][1] };
@@ -10425,6 +10532,12 @@ route();
 .lcam .lc-sub{font-size:12px;line-height:1.25;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lcam .lc-x{flex:none;border:0;background:none;color:inherit;font-size:20px;line-height:1;padding:0 8px;min-width:36px}
 .prow .lc-sum{font-size:12.5px;opacity:.85}
+.prow .lc-card{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0}
+.lc-card th,.lc-card td{padding:3px 4px;text-align:left;vertical-align:top;font-weight:500}
+.lc-card thead th{font-family:var(--display);text-transform:uppercase;letter-spacing:.03em;opacity:.8}
+.lc-card tbody th{opacity:.85}.lc-card td small{display:block;opacity:.75;font-size:11px}
+.lc-card td.ok{color:#2BD17E}.lc-card td.no{color:#FFC23D}.lc-card tr.sc td,.lc-card tr.sc th{font-weight:700;border-top:1px solid rgba(127,140,166,.35)}
+
 .lc-note{margin:-4px 0 4px;font-size:13px}`;
     document.head.appendChild(st);
 
@@ -10472,6 +10585,8 @@ route();
           el.textContent = `Camera saw ${s.drib} dribbles. ${seen}${legs ? "" : " Legs not in the picture (close quarters), so no stance checks."}${top ? ` Said most: ${LC_CUE[top][0]}.` : ""}${lcRounds(d, s)}`.replace(/  +/g, " ");
           const seg = rows[i].querySelector(".seg");
           rows[i].insertBefore(el, seg || null);
+          const card = lcCardHTML(d, s);
+          if (card) el.insertAdjacentHTML("afterend", card);
         });
       }
       lcBar();
@@ -10486,6 +10601,53 @@ route();
       return ` Ball in the called hand: ${ks.length === 1 && ph.length === 1 ? of(ks[0]) : ks.map(k => `${ph[k] ? ph[k][0] : "Part " + (+k + 1)} ${of(k)}`).join(", ")}.`;
     }
     window.__hoopsLcRounds = lcRounds;
+    // Eyes-Up Signals' round card. Every cue has a target for the standard case (low, quick, wide, eyes up; first
+    // guesses, to tune on real rounds); a round's score is how many of the cues the camera could judge were on target.
+    // Pace is a round average, not rhythm: breaking rhythm on purpose isn't marked down. A share needs 2 s of frames
+    // (40) before it shows.
+    const lcGl = n => (n ? `${n} glance${n > 1 ? "s" : ""} down` : "no glances down");
+    const LC_CARD = [
+      // [label, value 0-100 or null, target, extra]
+      ["Eyes up", R => R.nu >= 40 ? 100 * R.up / R.nu : null, 90, R => lcGl(R.gl)],
+      ["Sitting low", R => R.nl >= 40 ? 100 * R.low / R.nl : null, 70],
+      ["Feet wider than shoulders", R => R.nw >= 40 ? 100 * R.wide / R.nw : null, 70, R => R.feet ? `feet moved ${R.feet}×` : "feet planted"],
+      ["Off arm up", R => R.na >= 40 ? 100 * R.arm / R.na : null, 50],
+      ["Dribbles below the waist", R => R.nh >= 5 ? 100 * R.hi / R.nh : null, 80, null, true],
+      ["Bounces close to your body", R => R.nbb >= 10 ? 100 * R.nearb / R.nbb : R.nb >= 5 ? 100 * R.near / R.nb : null, 80],
+      ["Crosses outside your knees", R => R.nx >= 3 ? 100 * R.wx / R.nx : null, 70]
+    ];
+    function lcCard(R) {
+      if (!R) return null;
+      const rows = LC_CARD.map(([l, v, tg, x, inv]) => {
+        let p = v(R); if (p == null) return null;
+        if (inv) p = 100 - p; // hi counts dribbles above the waist
+        p = Math.round(p);
+        // feet: a step or two in a round is fine (Signals has retreats); more and the base isn't holding
+        return { l, p, ok: p >= tg && !(l.startsWith("Feet") && R.feet > 2), x: x ? x(R) : "" };
+      }).filter(Boolean);
+      if (!rows.length) return null;
+      const pace = R.sec >= 5 ? Math.round(R.drib * 60 / R.sec) : null;
+      if (R.nball >= 20) rows.push({ l: "Lost balls", p: R.lost, unit: "", ok: !R.lost, x: "" });
+      if (pace != null) rows.push({ l: "Dribbles a minute", p: pace, unit: "", ok: pace >= LC.PACE, x: `${R.drib} dribbles` });
+      return { rows, ok: rows.filter(r => r.ok).length, n: rows.length };
+    }
+    // Next round's key screen: "eyes up 94%, 1 glance down · 4 of 5 cues on target"
+    function lcCardShort(R) {
+      const c = lcCard(R), e = c && c.rows.find(r => r.l === "Eyes up");
+      return c ? [e && `eyes up ${e.p}%, ${e.x}`, `${c.ok} of ${c.n} cues on target`].filter(Boolean).join(" · ") : "";
+    }
+    window.__hoopsLcEyes = lcCardShort;
+    function lcCardHTML(d, s) {
+      if (!d || d.id !== "h_r_signal") return "";
+      const ks = Object.keys(s.pr || {}).filter(k => lcCard(s.pr[k])).sort((a, b) => a - b);
+      if (!ks.length) return "";
+      let ph = []; try { ph = phasesOf(d) || []; } catch (e) {}
+      const cs = ks.map(k => lcCard(s.pr[k])), labels = [...LC_CARD.map(r => r[0]), "Lost balls", "Dribbles a minute"].filter(l => cs.some(c => c.rows.some(r => r.l === l)));
+      const cell = (c, l) => { const r = c.rows.find(x => x.l === l); return r ? `<td class="${r.ok ? "ok" : "no"}">${r.p}${r.unit ?? "%"}${r.x ? `<small>${esc(r.x)}</small>` : ""}</td>` : "<td>–</td>"; };
+      return `<table class="lc-card"><thead><tr><th></th>${ks.map(k => `<th>${esc(ph[k] ? ph[k][0] : "Part " + (+k + 1))}</th>`).join("")}</tr></thead><tbody>
+        ${labels.map(l => `<tr><th>${l}</th>${cs.map(c => cell(c, l)).join("")}</tr>`).join("")}
+        <tr class="sc"><th>On target</th>${cs.map(c => `<td>${c.ok} of ${c.n}</td>`).join("")}</tr></tbody></table>`;
+    }
 
     function lcOpen(items) {
       lcClose();
@@ -10527,7 +10689,44 @@ route();
       try { await me.video.play(); } catch (e) {}
       me.raf = requestAnimationFrame(lcLoop);
       lcSetup();
+      lbStart(me);
     }
+
+    // The ball detector runs in its own worker (ball_worker.mjs) on 3 frames in a row, 480x270, the size it was trained
+    // on. While it works on one set, nothing is grabbed; then the next 3 frames are. Frames stay in memory and are
+    // thrown away. If the worker or model can't load, the ball checks just don't show (lost ball; the bounce spot falls
+    // back to the hand).
+    function lbStart(me) {
+      if (!window.Worker || me.ball) return;
+      try {
+        const w = new Worker(new URL("ball_worker.mjs", location.href), { type: "module" });
+        const cv = document.createElement("canvas");
+        cv.width = 480; cv.height = 270;
+        const B = me.ball = { w, cv, ctx: cv.getContext("2d", { willReadFrequently: true }), ready: false, busy: false, ring: [], ms: [] };
+        w.onmessage = e => {
+          const m = e.data;
+          if (m.ready) B.ready = true;
+          else if (m.error) { B.dead = true; w.terminate(); }
+          else { B.busy = false; B.out = m; B.ms.push(m.ms); if (B.ms.length > 50) B.ms.shift(); }
+        };
+        w.onerror = () => { B.dead = true; };
+        w.postMessage({ init: true, model: new URL("ball3f_v2.onnx", location.href).href });
+      } catch (e) {}
+    }
+    function lbFeed(me, live) {
+      const B = me.ball, v = me.video;
+      if (!B || !B.ready || B.dead || B.busy || !live) { if (B) B.ring = []; return; }
+      const now = performance.now();
+      if (B.ring.length && now - B.ring[B.ring.length - 1].t < 28) return; // about 30 a second, like the training clips
+      B.ctx.drawImage(v, 0, 0, 480, 270);
+      B.ring.push({ t: now, d: B.ctx.getImageData(0, 0, 480, 270).data });
+      if (B.ring.length < 3) return;
+      const fr = B.ring.map(r => r.d);
+      B.busy = true;
+      B.w.postMessage({ fr, t: now / 1000 }, fr.map(a => a.buffer));
+      B.ring = [];
+    }
+    window.__hoopsBallMs = () => (K && K.ball ? K.ball.ms.slice() : null);
 
     // The setup check from 4c, fed by this loop's own landmarks. While it's open, it also learns where your head is
     // when you look at the phone (the "eyes up" baseline). Go starts the drill; Back runs it without cues.
@@ -10541,6 +10740,7 @@ route();
           if (K !== me || !P) return;
           me.placed = true;
           me.base = me.cal.cal.length >= 12 ? lcMed(me.cal.cal) : null;
+          me.stand = me.cal.lg && me.cal.lg.length >= 12 ? lcMed(me.cal.lg) : null;
           if (P.stage === "ready") { P.running = true; advance(); }
           else if (!P.running) { P.running = true; P.cd = 0; P.lost = false; P.beat = 0; drawPlayer(); }
         },
@@ -10551,6 +10751,7 @@ route();
       if (!K) return;
       cancelAnimationFrame(K.raf);
       if (K.stream) K.stream.getTracks().forEach(t => t.stop());
+      if (K.ball) K.ball.w.terminate();
       K.el.remove();
       K = null;
     }
@@ -10572,7 +10773,9 @@ route();
       const me = K;
       me.raf = requestAnimationFrame(lcLoop);
       const v = me.video, now = performance.now();
-      const part = lcCur(), live = !!part && P && P.running && !P.cd && me.placed;
+      // Eyes-Up Signals' key screen isn't dribbling time: you're reading the new key, so it doesn't count
+      const part = lcCur(), live = !!part && P && P.running && !P.cd && me.placed && !(P.sig && P.sig.key > 0);
+      if (v.videoWidth && v.readyState >= 2) lbFeed(me, live);
       // 20 a second while watching or setting up, 5 while resting
       if (!v.videoWidth || v.readyState < 2 || now - me.lastT < (live || !me.placed ? 50 : 200)) return;
       me.lastT = now;
@@ -10584,14 +10787,14 @@ route();
       if (!me.placed) { if (lm) lcCalib(me.cal, lm, ar); return lcBar(); }
       if (!P) return;
       // a new drill gets its own tracker; a new part restarts the problem timers
-      if (me.Ci !== P.i) { me.Ci = P.i; me.C = lcNew(); me.C.base = me.base; P.lcStats[P.i] = me.C.stats; }
+      if (me.Ci !== P.i) { me.Ci = P.i; me.C = lcNew(); me.C.base = me.base; me.C.stand = me.stand; P.lcStats[P.i] = me.C.stats; }
       const key = P.i + ":" + P.pi + ":" + P.stage;
       if (key !== me.key) {
         lcScore(me.C, t);
         // Eyes-Up Signals: the next round's key screen is already up, so add the round just scored to it
         const kEl = document.getElementById("pKey");
         if (kEl && typeof sigLast === "function") { const old = kEl.querySelector(".siglast"); if (old) old.outerHTML = sigLast(); else kEl.querySelector(".label").insertAdjacentHTML("afterend", sigLast()); }
-        me.key = key; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.pend = []; me.C.hand = { L: null, R: null }; }
+        me.key = key; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.pend = []; me.C.hand = { L: null, R: null }; me.C.pi = P.pi; me.C.dn = null; }
       // a new call ("Left", "Cross"): when it came, for the switch and tempo checks
       if (P.flashAt && P.flashAt !== me.flash) {
         me.flash = P.flashAt; lcScore(me.C, t);
@@ -10605,6 +10808,7 @@ route();
       // back from a pause or a lost ball: start the checks fresh, so the time away doesn't read as a slow beat
       if (!me.was) { me.was = true; me.partT0 = t; me.C.partT0 = t; me.C.prob = {}; me.C.okSince = t; me.C.ev = []; me.C.pend = []; me.C.hand = { L: null, R: null }; }
       lcStep(me.C, lm, t, ar, part);
+      if (me.ball && me.ball.out) { lcBall(me.C, me.ball.out, ar); me.ball.out = null; }
       const seen = lm && me.C.last === t;
       const rate = me.C.ev.filter(e => e.t > t - 6).length * 10;
       me.sub = !seen ? "Can't see you" : t - me.partT0 > 4 && !me.C.ev.some(e => e.t > t - 4) && !part.behind && !part.quiet ? "Can't see the dribble" : rate ? `${rate} a min` : "Watching";

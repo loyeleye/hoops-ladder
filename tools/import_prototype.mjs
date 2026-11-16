@@ -63,6 +63,14 @@ patch(
   'const b64=await (await fetch(new URL("pose_lite.b64.txt",base).href)).text();const bin=atob(b64.trim()),buf=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);',
   'const buf=new Uint8Array(await (await fetch(new URL("pose_landmarker_lite.task",base).href)).arrayBuffer());'
 );
+// 3b. The ball detector for live cues: its worker, the model (trained on Ladi's own clips, tools/ball_detector) and
+// ONNX Runtime Web's single-threaded WebAssembly build (MIT). See docs/LEARNING.md, step 34.
+{
+  fs.mkdirSync(path.join(www, "ort"), { recursive: true });
+  for (const f of ["ball_worker.mjs", "ball3f_v2.onnx"]) fs.copyFileSync(path.join(root, "native-web", f), path.join(www, f));
+  const ort = path.join(root, "node_modules", "onnxruntime-web", "dist");
+  for (const f of ["ort.wasm.min.mjs", "ort-wasm-simd-threaded.mjs", "ort-wasm-simd-threaded.wasm"]) fs.copyFileSync(path.join(ort, f), path.join(www, "ort", f));
+}
 // App-only page code (native-web/native.js): progress storage, volume-button and lock-screen logging.
 // The page's whole app lives inside one (()=>{ ... })(); so its names (S, R, persist, openBig, ...) are private.
 // native.js goes in just before that closing })(); so it can see and wrap those functions. See docs/LEARNING.md, step 11.
