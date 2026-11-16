@@ -1317,7 +1317,7 @@ is off unless you turn it on, and it only shows when the workout has a drill it 
 | Pound–Between–Behind | eyes up, sitting low, base, feet set (no height or "can't see the dribble": the ball goes behind you every rep) |
 | Two-Ball Juggle | eyes up (not on the slow first part), sitting low, base, height, feet set |
 | Behind-the-Back Catch | sitting low, base, feet set (it's one dribble and a catch, so no eyes, height or dribble checks) |
-| Eyes-Up Signals | eyes up (on the phone, where the signals are), sitting low, base, height, and the ball in the hand a ← or → signal names. Cues are shown, never spoken, since the drill is silent. Also a score per round and a round card: eyes up and glances down, plus the dribble cues (see below) |
+| Eyes-Up Signals | eyes up (on the phone, where the signals are), sitting low, base (no feet check), height, and the ball in the hand a ← or → signal names. Cues are shown, never spoken, since the drill is silent. Also a score per round and a round card: eyes up and glances down, plus the dribble cues (see below) |
 | Tennis Ball Toss and Snatch, Tennis Ball Exchange, Toss Cross One Bounce (standing parts), Toss Move Catch, Drop Move Catch | sitting low, base, height, feet set, and "Keep the dribble alive". No eyes up: your eyes belong on the tennis ball |
 
 When that workout is the one on Today and one of these drills starts, the player holds, the **front** camera opens
@@ -1428,7 +1428,7 @@ on target, amber not), and the round's score is how many of the cues the camera 
 |---|---|---|
 | Eyes up | share of frames with the head up (`lcEyes`), plus glances down: the nose dropping more than `LC.DOWN` (0.12) against the ears for at least `LC.GLANCE` (0.15 s); looks down less than `LC.GAP` (0.3 s) apart, or across side-on or no-face frames, are one glance | 90% |
 | Sitting low | hips above the ankles in shoulder widths (`f.lg`), at most `LC.LOWR` (0.9) of standing: the setup check's value or `LC.STAND` (2.1), whichever is taller. Skipped when turned (shoulders under 0.7 torso) | 70% |
-| Feet wider than shoulders | ankles at least 0.72 torso apart; also how many times the feet started to wander (the "Feet stay put" check) | 70%, at most 2 wanders |
+| Feet wider than shoulders | ankles at least 0.72 torso apart. Moving feet isn't marked down: it's part of the game, so Signals has no "Feet stay put" cue either | 70% |
 | Off arm up | while one hand alone has dribbled in the last second, the free wrist at least 0.15 torso above the hips | 50% |
 | Dribbles below the waist | the top of each push below `LC.HIGH` | 80% |
 | Bounces close to your body | side to side only: no more than a ball's width (`LC.OUT`) outside your feet. From the ball detector's low finds when it has 10, else from the hand at the bottom of each push | 80% |
