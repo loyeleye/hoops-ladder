@@ -3011,6 +3011,7 @@
         GLANCE: 0.2,      // eyes down this long (s) is one glance down at the ball
         GAP: 0.3,         // back up for less than this (s) between two looks down: still the same glance
         NEAR: 0.9,        // bounce spot: the hand at the bottom of a dribble within this far of your middle, side to side
+        PACE: 120,        // a quick dribble: at least this many dribbles a minute over the round
         ARM: -0.15        // off arm up: the free hand's wrist at least this far above the hips (protecting the ball)
       };
       // tennis ball drills: one hand dribbles, the other tosses and catches (and they swap on some drills)
@@ -3029,7 +3030,7 @@
         // Pound and Around: one hand keeps pounding while the other ball circles a leg
         const pm = id === "h_2around" && n.match(/(left|right) hand pounds|(left|right) ball around/);
         return {
-          id, behind,
+          id, behind, btw: /between/.test(n),
           pound: id === "h_pound",
           // One-Hand Cross Series keeps the ball inside your legs on purpose
           cross: /cross/.test(n) && !/kobe|snatch back/.test(n) && id !== "h_handy",
@@ -3053,7 +3054,7 @@
       // Per round (C.pi is the part) totals for the round card: eyes up and glances down, sitting low, base, feet moved,
       // off arm up, dribbles below the waist (graded), and dribbles and time for the pace (shown only).
       function lcRound(C, t) {
-        const R = C.stats.pr[C.pi] = C.stats.pr[C.pi] || { sec: 0, lt: t, nu: 0, up: 0, gl: 0, nl: 0, low: 0, nw: 0, wide: 0, feet: 0, na: 0, arm: 0, drib: 0, nh: 0, hi: 0, nb: 0, near: 0 };
+        const R = C.stats.pr[C.pi] = C.stats.pr[C.pi] || { sec: 0, lt: t, nu: 0, up: 0, gl: 0, nl: 0, low: 0, nw: 0, wide: 0, feet: 0, na: 0, arm: 0, drib: 0, nh: 0, hi: 0, nb: 0, near: 0, nx: 0, wx: 0 };
         R.sec += Math.min(Math.max(t - R.lt, 0), .2); R.lt = t;
         return R;
       }
@@ -3208,6 +3209,10 @@
           // bounce spot, side to side only (the front camera can't see how far in front): from the hand, until the ball
           // detector can say where the ball lands
           if (!part.behind) { R.nb++; R.near += e.mid <= LC.NEAR ? 1 : 0; }
+          // crossover width: the first dribble in the new hand after a switch (not a between or behind call), the hand's
+          // widest point against its knee, as the "wider crosses" cue does
+          if (C.lastH && C.lastH !== e.h && e.kn != null && !part.behind && !part.btw) { R.nx++; R.wx += e.xo >= e.kn ? 1 : 0; }
+          C.lastH = e.h;
         }
         return out;
       }
@@ -3300,7 +3305,7 @@
 .lc-card thead th{font-family:var(--display);text-transform:uppercase;letter-spacing:.03em;opacity:.8}
 .lc-card tbody th{opacity:.85}.lc-card td small{display:block;opacity:.75;font-size:11px}
 .lc-card td.ok{color:#2BD17E}.lc-card td.no{color:#FFC23D}.lc-card tr.sc td,.lc-card tr.sc th{font-weight:700;border-top:1px solid rgba(127,140,166,.35)}
-.lc-card tr.info td,.lc-card tr.info th{opacity:.7}
+
 .lc-note{margin:-4px 0 4px;font-size:13px}`;
     document.head.appendChild(st);
 
@@ -3364,9 +3369,10 @@
       return ` Ball in the called hand: ${ks.length === 1 && ph.length === 1 ? of(ks[0]) : ks.map(k => `${ph[k] ? ph[k][0] : "Part " + (+k + 1)} ${of(k)}`).join(", ")}.`;
     }
     window.__hoopsLcRounds = lcRounds;
-    // Eyes-Up Signals' round card. Graded cues have a target (first guesses, to tune on real rounds); a round's score is
-    // how many of the cues the camera could judge were on target. Dribbles and pace are shown, not graded: advanced
-    // players change speed on purpose. A share needs 2 s of frames (40) before it shows.
+    // Eyes-Up Signals' round card. Every cue has a target for the standard case (low, quick, wide, eyes up; first
+    // guesses, to tune on real rounds); a round's score is how many of the cues the camera could judge were on target.
+    // Pace is a round average, not rhythm: breaking rhythm on purpose isn't marked down. A share needs 2 s of frames
+    // (40) before it shows.
     const lcGl = n => (n ? `${n} glance${n > 1 ? "s" : ""} down` : "no glances down");
     const LC_CARD = [
       // [label, value 0-100 or null, target, extra]
@@ -3375,7 +3381,8 @@
       ["Feet wider than shoulders", R => R.nw >= 40 ? 100 * R.wide / R.nw : null, 70, R => R.feet ? `feet moved ${R.feet}×` : "feet planted"],
       ["Off arm up", R => R.na >= 40 ? 100 * R.arm / R.na : null, 50],
       ["Dribbles below the waist", R => R.nh >= 5 ? 100 * R.hi / R.nh : null, 80, null, true],
-      ["Bounces close to your body", R => R.nb >= 5 ? 100 * R.near / R.nb : null, 80]
+      ["Bounces close to your body", R => R.nb >= 5 ? 100 * R.near / R.nb : null, 80],
+      ["Crosses outside your knees", R => R.nx >= 3 ? 100 * R.wx / R.nx : null, 70]
     ];
     function lcCard(R) {
       if (!R) return null;
@@ -3386,7 +3393,9 @@
         return { l, p, ok: p >= tg && !(l.startsWith("Feet") && R.feet), x: x ? x(R) : "" };
       }).filter(Boolean);
       if (!rows.length) return null;
-      return { rows, ok: rows.filter(r => r.ok).length, n: rows.length, drib: R.drib, pace: R.sec >= 5 ? Math.round(R.drib * 60 / R.sec) : null };
+      const pace = R.sec >= 5 ? Math.round(R.drib * 60 / R.sec) : null;
+      if (pace != null) rows.push({ l: "Dribbles a minute", p: pace, unit: "", ok: pace >= LC.PACE, x: `${R.drib} dribbles` });
+      return { rows, ok: rows.filter(r => r.ok).length, n: rows.length };
     }
     // Next round's key screen: "eyes up 94%, 1 glance down · 4 of 5 cues on target"
     function lcCardShort(R) {
@@ -3399,12 +3408,11 @@
       const ks = Object.keys(s.pr || {}).filter(k => lcCard(s.pr[k])).sort((a, b) => a - b);
       if (!ks.length) return "";
       let ph = []; try { ph = phasesOf(d) || []; } catch (e) {}
-      const cs = ks.map(k => lcCard(s.pr[k])), labels = LC_CARD.map(r => r[0]).filter(l => cs.some(c => c.rows.some(r => r.l === l)));
-      const cell = (c, l) => { const r = c.rows.find(x => x.l === l); return r ? `<td class="${r.ok ? "ok" : "no"}">${r.p}%${r.x ? `<small>${esc(r.x)}</small>` : ""}</td>` : "<td>–</td>"; };
+      const cs = ks.map(k => lcCard(s.pr[k])), labels = [...LC_CARD.map(r => r[0]), "Dribbles a minute"].filter(l => cs.some(c => c.rows.some(r => r.l === l)));
+      const cell = (c, l) => { const r = c.rows.find(x => x.l === l); return r ? `<td class="${r.ok ? "ok" : "no"}">${r.p}${r.unit ?? "%"}${r.x ? `<small>${esc(r.x)}</small>` : ""}</td>` : "<td>–</td>"; };
       return `<table class="lc-card"><thead><tr><th></th>${ks.map(k => `<th>${esc(ph[k] ? ph[k][0] : "Part " + (+k + 1))}</th>`).join("")}</tr></thead><tbody>
         ${labels.map(l => `<tr><th>${l}</th>${cs.map(c => cell(c, l)).join("")}</tr>`).join("")}
-        <tr class="sc"><th>On target</th>${cs.map(c => `<td>${c.ok} of ${c.n}</td>`).join("")}</tr>
-        <tr class="info"><th>Dribbles (info)</th>${cs.map(c => `<td>${c.drib}${c.pace ? `<small>${c.pace} a min</small>` : ""}</td>`).join("")}</tr></tbody></table>`;
+        <tr class="sc"><th>On target</th>${cs.map(c => `<td>${c.ok} of ${c.n}</td>`).join("")}</tr></tbody></table>`;
     }
 
     function lcOpen(items) {
