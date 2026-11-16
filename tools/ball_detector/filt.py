@@ -1,4 +1,6 @@
-import numpy as np, json, sys
+import numpy as np, json, sys, os
+RMIN,RMAX=(7,18) if os.environ.get("BALL")=="dark" else (12,28)
+DARK=os.environ.get("BALL")=="dark"
 def ok(c,P):
     if P is None: return True
     P=np.array(P); nose=P[0,:2]; ear=np.linalg.norm(P[7,:2]-P[8,:2])
@@ -6,6 +8,9 @@ def ok(c,P):
     xy=np.array([c["x"],c["y"]])
     if np.linalg.norm(xy-nose)<max(ear*1.3,tor*.45): return False   # head
     if xy[1]<sh[1]-tor*.1: return False   # above shoulders: not dribbling
+    if DARK:
+        hw=abs(P[23,0]-P[24,0])*.75; kn=(P[25,1]+P[26,1])/2
+        if abs(xy[0]-hip[0])<hw and hip[1]-tor*.1<xy[1]<kn-tor*.15: return False
     w=min(np.linalg.norm(xy-P[15,:2]),np.linalg.norm(xy-P[16,:2]))
     ank=P[[27,28],:2]; lo,hi=ank[:,0].min()-tor*.7,ank[:,0].max()+tor*.7
     return w<tor*1.3 or (lo<=xy[0]<=hi and xy[1]>hip[1])
@@ -13,7 +18,7 @@ def run(nm):
     T=json.load(open(f"data/{nm}_trk.json")); P=json.load(open(f"data/{nm}_pose.json"))
     n=len(P); pick=[None]*n
     for t,cs in enumerate(T["cands"]):
-        good=[c for c in cs if c["area"]>=120 and c["fill"]>.45 and c["asp"]>.45 and 12<=max(c["w"],c["h"])/2<=28 and ok(c,P[t])]
+        good=[c for c in cs if c["area"]>=120 and c["fill"]>.45 and c["asp"]>.45 and RMIN<=max(c["w"],c["h"])/2<=RMAX and ok(c,P[t])]
         if good: pick[t]=max(good,key=lambda c:c["area"]*c["fill"])
     lab=[None]*n
     for t in range(n):

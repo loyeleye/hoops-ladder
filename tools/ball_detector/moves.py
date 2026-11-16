@@ -1,10 +1,14 @@
 import numpy as np, json, sys
 D=__import__("os").environ.get("CLIPS","movecheck2/")
+U=__import__("os").environ.get("CLIPS_ROOT","./")
 CALLS={"c01":"movecheck_01_crossover (3).json","c02b":"movecheck_02b_between-square-stance (3).json","c03":"movecheck_03_behind-the-back (3).json","c14":"movecheck_14_mixed-bag (4).json","c15a":"movecheck_15a_eyes-up-signals-round-1 (4).json"}
+CALLS={k:D+v for k,v in CALLS.items()}
+for k,v in {"h01":"movecheck_01_crossover (5).json","h02b":"movecheck_02b_between-square-stance (5).json","h03":"movecheck_03_behind-the-back (5).json","h14":"movecheck_14_mixed-bag (5).json","h15a":"movecheck_15a_eyes-up-signals-round-1 (5).json"}.items(): CALLS[k]=U+"movecheck3/"+v
+CALLS["d01"]=U+"movecheck/movecheck_01_crossover.json"; CALLS["d03"]=U+"movecheck/movecheck_03_behind-the-back.json"
 MV=("cross","between","behind")
 def feats(nm,track):
     """track: list per frame of None or dict(x,y). returns list of (move, featvec)"""
-    calls=json.load(open(D+CALLS[nm]))["calls"]; ts=np.load(f"data/{nm}_t.npy"); P=json.load(open(f"data/{nm}_pose.json"))
+    calls=json.load(open(CALLS[nm]))["calls"]; ts=np.load(f"data/{nm}_t.npy"); P=json.load(open(f"data/{nm}_pose.json"))
     out=[]
     for i,c in enumerate(calls):
         if c["move"] not in MV: continue
